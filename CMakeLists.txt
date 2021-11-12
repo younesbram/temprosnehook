@@ -1,12 +1,8 @@
 cmake_minimum_required(VERSION 3.20.4)
 
 set(EnablePrecompiledHeaders 1 CACHE BOOL "Enable Precompiled Headers to reduce compile time")
-if (${CMAKE_VERSION} VERSION_LESS "3.16.0")
-    unset(NativePrecompiledHeaders)
-else()
-    set(NativePrecompiledHeaders 1)
-    unset(EnableCotire CACHE)
-endif()
+set(NativePrecompiledHeaders 1)
+unset(EnableCotire CACHE)
 
 # Ensure that only 32 bit libraries are used.
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/Toolchain-cross-m32.cmake")

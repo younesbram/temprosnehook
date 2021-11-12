@@ -3,7 +3,7 @@
 #include "playerresource.h"
 #include "soundcache.hpp"
 
-namespace hacks::shared::tracers
+namespace hacks::tracers
 {
 
 static settings::Boolean enabled("tracers.enabled", "false");
@@ -180,5 +180,9 @@ void draw()
     }
 }
 
-static InitRoutine init([]() { EC::Register(EC::Draw, draw, "DRAW_tracers"); });
-} // namespace hacks::shared::tracers
+static InitRoutine init(
+    []()
+    {
+        EC::Register(EC::Draw, draw, "DRAW_tracers");
+    });
+} // namespace hacks::tracers

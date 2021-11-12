@@ -1,4 +1,5 @@
 # Cathook Training Software
+
 ![banner](https://user-images.githubusercontent.com/13179138/134817300-d4865695-af33-4e83-a017-5ec0d31ea0a1.png)
 
 [![CircleCI](https://circleci.com/gh/nullworks/cathook.svg?style=svg)](https://circleci.com/gh/nullworks/cathook)
@@ -11,7 +12,6 @@ The software could be detected by VAC in the future. Only use it on accounts you
 
 Cathook is a training software designed for Team Fortress 2 for Linux. Cathook includes some joke features like
 
-* Ignore Hoovy
 * Encrypted chat
 * Nullnexus Support (Find other Cathook users in-game automatically)
 * Sandvich aimbot

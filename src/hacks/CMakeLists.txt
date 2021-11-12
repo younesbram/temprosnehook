@@ -20,7 +20,6 @@ set(files "${CMAKE_CURRENT_LIST_DIR}/AutoJoin.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/AutoReflect.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/AutoSticky.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/AutoTaunt.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/Bunnyhop.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Backtrack.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/BPExpander.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/ChatCommands.cpp"
@@ -44,11 +43,10 @@ set(files "${CMAKE_CURRENT_LIST_DIR}/AutoJoin.cpp"
 target_sources(cathook PRIVATE ${files})
 
 add_subdirectory(ac)
-if(EnableVisuals)
+if (EnableVisuals)
     set(files "${CMAKE_CURRENT_LIST_DIR}/BulletTracers.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/DominateMark.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/ESP.cpp"
-            "${CMAKE_CURRENT_LIST_DIR}/ExplosionCircles.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/HeadESP.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/KillfeedColor.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/Tracers.cpp"

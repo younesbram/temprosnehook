@@ -137,11 +137,13 @@ WMWindow::WMWindow(WindowContainer &container) : BaseMenuObject{}, container(con
     addObject(std::move(header_obj));
     addObject(std::move(container_obj));
 
-    header_location.installChangeCallback([this](settings::VariableBase<int> &var, int after) {
-        location = static_cast<HeaderLocation>(after);
-        moveObjects();
-        recalculateSize();
-    });
+    header_location.installChangeCallback(
+        [this](settings::VariableBase<int> &var, int after)
+        {
+            location = static_cast<HeaderLocation>(after);
+            moveObjects();
+            recalculateSize();
+        });
 }
 
 void WMWindow::openSettingsModal()

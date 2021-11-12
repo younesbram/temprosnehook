@@ -74,18 +74,6 @@ const std::string &hack::GetType()
     version += " GUI";
 #endif
 
-#ifndef DYNAMIC_CLASSES
-
-#ifdef GAME_SPECIFIC
-    version += " GAME " TO_STRING(GAME);
-#else
-    version += " UNIVERSAL";
-#endif
-
-#else
-    version += " DYNAMIC";
-#endif
-
 #if not ENABLE_VISUALS
     version += " NOVISUALS";
 #endif
@@ -170,7 +158,7 @@ void hack::Hook()
     uintptr_t *clientMode = 0;
     // Bad way to get clientmode.
     // FIXME [MP]?
-    while (!(clientMode = **(uintptr_t ***) ((uintptr_t)((*(void ***) g_IBaseClient)[10]) + 1)))
+    while (!(clientMode = **(uintptr_t ***) ((uintptr_t) ((*(void ***) g_IBaseClient)[10]) + 1)))
     {
         usleep(10000);
     }
@@ -337,11 +325,6 @@ free(logname);*/
     CreateInterfaces();
     CDumper dumper;
     dumper.SaveDump();
-    logging::Info("Is TF2? %d", IsTF2());
-    logging::Info("Is TF2C? %d", IsTF2C());
-    logging::Info("Is HL2DM? %d", IsHL2DM());
-    logging::Info("Is CSS? %d", IsCSS());
-    logging::Info("Is TF? %d", IsTF());
     InitClassTable();
 
     BeginConVars();

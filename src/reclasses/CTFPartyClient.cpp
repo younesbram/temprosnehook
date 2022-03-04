@@ -160,7 +160,7 @@ int re::CTFPartyClient::KickPlayer(CSteamID steamid)
 }
 bool re::CTFPartyClient::GetCurrentPartyLeader(CSteamID &id)
 {
-    uintptr_t party = *reinterpret_cast<uintptr_t *>(reinterpret_cast<uintptr_t>(this) + 0x30);
+    uintptr_t party = *reinterpret_cast<uintptr_t *>(reinterpret_cast<uintptr_t>(this) + 0x18);
     if (!party)
         return false;
 

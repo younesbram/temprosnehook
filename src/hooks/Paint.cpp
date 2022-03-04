@@ -41,6 +41,7 @@ DEFINE_HOOKED_METHOD(Paint, void, IEngineVGui *this_, PaintMode_t mode)
 #if ENABLE_IPC
         ipc::UpdateServerAddress();
 #endif
+        hacks::autoparty::joinMatch();
     }
 
     if (mode & PaintMode_t::PAINT_UIPANELS)

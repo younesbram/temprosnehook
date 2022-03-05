@@ -232,7 +232,7 @@ void party_routine()
                     }
 
                     // If enabled, check for any raged players who may have joined our party and kick them
-                    // If there are any, return so we don't kick other members in the event we're also over the set size limit
+                    // If there are any, return, so we don't kick other members in the event we're also over the set size limit
                     if (*kick_rage)
                     {
                         bool should_ret = false;

@@ -11,10 +11,6 @@
 namespace hacks::noisemaker
 {
 
-// Merry Christmas
-#if ENABLE_TEXTMODE
-static settings::Boolean enable{ "noisemaker-spam.enable", "true" };
-#else
 static settings::Boolean enable{ "noisemaker-spam.enable", "false" };
 #endif
 

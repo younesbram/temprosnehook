@@ -12,7 +12,6 @@ namespace hacks::noisemaker
 {
 
 static settings::Boolean enable{ "noisemaker-spam.enable", "false" };
-#endif
 
 static void CreateMove()
 {

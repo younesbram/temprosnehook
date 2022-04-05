@@ -45,11 +45,9 @@ static settings::Boolean debug{ "auto-item.debug", "false" };
     if (*debug)    \
     logging::Info("AutoItem.cpp: " __VA_ARGS__)
 
-#if ENABLE_TEXTMODE
-static settings::Boolean autoNoisemaker{ "misc.auto-noisemaker", "true" };
-#else
 static settings::Boolean autoNoisemaker{ "misc.auto-noisemaker", "false" };
-#endif
+
+static const int unequip_id = -1;
 
 // 536 is Birthday noisemaker
 // 673 is Christmas noisemaker
@@ -361,9 +359,9 @@ void CreateMove()
             offset = (offset + 1) % 3;
         }
         if (autoNoisemaker && inv->GetFirstItemOfItemDef(noisemaker_id))
-        {
             equipItem(clazz, 9, noisemaker_id, false, false);
-        }
+        else // Unequip the noisemaker if we're not using it
+            equipItem(clazz, 9, unequip_id, false, false);
     }
 }
 

@@ -114,7 +114,7 @@ struct ConnectionInfo
     enum State
     {
         // Tried using this connection, failed for some reason
-        STUCK,
+        STUCK
     };
     int expire_tick;
     State state;
@@ -187,7 +187,7 @@ public:
     std::unordered_map<std::pair<CNavArea *, CNavArea *>, CachedConnection, boost::hash<std::pair<CNavArea *, CNavArea *>>> vischeck_cache;
     std::unordered_map<std::pair<CNavArea *, CNavArea *>, CachedStucktime, boost::hash<std::pair<CNavArea *, CNavArea *>>> connection_stuck_time;
     // This is a pure blacklist that does not get cleared and is for free usage internally and externally, e.g. blacklisting where enemies are standing
-    // This blacklist only gets cleared on map change, and can be used time independantly.
+    // This blacklist only gets cleared on map change, and can be used time independently.
     // the enum is the Blacklist reason, so you can easily edit it
     std::unordered_map<CNavArea *, BlacklistReason> free_blacklist;
     // When the local player stands on one of the nav squares the free blacklist should NOT run
@@ -275,7 +275,7 @@ public:
         }
     }
 
-    // Function for getting closest Area to player, aka "LocalNav"
+    // Function for getting the closest area to the player, aka "LocalNav"
     CNavArea *findClosestNavSquare(const Vector &vec)
     {
         auto vec_corrected = vec;
@@ -367,10 +367,9 @@ public:
             {
                 // Should we even ignore the sentry?
                 // Soldier/Heavy do not care about Level 1 or mini sentries
-                bool is_strong_class = g_pLocalPlayer->clazz == tf_soldier || g_pLocalPlayer->clazz == tf_heavy;
+                bool is_strong_class = g_pLocalPlayer->clazz == tf_heavy;
                 int bullet           = CE_INT(ent, netvar.m_iAmmoShells);
-                int rocket           = CE_INT(ent, netvar.m_iAmmoRockets);
-                if ((is_strong_class && (CE_BYTE(ent, netvar.m_bMiniBuilding) || CE_INT(ent, netvar.iUpgradeLevel) == 1)) || (bullet == 0 && (CE_INT(ent, netvar.iUpgradeLevel) != 3 || rocket == 0)))
+                if ((is_strong_class && (CE_BYTE(ent, netvar.m_bMiniBuilding) || CE_INT(ent, netvar.iUpgradeLevel) == 1)) || (bullet == 0 && (CE_INT(ent, netvar.iUpgradeLevel) != 3)))
                     continue;
 
                 // It's still building/being sapped, ignore.
@@ -470,7 +469,7 @@ public:
         pather.Reset();
     }
 
-    // Uncesseray thing that is sadly necessary
+    // Unnecessary thing that is sadly necessary
     void PrintStateInfo(void *) override
     {
     }
@@ -672,7 +671,7 @@ static void followCrumbs()
     if (reset_z)
         current_vec.z = g_pLocalPlayer->v_Origin.z;
 
-    // We are close enough to the second crumb, Skip both (This is espcially helpful with drop downs)
+    // We are close enough to the second crumb, Skip both (This is especially helpful with drop-downs)
     if (crumbs.size() > 1 && crumbs[1].vec.DistTo(g_pLocalPlayer->v_Origin) < 50)
     {
         last_crumb = crumbs[1];
@@ -699,7 +698,7 @@ static void followCrumbs()
 
     // Detect when jumping is necessary.
     // 1. No jumping if zoomed (or revved)
-    // 2. Jump if its necessary to do so based on z values
+    // 2. Jump if it's necessary to do so based on z values
     // 3. Jump if stuck (not getting closer) for more than stuck_time/2 (500ms)
     if ((!(g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed) && !(g_pLocalPlayer->bRevved || g_pLocalPlayer->bRevving) && (crouch || crumbs[0].vec.z - g_pLocalPlayer->v_Origin.z > 18) && last_jump.check(200)) || (last_jump.check(200) && inactivity.check(*stuck_time / 2)))
     {
@@ -872,7 +871,7 @@ void CreateMove()
         return;
     }
     round_states round_state = g_pTeamRoundTimer->GetRoundState();
-    // Still in setuptime, if on fitting team, then do not path yet
+    // Still in setup time, if on fitting team, then do not path yet
     // F you Pipeline
     if (round_state == RT_STATE_SETUP && GetLevelName() != "plr_pipeline" && g_pLocalPlayer->team == TEAM_BLU)
     {

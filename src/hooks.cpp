@@ -118,5 +118,6 @@ VMTHook soundclient{};
 VMTHook enginevgui{};
 VMTHook vstd{};
 VMTHook eventmanager2{};
+VMTHook cmdclientunrestricted{};
 VMTHook toolbox{};
 } // namespace hooks

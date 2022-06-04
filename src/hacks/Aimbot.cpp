@@ -1202,7 +1202,7 @@ void DoAutoshoot(CachedEntity *target_entity)
 
     if (IsAmbassador(LOCAL_W))
     {
-        // Check if ambasador can headshot
+        // Check if ambassador can headshot
         if (wait_for_charge && !AmbassadorCanHeadshot())
             attack = false;
     }

@@ -135,7 +135,7 @@ std::vector<CachedEntity *> getDispensers()
 }
 
 // Get entities of given itemtypes (Used for health/ammo)
-std::vector<CachedEntity *> getEntities(const std::vector<k_EItemType> &itemtypes)
+/*std::vector<CachedEntity *> getEntities(const std::vector<k_EItemType> &itemtypes)
 {
     std::vector<CachedEntity *> entities;
     for (int i = g_IEngine->GetMaxClients() + 1; i < MAX_ENTITIES; i++)
@@ -237,7 +237,7 @@ bool getAmmo(bool force = false)
     else if (navparser::NavEngine::current_priority == ammo && !was_force)
         navparser::NavEngine::cancelPath();
     return false;
-}
+}*/
 
 // Vector of sniper spot positions we can nav to
 std::vector<Vector> sniper_spots;

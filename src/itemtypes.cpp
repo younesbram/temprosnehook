@@ -266,7 +266,7 @@ bool Hash::IsHazard(const char *szName)
 {
    switch (String(szName))
    {
-   case BallonBomb:
+   case BalloonBomb:
    case WoodenBarrel:
    case WalkerExplode:
        return true;

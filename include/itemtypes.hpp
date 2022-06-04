@@ -78,7 +78,7 @@ constexpr size_owned RareSpell1 = 0x28177e05;
 constexpr size_owned RareSpell2 = 0x2a1a7798;
 
 //=== Environmental Hazards ===
-constexpr size_owned BallonBomb    = 0xda3eb058;
+constexpr size_owned BalloonBomb    = 0xda3eb058;
 constexpr size_owned WoodenBarrel  = 0x23c01644;
 constexpr size_owned WalkerExplode = 0xd530882f;
 

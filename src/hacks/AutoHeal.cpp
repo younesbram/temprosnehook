@@ -676,7 +676,7 @@ void CreateMove()
         if (target_is_healing_target && look_at_target)
         {
             Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, out->center);
-            hacks::tf2::misc_aimbot::DoSlowAim(angles);
+            hacks::misc_aimbot::DoSlowAim(angles);
             current_user_cmd->viewangles = angles;
         }
 

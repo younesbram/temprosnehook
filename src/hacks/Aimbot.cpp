@@ -1103,13 +1103,13 @@ bool IsTargetStateGood(CachedEntity *entity)
         return false; // Target not valid
 }
 
-// A function to aim at a specific entitiy
+// A function to aim at a specific entity
 void Aim(CachedEntity *entity)
 {
     if (*miss_chance > 0 && UniformRandomInt(0, 99) < *miss_chance)
         return;
 
-    // Dont aim at a bad entity
+    // Don't aim at a bad entity
     if (CE_BAD(entity))
         return;
 

@@ -5,8 +5,8 @@
             <AutoVariable width="fill" target="chams.additive" label="Additive"/>
             <AutoVariable width="fill" target="chams.pearlescent" label="Pearlescent"/>
             <AutoVariable width="fill" target="chams.phong" label="Phong"/>
-            <AutoVariable width="fill" target="chams.phongboost" label="Phong bst" tooltip="Phong boost"/>
-            <AutoVariable width="fill" target="chams.phongexponent" label="Phong exp" tooltip="Phone exponent"/>
+            <AutoVariable width="fill" target="chams.phongboost" label="Phong bst" tooltip="Phong boost."/>
+            <AutoVariable width="fill" target="chams.phongexponent" label="Phong exp" tooltip="Phone exponent."/>
             <!--Fresnel should be capitalized-->
             <AutoVariable width="fill" target="chams.phonefresnelranges" label="Phong Fresnel ranges"/>
             <AutoVariable width="fill" target="chams.phongfresnelranges.1" label="Normal"/>
@@ -17,19 +17,20 @@
             <AutoVariable width="fill" target="chams.rimlighting.exponent" label="Rimlighting exp"/>
             <AutoVariable width="fill" target="chams.envmap" label="Envmap"/>
             <AutoVariable width="fill" target="chams.envmap.matt" label="Make envmap matt"/>
-            <AutoVariable width="fill" target="chams.envmap.tint" label="Enable tint" tooltip="Control intensity of envmap colors"/>
+            <AutoVariable width="fill" target="chams.envmap.tint" label="Enable tint"
+                          tooltip="Control intensity of envmap colors"/>
             <AutoVariable width="fill" target="chams.envmapfresnel" label="EnvMap Fresnel"/>
         </List>
     </Box>
     <Box padding="12 12 12 12" width="content" height="content" name="Envmap tints" x="160">
-        <Box padding="12 12 12 12" width="content" height="content" name="RED team">
+        <Box padding="12 12 12 12" width="content" height="content" name="Red team">
             <List width="150">
                 <AutoVariable width="fill" target="chams.envmap.tint.red.r" label="Red intensity"/>
                 <AutoVariable width="fill" target="chams.envmap.tint.red.g" label="Green intensity"/>
                 <AutoVariable width="fill" target="chams.envmap.tint.red.b" label="Blue intensity"/>
             </List>
         </Box>
-        <Box padding="12 12 12 12" width="content" height="content" name="BLU team" x="170">
+        <Box padding="12 12 12 12" width="content" height="content" name="Blu team" x="170">
             <List width="150">
                 <AutoVariable width="fill" target="chams.envmap.tint.blu.r" label="Red intensity"/>
                 <AutoVariable width="fill" target="chams.envmap.tint.blu.g" label="Green intensity"/>

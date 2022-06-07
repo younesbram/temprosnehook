@@ -929,7 +929,7 @@ void shutdown()
     g_IEventManager2->RemoveListener(&listener2());
 }
 
-#if ENABLE_VISUALS
+/*#if ENABLE_VISUALS
 static void draw()
 {
     if (!catbotmode || !anti_motd)
@@ -939,7 +939,7 @@ static void draw()
     AddCenterString(health, colors::green);
     AddCenterString(ammo, colors::yellow);
 }
-#endif
+#endif*/
 
 static InitRoutine runinit(
     []()
@@ -948,9 +948,9 @@ static InitRoutine runinit(
         EC::Register(EC::CreateMove, update, "cm2_catbot", EC::average);
         EC::Register(EC::LevelInit, level_init, "levelinit_catbot", EC::average);
         EC::Register(EC::Shutdown, shutdown, "shutdown_catbot", EC::average);
-#if ENABLE_VISUALS
+/*#if ENABLE_VISUALS
         EC::Register(EC::Draw, draw, "draw_catbot", EC::average);
-#endif
+#endif*/
         init();
     });
 } // namespace hacks::catbot

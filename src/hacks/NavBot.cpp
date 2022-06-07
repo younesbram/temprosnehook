@@ -135,7 +135,8 @@ std::vector<CachedEntity *> getDispensers()
 }
 
 // Get entities of given itemtypes (Used for health/ammo)
-/*std::vector<CachedEntity *> getEntities(const std::vector<k_EItemType> &itemtypes)
+// Use true for health packs, use false for ammo packs
+std::vector<CachedEntity *> getEntities(bool find_health)
 {
     std::vector<CachedEntity *> entities;
     for (int i = g_IEngine->GetMaxClients() + 1; i < MAX_ENTITIES; i++)
@@ -143,9 +144,11 @@ std::vector<CachedEntity *> getDispensers()
         CachedEntity *ent = ENTITY(i);
         if (CE_BAD(ent))
             continue;
-        for (auto &itemtype : itemtypes)
+        const model_t *model = RAW_ENT(ent)->GetModel();
+        if (model)
         {
-            if (ent->m_ItemType() == itemtype)
+            const auto szName = g_IModelInfo->GetModelName(model);
+            if ((find_health && Hash::IsHealth(szName)) || (!find_health && Hash::IsAmmo(szName)))
             {
                 entities.push_back(ent);
                 break;
@@ -172,7 +175,7 @@ bool getHealth(bool low_priority = false)
             if (!repath_timer.test_and_set(2000))
                 return true;
         }
-        auto healthpacks = getEntities({ ITEM_HEALTH_SMALL, ITEM_HEALTH_MEDIUM, ITEM_HEALTH_LARGE });
+        auto healthpacks = getEntities(true);
         auto dispensers  = getDispensers();
 
         auto total_ents = healthpacks;
@@ -213,7 +216,7 @@ bool getAmmo(bool force = false)
         }
         else
             was_force = false;
-        auto ammopacks  = getEntities({ ITEM_AMMO_SMALL, ITEM_AMMO_MEDIUM, ITEM_AMMO_LARGE });
+        auto ammopacks  = getEntities(false);
         auto dispensers = getDispensers();
 
         auto total_ents = ammopacks;
@@ -237,7 +240,7 @@ bool getAmmo(bool force = false)
     else if (navparser::NavEngine::current_priority == ammo && !was_force)
         navparser::NavEngine::cancelPath();
     return false;
-}*/
+}
 
 // Vector of sniper spot positions we can nav to
 std::vector<Vector> sniper_spots;

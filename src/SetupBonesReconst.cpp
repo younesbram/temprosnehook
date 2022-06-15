@@ -13,9 +13,7 @@ void GetSkeleton(IClientEntity *ent, CStudioHdr *pStudioHdr, Vector pos[], Quate
         return;
 
     if (!pStudioHdr->SequencesAvailable())
-    {
         return;
-    }
 
     static uintptr_t m_pIK_offset = 0x568;
     CIKContext **m_pIk            = (reinterpret_cast<CIKContext **>(reinterpret_cast<uint64_t>(ent) + (m_pIK_offset)));
@@ -32,21 +30,22 @@ void GetSkeleton(IClientEntity *ent, CStudioHdr *pStudioHdr, Vector pos[], Quate
     int layer[MAX_OVERLAYS] = {};
     int i;
     for (i = 0; i < m_AnimOverlay.Count(); i++)
-    {
         layer[i] = MAX_OVERLAYS;
-    }
+
     for (i = 0; i < m_AnimOverlay.Count(); i++)
     {
         CAnimationLayer &pLayer = m_AnimOverlay[i];
         if ((pLayer.m_flWeight > 0) && pLayer.IsActive() && pLayer.m_nOrder >= 0 && pLayer.m_nOrder < m_AnimOverlay.Count())
-        {
             layer[pLayer.m_nOrder] = i;
-        }
     }
     for (i = 0; i < m_AnimOverlay.Count(); i++)
     {
         if (layer[i] >= 0 && layer[i] < m_AnimOverlay.Count())
+        {
             CAnimationLayer &pLayer = m_AnimOverlay[layer[i]];
+
+            boneSetup.AccumulatePose(pos, q, pLayer.m_nSequence, pLayer.m_flCycle, pLayer.m_flWeight, g_GlobalVars->curtime, *m_pIk);
+        }
     }
 
     if (m_pIk)
@@ -57,9 +56,7 @@ void GetSkeleton(IClientEntity *ent, CStudioHdr *pStudioHdr, Vector pos[], Quate
         boneSetup.CalcAutoplaySequences(pos, q, g_GlobalVars->curtime, &auto_ik);
     }
     else
-    {
         boneSetup.CalcAutoplaySequences(pos, q, g_GlobalVars->curtime, NULL);
-    }
 
     boneSetup.CalcBoneAdj(pos, q, &NET_FLOAT(ent, netvar.m_flEncodedController));
 }
@@ -72,9 +69,7 @@ bool SetupBones(IClientEntity *ent, matrix3x4_t *pBoneToWorld, int boneMask)
         return false;
 
     if (pBoneToWorld == nullptr)
-    {
         pBoneToWorld = new matrix3x4_t[sizeof(matrix3x4_t) * MAXSTUDIOBONES];
-    }
 
     int *entity_flags = (int *) ((uintptr_t) ent + 400);
 
@@ -114,9 +109,7 @@ bool SetupBones(IClientEntity *ent, matrix3x4_t *pBoneToWorld, int boneMask)
         (*m_pIk)->SolveDependencies(pos, q, pBoneToWorld, boneComputed);
     }
     else
-    {
         GetSkeleton(ent, pStudioHdr, pos, q, boneMask);
-    }
 
     // m_flModelScale
     Studio_BuildMatrices(pStudioHdr, angles2, adjOrigin, pos, q, -1, NET_FLOAT(ent, netvar.m_flModelScale), // Scaling

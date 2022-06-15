@@ -18,7 +18,7 @@ void cm()
     for (unsigned int i = 1; i <= g_IEngine->GetMaxClients(); i++)
     {
         ent = ENTITY(i);
-        if (!HasCondition<TFCond_Taunting>(ent) && (CE_BAD(ent) || ent->m_Type() != ENTITY_PLAYER))
+        if (CE_BAD(ent) || ent->m_Type() != ENTITY_PLAYER)
             continue;
 
         RemoveCondition<TFCond_Taunting>(ent);

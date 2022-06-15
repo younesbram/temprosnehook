@@ -62,7 +62,6 @@ static settings::Boolean aimbot_debug{ "aimbot.debug", "false" };
 settings::Boolean engine_projpred{ "aimbot.debug.engine-pp", "true" };
 
 static settings::Boolean auto_spin_up{ "aimbot.auto.spin-up", "false" };
-static settings::Boolean auto_zoom{ "aimbot.auto.zoom", "false" };
 static settings::Boolean auto_unzoom{ "aimbot.auto.unzoom", "false" };
 
 static settings::Boolean backtrackAimbot{ "aimbot.backtrack", "false" };
@@ -305,13 +304,50 @@ bool validateTickFOV(backtrack::BacktrackData &tick)
     return true;
 }
 
-// Am I holding Hitman's Heatmaker ?
+// Am I holding The Hitman's Heatmaker ?
 static bool CarryingHeatmaker()
 {
     return CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 752;
 }
 
-static void doAutoZoom(bool target_found)
+// Am I holding The Machina ?
+static bool CarryingMachina()
+{
+    return CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 526;
+}
+
+static bool allowNoScope(CachedEntity *target)
+{
+    if (target)
+    {
+        if (CarryingMachina())
+            return false;
+
+        float target_health = target->m_iHealth();
+
+        if (IsPlayerCritBoosted(LOCAL_E) && target_health <= 150.0f)
+            return true;
+
+        if (IsPlayerMiniCritBoosted(LOCAL_E))
+        {
+            if (!CarryingHeatmaker() && target_health <= 68.0f)
+                return true;
+
+            if (CarryingHeatmaker() && target_health <= 54.0f)
+                return true;
+        }
+
+        if (!CarryingHeatmaker() && target_health <= 50.0f)
+            return true;
+
+        if (CarryingHeatmaker() && target_health <= 40.0f)
+            return true;
+    }
+
+    return false;
+}
+
+static void doAutoZoom(bool target_found, CachedEntity *target)
 {
     bool isIdle = target_found ? false : hacks::followbot::isIdle();
 
@@ -330,7 +366,7 @@ static void doAutoZoom(bool target_found)
         return;
     }
 
-    if (auto_zoom && g_pLocalPlayer->holding_sniper_rifle && (target_found || isIdle))
+    if (!allowNoScope(target) && g_pLocalPlayer->holding_sniper_rifle && (target_found || isIdle))
     {
         if (target_found)
             zoomTime.update();
@@ -381,7 +417,7 @@ static void CreateMove()
         return;
     }
 
-    doAutoZoom(false);
+    doAutoZoom(false, nullptr);
 
     // TODO: Investigate this hack. Why is this necessary?
     if (LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun) && CE_INT(LOCAL_E, netvar.m_iAmmo + 4) == 0)
@@ -432,10 +468,10 @@ static void CreateMove()
         return;
 
     // Auto-zoom
-    doAutoZoom(true);
+    doAutoZoom(true, target_entity);
 
     // If zoomed only is on, check if zoomed
-    if (zoomed_only && g_pLocalPlayer->holding_sniper_rifle)
+    if (zoomed_only && g_pLocalPlayer->holding_sniper_rifle && !allowNoScope(target_entity))
     {
         if (!g_pLocalPlayer->bZoomed && !(current_user_cmd->buttons & IN_ATTACK))
             return;
@@ -1196,7 +1232,7 @@ void DoAutoshoot(CachedEntity *target_entity)
 
     if (g_pLocalPlayer->holding_sniper_rifle)
     {
-        if (zoomed_only && !CanHeadshot())
+        if (zoomed_only && !CanHeadshot() && !allowNoScope(target_entity))
             attack = false;
     }
 

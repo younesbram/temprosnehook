@@ -152,12 +152,12 @@ endif()
 configure_file(include/config.h.in ${CMAKE_SOURCE_DIR}/include/config.h @ONLY)
 configure_file(include/version.h.in ${CMAKE_SOURCE_DIR}/include/version.h @ONLY)
 
-set(CMAKE_CXX_FLAGS "-m32 -mavx2 -O3 -fexceptions -fno-gnu-unique -DNDEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG "-m32 -mavx2 -Og -rdynamic -ggdb")
+set(CMAKE_CXX_FLAGS "-Ofast -m32 -march=native -mtune=native -fexceptions -fno-gnu-unique -DNDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "-Og -m32 -march=native -mtune=native -rdynamic -ggdb")
 if (Internal_Symbolized)
-    set(CMAKE_CXX_FLAGS_RELEASE "-m32 -mavx2 -O3 -ggdb -fvisibility=hidden -fvisibility-inlines-hidden")
+    set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -ggdb -fvisibility=hidden -fvisibility-inlines-hidden")
 else()
-    set(CMAKE_CXX_FLAGS_RELEASE "-m32 -mavx2 -O3 -s -fvisibility=hidden -fvisibility-inlines-hidden")
+    set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -s -fvisibility=hidden -fvisibility-inlines-hidden")
 endif()
 
 target_compile_definitions(cathook PRIVATE
@@ -182,7 +182,7 @@ target_include_directories(cathook SYSTEM PRIVATE
         "external/source-sdk-2013-headers/mp/src")
 
 if (EnableWarnings)
-    target_compile_options(cathook PRIVATE -Wall -Wextra -Wno-unused-parameter -Wno-class-memaccess -Wno-strict-aliasing -Wno-sign-compare)
+    target_compile_options(cathook PRIVATE -Wall -Wextra -Wno-unused-parameter -Wno-class-memaccess -Wno-strict-aliasing -Wno-sign-compare -Ofast)
 else()
     target_compile_options(cathook PRIVATE -w)
 endif()

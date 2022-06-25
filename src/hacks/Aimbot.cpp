@@ -318,11 +318,11 @@ static bool CarryingMachina()
 
 static bool allowNoScope(CachedEntity *target)
 {
+    if (CarryingMachina())
+        return false;
+
     if (target)
     {
-        if (CarryingMachina())
-            return false;
-
         float target_health = target->m_iHealth();
 
         if (IsPlayerCritBoosted(LOCAL_E) && target_health <= 150.0f)

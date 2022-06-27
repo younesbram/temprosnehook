@@ -563,12 +563,7 @@ bool smallBoxChecker(CachedEntity *target_entity)
 {
     if (CE_BAD(target_entity) || !g_IEntityList->GetClientEntity(target_entity->m_IDX))
         return false;
-#if ENABLE_VISUALS
-    if (target_entity->m_Type() == ENTITY_PLAYER)
-    {
-        hacks::shared::esp::SetEntityColor(target_entity, colors::target);
-    }
-#endif
+
     return true;
 }
 // Just hold m1 if we were aiming at something before and are in rapidfire
@@ -1073,6 +1068,12 @@ bool Aim(CachedEntity *entity)
     if (slow_aim)
         DoSlowAim(angles);
 
+#if ENABLE_VISUALS
+    if (target_entity->m_Type() == ENTITY_PLAYER)
+    {
+        hacks::shared::esp::SetEntityColor(target_entity, colors::target);
+    }
+#endif
     // Set angles
     current_user_cmd->viewangles = angles;
 
@@ -1083,7 +1084,6 @@ bool Aim(CachedEntity *entity)
         current_user_cmd->tick_count = TIME_TO_TICKS(CE_FLOAT(entity, netvar.m_flSimulationTime));
     aimed_this_tick      = true;
     viewangles_this_tick = angles;
-    logging::Info("IT RAN");
     // Finish function
     return true;
 }

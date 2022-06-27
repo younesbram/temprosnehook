@@ -1093,7 +1093,7 @@ void DoAutoshoot(CachedEntity *target_entity)
     else if (IsPlayerDisguised(g_pLocalPlayer->entity) && !autoshoot_disguised)
         return;
     // Handle Huntsman/Loose cannon
-    if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFCompoundBow) || g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFCannon))
+    else if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFCompoundBow) || g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFCannon))
     {
         if (!only_can_shoot)
         {
@@ -1111,7 +1111,7 @@ void DoAutoshoot(CachedEntity *target_entity)
     }
     else
         begancharge = false;
-    if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFPipebombLauncher))
+    else if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFPipebombLauncher))
     {
         float chargebegin = CE_FLOAT(LOCAL_W, netvar.flChargeBeginTime);
         float chargetime  = g_GlobalVars->curtime - chargebegin;
@@ -1138,7 +1138,7 @@ void DoAutoshoot(CachedEntity *target_entity)
 
     // Rifle check
 
-    if (g_pLocalPlayer->clazz == tf_class::tf_sniper)
+    else if (g_pLocalPlayer->clazz == tf_class::tf_sniper)
     {
         if (g_pLocalPlayer->holding_sniper_rifle)
         {
@@ -1149,7 +1149,7 @@ void DoAutoshoot(CachedEntity *target_entity)
 
     // Ambassador check
 
-    if (IsAmbassador(g_pLocalPlayer->weapon()))
+   else if (IsAmbassador(g_pLocalPlayer->weapon()))
     {
         // Check if ambasador can headshot
         if (!AmbassadorCanHeadshot() && wait_for_charge)
@@ -1158,14 +1158,14 @@ void DoAutoshoot(CachedEntity *target_entity)
 
     // Autoshoot breaks with Slow aimbot, so use a workaround to detect when it
     // can
-    if (slow_aim && !slow_can_shoot)
+    else if (slow_aim && !slow_can_shoot)
         attack = false;
 
     // Dont autoshoot without anything in clip
-    if (CE_INT(g_pLocalPlayer->weapon(), netvar.m_iClip1) == 0)
+    else if (CE_INT(g_pLocalPlayer->weapon(), netvar.m_iClip1) == 0)
         attack = false;
 
-    if (attack)
+    else if (attack)
     {
         // TO DO: Sending both reload and attack will activate the hitmans heatmaker ability
         // Don't activate it only on first kill (or somehow activate it before a shot)
@@ -1271,7 +1271,7 @@ int notVisibleHitbox(CachedEntity *target, int preferred)
     else
         return hitbox_t::spine_1;
 }
-int auto_hitbox(CachedEntity *target)
+int autoHitbox(CachedEntity *target)
 {
 
     int preferred     = 3;
@@ -1365,7 +1365,7 @@ int BestHitbox(CachedEntity *target)
     {
     case 0:
         // AUTO priority
-        return auto_hitbox(target);
+        return autoHitbox(target);
         break;
     case 1:
     { // AUTO priority, return closest hitbox to crosshair

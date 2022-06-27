@@ -1065,7 +1065,7 @@ bool Aim(CachedEntity *entity)
 #if ENABLE_VISUALS
     if (entity->m_Type() == ENTITY_PLAYER)
     {
-        hacks::shared::esp::SetEntityColor(target_entity, colors::target);
+        hacks::shared::esp::SetEntityColor(entity, colors::target);
     }
 #endif
     // Set angles

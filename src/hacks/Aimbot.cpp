@@ -1165,7 +1165,7 @@ void DoAutoshoot(CachedEntity *target_entity)
     else if (CE_INT(g_pLocalPlayer->weapon(), netvar.m_iClip1) == 0)
         attack = false;
 
-    else if (attack)
+    if (attack)
     {
         // TO DO: Sending both reload and attack will activate the hitmans heatmaker ability
         // Don't activate it only on first kill (or somehow activate it before a shot)

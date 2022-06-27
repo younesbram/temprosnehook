@@ -1111,7 +1111,7 @@ void DoAutoshoot(CachedEntity *target_entity)
     }
     else
         begancharge = false;
-    else if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFPipebombLauncher))
+    if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFPipebombLauncher))
     {
         float chargebegin = CE_FLOAT(LOCAL_W, netvar.flChargeBeginTime);
         float chargetime  = g_GlobalVars->curtime - chargebegin;
@@ -1138,7 +1138,7 @@ void DoAutoshoot(CachedEntity *target_entity)
 
     // Rifle check
 
-    else if (g_pLocalPlayer->clazz == tf_class::tf_sniper)
+    if (g_pLocalPlayer->clazz == tf_class::tf_sniper)
     {
         if (g_pLocalPlayer->holding_sniper_rifle)
         {

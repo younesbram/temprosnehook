@@ -1063,7 +1063,7 @@ bool Aim(CachedEntity *entity)
         DoSlowAim(angles);
 
 #if ENABLE_VISUALS
-    if (target_entity->m_Type() == ENTITY_PLAYER)
+    if (entity->m_Type() == ENTITY_PLAYER)
     {
         hacks::shared::esp::SetEntityColor(target_entity, colors::target);
     }

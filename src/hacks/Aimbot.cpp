@@ -748,13 +748,8 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
             if (IsTargetStateGood(ent) && smallBoxChecker(ent) && Aim(ent))
                 isTargetGood = true;
         }
-        if (isTargetGood)
+        if (isTargetGood) // Melee mode straight up won't swing if the target is too far away. No need to prioritize based on distance. Just use whatever the user chooses.
         {
-            // Distance Priority, Uses this is melee is used
-            if (GetWeaponMode() == weaponmode::weapon_melee || (int) priority_mode == 2)
-                scr = 4096.0f - calculated_data_array[i].aim_position.DistTo(g_pLocalPlayer->v_Eye);
-            else
-            {
                 switch ((int) priority_mode)
                 {
                 case 0: // Smart Priority
@@ -785,7 +780,6 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                 default:
                     break;
                 }
-            }
             // Crossbow logic
             if (!ent->m_bEnemy() && ent->m_Type() == ENTITY_PLAYER && CE_GOOD(LOCAL_W) && LOCAL_W->m_iClassID() == CL_CLASS(CTFCrossbow))
             {
@@ -838,7 +832,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         // Distance
 
         float targeting_range = EffectiveTargetingRange();
-        if (entity->m_flDistance() > targeting_range && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
+        if (entity->m_flDistance()-40 > targeting_range && tickcount > hacks::shared::aimbot::last_target_ignore_timer) // m_flDistance includes the collision box. You have to subtract it (Should be the same for every model)
             return false;
 
         // Rage only check
@@ -943,7 +937,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         // Distance
         else if (EffectiveTargetingRange())
         {
-            if (entity->m_flDistance() > (int) EffectiveTargetingRange() && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
+            if (entity->m_flDistance()-40 > EffectiveTargetingRange() && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
                 return false;
         }
 
@@ -988,7 +982,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         // Distance
         float targeting_range = EffectiveTargetingRange();
 
-        if (entity->m_flDistance() > targeting_range && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
+        if (entity->m_flDistance()-40 > targeting_range && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
             return false;
 
         // Grab the prediction var

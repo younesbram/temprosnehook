@@ -608,7 +608,12 @@ bool smallBoxChecker(CachedEntity *target_entity)
 {
     if (CE_BAD(target_entity) || !g_IEntityList->GetClientEntity(target_entity->m_IDX))
         return false;
-
+#if ENABLE_VISUALS
+    if (target_entity->m_Type() == ENTITY_PLAYER)
+    {
+        hacks::shared::esp::SetEntityColor(target_entity, colors::target);
+    }
+#endif
     return true;
 }
 // Just hold m1 if we were aiming at something before and are in rapidfire
@@ -793,8 +798,13 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
             if (IsTargetStateGood(ent) && smallBoxChecker(ent) && Aim(ent))
                 isTargetGood = true;
         }
-        if (isTargetGood) // Melee mode straight up won't swing if the target is too far away. No need to prioritize based on distance. Just use whatever the user chooses.
+        if (isTargetGood)
         {
+            // Distance Priority, Uses this is melee is used
+            if (GetWeaponMode() == weaponmode::weapon_melee || (int) priority_mode == 2)
+                scr = 4096.0f - calculated_data_array[i].aim_position.DistTo(g_pLocalPlayer->v_Eye);
+            else
+            {
                 switch ((int) priority_mode)
                 {
                 case 0: // Smart Priority
@@ -825,6 +835,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                 default:
                     break;
                 }
+            }
             // Crossbow logic
             if (!ent->m_bEnemy() && ent->m_Type() == ENTITY_PLAYER && CE_GOOD(LOCAL_W) && LOCAL_W->m_iClassID() == CL_CLASS(CTFCrossbow))
             {
@@ -877,7 +888,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         // Distance
 
         float targeting_range = EffectiveTargetingRange();
-        if (entity->m_flDistance()-40 > targeting_range && tickcount > hacks::shared::aimbot::last_target_ignore_timer) // m_flDistance includes the collision box. You have to subtract it (Should be the same for every model)
+        if (entity->m_flDistance() > targeting_range && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
             return false;
 
         // Rage only check
@@ -982,7 +993,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         // Distance
         else if (EffectiveTargetingRange())
         {
-            if (entity->m_flDistance()-40 > EffectiveTargetingRange() && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
+            if (entity->m_flDistance() > (int) EffectiveTargetingRange() && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
                 return false;
         }
 
@@ -1027,7 +1038,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         // Distance
         float targeting_range = EffectiveTargetingRange();
 
-        if (entity->m_flDistance()-40 > targeting_range && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
+        if (entity->m_flDistance() > targeting_range && tickcount > hacks::shared::aimbot::last_target_ignore_timer)
             return false;
 
         // Grab the prediction var
@@ -1109,12 +1120,6 @@ bool Aim(CachedEntity *entity)
     if (slow_aim)
         DoSlowAim(angles);
 
-#if ENABLE_VISUALS
-    if (entity->m_Type() == ENTITY_PLAYER)
-    {
-        hacks::shared::esp::SetEntityColor(entity, colors::target);
-    }
-#endif
     // Set angles
     current_user_cmd->viewangles = angles;
 
@@ -1130,6 +1135,7 @@ bool Aim(CachedEntity *entity)
     // current_user_cmd->tick_count = TIME_TO_TICKS(CE_FLOAT(entity, netvar.m_flSimulationTime));
     aimed_this_tick      = true;
     viewangles_this_tick = angles;
+    logging::Info("IT RAN");
     // Finish function
     return true;
 }
@@ -1145,7 +1151,7 @@ void DoAutoshoot(CachedEntity *target_entity)
     else if (IsPlayerDisguised(g_pLocalPlayer->entity) && !autoshoot_disguised)
         return;
     // Handle Huntsman/Loose cannon
-    else if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFCompoundBow) || g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFCannon))
+    if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFCompoundBow) || g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFCannon))
     {
         if (!only_can_shoot)
         {
@@ -1201,7 +1207,7 @@ void DoAutoshoot(CachedEntity *target_entity)
 
     // Ambassador check
 
-   else if (IsAmbassador(g_pLocalPlayer->weapon()))
+    if (IsAmbassador(g_pLocalPlayer->weapon()))
     {
         // Check if ambasador can headshot
         if (!AmbassadorCanHeadshot() && wait_for_charge)
@@ -1210,11 +1216,11 @@ void DoAutoshoot(CachedEntity *target_entity)
 
     // Autoshoot breaks with Slow aimbot, so use a workaround to detect when it
     // can
-    else if (slow_aim && !slow_can_shoot)
+    if (slow_aim && !slow_can_shoot)
         attack = false;
 
     // Dont autoshoot without anything in clip
-    else if (CE_INT(g_pLocalPlayer->weapon(), netvar.m_iClip1) == 0)
+    if (CE_INT(g_pLocalPlayer->weapon(), netvar.m_iClip1) == 0)
         attack = false;
 
     if (attack)
@@ -1323,7 +1329,7 @@ int notVisibleHitbox(CachedEntity *target, int preferred)
     else
         return hitbox_t::spine_1;
 }
-int autoHitbox(CachedEntity *target)
+int auto_hitbox(CachedEntity *target)
 {
 
     int preferred     = 3;
@@ -1417,7 +1423,7 @@ int BestHitbox(CachedEntity *target)
     {
     case 0:
         // AUTO priority
-        return autoHitbox(target);
+        return auto_hitbox(target);
         break;
     case 1:
     { // AUTO priority, return closest hitbox to crosshair

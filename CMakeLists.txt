@@ -155,9 +155,9 @@ configure_file(include/version.h.in ${CMAKE_SOURCE_DIR}/include/version.h @ONLY)
 set(CMAKE_CXX_FLAGS "-m32 -march=native -fexceptions -fno-gnu-unique -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "-march=native -rdynamic -ggdb -Og")
 if (Internal_Symbolized)
-    set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -ggdb -fvisibility=hidden -fvisibility-inlines-hidden")
+    set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -ggdb -march=native -fvisibility=hidden -fvisibility-inlines-hidden")
 else()
-    set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -s -fvisibility=hidden -fvisibility-inlines-hidden")
+    set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -s -march=native -fvisibility=hidden -fvisibility-inlines-hidden")
 endif()
 
 target_compile_definitions(cathook PRIVATE

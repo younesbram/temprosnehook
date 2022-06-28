@@ -42,6 +42,18 @@ static Timer routine_timer{};
 // Populated by the routine when empty and by configuration changes
 static std::vector<uint32> party_hosts = {};
 
+/*
+ *
+ *
+              _..----.._    _
+            .'  .--.    "-.(0)_
+'-.__.-'"'=:|   ,  _)_ \__ . c\'-..
+             '''------'---''---'-"
+             Credits to rathook
+ *
+ *
+ */
+
 // ha ha macros go brr
 #define log(...)        \
     if (*autoparty_log) \
@@ -306,5 +318,6 @@ static InitRoutine init(
         host_list.installChangeCallback([](settings::VariableBase<std::string> &var, std::string after) { repopulate(after); });
         ipc_mode.installChangeCallback([](settings::VariableBase<bool> &var, bool after) { party_hosts.clear(); });
         EC::Register(EC::Paint, party_routine, "paint_autoparty", EC::average);
+
     });
-} // namespace hacks::autoparty
+} // namespace hacks::tf2::autoparty

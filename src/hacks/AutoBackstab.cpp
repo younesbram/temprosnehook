@@ -450,4 +450,4 @@ static InitRoutine EC(
         EC::Register(EC::CreateMove, CreateMove, "autobackstab", EC::average);
         EC::Register(EC::CreateMoveWarp, CreateMove, "autobackstab_w", EC::average);
     });
-} // namespace hacks::autobackstab
+} // namespace hacks::tf2::autobackstab

@@ -872,7 +872,7 @@ void CreateMove()
         return;
     }
     round_states round_state = g_pTeamRoundTimer->GetRoundState();
-    // Still in setuptime, if on fitting team, then do not path yet
+    // Still in setup time, if on fitting team, then do not path yet
     // F you Pipeline
     if (round_state == RT_STATE_SETUP && GetLevelName() != "plr_pipeline" && g_pLocalPlayer->team == TEAM_BLU)
     {

@@ -153,26 +153,7 @@ bool ShouldShoot()
     // If zoomed only is on, check if zoomed
     if (zoomed_only && g_pLocalPlayer->holding_sniper_rifle)
     {
-        // Check if Carrying A building
-        if (CE_BYTE(g_pLocalPlayer->entity, netvar.m_bCarryingObject))
-            return false;
-        // Check if deadringer out
-        if (CE_BYTE(g_pLocalPlayer->entity, netvar.m_bFeignDeathReady))
-            return false;
-        // If zoomed only is on, check if zoomed
-        if (zoomed_only && g_pLocalPlayer->holding_sniper_rifle)
-        {
-            if (!g_pLocalPlayer->bZoomed && !(current_user_cmd->buttons & IN_ATTACK))
-                return false;
-        }
-        // Check if player is bonked
-        if (HasCondition<TFCond_Bonked>(g_pLocalPlayer->entity))
-            return false;
-        // Check if player is taunting
-        if (HasCondition<TFCond_Taunting>(g_pLocalPlayer->entity))
-            return false;
-        // Check if player is cloaked
-        if (IsPlayerInvisible(g_pLocalPlayer->entity))
+        if (!g_pLocalPlayer->bZoomed && !(current_user_cmd->buttons & IN_ATTACK))
             return false;
     }
     // Check if player is bonked

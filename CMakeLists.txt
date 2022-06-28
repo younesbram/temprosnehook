@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20)
 
 set(EnablePrecompiledHeaders 1 CACHE BOOL "Enable Precompiled Headers to reduce compile time")
 if(${CMAKE_VERSION} VERSION_LESS "3.16.0")

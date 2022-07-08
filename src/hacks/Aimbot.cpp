@@ -1083,7 +1083,7 @@ void DoAutoshoot(CachedEntity *target_entity)
     {
         if (g_pLocalPlayer->holding_sniper_rifle)
         {
-            if (zoomed_only && !CanHeadshot())
+            if (zoomed_only && !CanHeadshot() && !allowNoScope(target_entity))
                 attack = false;
         }
     }

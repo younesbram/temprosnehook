@@ -393,11 +393,6 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
         g_pLocalPlayer->UpdateEnd();
     }
 
-    //	PROF_END("CreateMove");
-    if (!(cmd->buttons & IN_ATTACK))
-    {
-        // LoadSavedState();
-    }
     g_Settings.is_create_move = false;
     if (nolerp)
     {

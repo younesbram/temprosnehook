@@ -39,11 +39,14 @@ void Reset();
 // Stuff to make storing functions easy
 bool isAiming();
 CachedEntity *CurrentTarget();
+bool ShouldAim();
 CachedEntity *RetrieveBestTarget(bool aimkey_state);
 bool IsTargetStateGood(CachedEntity *entity);
 bool Aim(CachedEntity *entity);
 void DoAutoshoot(CachedEntity *target = nullptr);
 int notVisibleHitbox(CachedEntity *target, int preferred);
+std::vector<Vector> getHitpointsVischeck(CachedEntity *ent, int hitbox);
+float projectileHitboxSize(int projectile_size);
 int autoHitbox(CachedEntity *target);
 bool hitscanSpecialCases(CachedEntity *target_entity, int weapon_case);
 bool projectileSpecialCases(CachedEntity *target_entity, int weapon_case);

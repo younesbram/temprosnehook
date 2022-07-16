@@ -25,6 +25,8 @@ Free open-source GNU/Linux training software for the game **Team Fortress 2**. D
 
 ### Dependencies
 
+The `dialog` package is not mandatory, yet recommended.
+
 Dependencies are handled automatically by the [dependencycheck](https://github.com/explowz/cathook/blob/master/scripts/dependencycheck) script.
 
 ### Downloading

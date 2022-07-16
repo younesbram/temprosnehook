@@ -1,48 +1,66 @@
-# Cathook Training Software
+# Cathook
+[![C++](https://img.shields.io/badge/language-C%2B%2B-%23f34b7d.svg?style=flat-square)](https://en.wikipedia.org/wiki/C%2B%2B)
+[![TF2](https://img.shields.io/badge/game-TF2-orange.svg?style=flat-square)](https://store.steampowered.com/app/440/Team_Fortress_2/)
+[![GNU/Linux](https://img.shields.io/badge/platform-GNU%2FLinux-ff69b4?style=flat-square)](https://www.gnu.org/gnu/linux-and-gnu.en.html)
+[![x86](https://img.shields.io/badge/arch-x86-red.svg?style=flat-square)](https://en.wikipedia.org/wiki/X86)
+[![License](https://img.shields.io/github/license/explowz/cathook.svg?style=flat-square)](LICENSE)
+[![Issues](https://img.shields.io/github/issues/explowz/cathook.svg?style=flat-square)](https://github.com/explowz/cathook/issues)
 
-![banner](https://user-images.githubusercontent.com/13179138/134817300-d4865695-af33-4e83-a017-5ec0d31ea0a1.png)
+Free open-source GNU/Linux training software for the game **Team Fortress 2**. Designed as an internal cheat - [Shared Library](https://en.wikipedia.org/wiki/Library_(computing)#Shared_libraries) (SO) loadable into game process. Compatible with the Steam version of the game.
 
-[![CircleCI](https://circleci.com/gh/nullworks/cathook.svg?style=svg)](https://circleci.com/gh/nullworks/cathook)
+## Table of Contents
 
-## Risk of VAC detection
+- [Table of Contents](#table-of-contents)
+- [Getting started](#getting-started)
+    - [Dependencies](#dependencies)
+    - [Downloading](#downloading)
+    - [Compiling from source](#compiling-from-source)
+    - [Loading / Injecting into game process](#loading--injecting-into-game-process)
+- [FAQ](#faq)
+    - [How do I open the menu?](#how-do-i-open-the-menu)
+    - [Where is my config file saved?](#where-is-my-config-file-saved)
+    - [Loading / Injecting into game process](#loading--injecting-into-game-process)
 
-The software could be detected by VAC in the future. Only use it on accounts you won't regret getting VAC banned.
+## Getting started
 
-## Overview
+### Dependencies
 
-Cathook is a training software designed for Team Fortress 2 for Linux. Cathook includes some joke features like
+Dependencies are handled automatically by the [dependencycheck](https://github.com/explowz/cathook/blob/master/scripts/dependencycheck) script.
 
-* Encrypted chat
-* Nullnexus Support (Find other Cathook users in-game automatically)
-* Sandvich aimbot
-* Chance to get manually VAC banned by Valve
+### Downloading
 
-and a lot of useful features, including
+Open a terminal window and enter the following command:
 
-* Working hitscan nospread
-* Anti Backstab with option to use "No" voice command when spy tries to backstab you
-* Extremely customizable spam (you can make spam lines that'll include name of random dead enemy pyro or sniper)
-* Follow Bots
-* Navparser Bots (Walkbots that can walk on any map without manual configuration)
-* Working crit hack (Editors note: Not fully working on all weapons)
-* Backtrack
-* Automatic matchmaking
-* And many more features!
+    bash <(wget -qO- https://raw.githubusercontent.com/explowz/One-in-all-cathook-install/master/install-all)
 
-[FULL LIST OF FEATURES HERE](https://cathook.club/wikis/Feature-List-and-explanations)
+The `cathook` folder should have been created successfully, containing all source files.
 
-# Installing, updating, attaching (injecting)
+### Compiling from source
 
-[View our short guide to installing and using cathook](https://cathook.club/wikis/Installing,-Attaching-And-General-Infos)
+When you have obtained a copy of the source code, the next step is opening it with your IDE of choice.
 
-## Community
-You can chat with other cathook users in [our official Telegram group](https://t.me/nullworks) and the [cathook announcements channel](https://t.me/cathook_cheat).
-If you don't have Telegram, you can chat with other cathook users in our official Matrix room, however, you will have to ask TotallyNotElite or BenCat07 for an invite to said room.
+Then change all `-march=native -mtune=native` arguments inside [CMakeLists.txt](https://github.com/explowz/cathook/blob/master/CMakeLists.txt) to `-march=<your cpu-type> -mtune=<your cpu-type>`. This should result in more performant code, optimized for your CPU. The list of valid options can be found [here](https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html).
 
-## Reporting Issues
+And simply run the following command while inside the source folder:
 
-If some things doesn't work as expected, please open issues on GitHub using [this page](https://cathook.club/issues).
+    ./update
 
-## Contributing
+If everything went right you should receive a binary file named `libcathook.so`.
 
-Do you want to submit code to cathook? Please read `CONTRIBUTING.md` for a short introduction.
+### Loading / Injecting into game process
+
+Run the following command while inside the source folder:
+
+    sudo ./attach
+
+This will inject `libcathook.so` into the `hl2_linux` process.
+
+When injected, the menu can be opened using the `INSERT` key.
+
+## FAQ
+
+### How do I open the menu?
+Press <kbd>INSERT</kbd> while focused on the TF2 window.
+
+### Where is my config file saved?
+Configuration files are saved inside the `cathook` folder located in your `opt` folder (`/opt/cathook/data`). The config is in human-readable format and can be edited via your text editor of choice.

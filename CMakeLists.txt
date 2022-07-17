@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.20.4)
 
-set(EnablePrecompiledHeaders 1 CACHE BOOL "Enable Precompiled Headers to reduce compile time")
 set(NativePrecompiledHeaders 1)
-unset(EnableCotire CACHE)
 
 # Ensure that only 32 bit libraries are used.
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/Toolchain-cross-m32.cmake")
@@ -215,9 +213,7 @@ add_subdirectory(include)
 add_subdirectory(external)
 add_subdirectory(modules)
 
-if (EnablePrecompiledHeaders AND NativePrecompiledHeaders)
-    target_precompile_headers(cathook PRIVATE "${CMAKE_SOURCE_DIR}/include/common.hpp")
-endif()
+target_precompile_headers(cathook PRIVATE "${CMAKE_SOURCE_DIR}/include/common.hpp")
 
 if (NOT Internal_Symbolized)
     add_custom_command(TARGET cathook POST_BUILD

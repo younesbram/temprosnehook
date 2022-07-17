@@ -710,22 +710,6 @@ bool ShouldAim()
     if (assistance_only && !MouseMoving())
         return false;
 #endif
-    switch (GetWeaponMode())
-    {
-    case weapon_hitscan:
-        break;
-    case weapon_melee:
-        break;
-    // Check we need to run projectile Aimbot code
-    case weapon_projectile:
-        if (!projectileAimbotRequired)
-            return false;
-        break;
-    // Check if player doesn't have a weapon usable by aimbot
-    default:
-        return false;
-    };
-
     return true;
 }
 
@@ -879,6 +863,7 @@ bool IsTargetStateGood(CachedEntity *entity)
     PROF_SECTION(PT_aimbot_targetstatecheck)
 
     const int current_type = entity->m_Type();
+    bool is_player         = false;
     switch (current_type)
     {
     case (ENTITY_PLAYER):
@@ -899,6 +884,7 @@ bool IsTargetStateGood(CachedEntity *entity)
             return false;
         // Distance
 
+        is_player             = true;
         float targeting_range = EffectiveTargetingRange();
         if (entity->m_flDistance() - 40 > targeting_range && tickcount > hacks::aimbot::last_target_ignore_timer) // m_flDistance includes the collision box. You have to subtract it (Should be the same for every model)
             return false;
@@ -979,7 +965,7 @@ bool IsTargetStateGood(CachedEntity *entity)
 
         AimbotCalculatedData_s &cd = calculated_data_array[entity->m_IDX];
         cd.hitbox                  = BestHitbox(entity);
-        if (*vischeck_hitboxes && !*multipoint)
+        if (*vischeck_hitboxes && !*multipoint && is_player)
         {
             if (*vischeck_hitboxes == 1 && playerlist::AccessData(entity).state != playerlist::k_EState::RAGE)
                 return true;
@@ -991,7 +977,7 @@ bool IsTargetStateGood(CachedEntity *entity)
                     return true;
                 while (i <= 17) // Prevents returning empty at all costs. Loops through every hitbox
                 {
-                    if (i == cd.hitbox)
+                    if (i == cd.hitbox && i != 17)
                         i++;
                     trace_t test_trace;
                     std::vector<Vector> centered_hitbox = getHitpointsVischeck(entity, i);

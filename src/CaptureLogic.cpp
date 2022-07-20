@@ -1,9 +1,9 @@
 #include "CaptureLogic.hpp"
+#include <utility>
 #include "common.hpp"
 
 namespace flagcontroller
 {
-
 std::array<flag_info, 2> flags;
 bool is_ctf = true;
 
@@ -92,7 +92,7 @@ flag_info getFlag(int team)
             return flag;
     }
     // None found
-    return flag_info();
+    return {};
 }
 
 // Get the Position of a flag on a specific team
@@ -153,7 +153,6 @@ ETFFlagStatus getStatus(int team)
 
 namespace plcontroller
 {
-
 // Array that controls all the payloads for each team. Red team is first, then comes blue team.
 static std::array<std::vector<CachedEntity *>, 2> payloads;
 static Timer update_payloads{};
@@ -215,7 +214,6 @@ void LevelInit()
 
 namespace cpcontroller
 {
-
 std::array<cp_info, MAX_CONTROL_POINTS> controlpoint_data;
 CachedEntity *objective_resource = nullptr;
 
@@ -223,7 +221,7 @@ struct point_ignore
 {
     std::string mapname;
     int point_idx;
-    point_ignore(std::string str, int idx) : mapname{ str }, point_idx{ idx } {};
+    point_ignore(std::string str, int idx) : mapname{ std::move(str) }, point_idx{ idx } {};
 };
 
 // TODO: Find a way to fix these edge-cases.
@@ -430,7 +428,7 @@ std::optional<Vector> getClosestControlPoint(Vector source, int team)
     for (auto &ignore : ignore_points)
     {
         // Try to find map name in bad point array
-        if (levelname.find(ignore.mapname) != levelname.npos)
+        if (levelname.find(ignore.mapname) != std::string::npos)
             ignore_index = ignore.point_idx;
     }
 

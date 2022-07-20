@@ -10,7 +10,6 @@
 #include "CaptureLogic.hpp"
 #include "PlayerTools.hpp"
 #include "Aimbot.hpp"
-#include "navparser.hpp"
 #include "MiscAimbot.hpp"
 #include "Misc.hpp"
 
@@ -278,7 +277,7 @@ static std::pair<CachedEntity *, float> getNearestPlayerDistance()
     return { best_ent, distance };
 }
 
-static std::vector<Vector> building_spots;
+// static std::vector<Vector> building_spots;
 
 /*inline bool HasGunslinger(CachedEntity *ent)
 {
@@ -459,9 +458,9 @@ enum slots
 {
     primary   = 1,
     secondary = 2,
-    melee     = 3,
+    melee     = 3/*,
     pda1      = 4,
-    pda2      = 5
+    pda2      = 5*/
 };
 
 #if ENABLE_VISUALS
@@ -665,7 +664,7 @@ bool stayNearTarget(CachedEntity *ent)
 
         float distance = (*ent_origin).DistToSqr(area_origin);
         // Good area found
-        good_areas.push_back(std::pair<CNavArea *, float>(&area, distance));
+        good_areas.emplace_back(&area, distance);
     }
     // Sort based on distance
     if (selected_config.prefer_far)
@@ -824,14 +823,14 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest)
         // Distance normally covered per second by charge
         float distance_per_second = 750.0f;
         // Apply modifiers to movespeed
-        distance_per_second = ATTRIB_HOOK_FLOAT(distance_per_second, "mult_player_movespeed_shieldrequired", raw_local, 0x0, true);
-        distance_per_second = ATTRIB_HOOK_FLOAT(distance_per_second, "mult_player_movespeed", raw_local, 0x0, true);
+        distance_per_second = ATTRIB_HOOK_FLOAT(distance_per_second, "mult_player_movespeed_shieldrequired", raw_local, nullptr, true);
+        distance_per_second = ATTRIB_HOOK_FLOAT(distance_per_second, "mult_player_movespeed", raw_local, nullptr, true);
         // Max is still 750.0f
         distance_per_second = std::min(distance_per_second, 750.0f);
         // Time spent charging
         float seconds = 1.5f;
         // Apply modifiers that change charge length
-        seconds = ATTRIB_HOOK_FLOAT(seconds, "mod_charge_time", RAW_ENT(LOCAL_E), 0x0, true);
+        seconds = ATTRIB_HOOK_FLOAT(seconds, "mod_charge_time", RAW_ENT(LOCAL_E), nullptr, true);
         // Total distance covered by charge
         float total_distance = seconds * distance_per_second;
         if (nearest.second < total_distance && isVisible)
@@ -895,7 +894,7 @@ bool tryToSnipe(CachedEntity *ent)
         // Not usable
         if (!isAreaValidForSnipe(ent_origin, area.m_center, false))
             continue;
-        good_areas.push_back(std::pair<CNavArea *, float>(&area, area.m_center.DistToSqr(ent_origin)));
+        good_areas.emplace_back(&area, area.m_center.DistToSqr(ent_origin));
     }
 
     // Sort based on distance
@@ -1131,18 +1130,20 @@ std::optional<Vector> getCtfGoal(int our_team, int enemy_team)
 
     current_capturetype = ctf;
 
-    // Flag is taken by us and CTF is the current capture type.
-    if (status == TF_FLAGINFO_STOLEN && carrier == LOCAL_E)
+    // CTF is the current capture type
+    if (status == TF_FLAGINFO_STOLEN)
     {
+        if (carrier == LOCAL_E)
+        {
             // Return our capture point location
             auto team_flag = flagcontroller::getFlag(our_team);
             return team_flag.spawn_pos;
+        }
     }
     // Get the flag if not taken by us already
     else
-    {
         return position;
-    }
+
     return std::nullopt;
 }
 
@@ -1291,7 +1292,6 @@ bool doRoam()
         if (navparser::NavEngine::navTo(*random, patrol))
             return true;
     }
-
     return false;
 }
 
@@ -1480,9 +1480,7 @@ void CreateMove()
     refreshBuildingSpots();*/
 
     if (danger_config_custom)
-    {
         selected_config = { *danger_config_custom_min_full_danger, *danger_config_custom_min_slight_danger, *danger_config_custom_max_slight_danger, *danger_config_custom_prefer_far };
-    }
     else
     {
         // Update the distance config
@@ -1550,7 +1548,7 @@ void LevelInit()
     // Doomsday sucks
     // TODO: add proper doomsday implementation
     auto map_name = std::string(g_IEngine->GetLevelName());
-    if (g_IEngine->GetLevelName() && map_name.find("sd_doomsday") != map_name.npos)
+    if (g_IEngine->GetLevelName() && map_name.find("sd_doomsday") != std::string::npos)
         is_doomsday = true;
 }
 #if ENABLE_VISUALS

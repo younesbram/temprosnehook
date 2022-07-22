@@ -11,8 +11,6 @@
 #include "hack.hpp"
 #include "PlayerTools.hpp"
 #include "e8call.hpp"
-#include "NavBot.hpp"
-#include "navparser.hpp"
 #include "SettingCommands.hpp"
 #include "glob.h"
 

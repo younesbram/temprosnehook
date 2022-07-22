@@ -12,6 +12,7 @@
 #include "Aimbot.hpp"
 #include "MiscAimbot.hpp"
 #include "Misc.hpp"
+#include "NavBot.hpp"
 
 namespace hacks::NavBot
 {
@@ -261,7 +262,7 @@ void refreshSniperSpots()
                 sniper_spots.emplace_back(hiding_spot.m_pos);
 }
 
-static std::pair<CachedEntity *, float> getNearestPlayerDistance()
+std::pair<CachedEntity *, float> getNearestPlayerDistance()
 {
     float distance         = FLT_MAX;
     CachedEntity *best_ent = nullptr;
@@ -774,6 +775,7 @@ bool stayNear()
     return false;
 }
 
+bool isVisible;
 // Try to attack people using melee if we are in a situation where this is viable
 bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest)
 {
@@ -799,7 +801,6 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest)
     }
 
     static Timer melee_cooldown{};
-    bool isVisible;
 
     {
         Ray_t ray;
@@ -811,10 +812,10 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest)
         {
             ray.Init(g_pLocalPlayer->v_Origin + Vector{ 0, 0, 20 }, hb->center, raw_local->GetCollideable()->OBBMins(), raw_local->GetCollideable()->OBBMaxs());
             g_ITrace->TraceRay(ray, MASK_PLAYERSOLID, &trace::filter_default, &trace);
-            isVisible = (IClientEntity *) trace.m_pEnt == RAW_ENT(nearest.first);
+            hacks::NavBot::isVisible = (IClientEntity *) trace.m_pEnt == RAW_ENT(nearest.first);
         }
         else
-            isVisible = false;
+            hacks::NavBot::isVisible = false;
     }
 
     // Charge aimbot things
@@ -833,7 +834,7 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest)
         seconds = ATTRIB_HOOK_FLOAT(seconds, "mod_charge_time", RAW_ENT(LOCAL_E), nullptr, true);
         // Total distance covered by charge
         float total_distance = seconds * distance_per_second;
-        if (nearest.second < total_distance && isVisible)
+        if (nearest.second < total_distance && hacks::NavBot::isVisible)
         {
             // Charge
             current_user_cmd->buttons |= IN_ATTACK2;
@@ -843,7 +844,7 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest)
         }
     }
     // If we are close enough, don't even bother with using the navparser to get there
-    if (nearest.second < 200 && isVisible)
+    if (nearest.second < 200 && hacks::NavBot::isVisible)
     {
         AimAt(g_pLocalPlayer->v_Eye, nearest.first->hitboxes.GetHitbox(head)->center, current_user_cmd);
         WalkTo(nearest.first->m_vecOrigin());

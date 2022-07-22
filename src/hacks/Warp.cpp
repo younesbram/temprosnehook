@@ -9,13 +9,13 @@
 #if ENABLE_VISUALS
 #include "drawing.hpp"
 #endif
-#include "MiscAimbot.hpp"
 #include "PlayerTools.hpp"
 #include "DetourHook.hpp"
 #include "WeaponData.hpp"
 #include "MiscTemporary.hpp"
 #include "Think.hpp"
 #include "Aimbot.hpp"
+#include "NavBot.hpp"
 
 namespace hacks::warp
 {

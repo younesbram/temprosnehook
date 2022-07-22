@@ -9,7 +9,6 @@
 #include <hacks/FollowBot.hpp>
 #include <settings/Bool.hpp>
 #include "navparser.hpp"
-#include "NavBot.hpp"
 #include "soundcache.hpp"
 #include "playerresource.h"
 #include "PlayerTools.hpp"

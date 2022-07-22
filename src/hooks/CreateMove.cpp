@@ -12,9 +12,7 @@
 #include <hacks/hacklist.hpp>
 #include <settings/Bool.hpp>
 #include <hacks/AntiAntiAim.hpp>
-#include "NavBot.hpp"
 #include "HookTools.hpp"
-#include "teamroundtimer.hpp"
 #include "Misc.hpp"
 #include "HookedMethods.hpp"
 #include "nospread.hpp"

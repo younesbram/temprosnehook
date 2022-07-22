@@ -122,7 +122,7 @@
 
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Autoshoot" x="170" y="270">
+    <Box padding="12 6 6 6" width="content" height="content" name="Autoshoot" x="170" y="285">
         <List width="150">
             <AutoVariable width="fill" target="aimbot.autoshoot" label="Enable autoshoot"
                           tooltip="Make the aimbot automatically fire your weapon."/>

@@ -36,15 +36,16 @@ static settings::Button warp_key{ "warp.key", "<null>" };
 static settings::Button charge_key{ "warp.charge-key", "<null>" };
 static settings::Boolean charge_passively{ "warp.charge-passively", "true" };
 static settings::Boolean charge_in_jump{ "warp.charge-passively.jump", "true" };
-static settings::Boolean charge_no_input{ "warp.charge-passively.no-inputs", "false" };
+static settings::Boolean charge_no_input{ "warp.charge-passively.no-inputs", "true" };
 static settings::Int warp_movement_ratio{ "warp.movement-ratio", "6" };
 static settings::Boolean warp_demoknight{ "warp.demoknight", "false" };
 static settings::Boolean warp_peek{ "warp.peek", "false" };
 static settings::Boolean warp_on_damage{ "warp.on-hit", "false" };
 static settings::Boolean warp_forward{ "warp.on-hit.forward", "false" };
 static settings::Boolean warp_backwards{ "warp.on-hit.backwards", "false" };
-static settings::Boolean warp_left{ "warp.on-hit.left", "true" };
-static settings::Boolean warp_right{ "warp.on-hit.right", "true" };
+static settings::Boolean warp_left{ "warp.on-hit.left", "false" };
+static settings::Boolean warp_right{ "warp.on-hit.right", "false" };
+static settings::Boolean warp_melee{ "warp.to.enemy", "false" };
 
 // Hidden control rvars for communtiy servers
 static settings::Int maxusrcmdprocessticks("warp.maxusrcmdprocessticks", "24");
@@ -289,6 +290,7 @@ bool shouldRapidfire()
 // Should we warp?
 bool shouldWarp(bool check_amount)
 {
+    auto nearest = hacks::NavBot::getNearestPlayerDistance();
     return
         // Ingame?
         g_IEngine->IsInGame() &&
@@ -299,7 +301,9 @@ bool shouldWarp(bool check_amount)
           // Rapidfire and trying to attack?
           || shouldRapidfire()) &&
          // Do we have enough to warp?
-         (!check_amount || warp_amount));
+         (!check_amount || warp_amount))
+        // Option is enabled, in melee range and target is visible to us
+        || (warp_melee && nearest.second < 175 && hacks::NavBot::isVisible);
 }
 
 // How many ticks of excess we have (for decimal speeds)

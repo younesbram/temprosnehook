@@ -845,6 +845,7 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest)
     // If we are close enough, don't even bother with using the navparser to get there
     if (nearest.second < 200 && isVisible)
     {
+        AimAt(g_pLocalPlayer->v_Eye, nearest.first->hitboxes.GetHitbox(head)->center, current_user_cmd);
         WalkTo(nearest.first->m_vecOrigin());
         navparser::NavEngine::cancelPath();
         return true;
@@ -853,7 +854,7 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest)
     {
         // Don't constantly path, it's slow.
         // The closer we are, the more we should try to path
-        if (!melee_cooldown.test_and_set(nearest.second < 200 ? 200 : nearest.second < 1000 ? 500 : 2000) && navparser::NavEngine::isPathing())
+        if (!melee_cooldown.test_and_set(nearest.second < 400 ? 400 : nearest.second < 2000 ? 1000 : 4000) && navparser::NavEngine::isPathing())
             return navparser::NavEngine::current_priority == prio_melee;
 
         // Just walk at the enemy l0l

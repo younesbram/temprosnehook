@@ -295,15 +295,15 @@ bool shouldWarp(bool check_amount)
         // Ingame?
         g_IEngine->IsInGame() &&
         // Warp key held?
-        (((warp_key && warp_key.isKeyDown())
-          // Hurt warp?
-          || was_hurt
-          // Rapidfire and trying to attack?
-          || shouldRapidfire()) &&
-         // Do we have enough to warp?
-         (!check_amount || warp_amount))
-        // Option is enabled, in melee range and target is visible to us
-        || (warp_melee && nearest.second < 175 && hacks::NavBot::isVisible);
+        ((((warp_key && warp_key.isKeyDown())
+           // Hurt warp?
+           || was_hurt
+           // Rapidfire and trying to attack?
+           || shouldRapidfire()) &&
+          // Do we have enough to warp?
+          (!check_amount || warp_amount))
+         // Option is enabled, in melee range and target is visible to us
+         || (warp_melee && nearest.second < 175 && hacks::NavBot::isVisible));
 }
 
 // How many ticks of excess we have (for decimal speeds)
@@ -359,13 +359,13 @@ void Warp(float accumulated_extra_samples, bool finalTick)
         return;
     }
 
-    PROF_SECTION(warp_profiler);
+    PROF_SECTION(warp_profiler)
 
     int warp_ticks = warp_amount;
     if (warp_amount_override)
         warp_ticks = warp_amount_override;
 
-    CL_Move_t original = (CL_Move_t) cl_move_detour.GetOriginalFunc();
+    auto original = (CL_Move_t) cl_move_detour.GetOriginalFunc();
 
     // Call CL_Move once for every warp tick
     int warp_amnt = GetWarpAmount(finalTick);
@@ -555,7 +555,7 @@ void handleMinigun()
 // This is called first, it subsequently calls all the CreateMove functions.
 void CL_Move_hook(float accumulated_extra_samples, bool bFinalTick)
 {
-    CL_Move_t original = (CL_Move_t) cl_move_detour.GetOriginalFunc();
+    auto original = (CL_Move_t) cl_move_detour.GetOriginalFunc();
     original(accumulated_extra_samples, bFinalTick);
     cl_move_detour.RestorePatch();
 

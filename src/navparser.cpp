@@ -57,7 +57,7 @@ static bool CastRay(Vector origin, Vector endpos, unsigned mask, ITraceFilter *f
     // This was found to be So inefficient that it is literally unusable for our purposes. it is almost 1000x slower than the above.
     // ray.Init(origin, target, -right * HALF_PLAYER_WIDTH, right * HALF_PLAYER_WIDTH);
 
-    PROF_SECTION(IEVV_TraceRay);
+    PROF_SECTION(IEVV_TraceRay)
     g_ITrace->TraceRay(ray, mask, filter, &trace);
 
     return trace.DidHit();
@@ -174,8 +174,8 @@ navPoints determinePoints(CNavArea *current, CNavArea *next)
     // Nearest point to center on "next"m used for height checks
     auto center_next = next->getNearestPoint(center_point.AsVector2D());
 
-    return navPoints(area_center, center_point, center_next, next_center);
-};
+    return {area_center, center_point, center_next, next_center};
+}
 
 class Map : public micropather::Graph
 {
@@ -541,19 +541,19 @@ bool navTo(const Vector &destination, int priority, bool should_repath, bool nav
 
     for (size_t i = 0; i < path.size(); i++)
     {
-        CNavArea *area = reinterpret_cast<CNavArea *>(path.at(i));
+        auto *area = reinterpret_cast<CNavArea *>(path.at(i));
 
         // All entries besides the last need an extra crumb
         if (i != path.size() - 1)
         {
-            CNavArea *next_area = (CNavArea *) path.at(i + 1);
+            auto *next_area = (CNavArea *) path.at(i + 1);
 
             auto points = determinePoints(area, next_area);
 
             points.center = handleDropdown(points.center, points.next);
 
-            crumbs.push_back({ area, std::move(points.current) });
-            crumbs.push_back({ area, std::move(points.center) });
+            crumbs.push_back({ area, points.current });
+            crumbs.push_back({ area, points.center });
         }
         else
             crumbs.push_back({ area, area->m_center });
@@ -833,7 +833,7 @@ void checkBlacklist()
 void updateStuckTime()
 {
     // No crumbs
-    if (!crumbs.size())
+    if (crumbs.empty())
         return;
     // We're stuck, add time to connection
     if (inactivity.check(*stuck_time / 2))
@@ -1019,7 +1019,7 @@ void Draw()
     }
 }
 #endif
-}; // namespace NavEngine
+} // namespace NavEngine
 
 Vector loc;
 

@@ -8,7 +8,6 @@
 #include "common.hpp"
 #include <PlayerTools.hpp>
 #include <settings/Bool.hpp>
-#include "soundcache.hpp"
 
 namespace hacks::autosticky
 {
@@ -63,7 +62,7 @@ bool IsTarget(CachedEntity *ent)
         if (!player_tools::shouldTarget(ent))
             return false;
 
-        // Dont target invulnerable players, ex: uber, bonk
+        // Don't target invulnerable players, ex: uber, bonk
         if (IsPlayerInvulnerable(ent))
             return false;
 
@@ -71,7 +70,7 @@ bool IsTarget(CachedEntity *ent)
         // if (ignore_taunting && HasCondition<TFCond_Taunting>(ent)) return
         // false;
 
-        // If settings don't allow, dont target cloaked players
+        // If settings don't allow, don't target cloaked players
         if (*legit && IsPlayerInvisible(ent))
             return false;
 
@@ -81,11 +80,9 @@ bool IsTarget(CachedEntity *ent)
         // Building specific
     }
     else if (ent->m_Type() == ENTITY_BUILDING)
-    {
         return *buildings;
-    }
 
-    // Target isnt a good type
+    // Target isn't a good type
     return false;
 }
 
@@ -118,23 +115,13 @@ void CreateMove()
     targets.clear();
 
     // Cycle through the ents and search for valid ents
-    for (int i = 0; i <= HIGHEST_ENTITY; i++)
+    for (auto &ent : entity_cache::valid_ents)
     {
-        // Assign the for loops index to an ent
-        CachedEntity *ent = ENTITY(i);
-        // Check for dormancy and if valid
-        if (CE_INVALID(ent))
-            continue;
-        // Check if ent is a bomb or suitable target and push to respective
-        // arrays
+        // Check if ent is a bomb or suitable target and push to respective arrays
         if (IsBomb(ent))
-        {
             bombs.push_back(ent);
-        }
         else if (IsTarget(ent))
-        {
             targets.push_back(ent);
-        }
     }
 
     // Loop through every target for a given bomb

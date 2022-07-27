@@ -446,33 +446,28 @@ void EffectGlow::Render(int x, int y, int w, int h)
     if (!isHackActive() || (clean_screenshots && g_IEngine->IsTakingScreenshot()) || g_Settings.bInvalid || disable_visuals)
         return;
     static ITexture *orig;
-    static IClientEntity *ent;
     static IMaterialVar *blury_bloomamount;
     if (!init)
         Init();
     CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
     orig = ptr->GetRenderTarget();
     BeginRenderGlow();
-    for (int i = 1; i <= HIGHEST_ENTITY; i++)
+    for (auto &ent_non_raw : entity_cache::valid_ents)
     {
-        ent = g_IEntityList->GetClientEntity(i);
-        if (ent && !ent->IsDormant() && ShouldRenderGlow(ent))
-        {
+        auto ent = RAW_ENT(ent_non_raw);
+        if (ent && ShouldRenderGlow(ent))
             RenderGlow(ent);
-        }
     }
     EndRenderGlow();
     if (*solid_when != 1)
     {
         ptr->ClearStencilBufferRectangle(x, y, w, h, 0);
         StartStenciling();
-        for (int i = 1; i <= HIGHEST_ENTITY; i++)
+        for (auto &non_raw : entity_cache::valid_ents)
         {
-            ent = g_IEntityList->GetClientEntity(i);
-            if (ent && !ent->IsDormant() && ShouldRenderGlow(ent))
-            {
+            auto ent = RAW_ENT(non_raw);
+            if (ent && ShouldRenderGlow(ent))
                 DrawToStencil(ent);
-            }
         }
         EndStenciling();
     }
@@ -488,14 +483,10 @@ void EffectGlow::Render(int x, int y, int w, int h)
     ptr->SetRenderTarget(orig);
     g_IVRenderView->SetBlend(0.0f);
     if (*solid_when != 1)
-    {
         SS_Drawing.SetStencilState(ptr);
-    }
     ptr->DrawScreenSpaceRectangle(mat_blit, x, y, w, h, 0, 0, w - 1, h - 1, w, h);
     if (*solid_when != -1)
-    {
         SS_Null.SetStencilState(ptr);
-    }
 #endif
 }
 
@@ -512,6 +503,5 @@ static InitRoutine init(
             effect_glow::g_pEffectGlow = new CScreenSpaceEffectRegistration("_cathook_glow", &effect_glow::g_EffectGlow);
             g_pScreenSpaceEffects->EnableScreenSpaceEffect("_cathook_glow");
         }
-    }
-);
+    });
 } // namespace effect_glow

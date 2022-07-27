@@ -32,11 +32,10 @@ static inline void CreateMove()
     // Empty the array
     sniperdot_array.fill(0);
     // Find sniper dots
-    for (int i = g_IEngine->GetMaxClients() + 1; i <= HIGHEST_ENTITY; i++)
+    for (auto &dot_ent : entity_cache::valid_ents)
     {
-        CachedEntity *dot_ent = ENTITY(i);
         // Not a sniper dot
-        if (CE_BAD(dot_ent) || dot_ent->m_iClassID() != CL_CLASS(CSniperDot))
+        if (dot_ent->m_iClassID() != CL_CLASS(CSniperDot))
             continue;
         // Get the player it belongs to
         auto ent_idx = HandleToIDX(CE_INT(dot_ent, netvar.m_hOwnerEntity));
@@ -54,9 +53,7 @@ void frameStageNotify(ClientFrameStage_t stage)
     if (!enable || !g_IEngine->IsInGame())
         return;
     if (stage == FRAME_NET_UPDATE_POSTDATAUPDATE_START)
-    {
         modifyAngles();
-    }
 #endif
 }
 

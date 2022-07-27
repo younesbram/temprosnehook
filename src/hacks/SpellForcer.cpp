@@ -135,14 +135,13 @@ CachedEntity *getClosestSpell()
 
     if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
         return ent;
-    for (int i = g_IEngine->GetMaxClients(); i < HIGHEST_ENTITY; i++)
+    for (auto &spell : entity_cache::valid_ents)
     {
-        CachedEntity *spell = ENTITY(i);
         const model_t *model = RAW_ENT(spell)->GetModel();
         if (model)
         {
             const auto szName = g_IModelInfo->GetModelName(model);
-            if (CE_INVALID(spell) || !spell->m_vecDormantOrigin() || (!Hash::IsSpellbook(szName) && !Hash::IsSpellbookRare(szName)))
+            if (!spell->m_vecDormantOrigin() || (!Hash::IsSpellbook(szName) && !Hash::IsSpellbookRare(szName)))
                 continue;
             float dist = spell->m_flDistance();
             if (dist < best_dist || (is_dormant && !RAW_ENT(spell)->IsDormant() && dist <= 300.0f))

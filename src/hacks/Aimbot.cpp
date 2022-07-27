@@ -759,11 +759,8 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
     CachedEntity *target_highest_ent                       = nullptr;
     target_highest_score                                   = -256;
     std::optional<hacks::backtrack::BacktrackData> bt_tick = std::nullopt;
-    for (int i = 1; i <= HIGHEST_ENTITY; i++)
+    for (auto &ent : entity_cache::valid_ents)
     {
-        ent = ENTITY(i);
-        if (CE_BAD(ent))
-            continue; // Check for null and dormant
         // Check whether the current ent is good enough to target
         bool isTargetGood = false;
 
@@ -815,7 +812,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
             }
             case 2: // Distance Priority (Closest)
             {
-                scr = 4096.0f - calculated_data_array[i].aim_position.DistTo(g_pLocalPlayer->v_Eye);
+                scr = 4096.0f - calculated_data_array[ent->m_IDX].aim_position.DistTo(g_pLocalPlayer->v_Eye);
                 break;
             }
             case 3: // Health Priority (Lowest)
@@ -825,7 +822,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
             }
             case 4: // Distance Priority (Furthest Away)
             {
-                scr = calculated_data_array[i].aim_position.DistTo(g_pLocalPlayer->v_Eye);
+                scr = calculated_data_array[ent->m_IDX].aim_position.DistTo(g_pLocalPlayer->v_Eye);
                 break;
             }
             case 5: // Health Priority (Highest)
@@ -854,7 +851,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
 
         // Restore tick
         if (shouldBacktrack(ent))
-            hacks::backtrack::RestoreEntity(i);
+            hacks::backtrack::RestoreEntity(ent->m_IDX);
     }
 
     if (target_highest_ent && bt_tick)

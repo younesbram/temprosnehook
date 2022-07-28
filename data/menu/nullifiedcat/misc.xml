@@ -2,5 +2,6 @@
     <TabContainer width="fill" height="fill">
         <Include path="nullifiedcat/misc/general.xml"/>
         <Include path="nullifiedcat/misc/chat.xml"/>
+        <Include path="nullifiedcat/misc/rsp.xml"/>
     </TabContainer>
 </Tab>

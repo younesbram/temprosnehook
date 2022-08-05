@@ -2,14 +2,14 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Rich Presence">
         <List width="200">
             <AutoVariable width="fill" target="steam.presence-enable" label="Enable RSP" 
-                          tooltip="Enables steam rich presences in friends list"/>
+                          tooltip="Enable Steam rich presence"/>
             <AutoVariable width="fill" target="steam.presence-override" label="Override Menu" 
-                          tooltip="Overrides default match state even in main menu"/>
+                          tooltip="Overrides default match state even in the main menu"/>
             <AutoVariable width="fill" target="steam.presence-value" label="Custom String" 
                           tooltip="Changes map state to a custom value"/>
             <AutoVariable width="fill" target="steam.presence-group" label="Party Size" 
-                          tooltip="Changes total party size in friends list"/>
-            <LabeledObject width="fill" label="Match State" tooltip="Changes the game state in friends list">
+                          tooltip="Changes total party size"/>
+            <LabeledObject width="fill" label="Match State" tooltip="Changes the game state">
                 <Select target="steam.presence-match">
                     <Option name="Special Event" value="0"/>
                         <Option name="Mann Up" value="1"/>

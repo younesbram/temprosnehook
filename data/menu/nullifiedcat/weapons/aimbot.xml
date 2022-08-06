@@ -134,6 +134,8 @@
                           tooltip="Spin up the minigun automatically if an enemy is found."/>
             <AutoVariable width="fill" target="aimbot.auto.zoom" label="Auto zoom"
                           tooltip="Intelligently zoom if applicable to current weapon type."/>
+            <AutoVariable width="fill" target="aimbot.zoom.distance" label="Zoom distance"
+                          tooltip="Distance to the nearest enemy in HMU for which the bot will always zoom"/>
             <AutoVariable width="fill" target="aimbot.auto.unzoom" label="Auto unzoom"
                           tooltip="Intelligently unzoom if applicable to current weapon type."/>
         </List>

@@ -15,7 +15,7 @@ void cm()
         return;
     CachedEntity *ent;
 
-    for (unsigned int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (unsigned i = 1; i <= g_IEngine->GetMaxClients(); i++)
     {
         ent = ENTITY(i);
         if (CE_BAD(ent) || ent->m_Type() != ENTITY_PLAYER)

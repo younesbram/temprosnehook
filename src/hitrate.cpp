@@ -6,9 +6,7 @@
  */
 
 #include "common.hpp"
-#include <hacks/Aimbot.hpp>
 #include <settings/Bool.hpp>
-#include "MiscTemporary.hpp"
 #include "init.hpp"
 #include "AntiAntiAim.hpp"
 #include "hitrate.hpp"
@@ -138,7 +136,7 @@ class HurtListener : public IGameEventListener
 public:
     virtual void FireGameEvent(KeyValues *event)
     {
-        if (strcmp("player_hurt", event->GetName()))
+        if (strcmp("player_hurt", event->GetName()) != 0)
             return;
         if (GetPlayerForUserID(event->GetInt("attacker")) == g_IEngine->GetLocalPlayer())
         {

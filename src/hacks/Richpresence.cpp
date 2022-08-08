@@ -1,9 +1,11 @@
-/*
- * Author: Lesshy
- */
+#include "steam/isteamfriends.h"
 #include "HookedMethods.hpp"
 #include "common.hpp"
 #include <iostream>
+#include <string.h>
+
+// SteamWorks rich presence created by blue snoop
+// Ported from Lesshook to Explowz Fork.
 
 namespace hooked_methods
 {
@@ -17,7 +19,7 @@ static settings::Int matchstate{ "steam.presence-match", "0" };          // Matc
 static settings::Int groupsize{ "steam.presence-group", "6" };           // Party Size
 static settings::String custom{ "steam.presence-value", "Cathook" };     // Custom input
 
-// Steam cannot use a made up value,
+// Steam cannot use a value made up
 // so we need to fix these values for it
 auto &value             = *custom;
 inline auto &groupvalue = *groupsize;

@@ -7,6 +7,7 @@
 
 #include "common.hpp"
 
+#include <time.h>
 #include <settings/Float.hpp>
 #include "soundcache.hpp"
 
@@ -55,7 +56,9 @@ void CachedEntity::Update()
 #if PROXY_ENTITY != true
     m_pEntity = g_IEntityList->GetClientEntity(idx);
     if (!m_pEntity)
+    {
         return;
+    }
 #endif
     m_lSeenTicks = 0;
     m_lLastSeen  = 0;
@@ -76,7 +79,7 @@ bool CachedEntity::IsVisible()
     static constexpr int optimal_hitboxes[] = { hitbox_t::head, hitbox_t::foot_L, hitbox_t::hand_R, hitbox_t::spine_1 };
     static bool vischeck0, vischeck;
 
-    PROF_SECTION(CE_IsVisible)
+    PROF_SECTION(CE_IsVisible);
     if (m_bVisCheckComplete)
         return m_bAnyHitboxVisible;
 
@@ -91,9 +94,9 @@ bool CachedEntity::IsVisible()
 
     if (m_Type() == ENTITY_PLAYER && fast_vischeck)
     {
-        for (int optimal_hitbox : optimal_hitboxes)
+        for (int i = 0; i < 4; i++)
         {
-            if (hitboxes.VisibilityCheck(optimal_hitbox))
+            if (hitboxes.VisibilityCheck(optimal_hitboxes[i]))
             {
                 m_bAnyHitboxVisible = true;
                 m_bVisCheckComplete = true;

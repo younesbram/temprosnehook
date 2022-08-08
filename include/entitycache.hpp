@@ -1,5 +1,5 @@
 /*
- * entitycache.hpp
+ * entitycache.h
  *
  *  Created on: Nov 7, 2016
  *      Author: nullifiedcat
@@ -50,12 +50,12 @@ constexpr int MAX_STRINGS = 16;
 #define CE_BYTE(entity, offset) CE_VAR(entity, offset, unsigned char)
 #define CE_VECTOR(entity, offset) CE_VAR(entity, offset, Vector)
 
-#define CE_GOOD(entity) ((entity) && !g_Settings.bInvalid && (entity)->Good())
+#define CE_GOOD(entity) (entity && !g_Settings.bInvalid && entity->Good())
 #define CE_BAD(entity) (!CE_GOOD(entity))
-#define CE_VALID(entity) ((entity) && !g_Settings.bInvalid && (entity)->Valid())
+#define CE_VALID(entity) (entity && !g_Settings.bInvalid && entity->Valid())
 #define CE_INVALID(entity) (!CE_VALID(entity))
 
-#define IDX_GOOD(idx) ((idx) >= 0 && (idx) <= HIGHEST_ENTITY && (idx) < MAX_ENTITIES)
+#define IDX_GOOD(idx) (idx >= 0 && idx <= HIGHEST_ENTITY && idx < MAX_ENTITIES)
 #define IDX_BAD(idx) !IDX_GOOD(idx)
 
 #define HIGHEST_ENTITY (entity_cache::max)
@@ -156,7 +156,7 @@ public:
     // Entity fields start here
     EntityType m_Type()
     {
-        EntityType ret;
+        EntityType ret = ENTITY_GENERIC;
         int classid    = m_iClassID();
         switch (classid)
         {

@@ -12,6 +12,7 @@
 
 namespace player_tools
 {
+
 static settings::Int betrayal_limit{ "player-tools.betrayal-limit", "2" };
 static settings::Boolean betrayal_sync{ "player-tools.betrayal-ipc-sync", "true" };
 
@@ -115,9 +116,9 @@ void onKilledBy(unsigned id)
             {
                 std::string command = "cat_ipc_exec_all cat_pl_mark_betrayal " + std::to_string(id);
                 if (command.length() >= 63)
-                    ipc::peer->SendMessage(nullptr, -1, ipc::commands::execute_client_cmd_long, command.c_str(), command.length() + 1);
+                    ipc::peer->SendMessage(0, -1, ipc::commands::execute_client_cmd_long, command.c_str(), command.length() + 1);
                 else
-                    ipc::peer->SendMessage(command.c_str(), -1, ipc::commands::execute_client_cmd, nullptr, 0);
+                    ipc::peer->SendMessage(command.c_str(), -1, ipc::commands::execute_client_cmd, 0, 0);
             }
         }
     }

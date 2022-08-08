@@ -8,12 +8,14 @@
 #include "playerlist.hpp"
 #include "common.hpp"
 
-#include <cstdint>
+#include <stdint.h>
 #include <dirent.h>
+#include <sys/stat.h>
 #include <boost/algorithm/string.hpp>
 
 namespace playerlist
 {
+
 std::unordered_map<unsigned, userdata> data{};
 
 const std::string k_Names[]                                     = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "PAZER", "ABUSE", "PARTY" };
@@ -229,7 +231,9 @@ bool ChangeState(unsigned int steamid, k_EState state, bool force)
         else
             return false;
     case k_EState::RAGE:
+        return false;
     case k_EState::PAZER:
+        return false;
     case k_EState::ABUSE:
         return false;
     }
@@ -253,16 +257,17 @@ CatCommand pl_print("pl_print", "Print current player list",
                         bool include_all = args.ArgC() >= 2 && *args.Arg(1) == '1';
 
                         logging::Info("Known entries: %lu", data.size());
-                        for (auto &it : data)
+                        for (auto it = data.begin(); it != data.end(); ++it)
                         {
-                            if (!include_all && !std::memcmp(&it.second, &empty, sizeof(empty)))
+                            if (!include_all && !std::memcmp(&it->second, &empty, sizeof(empty)))
                                 continue;
 
-                            const auto &ent = it.second;
+                            const auto &ent = it->second;
 #if ENABLE_VISUALS
-                            logging::Info("%u -> %d (%f,%f,%f,%f) %f %u %u", it.first, ent.state, ent.color.r, ent.color.g, ent.color.b, ent.color.a, ent.inventory_value, ent.deaths_to, ent.kills);
+                            logging::Info("%u -> %d (%f,%f,%f,%f) %f %u %u", it->first, ent.state, ent.color.r, ent.color.g, ent.color.b, ent.color.a, ent.inventory_value, ent.deaths_to, ent.kills);
 #else
-                            logging::Info("%u -> %d %f %u %u", it.first, ent.state, ent.inventory_value, ent.deaths_to, ent.kills);
+        logging::Info("%u -> %d %f %u %u", it->first, ent.state,
+            ent.inventory_value, ent.deaths_to, ent.kills);
 #endif
                         }
                     });
@@ -291,7 +296,7 @@ static void pl_cleanup()
     size_t counter = 0;
     for (auto it = data.begin(); it != data.end(); ++it)
     {
-        if (std::memcmp(&it->second, &empty, sizeof(empty)) != 0)
+        if (std::memcmp(&it->second, &empty, sizeof(empty)))
             continue;
 
         ++counter;
@@ -316,7 +321,7 @@ CatCommand pl_set_state("pl_set_state", "cat_pl_set_state [playername] [state] (
                             int id    = -1;
                             for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
                             {
-                                player_info_s info{};
+                                player_info_s info;
                                 if (!GetPlayerInfo(i, &info))
                                     continue;
                                 std::string currname(info.name);
@@ -335,7 +340,7 @@ CatCommand pl_set_state("pl_set_state", "cat_pl_set_state [playername] [state] (
                             }
                             std::string state = args.Arg(2);
                             boost::to_upper(state);
-                            player_info_s info{};
+                            player_info_s info;
                             GetPlayerInfo(id, &info);
 
                             for (int i = 0; i <= int(k_EState::STATE_LAST); ++i)
@@ -378,7 +383,7 @@ static int cat_pl_set_state_completionCallback(const char *c_partial, char comma
 
     for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
     {
-        player_info_s info{};
+        player_info_s info;
         if (!GetPlayerInfo(i, &info))
             continue;
         std::string name(info.name);

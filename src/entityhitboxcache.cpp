@@ -7,12 +7,10 @@
 
 #include <settings/Int.hpp>
 #include "common.hpp"
-#include "MiscTemporary.hpp"
 #include "SetupBonesReconst.hpp"
 
 namespace hitbox_cache
 {
-
 EntityHitboxCache::EntityHitboxCache() : parent_ref(&entity_cache::Get(((unsigned) this - (unsigned) &hitbox_cache::array) / sizeof(EntityHitboxCache)))
 {
     Reset();
@@ -173,7 +171,7 @@ matrix3x4_t *EntityHitboxCache::GetBones(int numbones)
             bones.resize(numbones);
         if (g_Settings.is_create_move)
         {
-            PROF_SECTION(bone_setup);
+            PROF_SECTION(bone_setup)
 
             // Only use reconstructed setupbones on players
             if (parent_ref->m_Type() == ENTITY_PLAYER)

@@ -41,7 +41,7 @@ public:
         logging::Info("csvstream: Trying to open log file");
         uid_t uid         = geteuid();
         struct passwd *pw = getpwuid(uid);
-        std::string uname = "";
+        std::string uname;
         if (pw)
         {
             uname = std::string(pw->pw_name);

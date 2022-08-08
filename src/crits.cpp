@@ -147,7 +147,7 @@ static float getCritCap(IClientEntity *wep)
     float chance = 0.02f;
     if (g_pLocalPlayer->weapon_mode == weapon_melee)
         chance = 0.15f;
-    float flMultCritChance = ATTRIB_HOOK_FLOAT(crit_mult * chance, "mult_crit_chance", wep, 0, 1);
+    float flMultCritChance = ATTRIB_HOOK_FLOAT(crit_mult * chance, "mult_crit_chance", wep, nullptr, true);
 
     if (isRapidFire(wep))
     {
@@ -159,7 +159,7 @@ static float getCritCap(IClientEntity *wep)
         float flNonCritDuration = (flCritDuration / flTotalCritChance) - flCritDuration;
         // calculate the chance per second of non-crit fire that we should transition into critting such that on average we achieve the total crit chance we want
         float flStartCritChance = 1 / flNonCritDuration;
-        flMultCritChance        = ATTRIB_HOOK_FLOAT(flStartCritChance, "mult_crit_chance", wep, 0, 1);
+        flMultCritChance        = ATTRIB_HOOK_FLOAT(flStartCritChance, "mult_crit_chance", wep, nullptr, true);
     }
 
     return flMultCritChance;
@@ -181,7 +181,7 @@ static std::pair<float, float> critMultInfo(IClientEntity *wep)
     float cur_crit        = getCritCap(wep);
     float observed_chance = CE_FLOAT(LOCAL_W, netvar.flObservedCritChance);
     float needed_chance   = cur_crit + 0.1f;
-    return std::pair<float, float>(observed_chance, needed_chance);
+    return { observed_chance, needed_chance };
 }
 
 // How much damage we need until we can crit
@@ -450,7 +450,7 @@ void force_crit()
     else if (g_pLocalPlayer->weapon_mode != weapon_melee && LOCAL_W->m_iClassID() != CL_CLASS(CTFPipebombLauncher))
     {
         // We have valid crit command numbers
-        if (crit_cmds.size() && crit_cmds.find(LOCAL_W->m_IDX) != crit_cmds.end() && crit_cmds.find(LOCAL_W->m_IDX)->second.size())
+        if (!crit_cmds.empty() && crit_cmds.find(LOCAL_W->m_IDX) != crit_cmds.end() && !crit_cmds.find(LOCAL_W->m_IDX)->second.empty())
         {
             if (current_index >= crit_cmds.at(LOCAL_W->m_IDX).size())
                 current_index = 0;
@@ -565,12 +565,12 @@ static void updateCmds()
         weapon_info info(weapon);
         int nProjectilesPerShot = GetWeaponData(weapon)->m_nBulletsPerShot;
         if (nProjectilesPerShot >= 1)
-            nProjectilesPerShot = ATTRIB_HOOK_FLOAT(nProjectilesPerShot, "mult_bullets_per_shot", weapon, 0x0, true);
+            nProjectilesPerShot = ATTRIB_HOOK_FLOAT(nProjectilesPerShot, "mult_bullets_per_shot", weapon, nullptr, true);
         else
             nProjectilesPerShot = 1;
 
         added_per_shot = GetWeaponData(weapon)->m_nDamage;
-        added_per_shot = ATTRIB_HOOK_FLOAT(added_per_shot, "mult_dmg", weapon, 0x0, true);
+        added_per_shot = ATTRIB_HOOK_FLOAT(added_per_shot, "mult_dmg", weapon, nullptr, true);
         added_per_shot *= nProjectilesPerShot;
         shots_to_fill_bucket = getBucketCap() / added_per_shot;
         // Special boi
@@ -603,7 +603,7 @@ static weapon_info last_weapon_info;
 // Fix bucket on non-local servers
 void fixBucket(IClientEntity *weapon, CUserCmd *cmd)
 {
-    INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
+    auto *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
     if (!ch)
         return;
 
@@ -777,7 +777,7 @@ static std::array<std::string, 32> crit_strings;
 static size_t crit_strings_count{ 0 };
 static std::array<rgba_t, 32> crit_strings_colors{ colors::empty };
 
-static std::string bar_string = "";
+static std::string bar_string;
 
 void AddCritString(const std::string &string, const rgba_t &color)
 {
@@ -792,7 +792,7 @@ void DrawCritStrings()
     float x = *bar_x + *size;
     float y = *bar_y + *size / 5.0f;
 
-    if (bar_string != "")
+    if (!bar_string.empty())
     {
         float sx, sy;
         fonts::center_screen->stringSize(bar_string, &sx, &sy);

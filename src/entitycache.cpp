@@ -19,7 +19,7 @@ bool IsProjectileACrit(CachedEntity *ent)
 // This method of const'ing the index is weird.
 CachedEntity::CachedEntity() : m_IDX(int(((unsigned) this - (unsigned) &entity_cache::array) / sizeof(CachedEntity))), hitboxes(hitbox_cache::Get(unsigned(m_IDX)))
 {
-#if PROXY_ENTITY != true
+#if !PROXY_ENTITY
     m_pEntity = nullptr;
 #endif
     m_fLastUpdate = 0.0f;

@@ -5,20 +5,25 @@
  *      Author: nullifiedcat
  */
 
-#include <csignal>
-#include <cstdio>
-#include <cstring>
+#define __USE_GNU
+#include <execinfo.h>
+#include <signal.h>
+#include <stdio.h>
+#include <string.h>
 #include <dlfcn.h>
 #include <boost/stacktrace.hpp>
+#include <cxxabi.h>
 #include <visual/SDLHooks.hpp>
 #include "hack.hpp"
 #include "common.hpp"
+#include "MiscTemporary.hpp"
 #if ENABLE_GUI
 #include "menu/GuiInterface.hpp"
 #endif
 #include <link.h>
 #include <pwd.h>
 
+#include <hacks/hacklist.hpp>
 #include "teamroundtimer.hpp"
 #if EXTERNAL_DRAWING
 #include "xoverlay.h"
@@ -28,6 +33,7 @@
 
 #include "copypasted/CDumper.hpp"
 #include "version.h"
+#include <cxxabi.h>
 
 /*
  *  Credits to josh33901 aka F1ssi0N for butifel F1Public and Darkstorm 2015
@@ -59,16 +65,16 @@ const std::string &hack::GetType()
     if (version_set)
         return version;
     version = "";
-#if !ENABLE_IPC
+#if not ENABLE_IPC
     version += " NOIPC";
 #endif
-#if !ENABLE_GUI
+#if not ENABLE_GUI
     version += " NOGUI";
 #else
     version += " GUI";
 #endif
 
-#if !ENABLE_VISUALS
+#if not ENABLE_VISUALS
     version += " NOVISUALS";
 #endif
 
@@ -138,7 +144,7 @@ static void InitRandom()
     if (!rnd || fread(&rand_seed, sizeof(rand_seed), 1, rnd) < 1)
     {
         logging::Info("Warning!!! Failed read from /dev/urandom (%s). Randomness is going to be weak", strerror(errno));
-        timespec t{};
+        timespec t;
         clock_gettime(CLOCK_MONOTONIC, &t);
         rand_seed = t.tv_nsec ^ (t.tv_sec & getpid());
     }
@@ -149,7 +155,7 @@ static void InitRandom()
 
 void hack::Hook()
 {
-    uintptr_t *clientMode;
+    uintptr_t *clientMode = 0;
     // Bad way to get clientmode.
     // FIXME [MP]?
     while (!(clientMode = **(uintptr_t ***) ((uintptr_t) ((*(void ***) g_IBaseClient)[10]) + 1)))

@@ -97,8 +97,8 @@ static bool old_isMMBanned()
 static bool getMMBanData(int type, int *time, int *time2)
 {
     typedef bool (*GetMMBanData_t)(int, int *, int *);
-    static uintptr_t addr       = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC ? 8B 5D 08 8B 75 0C 8B 7D 10 83 FB FF");
-    static auto GetMMBanData_fn = GetMMBanData_t(addr);
+    static uintptr_t addr                 = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC ? 8B 5D 08 8B 75 0C 8B 7D 10 83 FB FF");
+    static GetMMBanData_t GetMMBanData_fn = GetMMBanData_t(addr);
 
     if (!addr)
     {

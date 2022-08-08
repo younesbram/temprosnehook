@@ -7,10 +7,12 @@
 
 #include "common.hpp"
 
-#include <cstring>
+#include <stdlib.h>
+#include <string.h>
 
 namespace hooks
 {
+
 unsigned CountMethods(method_table_t table)
 {
     unsigned int i = 0;
@@ -43,7 +45,7 @@ VMTHook::VMTHook()
 {
     static_assert(ptr_size == 4, "Pointer size must be DWORD.");
     hooks.push_back(this);
-}
+};
 
 VMTHook::~VMTHook()
 {

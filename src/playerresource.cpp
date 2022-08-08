@@ -177,7 +177,7 @@ bool TFPlayerResource::isAlive(int idx)
 {
     IClientEntity *ent = g_IEntityList->GetClientEntity(entity);
     if (!ent || ent->GetClientClass()->m_ClassID != RCC_PLAYERRESOURCE)
-        return false;
+        return 0;
     if (idx >= MAX_PLAYERS || idx < 0)
         return false;
     return *(bool *) ((unsigned) ent + netvar.res_bAlive + idx);
@@ -187,7 +187,7 @@ bool TFPlayerResource::isValid(int idx)
 {
     IClientEntity *ent = g_IEntityList->GetClientEntity(entity);
     if (!ent || ent->GetClientClass()->m_ClassID != RCC_PLAYERRESOURCE)
-        return false;
+        return 0;
     if (idx >= MAX_PLAYERS || idx < 0)
         return false;
     return *(bool *) ((unsigned) ent + netvar.res_bValid + idx);

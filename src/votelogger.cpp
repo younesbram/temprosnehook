@@ -26,12 +26,13 @@ namespace votelogger
 
 static bool was_local_player{ false };
 static Timer local_kick_timer{};
+static int kicked_player;
 
 static void vote_rage_back()
 {
     static Timer attempt_vote_time;
     char cmd[40];
-    player_info_s info{};
+    player_info_s info;
     std::vector<int> targets;
 
     if (!g_IEngine->IsInGame() || !attempt_vote_time.test_and_set(1000))
@@ -61,7 +62,7 @@ static void vote_rage_back()
 struct CVRNG
 {
     std::string content;
-    unsigned time{};
+    unsigned time;
     Timer timer{};
 };
 static CVRNG vote_command;
@@ -94,6 +95,7 @@ void dispatchUserMessage(bf_read &buffer, int type)
         if (!GetPlayerInfo(target, &info) || !GetPlayerInfo(caller, &info2))
             break;
 
+        kicked_player = target;
         logging::Info("Vote called to kick %s [U:1:%u] for %s by %s [U:1:%u]", info.name, info.friendsID, reason, info2.name, info2.friendsID);
         if (info.friendsID == g_ISteamUser->GetSteamID().GetAccountID())
         {
@@ -154,9 +156,9 @@ void dispatchUserMessage(bf_read &buffer, int type)
     }
 }
 static bool found_message = false;
-void onShutdown(const std::string &message)
+void onShutdown(std::string message)
 {
-    if (message.find("Generic_Kicked") == std::string::npos)
+    if (message.find("Generic_Kicked") == message.npos)
     {
         found_message = false;
         return;
@@ -182,7 +184,7 @@ static void setup_paint_abandon()
         EC::Paint,
         []()
         {
-            if (!vote_command.content.empty() && vote_command.timer.test_and_set(vote_command.time))
+            if (vote_command.content != "" && vote_command.timer.test_and_set(vote_command.time))
             {
                 g_IEngine->ClientCmd_Unrestricted(vote_command.content.c_str());
                 vote_command.content = "";
@@ -192,7 +194,7 @@ static void setup_paint_abandon()
             if (local_kick_timer.check(60000) || !local_kick_timer.test_and_set(10000) || !was_local_player)
                 return;
             if (abandon_and_crash_on_kick)
-                *(int *) nullptr = 0;
+                *(int *) 0 = 0;
         },
         "vote_abandon_restart");
 }

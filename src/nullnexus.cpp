@@ -66,7 +66,7 @@ void authedplayers(std::vector<std::string> steamids)
         {
             if (pinfo.friendsID == 0)
                 continue;
-            MD5Value_t result{};
+            MD5Value_t result;
             std::string steamidhash = std::to_string(pinfo.friendsID) + pinfo.name;
             MD5_ProcessSingleBuffer(steamidhash.c_str(), strlen(steamidhash.c_str()), result);
             std::stringstream ss;
@@ -94,7 +94,7 @@ void authedplayers(std::vector<std::string> steamids)
 // Update info about the current server we are on.
 void updateServer(NullNexus::UserSettings &settings)
 {
-    auto *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
+    INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
     // Additional currently inactive security measure, may be activated at any time
     static int *gHostSpawnCount = *reinterpret_cast<int **>(gSignatures.GetEngineSignature("A3 ? ? ? ? A1 ? ? ? ? 8B 10 89 04 24 FF 52 ? 83 C4 2C") + sizeof(char));
     if (ch && *authenticate)
@@ -106,7 +106,7 @@ void updateServer(NullNexus::UserSettings &settings)
             player_info_s pinfo{};
             if (GetPlayerInfo(g_pLocalPlayer->entity_idx, &pinfo))
             {
-                MD5Value_t result{};
+                MD5Value_t result;
                 std::string steamidhash = std::to_string(pinfo.friendsID) + pinfo.name;
                 MD5_ProcessSingleBuffer(steamidhash.c_str(), strlen(steamidhash.c_str()), result);
                 std::stringstream ss;
@@ -133,9 +133,9 @@ void updateServer()
 
 void updateData()
 {
-    std::optional<std::string> username;
-    std::optional<int> newcolour = std::nullopt;
-    username                     = *anon ? "anon" : g_ISteamFriends->GetPersonaName();
+    std::optional<std::string> username = std::nullopt;
+    std::optional<int> newcolour        = std::nullopt;
+    username                            = *anon ? "anon" : g_ISteamFriends->GetPersonaName();
 #if ENABLE_VISUALS
     if ((*colour).r || (*colour).g || (*colour).b)
     {

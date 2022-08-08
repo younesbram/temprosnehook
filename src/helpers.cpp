@@ -106,7 +106,7 @@ ConVar *CreateConVar(std::string name, std::string value, std::string help)
     strncpy(valuec, value.c_str(), 255);
     strncpy(helpc, help.c_str(), 255);
     // logging::Info("Creating ConVar: %s %s %s", namec, valuec, helpc);
-    auto *ret = new ConVar(const_cast<const char *>(namec), const_cast<const char *>(valuec), 0, const_cast<const char *>(helpc));
+    ConVar *ret = new ConVar(const_cast<const char *>(namec), const_cast<const char *>(valuec), 0, const_cast<const char *>(helpc));
     g_ICvar->RegisterConCommand(ret);
     RegisteredVarsList().push_back(ret);
     return ret;
@@ -381,7 +381,7 @@ bool canReachVector(Vector loc, Vector dest)
                 Ray_t ray;
                 ray.Init(vec, directionalLoc);
                 {
-                    PROF_SECTION(IEVV_TraceRay)
+                    PROF_SECTION(IEVV_TraceRay);
                     g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_no_player, &trace);
                 }
                 // distance of trace < than 26
@@ -424,7 +424,7 @@ bool canReachVector(Vector loc, Vector dest)
             Ray_t ray;
             ray.Init(loc, directionalLoc);
             {
-                PROF_SECTION(IEVV_TraceRay)
+                PROF_SECTION(IEVV_TraceRay);
                 g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_no_player, &trace);
             }
             // distance of trace < than 26
@@ -492,7 +492,7 @@ Vector ComputeMove(const Vector &a, const Vector &b)
 
 ConCommand *CreateConCommand(const char *name, FnCommandCallback_t callback, const char *help)
 {
-    auto *ret = new ConCommand(name, callback, help);
+    ConCommand *ret = new ConCommand(name, callback, help);
     g_ICvar->RegisterConCommand(ret);
     RegisteredCommandsList().push_back(ret);
     return ret;
@@ -1076,7 +1076,7 @@ bool VisCheckEntFromEnt(CachedEntity *startEnt, CachedEntity *endEnt)
     Ray_t ray;
     ray.Init(startEnt->m_vecOrigin(), endEnt->m_vecOrigin());
     {
-        PROF_SECTION(IEVV_TraceRay)
+        PROF_SECTION(IEVV_TraceRay);
         g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, &trace);
     }
     // Is the entity that we hit our target ent? if so, the vis check passes
@@ -1103,7 +1103,7 @@ bool VisCheckEntFromEntVector(Vector startVector, CachedEntity *startEnt, Cached
     Ray_t ray;
     ray.Init(startVector, endEnt->m_vecOrigin());
     {
-        PROF_SECTION(IEVV_TraceRay)
+        PROF_SECTION(IEVV_TraceRay);
         g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, &trace);
     }
     // Is the entity that we hit our target ent? if so, the vis check passes
@@ -1172,11 +1172,11 @@ CachedEntity *weapon_get(CachedEntity *entity)
     int handle, eid;
 
     if (CE_BAD(entity))
-        return nullptr;
+        return 0;
     handle = CE_INT(entity, netvar.hActiveWeapon);
     eid    = handle & 0xFFF;
     if (IDX_BAD(eid))
-        return nullptr;
+        return 0;
     return ENTITY(eid);
 }
 
@@ -1428,7 +1428,7 @@ bool IsVectorVisible(Vector origin, Vector target, bool enviroment_only, CachedE
 
         trace::filter_no_player.SetSelf(RAW_ENT(self));
         ray.Init(origin, target);
-        PROF_SECTION(IEVV_TraceRay)
+        PROF_SECTION(IEVV_TraceRay);
         g_ITrace->TraceRay(ray, mask, &trace::filter_no_player, &trace_visible);
         return (trace_visible.fraction == 1.0f);
     }
@@ -1439,7 +1439,7 @@ bool IsVectorVisible(Vector origin, Vector target, bool enviroment_only, CachedE
 
         trace::filter_no_entity.SetSelf(RAW_ENT(self));
         ray.Init(origin, target);
-        PROF_SECTION(IEVV_TraceRay)
+        PROF_SECTION(IEVV_TraceRay);
         g_ITrace->TraceRay(ray, mask, &trace::filter_no_entity, &trace_visible);
         return (trace_visible.fraction == 1.0f);
     }
@@ -1451,7 +1451,7 @@ bool IsVectorVisibleNavigation(Vector origin, Vector target, unsigned int mask)
     Ray_t ray;
 
     ray.Init(origin, target);
-    PROF_SECTION(IEVV_TraceRay)
+    PROF_SECTION(IEVV_TraceRay);
     g_ITrace->TraceRay(ray, mask, &trace::filter_navigation, &trace_visible);
     return (trace_visible.fraction == 1.0f);
 }
@@ -1476,7 +1476,7 @@ void WhatIAmLookingAt(int *result_eindex, Vector *result_pos)
     forward   = forward * 8192.0f + g_pLocalPlayer->v_Eye;
     ray.Init(g_pLocalPlayer->v_Eye, forward);
     {
-        PROF_SECTION(IEVV_TraceRay)
+        PROF_SECTION(IEVV_TraceRay);
         g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_default, &trace);
     }
     if (result_pos)
@@ -1731,7 +1731,7 @@ bool IsEntityVisiblePenetration(CachedEntity *entity, int hb)
     }
     ray.Init(g_pLocalPlayer->v_Origin + g_pLocalPlayer->v_ViewOffset, hit);
     {
-        PROF_SECTION(IEVV_TraceRay)
+        PROF_SECTION(IEVV_TraceRay);
         g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_penetration, &trace_visible);
     }
     correct_entity = false;
@@ -1742,7 +1742,7 @@ bool IsEntityVisiblePenetration(CachedEntity *entity, int hb)
     if (!correct_entity)
         return false;
     {
-        PROF_SECTION(IEVV_TraceRay)
+        PROF_SECTION(IEVV_TraceRay);
         g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_default, &trace_visible);
     }
     if (trace_visible.m_pEnt)
@@ -1791,7 +1791,7 @@ CatCommand print_classnames("debug_print_classnames", "Lists classnames currentl
 void PrintChat(const char *fmt, ...)
 {
 #if ENABLE_VISUALS
-    auto *chat = (CHudBaseChat *) g_CHUD->FindElement("CHudChat");
+    CHudBaseChat *chat = (CHudBaseChat *) g_CHUD->FindElement("CHudChat");
     if (chat)
     {
         std::unique_ptr<char[]> buf(new char[1024]);
@@ -1844,15 +1844,15 @@ Vector getShootPos(Vector angle)
         vecOffset = Vector(23.5f, 8.0f, -3.0f);
         switch (LOCAL_W->m_iClassID())
         {
-        case CL_CLASS(CTFParticleCannon): // Cow Mangler 5000
-        case CL_CLASS(CTFRaygun):         // Righteous Bison
-        {
-            if (CE_INT(LOCAL_E, netvar.iFlags) & FL_DUCKING)
-                vecOffset->z = 8.0f;
-            break;
-        }
-        default:
-            break;
+            case CL_CLASS(CTFParticleCannon): // Cow Mangler 5000
+            case CL_CLASS(CTFRaygun): // Righteous Bison
+            {
+                if (CE_INT(LOCAL_E, netvar.iFlags) & FL_DUCKING)
+                    vecOffset->z = 8.0f;
+                break;
+            }
+            default:
+                break;
         }
         break;
     }
@@ -1947,7 +1947,7 @@ void ChangeName(std::string name)
 
     ReplaceSpecials(name);
     NET_SetConVar setname("name", name.c_str());
-    auto *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
+    INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
     if (ch)
     {
         setname.SetNetChannel(ch);
@@ -1993,7 +1993,7 @@ bool GetPlayerInfo(int idx, player_info_s *info)
     {
         std::string guid = info->guid;
         guid             = guid.substr(5, guid.length() - 6);
-        info->friendsID  = std::stoul(guid);
+        info->friendsID  = std::stoul(guid.c_str());
     }
     catch (...)
     {
@@ -2007,7 +2007,7 @@ int GetPlayerForUserID(int userID)
 {
     for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
     {
-        player_info_s player_info{};
+        player_info_s player_info;
         if (!GetPlayerInfo(i, &player_info))
             continue;
         // Found player
@@ -2033,7 +2033,7 @@ bool HookNetvar(std::vector<std::string> path, ProxyFnHook &hook, RecvVarProxyFn
                 bool found = false;
                 for (int j = 0; j < curr_table->m_nProps; j++)
                 {
-                    auto *pProp = (RecvPropRedef *) &(curr_table->m_pProps[j]);
+                    RecvPropRedef *pProp = (RecvPropRedef *) &(curr_table->m_pProps[j]);
                     if (!pProp)
                         continue;
                     if (!strcmp(path[i].c_str(), pProp->m_pVarName))

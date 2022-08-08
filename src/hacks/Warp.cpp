@@ -299,11 +299,11 @@ bool shouldWarp(bool check_amount)
            // Hurt warp?
            || was_hurt
            // Rapidfire and trying to attack?
-           || shouldRapidfire()) &&
-          // Do we have enough to warp?
-          (!check_amount || warp_amount))
-         // Option is enabled, in melee range and target is visible to us
-         || (warp_melee && nearest.second < 175 && hacks::NavBot::isVisible));
+           || shouldRapidfire())
+           // Option is enabled, in melee range and target is visible to us
+           || (warp_melee && nearest.second < 175 && hacks::NavBot::isVisible))
+        // Do we have enough to warp?
+        && (!check_amount || warp_amount));
 }
 
 // How many ticks of excess we have (for decimal speeds)

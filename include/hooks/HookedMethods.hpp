@@ -52,7 +52,6 @@ DECLARE_HOOKED_METHOD(Shutdown, void, INetChannel *, const char *)
 DECLARE_HOOKED_METHOD(SendDatagram, int, INetChannel *, bf_write *)
 // ISteamFriends
 DECLARE_HOOKED_METHOD(GetFriendPersonaName, const char *, ISteamFriends *, CSteamID)
-DECLARE_HOOKED_METHOD(SetRichPresence, bool, const char*, const char*);
 // IEngineVGui
 DECLARE_HOOKED_METHOD(Paint, void, IEngineVGui *, PaintMode_t)
 // IGameEventManager2

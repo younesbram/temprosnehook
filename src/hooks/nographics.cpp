@@ -110,12 +110,14 @@ static bool blacklist_file(const char *&filename)
     if (!std::strncmp(filename, "sound/player/footsteps", 22))
         return false;
     if (!std::strcmp(ext_p, ".mdl"))
+    {
         return false;
+    }
     if (!std::strncmp(filename, "/decal", 6))
         return true;
 
-    for (auto &i : blacklist)
-        if (!std::strcmp(ext_p, i))
+    for (int i = 0; i < sizeof(blacklist) / sizeof(blacklist[0]); ++i)
+        if (!std::strcmp(ext_p, blacklist[i]))
             return true;
 
     return false;

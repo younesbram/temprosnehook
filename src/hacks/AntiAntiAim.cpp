@@ -30,7 +30,7 @@ static inline void modifyAngles()
 static inline void CreateMove()
 {
     // Empty the array
-    sniperdot_array.fill(0);
+    sniperdot_array.fill(nullptr);
     // Find sniper dots
     for (auto &dot_ent : entity_cache::valid_ents)
     {
@@ -162,8 +162,8 @@ void increaseBruteNum(int idx)
 
 static void pitchHook(const CRecvProxyData *pData, void *pStruct, void *pOut)
 {
-    float flPitch      = pData->m_Value.m_Float;
-    float *flPitch_out = (float *) pOut;
+    float flPitch     = pData->m_Value.m_Float;
+    auto *flPitch_out = (float *) pOut;
 
     if (!enable)
     {
@@ -179,8 +179,8 @@ static void pitchHook(const CRecvProxyData *pData, void *pStruct, void *pOut)
 
 static void yawHook(const CRecvProxyData *pData, void *pStruct, void *pOut)
 {
-    float flYaw      = pData->m_Value.m_Float;
-    float *flYaw_out = (float *) pOut;
+    float flYaw     = pData->m_Value.m_Float;
+    auto *flYaw_out = (float *) pOut;
 
     if (!enable)
     {
@@ -211,14 +211,14 @@ static void hook()
         {
             for (int i = 0; i < pClass->m_pRecvTable->m_nProps; i++)
             {
-                RecvPropRedef *pProp1 = (RecvPropRedef *) &(pClass->m_pRecvTable->m_pProps[i]);
+                auto *pProp1 = (RecvPropRedef *) &(pClass->m_pRecvTable->m_pProps[i]);
                 if (!pProp1)
                     continue;
                 const char *pszName2 = pProp1->m_pVarName;
                 if (!strcmp(pszName2, "tfnonlocaldata"))
                     for (int j = 0; j < pProp1->m_pDataTable->m_nProps; j++)
                     {
-                        RecvPropRedef *pProp2 = (RecvPropRedef *) &(pProp1->m_pDataTable->m_pProps[j]);
+                        auto *pProp2 = (RecvPropRedef *) &(pProp1->m_pDataTable->m_pProps[j]);
                         if (!pProp2)
                             continue;
                         const char *name = pProp2->m_pVarName;

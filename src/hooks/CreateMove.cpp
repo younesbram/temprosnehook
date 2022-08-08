@@ -36,13 +36,13 @@ void RunEnginePrediction(IClientEntity *ent, CUserCmd *ucmd)
     typedef void (*SetupMoveFn)(IPrediction *, IClientEntity *, CUserCmd *, class IMoveHelper *, CMoveData *);
     typedef void (*FinishMoveFn)(IPrediction *, IClientEntity *, CUserCmd *, CMoveData *);
 
-    void **predictionVtable  = *((void ***) g_IPrediction);
-    SetupMoveFn oSetupMove   = (SetupMoveFn) (*(unsigned *) (predictionVtable + 19));
-    FinishMoveFn oFinishMove = (FinishMoveFn) (*(unsigned *) (predictionVtable + 20));
+    void **predictionVtable = *((void ***) g_IPrediction);
+    auto oSetupMove         = (SetupMoveFn) (*(unsigned *) (predictionVtable + 19));
+    auto oFinishMove        = (FinishMoveFn) (*(unsigned *) (predictionVtable + 20));
     // CMoveData *pMoveData = (CMoveData*)(sharedobj::client->lmap->l_addr +
     // 0x1F69C0C);  CMoveData movedata {};
-    auto object          = std::make_unique<char[]>(165);
-    CMoveData *pMoveData = (CMoveData *) object.get();
+    auto object     = std::make_unique<char[]>(165);
+    auto *pMoveData = (CMoveData *) object.get();
 
     // Backup
     float frameTime = g_GlobalVars->frametime;
@@ -52,9 +52,7 @@ void RunEnginePrediction(IClientEntity *ent, CUserCmd *ucmd)
 
     CUserCmd defaultCmd{};
     if (ucmd == nullptr)
-    {
         ucmd = &defaultCmd;
-    }
 
     // Set Usercmd for prediction
     NET_VAR(ent, 4188, CUserCmd *) = ucmd;
@@ -67,7 +65,7 @@ void RunEnginePrediction(IClientEntity *ent, CUserCmd *ucmd)
 
     // Run The Prediction
     g_IGameMovement->StartTrackPredictionErrors(reinterpret_cast<CBasePlayer *>(ent));
-    oSetupMove(g_IPrediction, ent, ucmd, NULL, pMoveData);
+    oSetupMove(g_IPrediction, ent, ucmd, nullptr, pMoveData);
     g_IGameMovement->ProcessMovement(reinterpret_cast<CBasePlayer *>(ent), pMoveData);
     oFinishMove(g_IPrediction, ent, ucmd, pMoveData);
     g_IGameMovement->FinishTrackPredictionErrors(reinterpret_cast<CBasePlayer *>(ent));
@@ -81,8 +79,6 @@ void RunEnginePrediction(IClientEntity *ent, CUserCmd *ucmd)
 
     // Adjust tickbase
     NET_INT(ent, netvar.nTickBase)++;
-
-    return;
 }
 // Restore Origin
 void FinishEnginePrediction(IClientEntity *ent, CUserCmd *ucmd)
@@ -152,7 +148,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
 #endif
 
     // Disabled because this causes EXTREME aimbot inaccuracy
-    // Actually dont disable it. It causes even more inaccuracy
+    // Actually don't disable it. It causes even more inaccuracy
     if (!cmd->command_number)
     {
         g_Settings.is_create_move = false;
@@ -174,7 +170,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
         return true;
     }
 
-    PROF_SECTION(CreateMove);
+    PROF_SECTION(CreateMove)
 #if ENABLE_VISUALS
     stored_buttons = current_user_cmd->buttons;
     if (freecam_is_toggled)
@@ -198,31 +194,29 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
     time_replaced = false;
     curtime_old   = g_GlobalVars->curtime;
 
-    if (!g_Settings.bInvalid && CE_GOOD(g_pLocalPlayer->entity))
+    if (CE_GOOD(g_pLocalPlayer->entity))
     {
         servertime            = (float) CE_INT(g_pLocalPlayer->entity, netvar.nTickBase) * g_GlobalVars->interval_per_tick;
         g_GlobalVars->curtime = servertime;
         time_replaced         = true;
     }
     if (g_Settings.bInvalid)
-    {
         entity_cache::Invalidate();
-    }
 
     //	PROF_BEGIN();
     // Do not update if in warp, since the entities will stay identical either way
     if (!hacks::warp::in_warp)
     {
-        PROF_SECTION(EntityCache);
+        PROF_SECTION(EntityCache)
         entity_cache::Update();
     }
     //	PROF_END("Entity Cache updating");
     {
-        PROF_SECTION(CM_PlayerResource);
+        PROF_SECTION(CM_PlayerResource)
         g_pPlayerResource->Update();
     }
     {
-        PROF_SECTION(CM_LocalPlayer);
+        PROF_SECTION(CM_LocalPlayer)
         g_pLocalPlayer->Update();
     }
     PrecalculateCanShoot();
@@ -230,9 +224,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
     {
         DelayTimer.update();
         if (identify)
-        {
             sendIdentifyMessage(false);
-        }
         EC::run(EC::FirstCM);
         firstcm = false;
     }
@@ -288,7 +280,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
                     }
                 }
             {
-                PROF_SECTION(CM_antiaim);
+                PROF_SECTION(CM_antiaim)
                 hacks::antiaim::ProcessUserCmd(cmd);
             }
             if (debug_projectiles)
@@ -296,7 +288,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
         }
     }
     {
-        PROF_SECTION(CM_WRAPPER);
+        PROF_SECTION(CM_WRAPPER)
         EC::run(EC::CreateMove_NoEnginePred);
 
         if (engine_pred)
@@ -314,7 +306,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
         g_GlobalVars->curtime = curtime_old;
     g_Settings.bInvalid = false;
     {
-        PROF_SECTION(CM_chat_stack);
+        PROF_SECTION(CM_chat_stack)
         chat_stack::OnCreateMove();
     }
 
@@ -322,13 +314,11 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
 
 #if ENABLE_IPC
     {
-        PROF_SECTION(CM_playerlist);
+        PROF_SECTION(CM_playerlist)
         static Timer ipc_update_timer{};
         //	playerlist::DoNotKillMe();
-        if (ipc_update_timer.test_and_set(1000 * 10))
-        {
+        if (ipc_update_timer.test_and_set(10000))
             ipc::UpdatePlayerlist();
-        }
     }
 #endif
     if (CE_GOOD(g_pLocalPlayer->entity))
@@ -443,7 +433,7 @@ DEFINE_HOOKED_METHOD(CreateMoveInput, void, IInput *this_, int sequence_nr, floa
         return;
     }
 
-    PROF_SECTION(CreateMoveInput);
+    PROF_SECTION(CreateMoveInput)
 
     // Run EC
     EC::run(EC::CreateMoveLate);

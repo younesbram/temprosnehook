@@ -1,11 +1,9 @@
 #include "HookedMethods.hpp"
-#include "MiscTemporary.hpp"
 #include "CatBot.hpp"
 #include "interfaces.hpp"
 #include "ipc.hpp"
 namespace hooked_methods
 {
-
 DEFINE_HOOKED_METHOD(ClientCmd_Unrestricted, void, IVEngineClient013 *_this, const char *command)
 {
     if (ipc::peer && hacks::catbot::abandon_if_ipc_bots_gte)
@@ -29,9 +27,7 @@ DEFINE_HOOKED_METHOD(ClientCmd_Unrestricted, void, IVEngineClient013 *_this, con
 
                         std::string remote_server_ip(peer_mem->peer_user_data[i].ingame.server);
                         if (remote_server_ip == server_ip)
-                        {
                             count_ipc++;
-                        }
                     }
                 }
             }

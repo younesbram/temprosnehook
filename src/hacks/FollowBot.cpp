@@ -127,8 +127,8 @@ static void checkAFK()
 
 static void init()
 {
-    for (size_t i = 0; i < afkTicks.size(); i++)
-        afkTicks[i].update();
+    for (auto &afkTick : afkTicks)
+        afkTick.update();
 
     inited = true;
 }
@@ -516,7 +516,7 @@ static void cm()
         if (!navparser::NavEngine::isReady())
         {
             follow_target = 0;
-            navtarget     = 0;
+            navtarget     = false;
         }
 
         if (!CE_GOOD(ent) || !startFollow(ent, false))
@@ -735,7 +735,7 @@ static CatCommand follow_me("fb_follow_me", "IPC connected bots will follow you"
                                     logging::Info("Can't get a local player");
                                     return;
                                 }
-                                player_info_s info;
+                                player_info_s info{};
                                 GetPlayerInfo(local_ent->m_IDX, &info);
                                 auto steam_id = info.friendsID;
                                 if (!steam_id)
@@ -747,9 +747,9 @@ static CatCommand follow_me("fb_follow_me", "IPC connected bots will follow you"
                                 // Construct the command
                                 std::string tmp = CON_PREFIX + follow_steam.name + " " + std::to_string(steam_id);
                                 if (tmp.length() >= 63)
-                                    ipc::peer->SendMessage(0, -1, ipc::commands::execute_client_cmd_long, tmp.c_str(), tmp.length() + 1);
+                                    ipc::peer->SendMessage(nullptr, -1, ipc::commands::execute_client_cmd_long, tmp.c_str(), tmp.length() + 1);
                                 else
-                                    ipc::peer->SendMessage(tmp.c_str(), -1, ipc::commands::execute_client_cmd, 0, 0);
+                                    ipc::peer->SendMessage(tmp.c_str(), -1, ipc::commands::execute_client_cmd, nullptr, 0);
                             });
 #endif
 void rvarCallback(settings::VariableBase<int> &var, int after)

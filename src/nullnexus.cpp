@@ -96,7 +96,7 @@ void updateServer(NullNexus::UserSettings &settings)
 {
     auto *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
     // Additional currently inactive security measure, may be activated at any time
-    static int *gHostSpawnCount = *reinterpret_cast<int **>(gSignatures.GetEngineSignature("A3 ? ? ? ? A1 ? ? ? ? 8B 10 89 04 24 FF 52 ? 83 C4 2C") + sizeof(char));
+    static int *gHostSpawnCount = *reinterpret_cast<int **>(CSignature::GetEngineSignature("A3 ? ? ? ? A1 ? ? ? ? 8B 10 89 04 24 FF 52 ? 83 C4 2C") + sizeof(char));
     if (ch && *authenticate)
     {
         auto addr = ch->GetRemoteAddress();

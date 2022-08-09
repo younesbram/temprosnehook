@@ -867,11 +867,11 @@ static InitRoutine init_bulletnospread(
     []()
     {
         // Get our detour hooks running
-        static auto writeusercmd_addr = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 2C 8B 45 ? 8B 7D ? 8B 5D ? 89 45 ? 8B 40");
+        static auto writeusercmd_addr = CSignature::GetClientSignature("55 89 E5 57 56 53 83 EC 2C 8B 45 ? 8B 7D ? 8B 5D ? 89 45 ? 8B 40");
         cl_writeusercmd_detour.Init(writeusercmd_addr, (void *) WriteUserCmd_hook);
-        static auto fx_firebullets_addr = gSignatures.GetClientSignature("55 89 E5 57 56 53 81 EC 0C 01 00 00 8B 45 ? 8B 7D ? 89 85");
+        static auto fx_firebullets_addr = CSignature::GetClientSignature("55 89 E5 57 56 53 81 EC 0C 01 00 00 8B 45 ? 8B 7D ? 89 85");
         fx_firebullets_detour.Init(fx_firebullets_addr, (void *) FX_FireBullets_hook);
-        /*static auto net_sendpacket_addr = gSignatures.GetEngineSignature("55 89 E5 57 56 53 81 EC EC 20 00 00 C7 85 ? ? ? ? 00 00 00 00 8B 45");
+        /*static auto net_sendpacket_addr = CSignature::GetEngineSignature("55 89 E5 57 56 53 81 EC EC 20 00 00 C7 85 ? ? ? ? 00 00 00 00 8B 45");
         net_sendpacket_detour.Init(net_sendpacket_addr, (void *) NET_SendPacket_hook);*/
 
         // Register Event callbacks

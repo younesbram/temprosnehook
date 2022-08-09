@@ -7,7 +7,6 @@
 
 #include "common.hpp"
 #include "PlayerTools.hpp"
-#include "Trigger.hpp"
 #include "Backtrack.hpp"
 #include "conditions.hpp"
 #include "helpers.hpp"
@@ -76,12 +75,12 @@ bool doMovedSwingTrace(CachedEntity *target, Vector new_target_origin)
     uintptr_t collisionprop = (uintptr_t) RAW_ENT(target) + netvar.m_Collision;
 
     typedef void (*MarkSurroundingBoundsDirty_t)(uintptr_t prop);
-    static auto sig_mark                                              = gSignatures.GetClientSignature("55 89 E5 56 53 83 EC 10 8B 5D ? 8B 43 ? 81 88 ? ? ? ? 00 40 00 00");
-    static MarkSurroundingBoundsDirty_t MarkSurroundingBoundsDirty_fn = (MarkSurroundingBoundsDirty_t) sig_mark;
+    static auto sig_mark                                              = CSignature::GetClientSignature("55 89 E5 56 53 83 EC 10 8B 5D ? 8B 43 ? 81 88 ? ? ? ? 00 40 00 00");
+    static auto MarkSurroundingBoundsDirty_fn = (MarkSurroundingBoundsDirty_t) sig_mark;
 
     typedef void (*UpdateParition_t)(uintptr_t prop);
-    static auto sig_update                     = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 3C 8B 5D ? 8B 43 ? 8B 90");
-    static UpdateParition_t UpdatePartition_fn = (UpdateParition_t) sig_update;
+    static auto sig_update                     = CSignature::GetClientSignature("55 89 E5 57 56 53 83 EC 3C 8B 5D ? 8B 43 ? 8B 90");
+    static auto UpdatePartition_fn = (UpdateParition_t) sig_update;
 
     // Mark for update
     MarkSurroundingBoundsDirty_fn(collisionprop);
@@ -107,7 +106,7 @@ bool doMovedSwingTrace(CachedEntity *target, Vector new_target_origin)
 int ClosestDistanceHitbox(CachedEntity *target)
 {
     int closest        = -1;
-    float closest_dist = FLT_MAX, dist = 0.0f;
+    float closest_dist = FLT_MAX, dist;
     for (int i = pelvis; i < spine_3; i++)
     {
         auto hitbox = target->hitboxes.GetHitbox(i);
@@ -125,7 +124,7 @@ int ClosestDistanceHitbox(CachedEntity *target)
 int ClosestDistanceHitbox(hacks::backtrack::BacktrackData btd)
 {
     int closest        = -1;
-    float closest_dist = FLT_MAX, dist = 0.0f;
+    float closest_dist = FLT_MAX, dist;
     for (int i = pelvis; i < spine_3; i++)
     {
         dist = g_pLocalPlayer->v_Eye.DistTo(btd.hitboxes.at(i).center);
@@ -321,7 +320,7 @@ static bool doRageBackstab()
 static bool legit_stab = false;
 static Vector newangle_apply;
 
-bool IsTickGood(hacks::backtrack::BacktrackData tick)
+bool IsTickGood(const hacks::backtrack::BacktrackData &tick)
 {
     CachedEntity *ent = ENTITY(tick.entidx);
     Vector target_vec = tick.m_vecOrigin;
@@ -336,7 +335,7 @@ bool IsTickGood(hacks::backtrack::BacktrackData tick)
     if (!angleCheck(ent, target_worldspace, angle))
         return false;
 
-    trace_t trace;
+    trace_t();
     if (doMovedSwingTrace(ent, target_vec))
     {
         newangle_apply = angle;

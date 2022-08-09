@@ -33,7 +33,7 @@ ItemSchemaPtr_t GetItemSchema(void)
 {
     if (!ItemSystem)
     {
-        ItemSystem = (ItemSystem_t) gSignatures.GetClientSignature((char *) sig_GetItemSchema);
+        ItemSystem = (ItemSystem_t) CSignature::GetClientSignature((char *) sig_GetItemSchema);
     }
     return (void *) ((uint32_t) (ItemSystem()) + 4);
 }
@@ -274,12 +274,12 @@ void FrameStageNotify(int stage)
 
     if (!SetRuntimeAttributeValueFn)
     {
-        SetRuntimeAttributeValueFn = (SetRuntimeAttributeValue_t) (gSignatures.GetClientSignature((char *) sig_SetRuntimeAttributeValue));
+        SetRuntimeAttributeValueFn = (SetRuntimeAttributeValue_t) (CSignature::GetClientSignature((char *) sig_SetRuntimeAttributeValue));
         logging::Info("SetRuntimeAttributeValue: 0x%08x", SetRuntimeAttributeValueFn);
     }
     if (!GetAttributeDefinitionFn)
     {
-        GetAttributeDefinitionFn = (GetAttributeDefinition_t) (gSignatures.GetClientSignature((char *) sig_GetAttributeDefinition));
+        GetAttributeDefinitionFn = (GetAttributeDefinition_t) (CSignature::GetClientSignature((char *) sig_GetAttributeDefinition));
         logging::Info("GetAttributeDefinition: 0x%08x", GetAttributeDefinitionFn);
     }
 

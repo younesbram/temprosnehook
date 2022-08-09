@@ -154,19 +154,19 @@ struct bonelist_s
         }
         try
         {
-            for (int i = 0; i < 3; i++)
+            for (unsigned i = 0; i < 3; i++)
                 leg_r[i] = bones.at(bonenames_leg_r[i]);
-            for (int i = 0; i < 3; i++)
+            for (unsigned i = 0; i < 3; i++)
                 leg_l[i] = bones.at(bonenames_leg_l[i]);
-            for (int i = 0; i < 3; i++)
+            for (unsigned i = 0; i < 3; i++)
                 bottom[i] = bones.at(bonenames_bottom[i]);
-            for (int i = 0; i < 7; i++)
+            for (unsigned i = 0; i < 7; i++)
                 spine[i] = bones.at(bonenames_spine[i]);
-            for (int i = 0; i < 3; i++)
+            for (unsigned i = 0; i < 3; i++)
                 arm_r[i] = bones.at(bonenames_arm_r[i]);
-            for (int i = 0; i < 3; i++)
+            for (unsigned i = 0; i < 3; i++)
                 arm_l[i] = bones.at(bonenames_arm_l[i]);
-            for (int i = 0; i < 3; i++)
+            for (unsigned i = 0; i < 3; i++)
                 up[i] = bones.at(bonenames_up[i]);
             success = true;
         }
@@ -177,7 +177,7 @@ struct bonelist_s
         setup = true;
     }
 
-    void _FASTCALL DrawBoneList(const matrix3x4_t *bones, int *in, int size, const rgba_t &color)
+    void _FASTCALL DrawBoneList(const matrix3x4_t *bones, const int *in, int size, const rgba_t &color)
     {
         Vector last_screen;
         Vector current_screen;
@@ -186,13 +186,9 @@ struct bonelist_s
             const auto &bone = bones[in[i]];
             Vector position(bone[0][3], bone[1][3], bone[2][3]);
             if (!draw::WorldToScreen(position, current_screen))
-            {
                 return;
-            }
             if (i > 0)
-            {
                 draw::Line(last_screen.x, last_screen.y, current_screen.x - last_screen.x, current_screen.y - last_screen.y, color, *bones_thickness);
-            }
             last_screen = current_screen;
         }
     }
@@ -283,12 +279,10 @@ static void Draw()
 {
     if (!enable)
         return;
-    PROF_SECTION(DRAW_ESP_PERFORMANCE);
+    PROF_SECTION(DRAW_ESP_PERFORMANCE)
     std::lock_guard<std::mutex> esp_lock(threadsafe_mutex);
     for (auto &i : entities_need_repaint)
-    {
         ProcessEntityPT(ENTITY(i.first));
-    }
 }
 
 // Function called on create move
@@ -319,7 +313,7 @@ static void cm()
         { // Prof section ends when out of scope, these brackets here.
             PROF_SECTION(CM_ESP_EntityLoop)
             // Loop through entities
-            for (int i = 0; i <= max_clients; i++)
+            for (unsigned i = 0; i <= max_clients; i++)
             {
                 // Get an entity from the loop tick and process it
                 CachedEntity *ent = ENTITY(i);
@@ -328,12 +322,7 @@ static void cm()
 
                 bool player = i < max_clients;
 
-                if (player)
-                {
-                    ProcessEntity(ent);
-                    hitboxUpdate(ent);
-                }
-                else if (entity_tick)
+                if (player || entity_tick)
                 {
                     ProcessEntity(ent);
                     hitboxUpdate(ent);
@@ -344,7 +333,7 @@ static void cm()
                     // Checking this every tick is a waste of nanoseconds
                     if (vischeck_tick && vischeck)
                         data[ent->m_IDX].transparent = !ent->IsVisible();
-                    entities_need_repaint.push_back({ ent->m_IDX, ent->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) });
+                    entities_need_repaint.emplace_back(ent->m_IDX, ent->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin));
                 }
             }
         }
@@ -362,12 +351,7 @@ static void cm()
 
                 bool player = ent_index->m_IDX < max_clients;
 
-                if (player)
-                {
-                    ProcessEntity(ent_index);
-                    hitboxUpdate(ent_index);
-                }
-                else if (entity_tick)
+                if (player || entity_tick)
                 {
                     ProcessEntity(ent_index);
                     hitboxUpdate(ent_index);
@@ -378,7 +362,7 @@ static void cm()
                     // Checking this every tick is a waste of nanoseconds
                     if (vischeck_tick && vischeck)
                         data[ent_index->m_IDX].transparent = !ent_index->IsVisible();
-                    entities_need_repaint.push_back({ ent_index->m_IDX, ent_index->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) });
+                    entities_need_repaint.emplace_back(ent_index->m_IDX, ent_index->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin));
                 }
             }
         }
@@ -406,7 +390,7 @@ void _FASTCALL hitboxUpdate(CachedEntity *ent)
 // Used when processing entitys with cached data from createmove in draw
 void _FASTCALL ProcessEntityPT(CachedEntity *ent)
 {
-    PROF_SECTION(PT_esp_process_entity);
+    PROF_SECTION(PT_esp_process_entity)
 
     // Check to prevent crashes
     if (CE_INVALID(ent) || !ent->m_bAlivePlayer())
@@ -451,7 +435,7 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
         // Logic for using the enum to sort out snipers
         if ((*sightlines == 2 || (*sightlines == 1 && CE_INT(ent, netvar.iClass) == tf_sniper)) && CE_GOOD(ent) && ent->hitboxes.GetHitbox(0))
         {
-            PROF_SECTION(PT_esp_sightlines);
+            PROF_SECTION(PT_esp_sightlines)
 
             // Get players angle and head position
             Vector &eye_angles = NET_VECTOR(RAW_ENT(ent), netvar.m_angEyeAngles);
@@ -487,7 +471,7 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
                 float end_distance = trace.endpos.DistTo(eye_position);
 
                 // Loop and look back until we have a vector on screen
-                for (int i = 1; i < 500; i++)
+                for (unsigned i = 1; i < 500; i++)
                 {
                     // Subtract 40 multiplyed by the tick from the end distance
                     // and use that as our length to check
@@ -514,7 +498,7 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
                     found_scn1 = false;
 
                     // Loop and look back untill we have a vector on screen
-                    for (int i = 1; i < 500; i++)
+                    for (unsigned i = 1; i < 500; i++)
                     {
                         // Multiply starting distance by 15, multiplyed by the
                         // loop tick
@@ -617,7 +601,7 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
                 bool visible = true;
 
                 // rotate, add vecorigin AND check worldtoscreen at the same time in single loop
-                for (int p = 0; p < 3; p++)
+                for (unsigned p = 0; p < 3; p++)
                     if (!(visible = draw::WorldToScreen(rotateVector(pseudo[p]) + ent->m_vecOrigin(), screen[p])))
                         break;
 
@@ -725,7 +709,7 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
     // Check if entity has strings to draw
     if (ent_data.string_count)
     {
-        PROF_SECTION(PT_esp_drawstrings);
+        PROF_SECTION(PT_esp_drawstrings)
 
         // Create our initial point at the center of the entity
         Vector draw_point   = screen;
@@ -803,7 +787,6 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
         // Loop through strings
         for (int j = 0; j < ent_data.string_count; j++)
         {
-
             // Pull string from the entity's cached string array
             const ESPString &string = ent_data.strings[j];
 
@@ -814,7 +797,7 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
                 color = colors::Transparent(color); // Apply transparency if needed
 
             // If the origin is centered, we use one method. if not, the other
-            if (!origin_is_zero || true)
+            if (!origin_is_zero)
             {
                 float draw_pointx_tmp = draw_point.x;
                 float draw_pointy_tmp = draw_point.y;
@@ -970,15 +953,10 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             // Explosive/Environmental hazard esp
             else if (item_explosive && (classid == CL_CLASS(CTFPumpkinBomb) || Hash::IsHazard(szName)))
             {
-                switch (classid)
-                {
-                case CL_CLASS(CTFPumpkinBomb):
+                if (classid == CL_CLASS(CTFPumpkinBomb))
                     AddEntityString(ent, pumpkinbomb_str, colors::FromRGBA8(255, 162, 0, 255));
-                    break;
-                default:
+                else
                     AddEntityString(ent, explosive_str, colors::FromRGBA8(255, 162, 0, 255));
-                    break;
-                }
             }
             if (item_objectives && (classid == CL_CLASS(CCaptureFlag) || (Hash::IsFlag(szName) || Hash::IsBombCart(szName) || Hash::IsBombCartRed(szName))))
             {
@@ -1010,7 +988,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             // Halloween spell esp
             else if (item_spellbooks && (Hash::IsSpellbook(szName) || Hash::IsSpellbookRare(szName)))
             {
-                if (Hash::IsSpellbookRare)
+                if (Hash::IsSpellbookRare(szName))
                     AddEntityString(ent, rare_spell_str, colors::FromRGBA8(139, 31, 221, 255));
                 else
                     AddEntityString(ent, spell_str, colors::green);
@@ -1128,7 +1106,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
         int pclass = CE_INT(ent, netvar.iClass);
 
         // Attempt to get player info, and if cant, return
-        player_info_s info;
+        player_info_s info{};
         if (!GetPlayerInfo(ent->m_IDX, &info))
             return;
 
@@ -1344,9 +1322,9 @@ void _FASTCALL Draw3DBox(CachedEntity *ent, const rgba_t &clr)
     corners[6] = mins + Vector(x, y, z);
     corners[7] = mins + Vector(0, y, z);
 
-    // Rotate the box and check if any point of the box isnt on the screen
+    // Rotate the box and check if any point of the box isn't on the screen
     bool success = true;
-    for (int i = 0; i < 8; i++)
+    for (unsigned i = 0; i < 8; i++)
     {
         float yaw    = NET_VECTOR(RAW_ENT(ent), netvar.m_angEyeAngles).y;
         float s      = sinf(DEG2RAD(yaw));
@@ -1367,7 +1345,7 @@ void _FASTCALL Draw3DBox(CachedEntity *ent, const rgba_t &clr)
 
     rgba_t draw_clr = clr;
     // Draw the actual box
-    for (int i = 1; i <= 4; i++)
+    for (unsigned i = 1; i <= 4; i++)
     {
         draw::Line((points[i - 1].x), (points[i - 1].y), (points[i % 4].x) - (points[i - 1].x), (points[i % 4].y) - (points[i - 1].y), draw_clr, 0.5f);
         draw::Line((points[i - 1].x), (points[i - 1].y), (points[i + 3].x) - (points[i - 1].x), (points[i + 3].y) - (points[i - 1].y), draw_clr, 0.5f);
@@ -1378,7 +1356,7 @@ void _FASTCALL Draw3DBox(CachedEntity *ent, const rgba_t &clr)
 // Draw a box around a player
 void _FASTCALL DrawBox(CachedEntity *ent, const rgba_t &clr)
 {
-    PROF_SECTION(PT_esp_drawbox);
+    PROF_SECTION(PT_esp_drawbox)
 
     // Check if ent is bad to prevent crashes
     if (CE_INVALID(ent) || !ent->m_bAlivePlayer())
@@ -1455,7 +1433,7 @@ void BoxCorners(int minx, int miny, int maxx, int maxy, const rgba_t &color, boo
 // Used for caching collidable bounds
 bool GetCollide(CachedEntity *ent)
 {
-    PROF_SECTION(PT_esp_getcollide);
+    PROF_SECTION(PT_esp_getcollide)
 
     // Null check to prevent crashing
     if (CE_INVALID(ent) || !ent->m_bAlivePlayer())
@@ -1464,7 +1442,7 @@ bool GetCollide(CachedEntity *ent)
     // Grab esp data
     ESPData &ent_data = data[ent->m_IDX];
 
-    // If entity has cached collides, return it. Otherwise generate new bounds
+    // If entity has cached collides, return it. Otherwise, generate new bounds
     if (!ent_data.has_collide)
     {
 
@@ -1510,14 +1488,14 @@ bool GetCollide(CachedEntity *ent)
         points_r[6] = mins + Vector(x, y, z);
         points_r[7] = mins + Vector(0, y, z);
 
-        // Check if any point of the box isnt on the screen
+        // Check if any point of the box isn't on the screen
         bool success = true;
-        for (int i = 0; i < 8; i++)
+        for (unsigned i = 0; i < 8; i++)
         {
             if (!draw::WorldToScreen(points_r[i], points[i]))
                 success = false;
         }
-        // If a point isnt on the screen, return here
+        // If a point isn't on the screen, return here
         if (!success)
             return false;
 
@@ -1526,16 +1504,16 @@ bool GetCollide(CachedEntity *ent)
         int max_y = -1;
         int min_x = 65536;
         int min_y = 65536;
-        for (int i = 0; i < 8; i++)
+        for (auto &point : points)
         {
-            if (points[i].x > max_x)
-                max_x = points[i].x;
-            if (points[i].y > max_y)
-                max_y = points[i].y;
-            if (points[i].x < min_x)
-                min_x = points[i].x;
-            if (points[i].y < min_y)
-                min_y = points[i].y;
+            if (point.x > max_x)
+                max_x = point.x;
+            if (point.y > max_y)
+                max_y = point.y;
+            if (point.x < min_x)
+                min_x = point.x;
+            if (point.y < min_y)
+                min_y = point.y;
         }
 
         // Save the info to the esp data and notify cached that we cached info.

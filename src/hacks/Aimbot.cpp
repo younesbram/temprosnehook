@@ -136,7 +136,7 @@ bool playerTeamCheck(CachedEntity *entity)
     return (int) teammates == 2 || (!teammates && entity->m_bEnemy()) || (teammates && !entity->m_bEnemy()) || (CE_GOOD(LOCAL_W) && LOCAL_W->m_iClassID() == CL_CLASS(CTFCrossbow) && entity->m_iHealth() < entity->m_iMaxHealth());
 }
 
-#define GET_MIDDLE(c1, c2) (corners[c1] + corners[c2]) / 2.0f
+#define GET_MIDDLE(c1, c2) ((corners[c1] + corners[c2]) / 2.0f)
 
 // Get all the valid aim positions
 std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)

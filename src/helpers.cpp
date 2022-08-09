@@ -1649,7 +1649,7 @@ float ATTRIB_HOOK_FLOAT(float base_value, const char *search_string, IClientEnti
 {
     typedef float (*AttribHookFloat_t)(float, const char *, IClientEntity *, void *, bool);
 
-    static uintptr_t AttribHookFloat = e8call_direct(gSignatures.GetClientSignature("E8 ? ? ? ? 8B 03 89 1C 24 D9 5D ? FF 90 ? ? ? ? 89 C7 8B 06 89 34 24 FF 90 ? ? ? ? 89 FA C1 E2 08 09 C2 33 15 ? ? ? ? 39 93 ? ? ? ? 74 ? 89 93 ? ? ? ? 89 14 24 E8 ? ? ? ? C7 44 24 ? 0F 27 00 00 BE 01 00 00 00"));
+    static uintptr_t AttribHookFloat = e8call_direct(CSignature::GetClientSignature("E8 ? ? ? ? 8B 03 89 1C 24 D9 5D ? FF 90 ? ? ? ? 89 C7 8B 06 89 34 24 FF 90 ? ? ? ? 89 FA C1 E2 08 09 C2 33 15 ? ? ? ? 39 93 ? ? ? ? 74 ? 89 93 ? ? ? ? 89 14 24 E8 ? ? ? ? C7 44 24 ? 0F 27 00 00 BE 01 00 00 00"));
     static auto AttribHookFloat_fn   = AttribHookFloat_t(AttribHookFloat);
 
     return AttribHookFloat_fn(base_value, search_string, ent, buffer, is_global_const_string);

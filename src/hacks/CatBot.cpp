@@ -5,7 +5,9 @@
  *      Author: nullifiedcat
  */
 
+#include <random>
 #include <settings/Bool.hpp>
+#include <utility>
 #include "CatBot.hpp"
 #include "common.hpp"
 #include "hack.hpp"
@@ -80,7 +82,7 @@ bool hasEnding(std::string const &fullString, std::string const &ending)
         return false;
 }
 
-std::vector<std::string> config_list(std::string in)
+std::vector<std::string> config_list(const std::string &in)
 {
     std::string complete_in = paths::getConfigPath() + "/" + in;
     if (!hasEnding(complete_in, ".conf"))
@@ -194,13 +196,13 @@ void on_killed_by(int userid)
 void do_random_votekick()
 {
     std::vector<int> targets;
-    player_info_s local_info;
+    player_info_s local_info{};
 
     if (CE_BAD(LOCAL_E) || !GetPlayerInfo(LOCAL_E->m_IDX, &local_info))
         return;
     for (int i = 1; i < g_GlobalVars->maxClients; ++i)
     {
-        player_info_s info;
+        player_info_s info{};
         if (!GetPlayerInfo(i, &info) || !info.friendsID)
             continue;
         if (g_pPlayerResource->GetTeam(i) != g_pLocalPlayer->team)
@@ -219,8 +221,11 @@ void do_random_votekick()
     if (targets.empty())
         return;
 
-    int target = targets[rand() % targets.size()];
-    player_info_s info;
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    std::uniform_real_distribution<double> dist(0.0, DBL_MAX);
+    int target = targets[(int) dist(mt) % targets.size()];
+    player_info_s info{};
     if (!GetPlayerInfo(GetPlayerForUserID(target), &info))
         return;
     hack::ExecuteCommand("callvote kick \"" + std::to_string(target) + " cheating\"");
@@ -238,18 +243,18 @@ static CatCommand debug_money("debug_mvmmoney", "Print MVM Money", []() { loggin
 // Store information
 struct Posinfo
 {
-    float x;
-    float y;
-    float z;
+    float x{};
+    float y{};
+    float z{};
     std::string lvlname;
     Posinfo(float _x, float _y, float _z, std::string _lvlname)
     {
         x       = _x;
         y       = _y;
         z       = _z;
-        lvlname = _lvlname;
+        lvlname = std::move(_lvlname);
     }
-    Posinfo(){};
+    Posinfo() = default;
 };
 struct Upgradeinfo
 {
@@ -259,7 +264,7 @@ struct Upgradeinfo
     // Higher = better
     int priority;
     int priority_falloff;
-    Upgradeinfo(){};
+    Upgradeinfo() = default;
     Upgradeinfo(int _id, int _cost, int _clazz, int _priority, int _priority_falloff)
     {
         id               = _id;
@@ -278,19 +283,19 @@ Upgradeinfo PickUpgrade()
     if (!inited_upgrades)
     {
         // Damage ( Important )
-        upgrade_list.push_back({ 0, 400, tf_sniper, 4, 1 });
+        upgrade_list.emplace_back(0, 400, tf_sniper, 4, 1);
         // Projectile Penetration ( Good )
-        upgrade_list.push_back({ 12, 400, tf_sniper, 5, 500 });
+        upgrade_list.emplace_back(12, 400, tf_sniper, 5, 500);
         // Explosive Headshot
-        upgrade_list.push_back({ 40, 350, tf_sniper, 6, 2 });
+        upgrade_list.emplace_back(40, 350, tf_sniper, 6, 2);
         // +50% Ammo ( Basically least valuable upgrade for primary )
-        upgrade_list.push_back({ 6, 250, tf_sniper, 3, 1 });
+        upgrade_list.emplace_back(6, 250, tf_sniper, 3, 1);
         // +20% Reload Speed ( Pretty important )
-        upgrade_list.push_back({ 35, 250, tf_sniper, 6, 1 });
+        upgrade_list.emplace_back(35, 250, tf_sniper, 6, 1);
         // +25 Health on kill ( It's meh yet you need it to not die )
-        upgrade_list.push_back({ 11, 200, tf_sniper, 3, 2 });
+        upgrade_list.emplace_back(11, 200, tf_sniper, 3, 2);
         // +25% Faster charge ( Good for "Wait for charge" catbots )
-        upgrade_list.push_back({ 17, 200, tf_sniper, 4, 1 });
+        upgrade_list.emplace_back(17, 200, tf_sniper, 4, 1);
         inited_upgrades = true;
     }
     int highest_priority = INT_MIN;
@@ -317,7 +322,10 @@ Upgradeinfo PickUpgrade()
         return { -1, -1, -1, -1, -1 };
     else
     {
-        auto choosen_element = potential_upgrades[rand() % vec_size];
+        std::random_device rd;
+        std::mt19937 mt(rd());
+        std::uniform_real_distribution<double> dist(0.0, DBL_MAX);
+        auto choosen_element = potential_upgrades[(int) dist(mt) % vec_size];
         // Less important after an upgrade
         choosen_element->priority -= choosen_element->priority_falloff;
         return *choosen_element;
@@ -370,7 +378,7 @@ static InitRoutine init_routine([]() {
                 run                = false;
                 auto upgrade_panel = g_CHUD->FindElement("CHudUpgradePanel");
                 typedef int (*CancelUpgrade_t)(CHudElement *);
-                static uintptr_t addr = (unsigned) e8call((void *) (gSignatures.GetClientSignature("E8 ? ? ? ? 8B 3D ? ? ? ? 8D 4B 28 ") + 1));
+                static uintptr_t addr = (unsigned) e8call((void *) (CSignature::GetClientSignature("E8 ? ? ? ? 8B 3D ? ? ? ? 8D 4B 28 ") + 1));
                 if (upgrade_panel)
                 {
                     static CancelUpgrade_t CancelUpgrade_fn = CancelUpgrade_t(addr);
@@ -555,10 +563,9 @@ static std::atomic_bool can_report = false;
 static std::vector<unsigned> to_report;
 void reportall()
 {
-    can_report = false;
     if (!patched_report)
     {
-        static BytePatch patch(gSignatures.GetClientSignature, "73 ? 80 7D ? ? 74 ? F3 0F 10 0D", 0x2F, { 0x89, 0xe0 });
+        static BytePatch patch(CSignature::GetClientSignature, "73 ? 80 7D ? ? 74 ? F3 0F 10 0D", 0x2F, { 0x89, 0xe0 });
         patch.Patch();
         patched_report = true;
     }
@@ -573,7 +580,7 @@ void reportall()
         // Pointer comparison is fine
         if (ent == LOCAL_E)
             continue;
-        player_info_s info;
+        player_info_s info{};
         if (GetPlayerInfo(i, &info) && info.friendsID)
         {
             if (!player_tools::shouldTargetSteamId(info.friendsID))
@@ -590,7 +597,7 @@ CatCommand report_uid("report_steamid", "Report with steamid",
                       {
                           if (args.ArgC() < 2)
                               return;
-                          unsigned steamid = 0;
+                          unsigned steamid;
                           try
                           {
                               steamid = std::stoi(args.Arg(1));
@@ -606,8 +613,8 @@ CatCommand report_uid("report_steamid", "Report with steamid",
                               return;
                           }
                           typedef uint64_t (*ReportPlayer_t)(uint64_t, int);
-                          static uintptr_t addr1                = gSignatures.GetClientSignature("55 89 E5 57 56 53 81 EC ? ? ? ? 8B 5D ? 8B 7D ? 89 D8");
-                          static ReportPlayer_t ReportPlayer_fn = ReportPlayer_t(addr1);
+                          static uintptr_t addr1      = CSignature::GetClientSignature("55 89 E5 57 56 53 81 EC ? ? ? ? 8B 5D ? 8B 7D ? 89 D8");
+                          static auto ReportPlayer_fn = ReportPlayer_t(addr1);
                           if (!addr1)
                               return;
                           CSteamID id(steamid, EUniverse::k_EUniversePublic, EAccountType::k_EAccountTypeIndividual);
@@ -672,8 +679,8 @@ CatCommand print_ammo("debug_print_ammo", "debug",
                       });
 static Timer disguise{};
 static Timer report_timer{};
-static std::string health = "Health: 0/0";
-static std::string ammo   = "Ammo: 0/0";
+/*static std::string health = "Health: 0/0";
+static std::string ammo   = "Ammo: 0/0";*/
 static int max_ammo;
 static CachedEntity *local_w;
 // TODO: add more stuffs
@@ -689,14 +696,14 @@ static void cm()
             local_w  = LOCAL_W;
             max_ammo = 0;
         }
-        float max_hp  = g_pPlayerResource->GetMaxHealth(LOCAL_E);
-        float curr_hp = CE_INT(LOCAL_E, netvar.iHealth);
+        /*float max_hp  = g_pPlayerResource->GetMaxHealth(LOCAL_E);
+        float curr_hp = CE_INT(LOCAL_E, netvar.iHealth);*/
         int ammo0     = CE_INT(LOCAL_E, netvar.m_iClip2);
         int ammo2     = CE_INT(LOCAL_E, netvar.m_iClip1);
         if (ammo0 + ammo2 > max_ammo)
             max_ammo = ammo0 + ammo2;
-        health = format("Health: ", curr_hp, "/", max_hp);
-        ammo   = format("Ammo: ", ammo0 + ammo2, "/", max_ammo);
+        /*health = format("Health: ", curr_hp, "/", max_hp);
+        ammo   = format("Ammo: ", ammo0 + ammo2, "/", max_ammo);*/
     }
     if (g_Settings.bInvalid)
         return;
@@ -712,7 +719,10 @@ static void cm()
     if (*auto_disguise && g_pPlayerResource->GetClass(LOCAL_E) == tf_spy && !IsPlayerDisguised(LOCAL_E) && disguise.test_and_set(3000))
     {
         int teamtodisguise = (LOCAL_E->m_iTeam() == TEAM_RED) ? TEAM_RED - 1 : TEAM_BLU - 1;
-        int classtojoin    = classes[rand() % 3];
+        std::random_device rd;
+        std::mt19937 mt(rd());
+        std::uniform_real_distribution<double> dist(0.0, DBL_MAX);
+        int classtojoin = classes[(int) dist(mt) % 3];
         g_IEngine->ClientCmd_Unrestricted(format("disguise ", classtojoin, " ", teamtodisguise).c_str());
     }
     if (*autoReport && report_timer.test_and_set(60000))
@@ -730,8 +740,8 @@ void update()
     if (can_report)
     {
         typedef uint64_t (*ReportPlayer_t)(uint64_t, int);
-        static uintptr_t addr1                = gSignatures.GetClientSignature("55 89 E5 57 56 53 81 EC ? ? ? ? 8B 5D ? 8B 7D ? 89 D8");
-        static ReportPlayer_t ReportPlayer_fn = ReportPlayer_t(addr1);
+        static uintptr_t addr1      = CSignature::GetClientSignature("55 89 E5 57 56 53 81 EC ? ? ? ? 8B 5D ? 8B 7D ? 89 D8");
+        static auto ReportPlayer_fn = ReportPlayer_t(addr1);
         if (!addr1)
             return;
         if (report_timer2.test_and_set(400))

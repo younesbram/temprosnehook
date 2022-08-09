@@ -2,7 +2,6 @@
 
 namespace hacks::antianticheat
 {
-
 settings::Boolean enabled("misc.antianticheat.enabled", "false");
 
 // Always a good idea to spoof these
@@ -10,7 +9,7 @@ void SendNetMsg(INetMessage &msg)
 {
     if (msg.GetType() == clc_RespondCvarValue)
     {
-        CLC_RespondCvarValue *cvar_msg = (CLC_RespondCvarValue *) &msg;
+        auto *cvar_msg = (CLC_RespondCvarValue *) &msg;
         if (!cvar_msg->m_szCvarName)
             return;
         // Remove cat_ commands and the linux unique sdl_double_click_size from cvar list

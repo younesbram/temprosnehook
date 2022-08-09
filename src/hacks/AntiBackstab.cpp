@@ -15,9 +15,9 @@ extern bool angleCheck(CachedEntity *from, CachedEntity *to, std::optional<Vecto
 }
 namespace hacks::antibackstab
 {
-static settings::Boolean enable{ "antibackstab.enable", "0" };
+static settings::Boolean enable{ "antibackstab.enable", "false" };
 static settings::Float distance{ "antibackstab.distance", "200" };
-static settings::Boolean sayno{ "antibackstab.nope", "0" };
+static settings::Boolean sayno{ "antibackstab.nope", "false" };
 bool noaa = false;
 
 void SayNope()

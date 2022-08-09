@@ -1116,7 +1116,7 @@ void rvarCallback(settings::VariableBase<bool> &, bool)
 static InitRoutine init(
     []()
     {
-        static auto cl_move_addr = gSignatures.GetEngineSignature("55 89 E5 57 56 53 81 EC 9C 00 00 00 83 3D ? ? ? ? 01");
+        static auto cl_move_addr = CSignature::GetEngineSignature("55 89 E5 57 56 53 81 EC 9C 00 00 00 83 3D ? ? ? ? 01");
         cl_move_detour.Init(cl_move_addr, (void *) CL_Move_hook);
 
         EC::Register(EC::LevelShutdown, LevelShutdown, "warp_levelshutdown");

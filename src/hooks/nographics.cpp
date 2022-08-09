@@ -82,7 +82,7 @@ static InitRoutine init_nographics(
     });
 static bool blacklist_file(const char *&filename)
 {
-    const static char *blacklist[] = { ".ani", ".wav", ".mp3", ".vvd", ".vtx", ".vtf", ".vfe", ".cache" /*, ".pcf"*/ };
+    const static char *blacklist[] = { ".ani", ".wav", ".mp3", ".vvd", ".vtx", ".vtf", ".vfe", ".cache" , ".pcf" };
     if (!filename || !std::strncmp(filename, "materials/console/", 18))
         return false;
 
@@ -114,9 +114,8 @@ static bool blacklist_file(const char *&filename)
     if (!std::strncmp(filename, "/decal", 6))
         return true;
 
-    for (auto &i : blacklist)
-        if (!std::strcmp(ext_p, i))
-            return true;
+    if (std::ranges::any_of(blacklist, [ext_p](const char *i) { return !std::strcmp(ext_p, i); }))
+        return true;
 
     return false;
 }
@@ -249,13 +248,13 @@ static void ReduceRamUsage()
 
     if (g_IBaseClient)
     {
-        static BytePatch playSequence{ gSignatures.GetClientSignature, "55 89 E5 57 56 53 83 EC ? 8B 75 0C 8B 5D 08 85 F6 74 ? 83 BB", 0x00, { 0xC3 } };
+        static BytePatch playSequence{ CSignature::GetClientSignature, "55 89 E5 57 56 53 83 EC ? 8B 75 0C 8B 5D 08 85 F6 74 ? 83 BB", 0x00, { 0xC3 } };
         playSequence.Patch();
 
         /* Same explanation as above, but spams about certain particles not loaded */
-        static BytePatch particleCreate{ gSignatures.GetClientSignature, "55 89 E5 56 53 83 EC ? 8B 5D 0C 8B 75 08 85 DB 74 ? A1", 0x00, { 0x31, 0xC0, 0xC3 } };
-        static BytePatch particlePrecache{ gSignatures.GetClientSignature, "55 89 E5 53 83 EC ? 8B 5D 0C 8B 45 08 85 DB 74 ? 80 3B 00 75 ? 83 C4 ? 5B 5D C3 ? ? ? ? 89 5C 24", 0x00, { 0x31, 0xC0, 0xC3 } };
-        static BytePatch particleCreating{ gSignatures.GetClientSignature, "55 89 E5 57 56 53 83 EC ? A1 ? ? ? ? 8B 75 08 85 C0 74 ? 8B 4D", 0x00, { 0x31, 0xC0, 0xC3 } };
+        static BytePatch particleCreate{ CSignature::GetClientSignature, "55 89 E5 56 53 83 EC ? 8B 5D 0C 8B 75 08 85 DB 74 ? A1", 0x00, { 0x31, 0xC0, 0xC3 } };
+        static BytePatch particlePrecache{ CSignature::GetClientSignature, "55 89 E5 53 83 EC ? 8B 5D 0C 8B 45 08 85 DB 74 ? 80 3B 00 75 ? 83 C4 ? 5B 5D C3 ? ? ? ? 89 5C 24", 0x00, { 0x31, 0xC0, 0xC3 } };
+        static BytePatch particleCreating{ CSignature::GetClientSignature, "55 89 E5 57 56 53 83 EC ? A1 ? ? ? ? 8B 75 08 85 C0 74 ? 8B 4D", 0x00, { 0x31, 0xC0, 0xC3 } };
         particleCreate.Patch();
         particlePrecache.Patch();
         particleCreating.Patch();
@@ -277,25 +276,25 @@ static InitRoutineEarly nullify_textmode(
     {
         // SDL_CreateWindow has a "flag" parameter. We simply give it HIDDEN as a flag
         // 0x8 = SDL_HIDDEN
-        static BytePatch patch1(gSignatures.GetLauncherSignature, "C7 43 ? ? ? ? ? C7 44 24 ? ? ? ? ? C7 44 24", 0xb, { 0x8 });
+        static BytePatch patch1(CSignature::GetLauncherSignature, "C7 43 ? ? ? ? ? C7 44 24 ? ? ? ? ? C7 44 24", 0xb, { 0x8 });
 
         // all are the same size so use same patch for all
         std::vector<unsigned char> patch_arr = { 0x90, 0x90, 0x90, 0x90, 0x90 };
 
         // Hide the SDL window
-        static BytePatch patch2(gSignatures.GetLauncherSignature, "E8 ? ? ? ? C6 43 25 01 83 C4 5C", 0x0, patch_arr);
-        static BytePatch patch3(gSignatures.GetLauncherSignature, "E8 ? ? ? ? 8B 43 14 89 04 24 E8 ? ? ? ? C6 43 25 01 83 C4 1C", 0x0, patch_arr);
-        static BytePatch patch4(gSignatures.GetLauncherSignature, "89 14 24 E8 ? ? ? ? 8B 45 B4", 0x3, patch_arr);
+        static BytePatch patch2(CSignature::GetLauncherSignature, "E8 ? ? ? ? C6 43 25 01 83 C4 5C", 0x0, patch_arr);
+        static BytePatch patch3(CSignature::GetLauncherSignature, "E8 ? ? ? ? 8B 43 14 89 04 24 E8 ? ? ? ? C6 43 25 01 83 C4 1C", 0x0, patch_arr);
+        static BytePatch patch4(CSignature::GetLauncherSignature, "89 14 24 E8 ? ? ? ? 8B 45 B4", 0x3, patch_arr);
 
         ReduceRamUsage();
         // CVideoMode_Common::Init  SetupStartupGraphic
         // Make SetupStartupGraphic instantly return
-        auto setup_graphic_addr = e8call_direct(gSignatures.GetEngineSignature("E8 ? ? ? ? 8B 93 ? ? ? ? 85 D2 0F 84")) + 0x18;
+        auto setup_graphic_addr = e8call_direct(CSignature::GetEngineSignature("E8 ? ? ? ? 8B 93 ? ? ? ? 85 D2 0F 84")) + 0x18;
         static BytePatch patch5(setup_graphic_addr, { 0x81, 0xC4, 0x6C, 0x20, 0x00, 0x00, 0x5B, 0x5E, 0x5F, 0x5D, 0xC3 });
         // CMaterialSystem::SwapBuffers
         static BytePatch patch6(sharedobj::materialsystem().Pointer(0x3ed90), { 0x31, 0xC0, 0x40, 0xC3 });
         // V_RenderView
-        static BytePatch patch7(gSignatures.GetEngineSignature, "55 89 E5 56 53 83 C4 80 C7 45 ? 00 00 00 00 A1 ? ? ? ? C7 45 ? 00 00 00 00 85 C0", 0x1d3, { 0x90, 0x90, 0x90, 0x90, 0x90 });
+        static BytePatch patch7(CSignature::GetEngineSignature, "55 89 E5 56 53 83 C4 80 C7 45 ? 00 00 00 00 A1 ? ? ? ? C7 45 ? 00 00 00 00 85 C0", 0x1d3, { 0x90, 0x90, 0x90, 0x90, 0x90 });
 
         patch1.Patch();
         patch2.Patch();
@@ -324,7 +323,7 @@ static InitRoutine nullifiy_textmode2(
             });
 #if ENABLE_TEXTMODE
         // Catbots still hit properly, this just makes it easier to Stub stuff not needed in textmode
-        uintptr_t g_bTextMode_ptrptr = gSignatures.GetEngineSignature("A2 ? ? ? ? 8B 43 04") + 0x1;
+        uintptr_t g_bTextMode_ptrptr = CSignature::GetEngineSignature("A2 ? ? ? ? 8B 43 04") + 0x1;
 
         BytePatch::mprotectAddr(g_bTextMode_ptrptr, 4, PROT_READ | PROT_WRITE | PROT_EXEC);
         BytePatch::mprotectAddr(*(uintptr_t *) g_bTextMode_ptrptr, 4, PROT_READ | PROT_WRITE | PROT_EXEC);
@@ -333,10 +332,10 @@ static InitRoutine nullifiy_textmode2(
         bool *g_bTextMode_ptr = *((bool **) g_bTextMode_ptrptr);
         *g_bTextMode_ptr      = true;
         // Skip downloading ressources
-        static BytePatch patch1(gSignatures.GetEngineSignature, "0F 85 ? ? ? ? A1 ? ? ? ? 8D 8B ? ? ? ?", 0x1, { 0x81 });
+        static BytePatch patch1(CSignature::GetEngineSignature, "0F 85 ? ? ? ? A1 ? ? ? ? 8D 8B ? ? ? ?", 0x1, { 0x81 });
         patch1.Patch();
         // CViewRender::Render
-        static BytePatch patch2(gSignatures.GetClientSignature, "55 89 E5 57 56 53 81 EC DC 03 00 00 C7 85 ? ? ? ? 00 00 00 00", 0x0, { 0x31, 0xC0, 0x40, 0xC3 });
+        static BytePatch patch2(CSignature::GetClientSignature, "55 89 E5 57 56 53 81 EC DC 03 00 00 C7 85 ? ? ? ? 00 00 00 00", 0x0, { 0x31, 0xC0, 0x40, 0xC3 });
         patch2.Patch();
 #endif
     });

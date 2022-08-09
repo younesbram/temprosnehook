@@ -33,10 +33,8 @@ Timer last_headshot{};
 const announcer_entry_s *find_entry(const std::vector<announcer_entry_s> &vector, int count)
 {
     for (auto it = vector.rbegin(); it != vector.rend(); ++it)
-    {
         if ((*it).count <= count)
             return &*it;
-    }
     return nullptr;
 }
 
@@ -132,7 +130,7 @@ void on_spawn(IGameEvent *event)
 
 class AnnouncerEventListener : public IGameEventListener2
 {
-    virtual void FireGameEvent(IGameEvent *event)
+    void FireGameEvent(IGameEvent *event) override
     {
         if (!enable)
             return;

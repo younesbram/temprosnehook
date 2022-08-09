@@ -16,9 +16,8 @@ static bool drawEsp[PLAYER_ARRAY_SIZE];
 rgba_t HeadESPColor(CachedEntity *ent)
 {
     if (!playerlist::IsDefault(ent))
-    {
         return playerlist::Color(ent);
-    }
+
     return colors::green;
 }
 

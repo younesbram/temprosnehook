@@ -9,7 +9,7 @@
 
 namespace hacks::deadringer
 {
-static settings::Boolean enable{ "auto-deadringer.enable", "0" };
+static settings::Boolean enable{ "auto-deadringer.enable", "false" };
 static settings::Int trigger_health{ "auto-deadringer.health", "30" };
 
 bool IsProjectile(CachedEntity *ent)
@@ -44,7 +44,6 @@ static void CreateMove()
         return;
     if (g_pLocalPlayer->clazz != tf_spy)
         return;
-    previouslyringered = false;
     if (HasCondition<TFCond_Cloaked>(LOCAL_E) || HasCondition<TFCond_CloakFlicker>(LOCAL_E))
         return;
     bool shouldm2 = true;

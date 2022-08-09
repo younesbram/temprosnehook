@@ -49,7 +49,7 @@ void draw_func()
         if (i + 1 <= fullHearts)
             hearts[2].draw(startPosX + (iconSize - iconPixel) * i, startPosY, iconSize, iconSize,
                            colors::white); // full heart
-        else if (fullHearts + 1 == i + 1 && !((int) halfHearts % 2 == 0))
+        else if (fullHearts + 1 == i + 1 && (int) halfHearts % 2 != 0)
             hearts[1].draw(startPosX + (iconSize - iconPixel) * i, startPosY, iconSize, iconSize,
                            colors::white); // last half heart
         else

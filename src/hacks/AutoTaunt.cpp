@@ -32,7 +32,7 @@ static Timer taunt_t{};
 class AutoTauntListener : public IGameEventListener2
 {
 public:
-    virtual void FireGameEvent(IGameEvent *event)
+    void FireGameEvent(IGameEvent *event) override
     {
         if (!enable)
             return;

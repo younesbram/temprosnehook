@@ -11,8 +11,8 @@
 
 namespace hacks::autodetonator
 {
-static settings::Boolean enable{ "auto-detonator.enable", "0" };
-static settings::Boolean legit{ "auto-detonator.ignore-cloaked", "0" };
+static settings::Boolean enable{ "auto-detonator.enable", "false" };
+static settings::Boolean legit{ "auto-detonator.ignore-cloaked", "false" };
 
 // A storage array for ents
 std::vector<CachedEntity *> flares;
@@ -55,18 +55,18 @@ bool IsTarget(CachedEntity *ent)
         if (!player_tools::shouldTarget(ent))
             return false;
 
-        // Dont target invulnerable players, ex: uber, bonk
+        // Don't target invulnerable players, ex: uber, bonk
         if (IsPlayerInvulnerable(ent))
             return false;
 
-        // If settings allow, dont target cloaked players
+        // If settings allow, don't target cloaked players
         if (legit && IsPlayerInvisible(ent))
             return false;
 
         // Target is good
         return true;
     }
-    // Target isnt a good type
+    // Target isn't a good type
     return false;
 }
 
@@ -110,8 +110,6 @@ void CreateMove()
             }
         }
     }
-    // End of function, just return
-    return;
 }
 
 static InitRoutine EC([]() { EC::Register(EC::CreateMove, CreateMove, "auto_detonator", EC::average); });

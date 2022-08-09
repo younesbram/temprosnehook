@@ -303,7 +303,7 @@ free(logname);*/
 
 // Fix locale issues caused by steam update
 #if ENABLE_TEXTMODE
-    static BytePatch patch(gSignatures.GetEngineSignature, "74 ? 89 5C 24 ? 8D 9D ? ? ? ? 89 74 24", 0, { 0x71 });
+    static BytePatch patch(CSignature::GetEngineSignature, "74 ? 89 5C 24 ? 8D 9D ? ? ? ? 89 74 24", 0, { 0x71 });
     patch.Patch();
 #endif
 

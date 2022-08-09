@@ -3,6 +3,7 @@
  * CritSay.cpp
  * Read if gay
  */
+
 #include <settings/Int.hpp>
 #include "common.hpp"
 
@@ -56,12 +57,15 @@ std::string ComposeCritSay(IGameEvent *event)
         return "";
     if (GetPlayerForUserID(kid) != g_IEngine->GetLocalPlayer())
         return "";
-    //	checks if the killsays.txt file is not 1 line. 100% sure it's going
-    // to crash if it is.
+
+    // Checks if the killsays.txt file is not 1 line. 100% sure it's going to crash if it is.
     std::string msg;
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    std::uniform_real_distribution<double> dist(0.0, DBL_MAX);
     do
     {
-        msg = source->at(rand() % source->size());
+        msg = source->at((int) dist(mt) % source->size());
     } while (msg == lastmsg && source->size() > 1);
     lastmsg = msg;
     player_info_s info{};

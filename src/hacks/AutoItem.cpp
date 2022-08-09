@@ -19,11 +19,11 @@
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <utility>
 #include "common.hpp"
 
 namespace hacks::autoitem
 {
-
 static settings::Boolean enable{ "auto-item.enable", "false" };
 static settings::Int interval{ "auto-item.time", "30000" };
 
@@ -55,7 +55,7 @@ static int noisemaker_id = 536;
 
 struct AchivementItem
 {
-    int achievement_id;
+    int achievement_id{};
     std::string name;
 };
 
@@ -464,9 +464,9 @@ void rvarCallback(std::string after, int idx)
 static InitRoutine init(
     []()
     {
-        primary.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { rvarCallback(after, 0); });
-        secondary.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { rvarCallback(after, 1); });
-        melee.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { rvarCallback(after, 2); });
+        primary.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { rvarCallback(std::move(after), 0); });
+        secondary.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { rvarCallback(std::move(after), 1); });
+        melee.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { rvarCallback(std::move(after), 2); });
 
         EC::Register(EC::CreateMove, CreateMove, "autoitem_cm");
 
@@ -476,7 +476,7 @@ static InitRoutine init(
         int day   = aTime->tm_mday;
         int month = aTime->tm_mon + 1; // Month is 0 - 11, add 1 to get a jan-dec 1-12 concept
 
-        // We only want to Use the christmas noisemaker around christmas time, let's use 12th of december+ til 12th of january
+        // We only want to Use the Christmas noisemaker around Christmastime, let's use 12th of december+ til 12th of january
         if ((month == 12 && day >= 12) || (month == 1 && day <= 12))
             noisemaker_id = 673;
 

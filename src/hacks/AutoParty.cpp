@@ -64,7 +64,7 @@ bool compare_ts(ipc_peer &a, ipc_peer &b)
 }
 
 // Re-populates party_hosts from the current or new configuration
-void repopulate(std::string str)
+void repopulate(const std::string &str)
 {
     // Empty previous values
     party_hosts.clear();
@@ -79,17 +79,16 @@ void repopulate(std::string str)
         }
         auto &peer_data                           = ipc::peer->memory->peer_user_data;
         std::vector<struct ipc_peer> sorted_peers = {};
-        for (int i = 0; i < cat_ipc::max_peers; i++)
+        for (auto &data : peer_data)
         {
-            ipc::user_data_s &data = peer_data[i];
-            struct ipc_peer peer   = { .friendid = data.friendid, .ts_injected = data.ts_injected };
+            struct ipc_peer peer = { .friendid = data.friendid, .ts_injected = data.ts_injected };
             sorted_peers.push_back(peer);
         }
+
         std::sort(sorted_peers.begin(), sorted_peers.end(), compare_ts);
         for (int i = 0; i < *ipc_count; i++)
-        {
             party_hosts.push_back(sorted_peers[i].friendid);
-        }
+
         return;
     }
 
@@ -99,9 +98,7 @@ void repopulate(std::string str)
     {
         party_hosts.push_back(id);
         if (ss.peek() == ',' or ss.peek() == ' ')
-        {
             ss.ignore();
-        }
     }
 }
 
@@ -109,13 +106,9 @@ void repopulate(std::string str)
 bool is_host()
 {
     uint32 id = g_ISteamUser->GetSteamID().GetAccountID();
-    for (int i = 0; i < party_hosts.size(); i++)
-    {
-        if (party_hosts.at(i) == id)
-        {
-            return true;
-        }
-    }
+    if (std::ranges::any_of(party_hosts, [id](unsigned party_host) { return party_host == id; }))
+        return true;
+
     return false;
 }
 
@@ -123,10 +116,8 @@ bool is_host()
 void find_party()
 {
     log_debug("No party members and not a party host; requesting to join with each party host");
-    for (int i = 0; i < party_hosts.size(); i++)
-    {
-        hack::ExecuteCommand("tf_party_request_join_user " + std::to_string(party_hosts[i]));
-    }
+    for (unsigned party_host : party_hosts)
+        hack::ExecuteCommand("tf_party_request_join_user " + std::to_string(party_host));
 }
 
 // Locks the party, prevents more members from joining
@@ -149,7 +140,7 @@ void leave_party(re::CTFPartyClient *client, bool was_leader)
 {
     log("Leaving the party because %d/%d members are offline", client->GetNumMembers() - client->GetNumOnlineMembers(), client->GetNumMembers());
     hack::ExecuteCommand("tf_party_leave");
-    if (was_leader and *auto_unlock)
+    if (was_leader && *auto_unlock)
         unlock_party();
 }
 
@@ -172,10 +163,8 @@ void party_routine()
     }
 
     // Populate party_hosts from the current configuration
-    if (party_hosts.size() == 0)
-    {
+    if (party_hosts.empty())
         repopulate(*host_list);
-    }
 
     re::CTFPartyClient *client = re::CTFPartyClient::GTFPartyClient();
     if (client)
@@ -209,7 +198,7 @@ void party_routine()
                 // And are we actually the leader?
                 // Get a list of party members, then check each one to determine the leader
                 std::vector<unsigned> members = client->GetPartySteamIDs();
-                uint32 leader_id              = 0;
+                uint32 leader_id;
                 CSteamID id;
                 client->GetCurrentPartyLeader(id);
                 leader_id = id.GetAccountID();
@@ -217,7 +206,7 @@ void party_routine()
                 {
                     // Great, let's manage it
                     // If a member is offline, just leave the party and allow new join requests
-                    if (*auto_leave and client->GetNumMembers() > client->GetNumOnlineMembers())
+                    if (*auto_leave && client->GetNumMembers() > client->GetNumOnlineMembers())
                     {
                         leave_party(client, true);
                         return;
@@ -228,16 +217,16 @@ void party_routine()
                     if (*kick_rage)
                     {
                         bool should_ret = false;
-                        for (int i = 0; i < members.size(); i++)
+                        for (unsigned member : members)
                         {
-                            auto &pl = playerlist::AccessData(members[i]);
+                            auto &pl = playerlist::AccessData(member);
                             if (pl.state == playerlist::k_EState::RAGE)
                             {
-                                std::string message = "Kicking Steam32 ID " + std::to_string(members[i]) + " from the party because they are set to RAGE";
+                                std::string message = "Kicking Steam32 ID " + std::to_string(member) + " from the party because they are set to RAGE";
                                 logging::Info("AutoParty: %s", message.c_str());
                                 if (*message_kicks)
                                     client->SendPartyChat(message.c_str());
-                                CSteamID id = CSteamID(members[i], EUniverse::k_EUniversePublic, EAccountType::k_EAccountTypeIndividual);
+                                CSteamID id = CSteamID(member, EUniverse::k_EUniversePublic, EAccountType::k_EAccountTypeIndividual);
                                 client->KickPlayer(id);
                                 should_ret = true;
                             }
@@ -247,7 +236,7 @@ void party_routine()
                     }
 
                     // If we are at or over the specified limit, lock the party so we auto-reject future join requests
-                    if (*auto_lock and members.size() >= *max_size)
+                    if (*auto_lock && members.size() >= *max_size)
                     {
                         log_debug("Locking the party because we have %d out of %d allowed members", members.size(), *max_size);
                         lock_party();
@@ -269,7 +258,7 @@ void party_routine()
                     }
 
                     // Unlock the party if it's not full
-                    if (*auto_unlock and members.size() < *max_size)
+                    if (*auto_unlock && members.size() < *max_size)
                         unlock_party();
                 }
                 else
@@ -291,10 +280,8 @@ void party_routine()
                 }
 
                 // If a member is offline, leave the party
-                if (*auto_leave and client->GetNumMembers() > client->GetNumOnlineMembers())
-                {
+                if (*auto_leave && client->GetNumMembers() > client->GetNumOnlineMembers())
                     leave_party(client, false);
-                }
             }
         }
     }
@@ -303,7 +290,7 @@ void party_routine()
 static InitRoutine init(
     []()
     {
-        host_list.installChangeCallback([](settings::VariableBase<std::string> &var, std::string after) { repopulate(after); });
+        host_list.installChangeCallback([](settings::VariableBase<std::string> &var, const std::string &after) { repopulate(after); });
         ipc_mode.installChangeCallback([](settings::VariableBase<bool> &var, bool after) { party_hosts.clear(); });
         EC::Register(EC::Paint, party_routine, "paint_autoparty", EC::average);
     });

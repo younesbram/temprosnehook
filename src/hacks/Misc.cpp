@@ -8,9 +8,6 @@
 #include "common.hpp"
 #include <unistd.h>
 #include <regex>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <hacks/AntiAim.hpp>
 #include <settings/Bool.hpp>
 
@@ -84,8 +81,8 @@ static settings::Boolean fix_cyoaanim{ "remove.contracker", "false" };
 #if !ENFORCE_STREAM_SAFETY && ENABLE_VISUALS
 static void tryPatchLocalPlayerShouldDraw(bool after)
 {
-    static BytePatch patch_shoulddraw{ gSignatures.GetClientSignature, "80 BB ? ? ? ? ? 75 DE", 0xD, { 0xE0 } };
-    static BytePatch patch_shoulddraw_wearable{ gSignatures.GetClientSignature("0F 85 ? ? ? ? E9 ? ? ? ? 85 D2") + 1, { 0x80 } };
+    static BytePatch patch_shoulddraw{ CSignature::GetClientSignature, "80 BB ? ? ? ? ? 75 DE", 0xD, { 0xE0 } };
+    static BytePatch patch_shoulddraw_wearable{ CSignature::GetClientSignature("0F 85 ? ? ? ? E9 ? ? ? ? 85 D2") + 1, { 0x80 } };
 
     if (after)
     {
@@ -145,7 +142,7 @@ void SendAutoBalanceRequest()
 { // Credits to blackfire
     if (!g_IEngine->IsInGame())
         return;
-    KeyValues *kv = new KeyValues("AutoBalanceVolunteerReply");
+    auto *kv = new KeyValues("AutoBalanceVolunteerReply");
     kv->SetInt("response", 1);
     g_IEngine->ServerCmdKeyValues(kv);
 }
@@ -426,7 +423,7 @@ void Draw()
         {
             // Assign the for loops tick number to an ent
             CachedEntity *ent = ENTITY(i);
-            player_info_s info;
+            player_info_s info{};
             if (!CE_BAD(ent) && ent != LOCAL_E && ent->m_Type() == ENTITY_PLAYER && (CE_INT(ent, netvar.hObserverTarget) & 0xFFF) == LOCAL_E->m_IDX && GetPlayerInfo(i, &info))
             {
                 auto observermode = "N/A";
@@ -586,8 +583,8 @@ void generate_schema()
     std::ifstream in("tf/scripts/items/items_game.txt");
     std::string outS((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     std::ofstream out(paths::getDataPath("/items_game.txt"));
-    std::regex a("\"equip_regions?\".*?\".*?\"");
-    std::regex b("\"equip_regions?\"\\s*?\\n\\s*?\\{[\\s\\S\\n]*?\\}");
+    std::regex a(R"("equip_regions?".*?".*?")");
+    std::regex b(R"("equip_regions?"\s*?\n\s*?\{[\s\S\n]*?\})");
     outS = std::regex_replace(outS, a, "");
     out << std::regex_replace(outS, b, "");
     out.close();
@@ -597,9 +594,9 @@ static CatCommand generateschema("schema_generate", "Generate custom schema", ge
 
 bool InitSchema(const char *fileName, const char *pathID, CUtlVector<CUtlString> *pVecErrors /* = NULL */)
 {
-    static auto GetItemSchema = reinterpret_cast<void *(*) (void)>(gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC ? 8B 1D ? ? ? ? 85 DB 89 D8"));
+    static auto GetItemSchema = reinterpret_cast<void *(*) ()>(CSignature::GetClientSignature("55 89 E5 57 56 53 83 EC ? 8B 1D ? ? ? ? 85 DB 89 D8"));
 
-    static auto BInitTextBuffer = reinterpret_cast<bool (*)(void *, CUtlBuffer &, CUtlVector<CUtlString> *)>(gSignatures.GetClientSignature("55 89 E5 57 56 53 8D 9D ? ? ? ? 81 EC ? ? ? ? 8B 7D ? 89 1C 24 "));
+    static auto BInitTextBuffer = reinterpret_cast<bool (*)(void *, CUtlBuffer &, CUtlVector<CUtlString> *)>(CSignature::GetClientSignature("55 89 E5 57 56 53 8D 9D ? ? ? ? 81 EC ? ? ? ? 8B 7D ? 89 1C 24 "));
     void *schema                = (void *) ((uintptr_t) GetItemSchema() + 0x4);
 
     // Read the raw data
@@ -655,7 +652,7 @@ CatCommand name("name_set", "Immediate name change",
                     std::string new_name(args.ArgS());
                     ReplaceSpecials(new_name);
                     NET_SetConVar setname("name", new_name.c_str());
-                    INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
+                    auto *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
                     if (ch)
                     {
                         setname.SetNetChannel(ch);
@@ -699,7 +696,7 @@ CatCommand say_lines("say_lines", "Say with newlines (\\n)",
 CatCommand disconnect("disconnect", "Disconnect with custom reason",
                       [](const CCommand &args)
                       {
-                          INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
+                          auto *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
                           if (!ch)
                               return;
                           std::string string = args.ArgS();
@@ -710,7 +707,7 @@ CatCommand disconnect("disconnect", "Disconnect with custom reason",
 CatCommand disconnect_vac("disconnect_vac", "Disconnect (fake VAC)",
                           []()
                           {
-                              INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
+                              auto *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
                               if (!ch)
                                   return;
                               ch->Shutdown("VAC banned from secure server\n");
@@ -731,7 +728,7 @@ void DumpRecvTable(CachedEntity *ent, RecvTable *table, int depth, const char *f
         {
             DumpRecvTable(ent, prop->GetDataTable(), depth + 1, ft, acc_offset + prop->GetOffset());
         }
-        if (forcetable && strcmp(ft, table->GetName()))
+        if (forcetable && strcmp(ft, table->GetName()) != 0)
             continue;
         switch (prop->GetType())
         {
@@ -773,7 +770,7 @@ static CatCommand dump_vars("debug_dump_netvars", "Dump netvars of entity",
                                     return;
                                 ClientClass *clz = RAW_ENT(ent)->GetClientClass();
                                 logging::Info("Entity %i: %s", ent->m_IDX, clz->GetName());
-                                const char *ft = (args.ArgC() > 1 ? args[2] : 0);
+                                const char *ft = (args.ArgC() > 1 ? args[2] : nullptr);
                                 DumpRecvTable(ent, clz->m_pRecvTable, 0, ft, 0);
                             });
 static CatCommand dump_vars_by_name("debug_dump_netvars_name", "Dump netvars of entity with target name",
@@ -788,10 +785,10 @@ static CatCommand dump_vars_by_name("debug_dump_netvars_name", "Dump netvars of 
                                             if (!clz)
                                                 continue;
                                             std::string clazz_name(clz->GetName());
-                                            if (clazz_name.find(name) == clazz_name.npos)
+                                            if (clazz_name.find(name) == std::string::npos)
                                                 continue;
                                             logging::Info("Entity %i: %s", ent->m_IDX, clz->GetName());
-                                            const char *ft = (args.ArgC() > 1 ? args[2] : 0);
+                                            const char *ft = (args.ArgC() > 1 ? args[2] : nullptr);
                                             DumpRecvTable(ent, clz->m_pRecvTable, 0, ft, 0);
                                         }
                                     });
@@ -850,7 +847,7 @@ Color &GetPlayerColor(int idx, int team, bool dead = false)
         returnColor.SetColor(245, 229, 196, 255);
     }
 
-    player_info_s pinfo;
+    player_info_s pinfo{};
     if (GetPlayerInfo(idx, &pinfo))
     {
         rgba_t cust = playerlist::Color(pinfo.friendsID);
@@ -887,9 +884,9 @@ static InitRoutine init(
     []()
     {
         // 012BA7E4
-        addr1 = gSignatures.GetClientSignature("89 04 24 FF 92 ? ? ? ? 8B 00") + 3;
+        addr1 = CSignature::GetClientSignature("89 04 24 FF 92 ? ? ? ? 8B 00") + 3;
         // 012BA105
-        addr2 = gSignatures.GetClientSignature("75 1B 83 FB 02") + 2;
+        addr2 = CSignature::GetClientSignature("75 1B 83 FB 02") + 2;
         if (addr1 == 3 || addr2 == 2)
             return;
         logging::Info("Patching scoreboard colors");
@@ -963,10 +960,10 @@ void UpdateLocalPlayerVisionFlags()
 static InitRoutine init_pyrovision(
     []()
     {
-        uintptr_t addr                        = gSignatures.GetClientSignature("8B 35 ? ? ? ? 75 27");
+        uintptr_t addr                        = CSignature::GetClientSignature("8B 35 ? ? ? ? 75 27");
         g_nLocalPlayerVisionFlags             = *reinterpret_cast<int **>(addr + 2);
         g_nLocalPlayerVisionFlagsWeaponsCheck = *reinterpret_cast<int **>(addr + 8 + 2);
-        addr                                  = gSignatures.GetClientSignature("C7 04 24 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? E8");
+        addr                                  = CSignature::GetClientSignature("C7 04 24 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? E8");
         if (!addr)
             return;
         addr += 17;
@@ -990,8 +987,8 @@ static InitRoutine init_pyrovision(
                 }
             },
             "remove_cart_cond");
-        static BytePatch cart_patch1(gSignatures.GetClientSignature, "0F 84 ? ? ? ? F3 0F 10 A2", 0x0, { 0x90, 0xE9 });
-        static BytePatch cart_patch2(gSignatures.GetClientSignature, "0F 85 ? ? ? ? 89 F8 84 C0 75 72", 0x0, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+        static BytePatch cart_patch1(CSignature::GetClientSignature, "0F 84 ? ? ? ? F3 0F 10 A2", 0x0, { 0x90, 0xE9 });
+        static BytePatch cart_patch2(CSignature::GetClientSignature, "0F 85 ? ? ? ? 89 F8 84 C0 75 72", 0x0, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
         if (unlimit_bumpercart_movement)
         {
             cart_patch1.Patch();
@@ -1073,7 +1070,7 @@ void cyoaview_nethook(const CRecvProxyData *data, void *pPlayer, void *out)
 // The Former is the main logic, the latter is, so you don't accidentally perma disable it either
 inline void force_wait_func(bool after)
 {
-    static auto enable_wait_signature = gSignatures.GetEngineSignature("74 ? A2 ? ? ? ? C7 44 24 ? 01 00 00 00");
+    static auto enable_wait_signature = CSignature::GetEngineSignature("74 ? A2 ? ? ? ? C7 44 24 ? 01 00 00 00");
     // Jump if not overflow, aka always jump in this case
     static BytePatch patch_wait(enable_wait_signature, { 0x71 });
     if (after)
@@ -1115,11 +1112,11 @@ static InitRoutine init(
         if (render_zoomed)
             tryPatchLocalPlayerShouldDraw(true);
         render_zoomed.installChangeCallback([](settings::VariableBase<bool> &, bool after) { tryPatchLocalPlayerShouldDraw(after); });
-        patch_playerpanel     = std::make_unique<BytePatch>(gSignatures.GetClientSignature, "0F 94 45 ? 85 C0 0F 8E", 0x0, std::vector<unsigned char>{ 0xC6, 0x45, 0xDF, 0x01 });
-        uintptr_t addr_scrbrd = gSignatures.GetClientSignature("8B 10 89 74 24 04 89 04 24 FF 92 ? ? ? ? 83 F8 02 75 09");
+        patch_playerpanel     = std::make_unique<BytePatch>(CSignature::GetClientSignature, "0F 94 45 ? 85 C0 0F 8E", 0x0, std::vector<unsigned char>{ 0xC6, 0x45, 0xDF, 0x01 });
+        uintptr_t addr_scrbrd = CSignature::GetClientSignature("8B 10 89 74 24 04 89 04 24 FF 92 ? ? ? ? 83 F8 02 75 09");
 
         // Address to the function we need to jump to
-        uintptr_t target_addr = e8call_direct(gSignatures.GetClientSignature("E8 ? ? ? ? 83 FE 2D"));
+        uintptr_t target_addr = e8call_direct(CSignature::GetClientSignature("E8 ? ? ? ? 83 FE 2D"));
         uintptr_t rel_addr    = ((uintptr_t) target_addr - ((uintptr_t) addr_scrbrd + 2)) - 5;
 
         patch_scoreboard1 = std::make_unique<BytePatch>(addr_scrbrd, std::vector<unsigned char>{ 0xEB, 0x31, 0xE8, foffset(rel_addr, 0), foffset(rel_addr, 1), foffset(rel_addr, 2), foffset(rel_addr, 3), 0xE9, 0xC9, 0x06, 0x00, 0x00 });
@@ -1130,9 +1127,9 @@ static InitRoutine init(
         patch_scoreboard2->Patch();
         patch_scoreboard3->Patch();
 
-        static BytePatch stealth_kill{ gSignatures.GetClientSignature, "84 C0 75 28 A1", 2, { 0x90, 0x90 } }; // stealth kill patch
+        static BytePatch stealth_kill{ CSignature::GetClientSignature, "84 C0 75 28 A1", 2, { 0x90, 0x90 } }; // stealth kill patch
         stealth_kill.Patch();
-        static BytePatch cyoa_patch{ gSignatures.GetClientSignature, "75 ? 80 BB ? ? ? ? 00 74 ? A1 ? ? ? ? 8B 10 C7 44 24", 0, { 0xEB } };
+        static BytePatch cyoa_patch{ CSignature::GetClientSignature, "75 ? 80 BB ? ? ? ? 00 74 ? A1 ? ? ? ? 8B 10 C7 44 24", 0, { 0xEB } };
         cyoa_patch.Patch();
         EC::Register(
             EC::Shutdown,

@@ -1,6 +1,7 @@
 /*
  *  Credits to UNKN0WN
  */
+
 #include "common.hpp"
 #include "DetourHook.hpp"
 #include "PlayerTools.hpp"
@@ -49,7 +50,7 @@ void DrawText_hook(int *_this, int x, int y, vgui::HFont hFont, Color clr, const
             player_names.clear();
             for (int i = 1; i < g_IEngine->GetMaxClients(); i++)
             {
-                player_info_s player_info;
+                player_info_s player_info{};
                 if (GetPlayerInfo(i, &player_info))
                     player_names[player_info.name] = i;
             }
@@ -61,7 +62,7 @@ void DrawText_hook(int *_this, int x, int y, vgui::HFont hFont, Color clr, const
         // Get entities by name
         for (auto &name : names_array)
         {
-            player_info_s pinfo;
+            player_info_s pinfo{};
             if (player_names[name] != 0 && GetPlayerInfo(player_names[name], &pinfo))
                 displayed_players.push_back(pinfo);
         }
@@ -145,7 +146,7 @@ void DrawText_hook(int *_this, int x, int y, vgui::HFont hFont, Color clr, const
 static InitRoutine init(
     []
     {
-        auto drawtext_addr = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 1C A1 ? ? ? ? 8B 4D");
+        auto drawtext_addr = CSignature::GetClientSignature("55 89 E5 57 56 53 83 EC 1C A1 ? ? ? ? 8B 4D");
         drawtext_detour.Init(drawtext_addr, (void *) DrawText_hook);
 
         EC::Register(

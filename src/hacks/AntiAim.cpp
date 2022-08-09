@@ -10,13 +10,14 @@
 #include <hacks/AntiAim.hpp>
 
 #include "common.hpp"
+
 namespace hacks::antiaim
 {
 bool force_fakelag = false;
 float used_yaw     = 0.0f;
-static settings::Boolean enable{ "antiaim.enable", "0" };
+static settings::Boolean enable{ "antiaim.enable", "false" };
 
-static settings::Boolean no_clamping{ "antiaim.no-clamp", "0" };
+static settings::Boolean no_clamping{ "antiaim.no-clamp", "false" };
 static settings::Float roll{ "antiaim.roll", "0" };
 static settings::Float spin{ "antiaim.spin-speed", "10" };
 
@@ -29,7 +30,7 @@ static settings::Float yaw_fake_static{ "antiaim.yaw.fake.static", "0" };
 static settings::Int yaw_real{ "antiaim.yaw.real", "0" };
 static settings::Float yaw_real_static{ "antiaim.yaw.real.static", "0" };
 
-static settings::Boolean aaaa_enable{ "antiaim.aaaa.enable", "0" };
+static settings::Boolean aaaa_enable{ "antiaim.aaaa.enable", "false" };
 static settings::Float aaaa_interval{ "antiaim.aaaa.interval.seconds", "0" };
 static settings::Float aaaa_interval_random_high{ "antiaim.aaaa.interval.random-high", "10" };
 static settings::Float aaaa_interval_random_low{ "antiaim.aaaa.interval.random-low", "2" };
@@ -355,7 +356,7 @@ float useEdge(float edgeViewAngle)
     // Var to be disabled when a angle is choosen to prevent the others from
     // conflicting
     bool edgeTest = true;
-    if (((edgeViewAngle < -135) || (edgeViewAngle > 135)) && edgeTest == true)
+    if (((edgeViewAngle < -135) || (edgeViewAngle > 135)) && edgeTest)
     {
         if (edgeToEdgeOn == 1)
             edgeYaw = (float) -90;
@@ -363,7 +364,7 @@ float useEdge(float edgeViewAngle)
             edgeYaw = (float) 90;
         edgeTest = false;
     }
-    if ((edgeViewAngle >= -135) && (edgeViewAngle < -45) && edgeTest == true)
+    if ((edgeViewAngle >= -135) && (edgeViewAngle < -45) && edgeTest)
     {
         if (edgeToEdgeOn == 1)
             edgeYaw = (float) 0;
@@ -371,7 +372,7 @@ float useEdge(float edgeViewAngle)
             edgeYaw = (float) 179;
         edgeTest = false;
     }
-    if ((edgeViewAngle >= -45) && (edgeViewAngle < 45) && edgeTest == true)
+    if ((edgeViewAngle >= -45) && (edgeViewAngle < 45) && edgeTest)
     {
         if (edgeToEdgeOn == 1)
             edgeYaw = (float) 90;
@@ -379,7 +380,7 @@ float useEdge(float edgeViewAngle)
             edgeYaw = (float) -90;
         edgeTest = false;
     }
-    if ((edgeViewAngle <= 135) && (edgeViewAngle >= 45) && edgeTest == true)
+    if ((edgeViewAngle <= 135) && (edgeViewAngle >= 45) && edgeTest)
     {
         if (edgeToEdgeOn == 1)
             edgeYaw = (float) 179;
@@ -549,5 +550,5 @@ bool isEnabled()
     return *enable;
 }
 
-static InitRoutine fakelag_check([]() { yaw_fake.installChangeCallback([](settings::VariableBase<int> &, int after) { force_fakelag = after > 0 ? true : false; }); });
+static InitRoutine fakelag_check([]() { yaw_fake.installChangeCallback([](settings::VariableBase<int> &, int after) { force_fakelag = after > 0; }); });
 } // namespace hacks::antiaim

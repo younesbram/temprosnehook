@@ -118,6 +118,14 @@ void onKilledBy(unsigned id)
                     ipc::peer->SendMessage(nullptr, -1, ipc::commands::execute_client_cmd_long, command.c_str(), command.length() + 1);
                 else
                     ipc::peer->SendMessage(command.c_str(), -1, ipc::commands::execute_client_cmd, nullptr, 0);
+
+                if (std::ifstream("tf/cfg/betrayals.cfg"))
+                {
+                    std::ofstream cfg_betrayal;
+                    cfg_betrayal.open("tf/cfg/betrayals.cfg");
+                    cfg_betrayal << "cat_pl_add_id " + std::to_string(id) + " ABUSE\n";
+                    cfg_betrayal.close();
+                }
             }
         }
     }

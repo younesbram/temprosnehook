@@ -158,12 +158,12 @@ navPoints determinePoints(CNavArea *current, CNavArea *next)
     // Do the same for the other area
     auto next_closest = next->getNearestPoint(area_center.AsVector2D());
 
-    // Use one of them as a center point, the one that is either x or y alligned with a center
+    // Use one of them as a center point, the one that is either x or y aligned with a center
     // Of the areas.
     // This will avoid walking into walls.
     auto center_point = area_closest;
 
-    // Determine if alligned, if not, use the other one as the center point
+    // Determine if aligned, if not, use the other one as the center point
     if (center_point.x != area_center.x && center_point.y != area_center.y && center_point.x != next_center.x && center_point.y != next_center.y)
     {
         center_point = next_closest;
@@ -268,9 +268,7 @@ public:
                     adjacent->push_back(micropather::StateCost{ reinterpret_cast<void *>(connection.area), cost });
                 }
                 else
-                {
                     vischeck_cache[key] = { TICKCOUNT_TIMESTAMP(60), false };
-                }
             }
         }
     }
@@ -777,9 +775,7 @@ void vischeckPath()
         }
         // Else we can update the cache (if not marked bad before this)
         else if (map->vischeck_cache.find(key) == map->vischeck_cache.end() || map->vischeck_cache[key].vischeck_state)
-        {
             map->vischeck_cache[key] = { TICKCOUNT_TIMESTAMP(*vischeck_cache_time), true };
-        }
     }
 }
 
@@ -821,10 +817,8 @@ void checkBlacklist()
             break;
         // A path Node is blacklisted, abandon pathing
         for (auto &entry : map->free_blacklist)
-        {
             if (entry.first == crumb.navarea)
                 should_abandon = true;
-        }
     }
     if (should_abandon)
         abandonPath();
@@ -917,9 +911,7 @@ void LevelInit()
         map = std::make_unique<Map>(nav_path);
     }
     else
-    {
         map->Reset();
-    }
 }
 
 // Return the whole thing
@@ -1050,22 +1042,16 @@ static CatCommand nav_debug_check("nav_debug_check", "Perform nav checks between
 
                                       // Too high for us to jump!
                                       if (points.center_next.z - points.center.z > PLAYER_JUMP_HEIGHT)
-                                      {
                                           return logging::Info("Nav: Area too high!");
-                                      }
 
                                       points.current.z += PLAYER_JUMP_HEIGHT;
                                       points.center.z += PLAYER_JUMP_HEIGHT;
                                       points.next.z += PLAYER_JUMP_HEIGHT;
 
                                       if (IsPlayerPassableNavigation(points.current, points.center) && IsPlayerPassableNavigation(points.center, points.next))
-                                      {
                                           logging::Info("Nav: Area is player passable!");
-                                      }
                                       else
-                                      {
                                           logging::Info("Nav: Area is NOT player passable! %.2f,%.2f,%.2f %.2f,%.2f,%.2f %.2f,%.2f,%.2f", points.current.x, points.current.y, points.current.z, points.center.x, points.center.y, points.center.z, points.next.x, points.next.y, points.next.z);
-                                      }
                                   });
 
 static CatCommand nav_debug_blacklist("nav_debug_blacklist", "Blacklist connection between two areas for 30s. First area: cat_nav_set Second area: Your location while running this command.",

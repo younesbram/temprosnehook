@@ -32,6 +32,9 @@ std::vector<ConCommand *> &RegisteredCommandsList()
 void BeginConVars()
 {
     logging::Info("Begin ConVars");
+    if (!std::ifstream("tf/cfg/betrayals.cfg"))
+        std::ofstream cfg_betrayals("tf/cfg/betrayals.cfg", std::ios::out | std::ios::trunc);
+
     if (!std::ifstream("tf/cfg/cat_autoexec_textmode.cfg"))
     {
         std::ofstream cfg_autoexec_textmode("tf/cfg/cat_autoexec_textmode.cfg", std::ios::out | std::ios::trunc);
@@ -48,6 +51,7 @@ void BeginConVars()
                                      "cat_ipc_connect";
         }
     }
+
     if (!std::ifstream("tf/cfg/cat_autoexec.cfg"))
     {
         std::ofstream cfg_autoexec("tf/cfg/cat_autoexec.cfg", std::ios::out | std::ios::trunc);
@@ -58,6 +62,7 @@ void BeginConVars()
                             "YOU INJECT CATHOOK\n";
         }
     }
+
     if (!std::ifstream("tf/cfg/cat_matchexec.cfg"))
     {
         std::ofstream cfg_autoexec("tf/cfg/cat_matchexec.cfg", std::ios::out | std::ios::trunc);
@@ -97,7 +102,7 @@ void EndConVars()
     }
 }
 
-ConVar *CreateConVar(std::string name, std::string value, std::string help)
+ConVar *CreateConVar(const std::string &name, const std::string &value, const std::string &help)
 {
     char *namec  = new char[256];
     char *valuec = new char[256];

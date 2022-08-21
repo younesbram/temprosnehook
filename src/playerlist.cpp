@@ -48,10 +48,9 @@ void Save()
         file.write(reinterpret_cast<const char *>(&SERIALIZE_VERSION), sizeof(SERIALIZE_VERSION));
         int size = 0;
         for (const auto &item : data)
-        {
             if (ShouldSave(item.second))
                 size++;
-        }
+
         file.write(reinterpret_cast<const char *>(&size), sizeof(size));
         for (const auto &item : data)
         {

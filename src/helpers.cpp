@@ -33,7 +33,10 @@ void BeginConVars()
 {
     logging::Info("Begin ConVars");
     if (!std::ifstream("tf/cfg/betrayals.cfg"))
-        std::ofstream cfg_betrayals("tf/cfg/betrayals.cfg", std::ios::out | std::ios::trunc);
+    {
+        std::ofstream cfg_betrayals("tf/cfg/betrayals.cfg");
+        cfg_betrayals.close();
+    }
 
     if (!std::ifstream("tf/cfg/cat_autoexec_textmode.cfg"))
     {
@@ -50,6 +53,7 @@ void BeginConVars()
                                      "fps_max 67\n"
                                      "cat_ipc_connect";
         }
+        cfg_autoexec_textmode.close();
     }
 
     if (!std::ifstream("tf/cfg/cat_autoexec.cfg"))
@@ -61,18 +65,21 @@ void BeginConVars()
                             "file\n// This script will be executed EACH TIME "
                             "YOU INJECT CATHOOK\n";
         }
+        cfg_autoexec.close();
     }
 
     if (!std::ifstream("tf/cfg/cat_matchexec.cfg"))
     {
-        std::ofstream cfg_autoexec("tf/cfg/cat_matchexec.cfg", std::ios::out | std::ios::trunc);
-        if (cfg_autoexec.good())
+        std::ofstream cat_matchexec("tf/cfg/cat_matchexec.cfg", std::ios::out | std::ios::trunc);
+        if (cat_matchexec.good())
         {
-            cfg_autoexec << "// Put your custom cathook settings in this "
+            cat_matchexec << "// Put your custom cathook settings in this "
                             "file\n// This script will be executed EACH TIME "
                             "YOU JOIN A MATCH\n";
         }
+        cat_matchexec.close();
     }
+
     logging::Info(":b:");
     SetCVarInterface(g_ICvar);
 }

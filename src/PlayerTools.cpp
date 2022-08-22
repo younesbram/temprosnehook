@@ -122,7 +122,7 @@ void onKilledBy(unsigned id)
                 if (std::ifstream("tf/cfg/betrayals.cfg"))
                 {
                     std::ofstream cfg_betrayal;
-                    cfg_betrayal.open("tf/cfg/betrayals.cfg");
+                    cfg_betrayal.open("tf/cfg/betrayals.cfg", std::ios::app);
                     cfg_betrayal << "cat_pl_add_id " + std::to_string(id) + " ABUSE\n";
                     cfg_betrayal.close();
                 }

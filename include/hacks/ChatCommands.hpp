@@ -18,5 +18,5 @@
 
 namespace hacks::ChatCommands
 {
-void handleChatMessage(const std::string& message, int userid);
+void handleChatMessage(const std::string &message, int userid);
 } // namespace hacks::ChatCommands

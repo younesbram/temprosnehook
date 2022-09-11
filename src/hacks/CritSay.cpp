@@ -62,10 +62,10 @@ std::string ComposeCritSay(IGameEvent *event)
     std::string msg;
     std::random_device rd;
     std::mt19937 mt(rd());
-    std::uniform_real_distribution<double> dist(0.0, DBL_MAX);
+    std::uniform_real_distribution<double> dist(0.0, source->size());
     do
     {
-        msg = source->at((int) dist(mt) % source->size());
+        msg = source->at((int) dist(mt));
     } while (msg == lastmsg && source->size() > 1);
     lastmsg = msg;
     player_info_s info{};

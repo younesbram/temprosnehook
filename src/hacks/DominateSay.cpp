@@ -51,11 +51,11 @@ std::string ComposeDominateSay(IGameEvent *event)
 
     std::random_device rd;
     std::mt19937 mt(rd());
-    std::uniform_real_distribution<double> dist(0.0, DBL_MAX);
-    std::string msg = source->at((int) dist(mt) % source->size());
+    std::uniform_real_distribution<double> dist(0.0, source->size());
+    std::string msg = source->at((int) dist(mt));
 
     while (msg == lastmsg && source->size() > 1)
-        msg = source->at((int) dist(mt) % source->size());
+        msg = source->at((int) dist(mt));
     lastmsg = msg;
     player_info_s info{};
 

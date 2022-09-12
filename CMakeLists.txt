@@ -184,6 +184,7 @@ target_include_directories(cathook SYSTEM PRIVATE
         "external/source-sdk-2013-headers/mp/src/common"
         "external/source-sdk-2013-headers/mp/src/public/tier0"
         "external/source-sdk-2013-headers/mp/src/public/tier1"
+        "external/source-sdk-2013-headers/mp/src/public/steam"
         "external/source-sdk-2013-headers/mp/src/tier1"
         "external/source-sdk-2013-headers/mp/src")
 

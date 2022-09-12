@@ -11,8 +11,8 @@
 #include "HookedMethods.hpp"
 #include "CatBot.hpp"
 #include "ChatCommands.hpp"
-#include "MiscTemporary.hpp"
 #include <iomanip>
+#include "nullnexus.hpp"
 #include "votelogger.hpp"
 #include "nospread.hpp"
 
@@ -63,14 +63,14 @@ template <typename T> void SplitName(std::vector<T> &ret, const T &name, int num
         ret.push_back(tmp);
 }
 static int anti_balance_attempts = 0;
-static std::string previous_name = "";
+static std::string previous_name;
 static Timer reset_it{};
 static Timer wait_timer{};
 void Paint()
 {
     if (!wait_timer.test_and_set(1000))
         return;
-    INetChannel *server = (INetChannel *) g_IEngine->GetNetChannelInfo();
+    auto *server = (INetChannel *) g_IEngine->GetNetChannelInfo();
     if (server)
         reset_it.update();
     if (reset_it.test_and_set(20000))
@@ -103,7 +103,6 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
     std::string data;
     switch (type)
     {
-
     case 25:
     {
         // DATA = [ 01 01 06  ] For "Charge me Doctor!"
@@ -140,7 +139,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
         if (hacks::catbot::anti_motd && hacks::catbot::catbotmode)
         {
             data = std::string(buf_data);
-            if (data.find("class_") != data.npos)
+            if (data.find("class_") != std::string::npos)
                 return false;
         }
         break;
@@ -148,10 +147,10 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
     {
         if (*anti_votekick && buf.GetNumBytesLeft() > 35)
         {
-            INetChannel *server = (INetChannel *) g_IEngine->GetNetChannelInfo();
+            auto *server = (INetChannel *) g_IEngine->GetNetChannelInfo();
             data                = std::string(buf_data);
             logging::Info("%s", data.c_str());
-            if (data.find("TeamChangeP") != data.npos && CE_GOOD(LOCAL_E))
+            if (data.find("TeamChangeP") != std::string::npos && CE_GOOD(LOCAL_E))
             {
                 std::string server_name(server->GetAddress());
                 if (server_name != previous_name)
@@ -251,7 +250,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
             for (int i = 0; i < 7; i++)
                 boost::replace_all(message2, toreplace[i], replacewith[i]);
 
-            for (auto filter : res)
+            for (const auto &filter : res)
                 if (boost::contains(message2, filter))
                 {
                     chat_stack::Say("\e" + clear, true);

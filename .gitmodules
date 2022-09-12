@@ -16,12 +16,12 @@
 [submodule "external/clip"]
 	path = external/clip
 	url = https://github.com/nullworks/clip
-[submodule "external/libnullnexus"]
-	path = external/libnullnexus
-	url = https://github.com/nullworks/libnullnexus
 [submodule "external/boost-cmake"]
 	path = external/boost-cmake
 	url = https://github.com/STEVE4git/boost-cmake.git
 [submodule "external/source-sdk-2013-headers"]
 	path = external/source-sdk-2013-headers
 	url = https://github.com/nullworks/source-sdk-2013-headers.git
+[submodule "external/libnullnexus"]
+	path = external/libnullnexus
+	url = https://github.com/nullworks/libnullnexus.git

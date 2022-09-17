@@ -1,6 +1,7 @@
 #include "common.hpp"
 #include "playerlist.hpp"
 #include <boost/format.hpp>
+#include <random>
 
 namespace hacks::miscplayerinfo
 {
@@ -15,7 +16,7 @@ struct LevelInfo
     {
         min     = _min;
         max     = _max;
-        content = _content;
+        content = std::move(_content);
     }
 };
 // Source: https://www.youtube.com/watch?v=Yke9BhP1uks
@@ -27,7 +28,7 @@ std::unordered_map<unsigned, int> previous_entry_amount{};
 std::string random_mafia_entry(int level, unsigned steamid)
 {
     std::vector<std::string> store;
-    if (choosen_entry[steamid].first != "")
+    if (!choosen_entry[steamid].first.empty())
     {
         int entry_amt = 0;
         for (auto &i : mafia_levels)
@@ -45,8 +46,14 @@ std::string random_mafia_entry(int level, unsigned steamid)
     if (store.empty())
         return "Crook";
     else
-        return store.at(rand() % store.size());
+    {
+        std::random_device rd;
+        std::mt19937 mt(rd());
+        std::uniform_real_distribution<double> dist(0.0, store.size());
+        return store.at((int) dist(mt));
+    }
 }
+
 static std::array<float, PLAYER_ARRAY_SIZE> death_timer;
 void Paint()
 {
@@ -132,7 +139,7 @@ void Paint()
             level            = max(level, 1);
 
             // String to draw, {Level} Cat for cathook users, else gotten from std::vector at random.
-            if (choosen_entry[ent->player_info.friendsID].first == "" || choosen_entry[ent->player_info.friendsID].second != level)
+            if (choosen_entry[ent->player_info.friendsID].first.empty() || choosen_entry[ent->player_info.friendsID].second != level)
                 choosen_entry[ent->player_info.friendsID] = { random_mafia_entry(level, ent->player_info.friendsID), level };
             std::string to_display = (playerlist::AccessData(ent->player_info.friendsID).state == playerlist::k_EState::CAT ? format("Lv.", level, " Cat") : format("Lv.", level, " ", choosen_entry[ent->player_info.friendsID].first));
 
@@ -159,10 +166,7 @@ void Paint()
         }
     }
 }
-static InitRoutine init(
-    []()
-    {
-        EC::Register(EC::Draw, Paint, "DRAW_Miscplayerinfo", EC::average);
-    });
+
+static InitRoutine init([]() { EC::Register(EC::Draw, Paint, "DRAW_Miscplayerinfo", EC::average); });
 #endif
-}; // namespace hacks::miscplayerinfo
+} // namespace hacks::miscplayerinfo

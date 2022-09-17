@@ -29,7 +29,7 @@ const std::string classnames[] = { "scout", "sniper", "soldier", "demoman", "med
 
 bool UnassignedTeam()
 {
-    return !g_pLocalPlayer->team or (g_pLocalPlayer->team == TEAM_SPEC);
+    return !g_pLocalPlayer->team || g_pLocalPlayer->team == TEAM_SPEC;
 }
 
 bool UnassignedClass()
@@ -111,9 +111,9 @@ static void update()
 {
     if (autoteam_timer.test_and_set(5000))
     {
-        if (autojoin_team and UnassignedTeam())
+        if (autojoin_team && UnassignedTeam())
             hack::ExecuteCommand("autoteam");
-        else if (autojoin_class and UnassignedClass())
+        else if (autojoin_class && UnassignedClass())
         {
             if (int(autojoin_class) < 10)
                 g_IEngine->ExecuteClientCmd(format("join_class ", classnames[int(autojoin_class) - 1]).c_str());

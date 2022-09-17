@@ -70,13 +70,9 @@ float GetAAAAPitch()
 float GetAAAATimerLength()
 {
     if (aaaa_interval)
-    {
         return (float) aaaa_interval;
-    }
     else
-    {
         return RandFloatRange((float) aaaa_interval_random_low, (float) aaaa_interval_random_high);
-    }
 }
 
 void NextAAAA()
@@ -320,14 +316,13 @@ bool findEdge(float edgeOrigYaw)
     float edgeRightDist = edgeDistance(edgeOrigYaw + 21);
     edgeRightDist       = edgeRightDist + edgeDistance(edgeOrigYaw + 27);
 
-    // If the distance is too far, then set the distance to max so the angle
-    // isnt used
+    // If the distance is too far, then set the distance to max so the angle isn't used
     if (edgeLeftDist >= 260)
         edgeLeftDist = 999999999;
     if (edgeRightDist >= 260)
         edgeRightDist = 999999999;
 
-    // If none of the vectors found a wall, then dont edge
+    // If none of the vectors found a wall, then don't edge
     if (edgeLeftDist == edgeRightDist)
         return false;
 
@@ -353,10 +348,10 @@ bool findEdge(float edgeOrigYaw)
 // Function to give you a static angle to use
 float useEdge(float edgeViewAngle)
 {
-    // Var to be disabled when a angle is choosen to prevent the others from
+    // Var to be disabled when an angle is chosen to prevent the others from
     // conflicting
     bool edgeTest = true;
-    if (((edgeViewAngle < -135) || (edgeViewAngle > 135)) && edgeTest)
+    if ((edgeViewAngle < -135) || (edgeViewAngle > 135))
     {
         if (edgeToEdgeOn == 1)
             edgeYaw = (float) -90;
@@ -386,11 +381,11 @@ float useEdge(float edgeViewAngle)
             edgeYaw = (float) 179;
         if (edgeToEdgeOn == 2)
             edgeYaw = (float) 0;
-        edgeTest = false;
     }
     // return with the angle choosen
     return edgeYaw;
 }
+
 static float randyaw = 0.0f;
 void ProcessUserCmd(CUserCmd *cmd)
 {

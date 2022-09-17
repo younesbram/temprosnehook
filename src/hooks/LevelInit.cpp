@@ -10,6 +10,7 @@
 #include "HookedMethods.hpp"
 #include "MiscTemporary.hpp"
 #include "AntiAntiAim.hpp"
+#include <random>
 
 static settings::Boolean halloween_mode{ "misc.force-halloween", "false" };
 static settings::Int skybox_changer{ "misc.skybox-override", "0" };
@@ -59,7 +60,12 @@ DEFINE_HOOKED_METHOD(LevelInit, void, void *this_, const char *name)
     {
         static TextFile file;
         if (file.TryLoad("names.txt"))
-            name_forced = file.lines.at(rand() % file.lines.size());
+        {
+            std::random_device rd;
+            std::mt19937 mt(rd());
+            std::uniform_real_distribution<double> dist(0.0, file.lines.size());
+            name_forced = file.lines.at((int) dist(mt));
+        }
     }
     else
         name_forced = "";

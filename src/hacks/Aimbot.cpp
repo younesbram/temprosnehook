@@ -63,7 +63,7 @@ static settings::Boolean auto_spin_up{ "aimbot.auto.spin-up", "false" };
 static settings::Boolean minigun_tapfire{ "aimbot.auto.tapfire", "false" };
 static settings::Boolean auto_zoom{ "aimbot.auto.zoom", "false" };
 static settings::Boolean auto_unzoom{ "aimbot.auto.unzoom", "false" };
-static settings::Int zoom_distance{ "aimbot.zoom.distance", "2000" };
+static settings::Int zoom_distance{ "aimbot.zoom.distance", "1250" };
 
 static settings::Boolean backtrackAimbot{ "aimbot.backtrack", "false" };
 static settings::Boolean backtrackLastTickOnly("aimbot.backtrack.only-last-tick", "true");
@@ -422,14 +422,14 @@ void doAutoZoom(bool target_found, CachedEntity *target)
     }
 
     auto nearest = hacks::NavBot::getNearestPlayerDistance();
-    if (!allowNoScope(target) && g_pLocalPlayer->holding_sniper_rifle && (target_found || isIdle || nearest.second < *zoom_distance))
+    if (!allowNoScope(target) && g_pLocalPlayer->holding_sniper_rifle && (target_found || isIdle || nearest.second <= *zoom_distance))
     {
         if (target_found)
             zoomTime.update();
         if (!g_pLocalPlayer->bZoomed)
             current_user_cmd->buttons |= IN_ATTACK2;
     }
-    else if (!target_found && nearest.second >= *zoom_distance)
+    else if (!target_found && nearest.second > *zoom_distance)
     {
         // Auto-Unzoom
         if (auto_unzoom)

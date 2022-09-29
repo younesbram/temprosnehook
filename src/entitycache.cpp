@@ -6,7 +6,6 @@
  */
 
 #include "common.hpp"
-
 #include <settings/Float.hpp>
 #include "soundcache.hpp"
 
@@ -38,9 +37,7 @@ void CachedEntity::Reset()
     m_fLastUpdate = 0;
 }
 
-CachedEntity::~CachedEntity()
-{
-}
+CachedEntity::~CachedEntity() = default;
 
 static settings::Float ve_window{ "debug.ve.window", "0" };
 static settings::Boolean ve_smooth{ "debug.ve.smooth", "true" };
@@ -52,7 +49,7 @@ void CachedEntity::Update()
 
     if (!raw)
         return;
-#if PROXY_ENTITY != true
+#if !PROXY_ENTITY
     m_pEntity = g_IEntityList->GetClientEntity(idx);
     if (!m_pEntity)
         return;

@@ -43,9 +43,7 @@ public:
         struct passwd *pw = getpwuid(uid);
         std::string uname;
         if (pw)
-        {
             uname = std::string(pw->pw_name);
-        }
         else
             uname = "unknown";
         stream.open(paths::getDataPath("/chat-" + uname + ".csv"), std::ios::out | std::ios::app);
@@ -73,9 +71,8 @@ csv_stream &operator<<(csv_stream &log, const std::string &string)
     for (const auto &i : string)
     {
         if (i == '"')
-        {
             log.stream << '"';
-        }
+
         log.stream << i;
     }
     log.stream << '"';
@@ -106,28 +103,26 @@ csv_stream &logger()
 void LogMessage(int eid, std::string message)
 {
     if (!enable)
-    {
         return;
-    }
-    if (no_spam && hacks::spam::isActive() and eid == g_IEngine->GetLocalPlayer())
+    if (message.empty())
+        return;
+    if (no_spam && hacks::spam::isActive() && eid == g_IEngine->GetLocalPlayer())
         return;
     player_info_s info{};
-    if (not GetPlayerInfo(eid, &info))
+    if (!GetPlayerInfo(eid, &info))
         return;
     if (no_ipc && (playerlist::AccessData(info.friendsID).state == playerlist::k_EState::IPC || playerlist::AccessData(info.friendsID).state == playerlist::k_EState::CAT))
         return;
 
     std::string name(info.name);
     for (auto &x : name)
-    {
         if (x == '\n' || x == '\r')
             x = '*';
-    }
+
     for (auto &x : message)
-    {
         if (x == '\n' || x == '\r')
             x = '*';
-    }
+
     logger() << std::to_string(time(nullptr)) << std::to_string(info.friendsID) << name << message
 #if ENABLE_IPC
              << std::to_string(ipc::peer ? ipc::peer->client_id : 0)

@@ -186,7 +186,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
         for (i = 0; i < s; i++)
             data.push_back(buf_data[i]);
         /* First byte is player ENT index
-         * Second byte is unindentified (equals to 0x01)
+         * Second byte is unidentified (equals to 0x01)
          */
         const char *p = data.c_str() + 2;
         std::string event(p), name((p += event.size() + 1)), message(p + name.size() + 1);

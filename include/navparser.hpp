@@ -47,7 +47,7 @@ class BlacklistReason
 {
 public:
     BlacklistReason_enum value;
-    int time     = 0;
+    int time = 0;
     void operator=(BlacklistReason_enum const &reason)
     {
         this->value = reason;

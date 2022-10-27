@@ -680,7 +680,6 @@ static void followCrumbs()
             return;
         inactivity.update();
     }
-
     // If we make any progress at all, reset this
     else
     {

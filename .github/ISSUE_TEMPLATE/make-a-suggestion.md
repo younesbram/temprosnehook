@@ -1,9 +1,10 @@
 ---
-Name: Make a Suggestion
-About: Help improve Cathook
-Title: ''
-Labels: enhancement
-Assignees: ''
+name: Make a Suggestion
+about: Help us improve Cathook
+title: ''
+labels: ''
+assignees: ''
+
 ---
 
 **Quick Description**

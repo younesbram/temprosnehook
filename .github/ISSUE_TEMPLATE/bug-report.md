@@ -1,9 +1,10 @@
 ---
-Name: Bug Report
-About: Create a report and help us improve Cathook!
-Title: Quick Description of Bug
-Labels: bug
-Assignees: ''
+name: Bug Report
+about: Create a report and help us improve Cathook!
+title: Quick Description of Bug
+labels: ''
+assignees: ''
+
 ---
 
 ## System Information

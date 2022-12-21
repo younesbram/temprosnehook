@@ -7,9 +7,6 @@
 
 #include "common.hpp"
 #include "core/sharedobj.hpp"
-#include <thread>
-
-#include <unistd.h>
 
 #include <string>
 #include <sstream>
@@ -61,18 +58,18 @@ IMDLCache *g_IMDLCache                             = nullptr;
 IToolFrameworkInternal *g_IToolFramework           = nullptr;
 CServerTools *g_IServerTools                       = nullptr;
 
-template <typename T> T *BruteforceInterface(std::string name, sharedobj::SharedObject &object, int start = 0)
+template <typename T> T *BruteforceInterface(const std::string &name, sharedobj::SharedObject &object, int start = 0)
 {
-    T *result = nullptr;
+    T *result;
     std::stringstream stream;
     for (int i = start; i < 100; i++)
     {
         stream.str("");
         stream << name;
-        int zeros = 0;
+        int zeros;
         if (i < 10)
             zeros = 2;
-        else if (i < 100)
+        else
             zeros = 1;
         for (int j = 0; j < zeros; j++)
             stream << '0';
@@ -82,8 +79,7 @@ template <typename T> T *BruteforceInterface(std::string name, sharedobj::Shared
             return result;
     }
     logging::Info("RIP Software: can't create interface %s!", name.c_str());
-    exit(0);
-    return nullptr;
+    exit(EXIT_FAILURE);
 }
 
 extern "C" typedef HSteamPipe (*GetHSteamPipe_t)();
@@ -112,15 +108,15 @@ void CreateInterfaces()
     g_IServerTools      = BruteforceInterface<CServerTools>("VSERVERTOOLS", sharedobj::server());
 
     logging::Info("Initing SteamAPI");
-    GetHSteamPipe_t GetHSteamPipe = reinterpret_cast<GetHSteamPipe_t>(dlsym(sharedobj::steamapi().lmap, "SteamAPI_GetHSteamPipe"));
-    HSteamPipe sp                 = GetHSteamPipe();
+    auto GetHSteamPipe = reinterpret_cast<GetHSteamPipe_t>(dlsym(sharedobj::steamapi().lmap, "SteamAPI_GetHSteamPipe"));
+    HSteamPipe sp      = GetHSteamPipe();
     if (!sp)
     {
         logging::Info("Connecting to Steam User");
         sp = g_ISteamClient->CreateSteamPipe();
     }
-    GetHSteamUser_t GetHSteamUser = reinterpret_cast<GetHSteamUser_t>(dlsym(sharedobj::steamapi().lmap, "SteamAPI_GetHSteamUser"));
-    HSteamUser su                 = GetHSteamUser();
+    auto GetHSteamUser = reinterpret_cast<GetHSteamUser_t>(dlsym(sharedobj::steamapi().lmap, "SteamAPI_GetHSteamUser"));
+    HSteamUser su      = GetHSteamUser();
     if (!su)
     {
         logging::Info("Connecting to Steam User");
@@ -155,7 +151,7 @@ void CreateInterfaces()
     uintptr_t sig          = CSignature::GetClientSignature("A3 ? ? ? ? C3 8D 74 26 00 B8 FF FF FF FF 5D A3 ? ? ? ? C3");
     g_PredictionRandomSeed = *reinterpret_cast<int **>(sig + (uintptr_t) 1);
 
-    uintptr_t g_pGameRules_sig = CSignature::GetClientSignature("C7 03 ? ? ? ? 89 1D ? ? ? ? 83 C4 14 5B 5D C3");
+    uintptr_t g_pGameRules_sig = CSignature::GetClientSignature("55 89 E5 56 53 83 EC 10 8B 5D ? 8B 45 ? 89 1C 24 89 44 24 ? E8 ? ? ? ? C7 03 ? ? ? ? 89 1D");
     rg_pGameRules              = *reinterpret_cast<CGameRules ***>(g_pGameRules_sig + 8);
     g_IMaterialSystem          = BruteforceInterface<IMaterialSystemFixed>("VMaterialSystem", sharedobj::materialsystem());
     g_IMDLCache                = BruteforceInterface<IMDLCache>("MDLCache", sharedobj::datacache());

@@ -2,6 +2,7 @@
 #include "CatBot.hpp"
 #include "interfaces.hpp"
 #include "ipc.hpp"
+
 namespace hooked_methods
 {
 DEFINE_HOOKED_METHOD(ClientCmd_Unrestricted, void, IVEngineClient013 *_this, const char *command)
@@ -12,7 +13,7 @@ DEFINE_HOOKED_METHOD(ClientCmd_Unrestricted, void, IVEngineClient013 *_this, con
 
         if (command_str.length() >= 20 && command_str.substr(0, 7) == "connect")
         {
-            unsigned count_ipc = 0;
+            unsigned int count_ipc = 0;
 
             if (command_str.substr(command_str.length() - 11, 11) == "matchmaking")
             {
@@ -20,11 +21,10 @@ DEFINE_HOOKED_METHOD(ClientCmd_Unrestricted, void, IVEngineClient013 *_this, con
 
                 auto &peer_mem = ipc::peer->memory;
 
-                for (unsigned i = 0; i < cat_ipc::max_peers; i++)
+                for (unsigned int i = 0; i < cat_ipc::max_peers; i++)
                 {
                     if (i != ipc::peer->client_id && !peer_mem->peer_data[i].free && peer_mem->peer_user_data[i].connected && peer_mem->peer_user_data[i].ingame.server)
                     {
-
                         std::string remote_server_ip(peer_mem->peer_user_data[i].ingame.server);
                         if (remote_server_ip == server_ip)
                             count_ipc++;

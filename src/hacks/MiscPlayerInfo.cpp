@@ -49,8 +49,8 @@ std::string random_mafia_entry(int level, unsigned steamid)
     {
         std::random_device rd;
         std::mt19937 mt(rd());
-        std::uniform_real_distribution<double> dist(0.0, store.size());
-        return store.at((int) dist(mt));
+        std::uniform_int_distribution<unsigned int> dist(0, store.size());
+        return store.at(dist(mt));
     }
 }
 

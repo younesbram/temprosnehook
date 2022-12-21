@@ -7,11 +7,11 @@
 
 #pragma once
 
-// Parts of copypasted code
+// Parts of copy-pasted code
 // Credits: Casual_Hacker
 
-#include <stdint.h>
-#include <stddef.h>
+#include <cstdint>
+#include <cstddef>
 
 namespace hooks
 {

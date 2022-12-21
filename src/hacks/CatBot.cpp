@@ -223,8 +223,8 @@ void do_random_votekick()
 
     std::random_device rd;
     std::mt19937 mt(rd());
-    std::uniform_real_distribution<double> dist(0.0, targets.size());
-    int target = targets[(int) dist(mt)];
+    std::uniform_int_distribution<unsigned int> dist(0, targets.size());
+    int target = targets[dist(mt)];
     player_info_s info{};
     if (!GetPlayerInfo(GetPlayerForUserID(target), &info))
         return;
@@ -324,8 +324,8 @@ Upgradeinfo PickUpgrade()
     {
         std::random_device rd;
         std::mt19937 mt(rd());
-        std::uniform_real_distribution<double> dist(0.0, vec_size);
-        auto choosen_element = potential_upgrades[(int) dist(mt)];
+        std::uniform_int_distribution<unsigned int> dist(0, vec_size);
+        auto choosen_element = potential_upgrades[dist(mt)];
         // Less important after an upgrade
         choosen_element->priority -= choosen_element->priority_falloff;
         return *choosen_element;
@@ -721,8 +721,8 @@ static void cm()
         int teamtodisguise = (LOCAL_E->m_iTeam() == TEAM_RED) ? TEAM_RED - 1 : TEAM_BLU - 1;
         std::random_device rd;
         std::mt19937 mt(rd());
-        std::uniform_real_distribution<double> dist(0.0, 3.0);
-        int classtojoin = classes[(int) dist(mt)];
+        std::uniform_int_distribution<byte> dist(0, 3);
+        int classtojoin = classes[dist(mt)];
         g_IEngine->ClientCmd_Unrestricted(format("disguise ", classtojoin, " ", teamtodisguise).c_str());
     }
     if (*autoReport && report_timer.test_and_set(60000))

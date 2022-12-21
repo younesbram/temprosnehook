@@ -8,7 +8,6 @@
 
 namespace client_classes
 {
-
 class dummy
 {
 public:

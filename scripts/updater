@@ -79,7 +79,7 @@ if [ "$dialog" == true ] && [ "$exists" == false ]; then
   cfg_write $configfile autoupdater $value
 fi
 
-# Send notice about auto updater, terminate script if its not enabled
+# Send notice about auto updater, terminate script if it's not enabled
 exists=true
 cfg_haskey $configfile autoupdater || exists=false
 if [ "$AUTO_UPDATER_ENABLED" == "true" ]; then

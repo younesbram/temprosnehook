@@ -63,8 +63,8 @@ DEFINE_HOOKED_METHOD(LevelInit, void, void *this_, const char *name)
         {
             std::random_device rd;
             std::mt19937 mt(rd());
-            std::uniform_real_distribution<double> dist(0.0, file.lines.size());
-            name_forced = file.lines.at((int) dist(mt));
+            std::uniform_int_distribution<unsigned int> dist(0, file.lines.size());
+            name_forced = file.lines.at(dist(mt));
         }
     }
     else

@@ -256,7 +256,7 @@ public:
         return RAW_ENT(this)->IsDormant();
     };
     bool velocity_is_valid{ false };
-#if PROXY_ENTITY != true
+#if !PROXY_ENTITY
     IClientEntity *m_pEntity{ nullptr };
 #endif
 };

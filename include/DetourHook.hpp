@@ -14,14 +14,12 @@
 
 class DetourHook
 {
-    uintptr_t original_address;
+    uintptr_t original_address{};
     std::unique_ptr<BytePatch> patch;
-    void *hook_fn;
+    void *hook_fn{};
 
 public:
-    DetourHook()
-    {
-    }
+    DetourHook() = default;
 
     DetourHook(uintptr_t original, void *hook_func)
     {

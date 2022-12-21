@@ -1,12 +1,13 @@
 #include "common.hpp"
 #include "HookTools.hpp"
 
+#include <utility>
+
 namespace EC
 {
-
 struct EventCallbackData
 {
-    explicit EventCallbackData(const EventFunction &function, std::string name, enum ec_priority priority) : function{ function }, priority{ int(priority) }, section(name), event_name{ name }
+    explicit EventCallbackData(EventFunction function, const std::string &name, enum ec_priority priority) : function{ std::move(function) }, priority{ int(priority) }, section(name), event_name{ name }
     {
     }
     EventFunction function;
@@ -23,8 +24,8 @@ CatCommand evt_print("debug_print_events", "Print EC events",
                          {
                              logging::Info("%d events:", i);
 
-                             for (auto it = events[i].begin(); it != events[i].end(); ++it)
-                                 logging::Info("%s", it->event_name.c_str());
+                             for (auto &it : events[i])
+                                 logging::Info("%s", it.event_name.c_str());
                              logging::Info("");
                          }
                      });
@@ -58,5 +59,4 @@ void run(ec_types type)
         i.function();
     }
 }
-
 } // namespace EC

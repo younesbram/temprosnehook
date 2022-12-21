@@ -57,8 +57,8 @@ DEFINE_HOOKED_METHOD(Shutdown, void, INetChannel *this_, const char *reason)
         {
             std::random_device rd;
             std::mt19937 mt(rd());
-            std::uniform_real_distribution<double> dist(0.0, randomnames_file.lines.size());
-            name_forced = randomnames_file.lines.at((int) dist(mt));
+            std::uniform_int_distribution<unsigned int> dist(0, randomnames_file.lines.size());
+            name_forced = randomnames_file.lines.at(dist(mt));
         }
     }
     else
@@ -77,8 +77,8 @@ static InitRoutine init(
                     {
                         std::random_device rd;
                         std::mt19937 mt(rd());
-                        std::uniform_real_distribution<double> dist(0.0, randomnames_file.lines.size());
-                        name_forced = randomnames_file.lines.at((int) dist(mt));
+                        std::uniform_int_distribution<unsigned int> dist(0, randomnames_file.lines.size());
+                        name_forced = randomnames_file.lines.at(dist(mt));
                     }
                 }
                 else

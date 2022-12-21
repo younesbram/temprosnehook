@@ -192,8 +192,8 @@ int QueryPlayer(Query query)
     {
         std::random_device rd;
         std::mt19937 mt(rd());
-        std::uniform_real_distribution<double> dist(0.0, candidates.size());
-        index_result = candidates.at((int) dist(mt));
+        std::uniform_int_distribution<unsigned int> dist(0, candidates.size());
+        index_result = candidates.at(dist(mt));
     }
     if (query.flags & static_cast<int>(QueryFlags::STATIC))
     {

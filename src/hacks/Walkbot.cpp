@@ -850,8 +850,8 @@ index_t SelectNextNode()
     {
         std::random_device rd;
         std::mt19937 mt(rd());
-        std::uniform_real_distribution<double> dist(0.0, chance.size());
-        return chance.at((int) dist(mt));
+        std::uniform_int_distribution<unsigned int> dist(0, chance.size());
+        return chance.at(dist(mt));
     }
     else
         return BAD_NODE;

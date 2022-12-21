@@ -507,9 +507,8 @@ void StartupSound()
     }
     std::random_device rd;
     std::mt19937 mt(rd());
-    std::uniform_real_distribution<double> dist(0.0, total_lines);
-    int random_number = (int) dist(mt);
-    g_ISurface->PlaySound(line_count[random_number].c_str());
+    std::uniform_int_distribution<unsigned int> dist(0, total_lines);
+    g_ISurface->PlaySound(line_count[dist(mt)].c_str());
 }
 
 #if ENABLE_ENGINE_DRAWING

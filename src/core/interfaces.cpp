@@ -4,7 +4,7 @@
  *  Created on: Oct 3, 2016
  *      Author: nullifiedcat
  */
-
+#define GAME_PTR_OFFSET 11815160
 #include "common.hpp"
 #include "core/sharedobj.hpp"
 
@@ -151,8 +151,8 @@ void CreateInterfaces()
     uintptr_t sig          = CSignature::GetClientSignature("A3 ? ? ? ? C3 8D 74 26 00 B8 FF FF FF FF 5D A3 ? ? ? ? C3");
     g_PredictionRandomSeed = *reinterpret_cast<int **>(sig + (uintptr_t) 1);
 
-    uintptr_t g_pGameRules_sig = CSignature::GetClientSignature("55 89 E5 56 53 83 EC 10 8B 5D ? 8B 45 ? 89 1C 24 89 44 24 ? E8 ? ? ? ? C7 03 ? ? ? ? 89 1D");
-    rg_pGameRules              = *reinterpret_cast<CGameRules ***>(g_pGameRules_sig + 8);
+    uintptr_t g_pGameRules_sig = CSignature::GetClientSignature("55 89 E5 53 83 EC 14 8B 5D ? C7 44 24 ? ? ? ? ? 89 1C 24 E8 ? ? ? ? C7 03 ? ? ? ? C7 43 ?");
+    rg_pGameRules              = *reinterpret_cast<CGameRules ***>(g_pGameRules_sig+GAME_PTR_OFFSET);
     g_IMaterialSystem          = BruteforceInterface<IMaterialSystemFixed>("VMaterialSystem", sharedobj::materialsystem());
     g_IMDLCache                = BruteforceInterface<IMDLCache>("MDLCache", sharedobj::datacache());
 

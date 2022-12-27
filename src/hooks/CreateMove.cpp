@@ -37,6 +37,7 @@ void RunEnginePrediction(IClientEntity *ent, CUserCmd *ucmd)
     typedef void (*FinishMoveFn)(IPrediction *, IClientEntity *, CUserCmd *, CMoveData *);
 
     void **predictionVtable = *((void ***) g_IPrediction);
+
     auto oSetupMove         = (SetupMoveFn) (*(unsigned *) (predictionVtable + 19));
     auto oFinishMove        = (FinishMoveFn) (*(unsigned *) (predictionVtable + 20));
     // CMoveData *pMoveData = (CMoveData*)(sharedobj::client->lmap->l_addr +
@@ -55,12 +56,11 @@ void RunEnginePrediction(IClientEntity *ent, CUserCmd *ucmd)
         ucmd = &defaultCmd;
 
     // Set Usercmd for prediction
-    NET_VAR(ent, 4188, CUserCmd *) = ucmd;
+    NET_VAR(ent, 4452, CUserCmd *) = ucmd;
 
     // Set correct CURTIME
     g_GlobalVars->curtime   = g_GlobalVars->interval_per_tick * NET_INT(ent, netvar.nTickBase);
     g_GlobalVars->frametime = g_GlobalVars->interval_per_tick;
-
     *g_PredictionRandomSeed = MD5_PseudoRandom(current_user_cmd->command_number) & 0x7FFFFFFF;
 
     // Run The Prediction
@@ -71,7 +71,7 @@ void RunEnginePrediction(IClientEntity *ent, CUserCmd *ucmd)
     g_IGameMovement->FinishTrackPredictionErrors(reinterpret_cast<CBasePlayer *>(ent));
 
     // Reset User CMD
-    NET_VAR(ent, 4188, CUserCmd *) = nullptr;
+    NET_VAR(ent, 4452, CUserCmd *) = nullptr;
 
     g_GlobalVars->frametime = frameTime;
     g_GlobalVars->curtime   = curTime;
@@ -214,10 +214,12 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
     {
         PROF_SECTION(CM_PlayerResource)
         g_pPlayerResource->Update();
+         
     }
     {
         PROF_SECTION(CM_LocalPlayer)
         g_pLocalPlayer->Update();
+   
     }
     PrecalculateCanShoot();
     if (firstcm)
@@ -242,6 +244,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
             }
             g_pLocalPlayer->isFakeAngleCM = false;
             static int fakelag_queue      = 0;
+                 
             if (CE_GOOD(LOCAL_E))
                 if (!hacks::nospread::is_syncing && (fakelag_amount || (hacks::antiaim::force_fakelag && hacks::antiaim::isEnabled())))
                 {
@@ -287,6 +290,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
                 projectile_logging::Update();
         }
     }
+        
     {
         PROF_SECTION(CM_WRAPPER)
         EC::run(EC::CreateMove_NoEnginePred);
@@ -296,11 +300,13 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
             engine_prediction::RunEnginePrediction(RAW_ENT(LOCAL_E), current_user_cmd);
             g_pLocalPlayer->UpdateEye();
         }
+        
 
         if (hacks::warp::in_warp)
             EC::run(EC::CreateMoveWarp);
         else
             EC::run(EC::CreateMove);
+         
     }
     if (time_replaced)
         g_GlobalVars->curtime = curtime_old;

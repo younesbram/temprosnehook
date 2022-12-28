@@ -12,7 +12,6 @@
 #include <sys/stat.h>
 #include <hacks/SkinChanger.hpp>
 #include <settings/Bool.hpp>
-#include <boost/functional/hash.hpp>
 
 namespace hacks::skinchanger
 {
@@ -29,7 +28,7 @@ ItemSystem_t ItemSystem{ nullptr };
 GetAttributeDefinition_t GetAttributeDefinitionFn{ nullptr };
 SetRuntimeAttributeValue_t SetRuntimeAttributeValueFn{ nullptr };
 
-ItemSchemaPtr_t GetItemSchema(void)
+ItemSchemaPtr_t GetItemSchema()
 {
     if (!ItemSystem)
     {
@@ -70,9 +69,7 @@ void CAttributeList::RemoveAttribute(int index)
     }
 }
 
-CAttributeList::CAttributeList()
-{
-}
+CAttributeList::CAttributeList() = default;
 
 void CAttributeList::SetAttribute(int index, float value)
 {
@@ -182,7 +179,7 @@ static CatCommand set_redirect("skinchanger_redirect", "Set Redirect",
 static CatCommand dump_attrs("skinchanger_debug_attrs", "Dump attributes",
                              []()
                              {
-                                 CAttributeList *list = (CAttributeList *) ((uintptr_t) (RAW_ENT(LOCAL_W)) + netvar.AttributeList);
+                                 auto *list = (CAttributeList *) ((uintptr_t) (RAW_ENT(LOCAL_W)) + netvar.AttributeList);
                                  logging::Info("ATTRIBUTE LIST: %i", list->m_Attributes.Size());
                                  for (int i = 0; i < list->m_Attributes.Size(); i++)
                                  {
@@ -285,7 +282,7 @@ void FrameStageNotify(int stage)
 
     weapon_list   = (int *) ((unsigned) (RAW_ENT(LOCAL_E)) + netvar.hMyWeapons);
     my_weapon     = CE_INT(g_pLocalPlayer->entity, netvar.hActiveWeapon);
-    my_weapon_ptr = g_IEntityList->GetClientEntity(my_weapon & 0xFFF);
+    my_weapon_ptr = g_IEntityList->GetClientEntity(HandleToIDX(my_weapon));
     if (!my_weapon_ptr)
         return;
     if (!re::C_BaseCombatWeapon::IsBaseCombatWeapon(my_weapon_ptr))
@@ -293,7 +290,7 @@ void FrameStageNotify(int stage)
     for (int i = 0; i < 4; i++)
     {
         handle = weapon_list[i];
-        eid    = handle & 0xFFF;
+        eid    = HandleToIDX(handle);
         if (eid <= MAX_PLAYERS || eid > HIGHEST_ENTITY)
             continue;
         // logging::Info("eid, %i", eid);
@@ -310,7 +307,7 @@ void FrameStageNotify(int stage)
         }
     }
     if ((my_weapon_ptr != last_weapon_out) || !cookie.Check())
-        cookie.Update(my_weapon & 0xFFF);
+        cookie.Update(HandleToIDX(my_weapon));
     last_weapon_out = my_weapon_ptr;
 }
 
@@ -327,16 +324,14 @@ void DrawText()
         AddSideString(format("dIDX: ", CE_INT(LOCAL_W, netvar.iItemDefinitionIndex)));
         list = (CAttributeList *) ((uintptr_t) (RAW_ENT(LOCAL_W)) + netvar.AttributeList);
         for (int i = 0; i < list->m_Attributes.Size(); i++)
-        {
             AddSideString(format('[', i, "] ", list->m_Attributes[i].defidx, ": ", list->m_Attributes[i].value));
-        }
     }
 }
 
 #define BINARY_FILE_WRITE(handle, data) handle.write(reinterpret_cast<const char *>(&data), sizeof(data))
 #define BINARY_FILE_READ(handle, data) handle.read(reinterpret_cast<char *>(&data), sizeof(data))
 
-void Save(std::string filename)
+void Save(const std::string &filename)
 {
     DIR *cathook_directory = opendir(paths::getDataPath("/skinchanger").c_str());
     if (!cathook_directory)
@@ -376,7 +371,7 @@ void Save(std::string filename)
     }
 }
 
-void Load(std::string filename, bool merge)
+void Load(const std::string &filename, bool merge)
 {
     DIR *cathook_directory = opendir(paths::getDataPath("/skinchanger").c_str());
     if (!cathook_directory)
@@ -479,7 +474,7 @@ void patched_weapon_cookie::Update(int entity)
     valid  = true;
 }
 
-bool patched_weapon_cookie::Check()
+bool patched_weapon_cookie::Check() const
 {
     IClientEntity *ent;
     CAttributeList *list;

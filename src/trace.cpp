@@ -16,9 +16,7 @@ trace::FilterDefault::FilterDefault()
     m_pSelf = nullptr;
 }
 
-trace::FilterDefault::~FilterDefault()
-{
-}
+trace::FilterDefault::~FilterDefault() = default;
 
 void trace::FilterDefault::SetSelf(IClientEntity *self)
 {
@@ -58,7 +56,7 @@ bool trace::FilterDefault::ShouldHitEntity(IHandleEntity *handle, int mask)
                 if (CE_GOOD(ent) && ent->m_bAlivePlayer())
                 {
                     // Get held weapon
-                    auto weapon_idx = CE_INT(ent, netvar.hActiveWeapon) & 0xFFF;
+                    auto weapon_idx = HandleToIDX(CE_INT(ent, netvar.hActiveWeapon));
                     // Check if weapon is valid
                     if (IDX_GOOD(weapon_idx))
                     {
@@ -91,7 +89,7 @@ trace::FilterNoPlayer::FilterNoPlayer()
     m_pSelf = nullptr;
 }
 
-trace::FilterNoPlayer::~FilterNoPlayer(){};
+trace::FilterNoPlayer::~FilterNoPlayer() = default;
 
 void trace::FilterNoPlayer::SetSelf(IClientEntity *self)
 {
@@ -137,9 +135,9 @@ TraceType_t trace::FilterNoPlayer::GetTraceType() const
 
 /* Navigation filter */
 
-trace::FilterNavigation::FilterNavigation(){};
+trace::FilterNavigation::FilterNavigation() = default;
 
-trace::FilterNavigation::~FilterNavigation(){};
+trace::FilterNavigation::~FilterNavigation() = default;
 
 #define MOVEMENT_COLLISION_GROUP 8
 #define RED_CONTENTS_MASK 0x800
@@ -182,7 +180,7 @@ trace::FilterNoEntity::FilterNoEntity()
     m_pSelf = nullptr;
 }
 
-trace::FilterNoEntity::~FilterNoEntity(){};
+trace::FilterNoEntity::~FilterNoEntity() = default;
 
 void trace::FilterNoEntity::SetSelf(IClientEntity *self)
 {
@@ -228,7 +226,7 @@ trace::FilterPenetration::FilterPenetration()
     m_pSelf = nullptr;
 }
 
-trace::FilterPenetration::~FilterPenetration(){};
+trace::FilterPenetration::~FilterPenetration() = default;
 
 void trace::FilterPenetration::SetSelf(IClientEntity *self)
 {
@@ -277,7 +275,7 @@ TraceType_t trace::FilterPenetration::GetTraceType() const
 
 void trace::FilterPenetration::Reset()
 {
-    m_pIgnoreFirst = 0;
+    m_pIgnoreFirst = nullptr;
 }
 
 trace::FilterDefault trace::filter_default{};

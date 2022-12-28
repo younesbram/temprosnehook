@@ -12,7 +12,6 @@
 
 namespace effect_glow
 {
-
 class EffectGlow : public IScreenSpaceEffect
 {
 public:
@@ -35,12 +34,12 @@ public:
     }
 
     void StartStenciling();
-    void EndStenciling();
-    void DrawEntity(IClientEntity *entity);
-    void DrawToStencil(IClientEntity *entity);
+    static void EndStenciling();
+    static void DrawEntity(IClientEntity *entity);
+    static void DrawToStencil(IClientEntity *entity);
     void DrawToBuffer(IClientEntity *entity);
     rgba_t GlowColor(IClientEntity *entity);
-    bool ShouldRenderGlow(IClientEntity *entity);
+    static bool ShouldRenderGlow(IClientEntity *entity);
     void RenderGlow(IClientEntity *entity);
     void BeginRenderGlow();
     void EndRenderGlow();

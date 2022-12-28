@@ -13,7 +13,7 @@
 
 IMaterialSystem *materials = nullptr;
 
-CScreenSpaceEffectRegistration *CScreenSpaceEffectRegistration::s_pHead = NULL;
+CScreenSpaceEffectRegistration *CScreenSpaceEffectRegistration::s_pHead = nullptr;
 IScreenSpaceEffectManager *g_pScreenSpaceEffects                        = nullptr;
 CScreenSpaceEffectRegistration **g_ppScreenSpaceRegistrationHead        = nullptr;
 CScreenSpaceEffectRegistration::CScreenSpaceEffectRegistration(const char *pName, IScreenSpaceEffect *pEffect)
@@ -49,14 +49,14 @@ settings::Boolean enable{ "glow.enable", "false" };
 
 struct ShaderStencilState_t
 {
-    bool m_bEnable;
+    bool m_bEnable{};
     StencilOperation_t m_FailOp;
     StencilOperation_t m_ZFailOp;
     StencilOperation_t m_PassOp;
     StencilComparisonFunction_t m_CompareFunc;
-    int m_nReferenceValue;
-    uint32 m_nTestMask;
-    uint32 m_nWriteMask;
+    int m_nReferenceValue{};
+    uint32 m_nTestMask{};
+    uint32 m_nWriteMask{};
 
     ShaderStencilState_t()
     {
@@ -128,13 +128,13 @@ void EffectGlow::Init()
         return;
     logging::Info("Init Glow...");
     {
-        KeyValues *kv = new KeyValues("UnlitGeneric");
+        auto *kv = new KeyValues("UnlitGeneric");
         kv->SetString("$basetexture", "vgui/white_additive");
         kv->SetInt("$ignorez", 0);
         mat_unlit.Init("__cathook_glow_unlit", kv);
     }
     {
-        KeyValues *kv = new KeyValues("UnlitGeneric");
+        auto *kv = new KeyValues("UnlitGeneric");
         kv->SetString("$basetexture", "vgui/white_additive");
         kv->SetInt("$ignorez", 1);
         mat_unlit_z.Init("__cathook_glow_unlit_z", kv);
@@ -143,14 +143,14 @@ void EffectGlow::Init()
     GetBuffer(1);
     GetBuffer(2);
     {
-        KeyValues *kv = new KeyValues("UnlitGeneric");
+        auto *kv = new KeyValues("UnlitGeneric");
         kv->SetString("$basetexture", "_cathook_buff1");
         kv->SetInt("$additive", 1);
         mat_blit.Init("__cathook_glow_blit", TEXTURE_GROUP_CLIENT_EFFECTS, kv);
         mat_blit->Refresh();
     }
     {
-        KeyValues *kv = new KeyValues("BlurFilterX");
+        auto *kv = new KeyValues("BlurFilterX");
         kv->SetString("$basetexture", "_cathook_buff1");
         kv->SetInt("$ignorez", 1);
         kv->SetInt("$translucent", 1);
@@ -159,7 +159,7 @@ void EffectGlow::Init()
         mat_blur_x->Refresh();
     }
     {
-        KeyValues *kv = new KeyValues("BlurFilterY");
+        auto *kv = new KeyValues("BlurFilterY");
         kv->SetString("$basetexture", "_cathook_buff2");
         kv->SetInt("$bloomamount", 5);
         kv->SetInt("$ignorez", 1);
@@ -228,23 +228,17 @@ rgba_t EffectGlow::GlowColor(IClientEntity *entity)
     {
         owner = re::C_TFWeaponBase::GetOwnerViaInterface(entity);
         if (owner)
-        {
             return GlowColor(owner);
-        }
     }
     switch (ent->m_Type())
     {
     case ENTITY_BUILDING:
         if (health)
-        {
             return colors::Health_dimgreen(ent->m_iHealth(), ent->m_iMaxHealth());
-        }
         break;
     case ENTITY_PLAYER:
         if (health && playerlist::IsDefault(ent))
-        {
             return colors::Health_dimgreen(ent->m_iHealth(), ent->m_iMaxHealth());
-        }
         else if (!playerlist::IsDefault(ent))
             return playerlist::Color(ent);
     default:
@@ -287,7 +281,6 @@ bool EffectGlow::ShouldRenderGlow(IClientEntity *entity)
         if (CE_BYTE(ent, netvar.iLifeState) != LIFE_ALIVE)
             return false;
         return true;
-        break;
     case ENTITY_PROJECTILE:
         if (!ent->m_bEnemy())
             return false;
@@ -405,7 +398,7 @@ void EffectGlow::DrawEntity(IClientEntity *entity)
     passes = 0;
 
     entity->DrawModel(1);
-    attach = g_IEntityList->GetClientEntity(*(int *) ((uintptr_t) entity + netvar.m_Collision - 24) & 0xFFF);
+    attach = g_IEntityList->GetClientEntity(HandleToIDX(*(int *) ((uintptr_t) entity + netvar.m_Collision - 24)));
     while (attach && passes++ < 32)
     {
         if (attach->ShouldDraw())
@@ -423,7 +416,7 @@ void EffectGlow::DrawEntity(IClientEntity *entity)
                 attach->DrawModel(1);
             }
         }
-        attach = g_IEntityList->GetClientEntity(*(int *) ((uintptr_t) attach + netvar.m_Collision - 20) & 0xFFF);
+        attach = g_IEntityList->GetClientEntity(HandleToIDX(*(int *) ((uintptr_t) attach + netvar.m_Collision - 20)));
     }
 #endif
 }

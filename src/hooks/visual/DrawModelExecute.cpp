@@ -198,11 +198,9 @@ template <typename T> void rvarCallback(settings::VariableBase<T> &, T)
 class DrawEntry
 {
 public:
-    int entidx;
-    int parentidx;
-    DrawEntry()
-    {
-    }
+    int entidx{};
+    int parentidx{};
+    DrawEntry() = default;
     DrawEntry(int own_idx, int parent_idx)
     {
         entidx    = own_idx;
@@ -299,7 +297,7 @@ bool ShouldRenderChams(IClientEntity *entity)
                     if (pipes)
                     {
                         if (pipes_local && chamsself)
-                            if ((CE_INT(ent, netvar.hThrower) & 0xFFF) == g_pLocalPlayer->entity->m_IDX) // Check if the sticky is the players own
+                            if (HandleToIDX(CE_INT(ent, netvar.hThrower)) == g_pLocalPlayer->entity->m_IDX) // Check if the sticky is the players own
                                 return true;
                         if (ent->m_bEnemy())
                             return true;
@@ -308,7 +306,7 @@ bool ShouldRenderChams(IClientEntity *entity)
                         return false;
                 }
                 if (stickies_local && chamsself)
-                    if ((CE_INT(ent, netvar.hThrower) & 0xFFF) == g_pLocalPlayer->entity->m_IDX) // Check if the sticky is the players own
+                    if (HandleToIDX(CE_INT(ent, netvar.hThrower)) == g_pLocalPlayer->entity->m_IDX) // Check if the sticky is the players own
                         return true;
                 if (ent->m_bEnemy())
                     return true;
@@ -335,9 +333,9 @@ static ChamColors GetChamColors(IClientEntity *entity, bool ignorez)
     CachedEntity *ent = ENTITY(entity->entindex());
 
     if (CE_BAD(ent))
-        return ChamColors(colors::white);
+        return { colors::white };
     if (ent == hacks::aimbot::CurrentTarget() && aimbot_color)
-        return ChamColors(colors::target);
+        return { colors::target };
     if (re::C_BaseCombatWeapon::IsBaseCombatWeapon(entity))
     {
         IClientEntity *owner = re::C_TFWeaponBase::GetOwnerViaInterface(entity);
@@ -348,15 +346,15 @@ static ChamColors GetChamColors(IClientEntity *entity, bool ignorez)
     {
     case ENTITY_BUILDING:
         if (!ent->m_bEnemy() && !(teammates || teammate_buildings) && ent != LOCAL_E)
-            return ChamColors();
+            return {};
         if (health)
-            return ChamColors(colors::Health_dimgreen(ent->m_iHealth(), ent->m_iMaxHealth()));
+            return { colors::Health_dimgreen(ent->m_iHealth(), ent->m_iMaxHealth()) };
         break;
     case ENTITY_PLAYER:
         if (!players)
-            return ChamColors();
+            return {};
         if (health)
-            return ChamColors(colors::Health_dimgreen(ent->m_iHealth(), ent->m_iMaxHealth()));
+            return { colors::Health_dimgreen(ent->m_iHealth(), ent->m_iMaxHealth()) };
         break;
     default:
         break;
@@ -399,7 +397,7 @@ static ChamColors GetChamColors(IClientEntity *entity, bool ignorez)
 
         return result;
     }
-    return ChamColors(colors::EntityF(ent));
+    return { colors::EntityF(ent) };
 }
 
 // Purpose => Render entity attachments (weapons, hats)
@@ -468,13 +466,13 @@ void RenderChamsRecursive(IClientEntity *entity, CMaterialReference &mat, IVMode
     IClientEntity *attach;
     int passes = 0;
 
-    attach = g_IEntityList->GetClientEntity(*(int *) ((uintptr_t) entity + netvar.m_Collision - 24) & 0xFFF);
+    attach = g_IEntityList->GetClientEntity(HandleToIDX(*(int *) ((uintptr_t) entity + netvar.m_Collision - 24)));
     while (attach && passes++ < 32)
     {
         chams_attachment_drawing = true;
         RenderAttachment(entity, attach, mat);
         chams_attachment_drawing = false;
-        attach                   = g_IEntityList->GetClientEntity(*(int *) ((uintptr_t) attach + netvar.m_Collision - 20) & 0xFFF);
+        attach                   = g_IEntityList->GetClientEntity(HandleToIDX(*(int *) ((uintptr_t) attach + netvar.m_Collision - 20)));
     }
 #endif
 }
@@ -535,7 +533,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
     if (!isHackActive() || effect_glow::g_EffectGlow.drawing || chams_attachment_drawing || (*clean_screenshots && g_IEngine->IsTakingScreenshot()) || CE_BAD(LOCAL_E) || (!enable && !no_hats && !no_arms && !blend_zoom && !arms_chams && !local_weapon_chams /*&& !(hacks::backtrack::chams && hacks::backtrack::isBacktrackEnabled)*/))
         return original::DrawModelExecute(this_, state, info, bone);
 
-    PROF_SECTION(DrawModelExecute);
+    PROF_SECTION(DrawModelExecute)
 
     if (!init_mat)
     {

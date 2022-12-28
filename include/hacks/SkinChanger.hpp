@@ -11,7 +11,6 @@
 
 namespace hacks::skinchanger
 {
-
 class CAttributeList;
 class CAttribute;
 
@@ -20,10 +19,10 @@ typedef void *AttributeDefinitionPtr_t;
 
 // FIXME move to separate header
 
-typedef ItemSchemaPtr_t (*ItemSystem_t)(void);
+typedef ItemSchemaPtr_t (*ItemSystem_t)();
 typedef void *(*SetRuntimeAttributeValue_t)(CAttributeList *, AttributeDefinitionPtr_t, float);
 typedef AttributeDefinitionPtr_t (*GetAttributeDefinition_t)(ItemSchemaPtr_t, int);
-ItemSchemaPtr_t GetItemSchema(void);
+ItemSchemaPtr_t GetItemSchema();
 
 extern const char *sig_GetItemSchema;
 extern const char *sig_GetAttributeDefinition;
@@ -48,10 +47,10 @@ public:
     CAttribute(uint16_t iAttributeDefinitionIndex, float flValue);
 
 public:
-    void *vtable;
+    void *vtable{};
     uint16_t defidx;
     float value;
-    unsigned int pad01;
+    unsigned int pad01{};
 };
 
 class CAttributeList
@@ -63,7 +62,7 @@ public:
     void RemoveAttribute(int index);
 
 public:
-    uint32_t unknown;
+    uint32_t unknown{};
     CUtlVector<CAttribute, CUtlMemory<CAttribute>> m_Attributes;
 };
 
@@ -98,9 +97,9 @@ enum class Sheens
 
 struct patched_weapon_cookie
 {
-    patched_weapon_cookie(int entity);
+    explicit patched_weapon_cookie(int entity);
     void Update(int entity);
-    bool Check();
+    bool Check() const;
 
 public:
     int eidx{ 0 };
@@ -129,8 +128,8 @@ def_attribute_modifier &GetModifier(int idx);
 // patched_weapon_cookie& GetCookie(int idx);
 
 constexpr unsigned SERIALIZE_VERSION = 1;
-void Save(std::string filename);
-void Load(std::string filename, bool merge = false);
+void Save(const std::string& filename);
+void Load(const std::string& filename, bool merge = false);
 
 void InvalidateCookie();
 void FrameStageNotify(int stage);

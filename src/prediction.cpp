@@ -5,9 +5,11 @@
  *      Author: nullifiedcat
  */
 #include "common.hpp"
-#include "navparser.hpp"
 #include <settings/Bool.hpp>
 #include <boost/circular_buffer.hpp>
+
+// Found in C_BasePlayer. It represents "m_pCurrentCommand"
+#define CURR_CUSERCMD_PTR 4452
 
 namespace hacks::aimbot
 {
@@ -25,7 +27,7 @@ static settings::Int sample_size("debug.strafepred.samplesize", "10");
 Vector SimpleLatencyPrediction(CachedEntity *ent, int hb)
 {
     if (!ent)
-        return Vector();
+        return {};
     Vector result;
     GetHitbox(ent, hb, result);
     float latency = g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_INCOMING);
@@ -90,9 +92,7 @@ static std::optional<StrafePredictionData> findCircle(const Vector &current, con
         else
             Center.y = AB_Mid.y + (AB_Mid.x - Center.x) / aSlope;
     }
-    else if (xDelta_a == 0)
-        return std::nullopt;
-    else if (xDelta_b == 0)
+    else if (xDelta_a == 0 || xDelta_b == 0)
         return std::nullopt;
     else
     {
@@ -297,7 +297,7 @@ std::vector<Vector> Predict(CachedEntity *player, Vector pos, float offset, Vect
             pos = PredictStep(pos, vel, acceleration, &minmax, g_GlobalVars->interval_per_tick, strafe_pred ? &*strafe_pred : nullptr);
         else
             pos = PredictStep(pos, vel, acceleration, &minmax, g_GlobalVars->interval_per_tick, strafe_pred ? &*strafe_pred : nullptr, false, dist);
-        positions.push_back({ pos.x, pos.y, pos.z + offset });
+        positions.emplace_back(pos.x, pos.y, pos.z + offset);
     }
     return positions;
 }
@@ -355,18 +355,17 @@ void Prediction_PaintTraverse()
                 if (!draw::WorldToScreen(ent->m_vecOrigin(), previous_screen))
                     continue;
                 rgba_t color = colors::FromRGBA8(0, 0, 255, 255);
-                for (size_t j = 0; j < data.size(); j++)
+                for (const auto &j : data)
                 {
                     Vector screen;
-                    if (draw::WorldToScreen(data[j], screen))
+                    if (draw::WorldToScreen(j, screen))
                     {
                         draw::Line(screen.x, screen.y, previous_screen.x - screen.x, previous_screen.y - screen.y, color, 2);
                         previous_screen = screen;
                     }
                     else
-                    {
                         break;
-                    }
+
                     color.b -= 1.0f / 20.0f;
                 }
                 /*if (!ent->m_bEnemy())
@@ -388,18 +387,17 @@ void Prediction_PaintTraverse()
                 if (!draw::WorldToScreen(ent->m_vecOrigin(), previous_screen))
                     continue;
                 rgba_t color = colors::FromRGBA8(255, 0, 0, 255);
-                for (size_t j = 0; j < data.size(); j++)
+                for (const auto &j : data)
                 {
                     Vector screen;
-                    if (draw::WorldToScreen(data[j], screen))
+                    if (draw::WorldToScreen(j, screen))
                     {
                         draw::Line(screen.x, screen.y, previous_screen.x - screen.x, previous_screen.y - screen.y, color, 2);
                         previous_screen = screen;
                     }
                     else
-                    {
                         break;
-                    }
+
                     color.r -= 1.0f / 20.0f;
                 }
 
@@ -426,9 +424,9 @@ Vector EnginePrediction(CachedEntity *entity, float time, Vector *vecVelocity)
     typedef void (*SetupMoveFn)(IPrediction *, IClientEntity *, CUserCmd *, class IMoveHelper *, CMoveData *);
     typedef void (*FinishMoveFn)(IPrediction *, IClientEntity *, CUserCmd *, CMoveData *);
 
-    void **predictionVtable  = *((void ***) g_IPrediction);
-    SetupMoveFn oSetupMove   = (SetupMoveFn) (*(unsigned *) (predictionVtable + 19));
-    FinishMoveFn oFinishMove = (FinishMoveFn) (*(unsigned *) (predictionVtable + 20));
+    void **predictionVtable = *((void ***) g_IPrediction);
+    auto oSetupMove         = (SetupMoveFn) (*(unsigned *) (predictionVtable + 19));
+    auto oFinishMove        = (FinishMoveFn) (*(unsigned *) (predictionVtable + 20));
 
     // CMoveData *pMoveData = (CMoveData*)(sharedobj::client->lmap->l_addr +
     // 0x1F69C0C);  CMoveData movedata {};
@@ -458,9 +456,9 @@ Vector EnginePrediction(CachedEntity *entity, float time, Vector *vecVelocity)
     // static Vector zerov{ 0, 0, 0 };
     // CE_VECTOR(entity, netvar.m_angEyeAngles) = zerov;
 
-    CUserCmd *original_cmd = NET_VAR(ent, 4452, CUserCmd *);
+    CUserCmd *original_cmd = NET_VAR(ent, CURR_CUSERCMD_PTR, CUserCmd *);
 
-    NET_VAR(ent, 4452, CUserCmd *) = &fakecmd;
+    NET_VAR(ent, CURR_CUSERCMD_PTR, CUserCmd *) = &fakecmd;
 
     g_GlobalVars->curtime   = g_GlobalVars->interval_per_tick * NET_INT(ent, netvar.nTickBase);
     g_GlobalVars->frametime = time;
@@ -486,7 +484,7 @@ Vector EnginePrediction(CachedEntity *entity, float time, Vector *vecVelocity)
     oFinishMove(g_IPrediction, ent, &fakecmd, pMoveData.get());
     g_IGameMovement->FinishTrackPredictionErrors(reinterpret_cast<CBasePlayer *>(ent));
 
-    NET_VAR(ent, 4452, CUserCmd *) = original_cmd;
+    NET_VAR(ent, CURR_CUSERCMD_PTR, CUserCmd *) = original_cmd;
 
     g_GlobalVars->frametime = frameTime;
     g_GlobalVars->curtime   = curTime;
@@ -514,13 +512,13 @@ std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb,
     if (!sv_gravity)
         sv_gravity = g_ICvar->FindVar("sv_gravity");
 
-    if (speed == 0.0f || !sv_gravity) 
+    if (speed == 0.0f || !sv_gravity)
         return { Vector(), Vector() };
-    
+
     float currenttime = g_pLocalPlayer->v_Eye.DistTo(hitbox) / speed - 1.5f;
-    if (currenttime <= 0.0f) 
+    if (currenttime <= 0.0f)
         currenttime = 0.01f;
-    
+
     float besttime          = currenttime;
     float mindelta          = 65536.0f;
     Vector bestpos          = origin;
@@ -581,12 +579,12 @@ std::pair<Vector, Vector> BuildingPrediction(CachedEntity *building, Vector vec,
         return { Vector(), Vector() };
 
     trace::filter_no_player.SetSelf(RAW_ENT(building));
-    
+
     // Buildings do not move. We don't need to do any steps here
     float time = g_pLocalPlayer->v_Eye.DistTo(result) / speed;
     // Compensate for ping
     time += g_IEngine->GetNetChannelInfo()->GetLatency(FLOW_OUTGOING) + cl_interp->GetFloat();
-    
+
     result.z += (sv_gravity->GetFloat() / 2.0f * time * time * gravity);
     Vector result_initialvel = result;
     result_initialvel.z -= proj_startvelocity * time;
@@ -620,10 +618,8 @@ std::pair<Vector, Vector> ProjectilePrediction(CachedEntity *ent, int hb, float 
     int maxsteps   = (int) debug_pp_steps;
     bool onground  = false;
     if (ent->m_Type() == ENTITY_PLAYER)
-    {
         if (CE_INT(ent, netvar.iFlags) & FL_ONGROUND)
             onground = true;
-    }
 
     Vector velocity;
     velocity::EstimateAbsVelocity(RAW_ENT(ent), velocity);

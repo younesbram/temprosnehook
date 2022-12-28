@@ -18,6 +18,9 @@
 #include "nospread.hpp"
 #include "Warp.hpp"
 
+// Found in C_BasePlayer. It represents "m_pCurrentCommand"
+#define CURR_CUSERCMD_PTR 4452
+
 static settings::Boolean roll_speedhack{ "misc.roll-speedhack", "false" };
 static settings::Boolean forward_speedhack{ "misc.roll-speedhack.forward", "false" };
 settings::Boolean engine_pred{ "misc.engine-prediction", "true" };
@@ -56,7 +59,7 @@ void RunEnginePrediction(IClientEntity *ent, CUserCmd *ucmd)
         ucmd = &defaultCmd;
 
     // Set Usercmd for prediction
-    NET_VAR(ent, 4452, CUserCmd *) = ucmd;
+    NET_VAR(ent, CURR_CUSERCMD_PTR, CUserCmd *) = ucmd;
 
     // Set correct CURTIME
     g_GlobalVars->curtime   = g_GlobalVars->interval_per_tick * NET_INT(ent, netvar.nTickBase);
@@ -71,7 +74,7 @@ void RunEnginePrediction(IClientEntity *ent, CUserCmd *ucmd)
     g_IGameMovement->FinishTrackPredictionErrors(reinterpret_cast<CBasePlayer *>(ent));
 
     // Reset User CMD
-    NET_VAR(ent, 4452, CUserCmd *) = nullptr;
+    NET_VAR(ent, CURR_CUSERCMD_PTR, CUserCmd *) = nullptr;
 
     g_GlobalVars->frametime = frameTime;
     g_GlobalVars->curtime   = curTime;
@@ -322,7 +325,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
     {
         PROF_SECTION(CM_playerlist)
         static Timer ipc_update_timer{};
-        //	playerlist::DoNotKillMe();
+        // playerlist::DoNotKillMe();
         if (ipc_update_timer.test_and_set(10000))
             ipc::UpdatePlayerlist();
     }

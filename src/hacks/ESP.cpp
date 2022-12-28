@@ -449,7 +449,7 @@ void _FASTCALL ProcessEntityPT(CachedEntity *ent)
             float sp         = sinf(DEG2RAD(eye_angles.x)); // pitch
             float cp         = cosf(DEG2RAD(eye_angles.x));
             Vector forward_t = Vector(cp * cy, cp * sy, -sp);
-            // We dont want the sightlines endpoint to go behind us because the
+            // We don't want the sightlines endpoint to go behind us because the
             // world to screen check will fail, but keep it at most 4096
             Vector forward = forward_t * 4096.0F + eye_position;
             Ray_t ray;
@@ -1225,7 +1225,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 if (IsPlayerCritBoosted(ent))
                     AddEntityString(ent, crit_str, colors::orange);
 
-                auto weapon_idx      = CE_INT(ent, netvar.hActiveWeapon) & 0xFFF;
+                auto weapon_idx      = HandleToIDX(CE_INT(ent, netvar.hActiveWeapon));
                 CachedEntity *weapon = IDX_GOOD(weapon_idx) ? ENTITY(weapon_idx) : nullptr;
 
                 if (CE_GOOD(weapon) && weapon->m_iClassID() == CL_CLASS(CTFMinigun) && CE_INT(weapon, netvar.iWeaponState) != 0)
@@ -1258,7 +1258,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             // Active weapon esp
             if (show_weapon)
             {
-                int widx = CE_INT(ent, netvar.hActiveWeapon) & 0xFFF;
+                int widx = HandleToIDX(CE_INT(ent, netvar.hActiveWeapon));
                 if (IDX_GOOD(widx))
                 {
                     CachedEntity *weapon = ENTITY(widx);

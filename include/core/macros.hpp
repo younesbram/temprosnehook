@@ -7,9 +7,6 @@
 
 #pragma once
 
-#define STRINGIFY(x) #x
-#define TO_STRING(x) STRINGIFY(x)
-
 /*
  * make -j4 -e GAME=tf2
  */

@@ -211,7 +211,6 @@ int ClassPriority(CachedEntity *ent)
 }
 
 static int lastent = 0;
-static Timer waittime{};
 static Timer navinactivity{};
 static bool navtarget = false;
 
@@ -314,11 +313,8 @@ static void cm()
     // Still good check
     if (follow_target)
     {
-        // Overflow protection
-        if (breadcrumbs.size() > crumb_limit)
-            follow_target = 0;
-        // Still good check
-        else if (CE_INVALID(ENTITY(follow_target)) || !ENTITY(follow_target)->m_vecDormantOrigin() || IsPlayerInvisible(ENTITY(follow_target)))
+        // Overflow protection and check our follow target
+        if (breadcrumbs.size() > crumb_limit || (CE_INVALID(ENTITY(follow_target)) || !ENTITY(follow_target)->m_vecDormantOrigin() || IsPlayerInvisible(ENTITY(follow_target))))
             follow_target = 0;
     }
 
@@ -429,8 +425,7 @@ static void cm()
     if (follow_target)
         isNavBotCM = false;
 
-    // If we don't have a follow target from that, we look again for someone
-    // else who is suitable
+    // If we don't have a follow target from that, we look again for someone else who is suitable
     if (roambot && !foundPreferredTarget && (!follow_target || change || ClassPriority(ENTITY(follow_target)) < 6))
     {
         // Try to get a new target
@@ -652,7 +647,7 @@ static void cm()
             last_slot_check = g_GlobalVars->curtime;
 
             // Get the follow targets active weapon
-            int owner_weapon_eid        = (CE_INT(ENTITY(follow_target), netvar.hActiveWeapon) & 0xFFF);
+            int owner_weapon_eid        = HandleToIDX(CE_INT(ENTITY(follow_target), netvar.hActiveWeapon));
             IClientEntity *owner_weapon = g_IEntityList->GetClientEntity(owner_weapon_eid);
 
             // If both the follow targets and the local players weapons are

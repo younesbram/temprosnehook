@@ -23,8 +23,6 @@
 #if EXTERNAL_DRAWING
 #include "xoverlay.h"
 #endif
-#define STRINGIFY(x) #x
-#define TO_STRING(x) STRINGIFY(x)
 
 #include "copypasted/CDumper.hpp"
 #include "version.h"

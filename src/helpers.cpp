@@ -1521,9 +1521,10 @@ Vector GetForwardVector(float distance, CachedEntity *punch_entity)
     return GetForwardVector(g_pLocalPlayer->v_Eye, g_pLocalPlayer->v_OrigViewangles, distance, punch_entity);
 }
 
+// TODO: Change it to be based on the model
 bool IsSentryBuster(CachedEntity *entity)
 {
-    return (entity->m_Type() == EntityType::ENTITY_PLAYER && CE_INT(entity, netvar.iClass) == tf_class::tf_demoman && g_pPlayerResource->GetMaxHealth(entity) == 2500);
+    return entity->m_Type() == EntityType::ENTITY_PLAYER && CE_INT(entity, netvar.iClass) == tf_class::tf_demoman && g_pPlayerResource->GetMaxHealth(entity) == 2500;
 }
 
 bool IsAmbassador(CachedEntity *entity)
@@ -1531,7 +1532,7 @@ bool IsAmbassador(CachedEntity *entity)
     if (entity->m_iClassID() != CL_CLASS(CTFRevolver))
         return false;
     const int &defidx = CE_INT(entity, netvar.iItemDefinitionIndex);
-    return (defidx == 61 || defidx == 1006);
+    return defidx == 61 || defidx == 1006;
 }
 
 bool IsPlayerInvulnerable(CachedEntity *player)

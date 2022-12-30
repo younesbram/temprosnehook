@@ -26,6 +26,7 @@ static settings::Boolean snipe_sentries_shortrange("navbot.snipe-sentries.shortr
 static settings::Boolean escape_danger("navbot.escape-danger", "true");
 static settings::Boolean escape_danger_ctf_cap("navbot.escape-danger.ctf-cap", "false");
 static settings::Boolean enable_slight_danger_when_capping("navbot.escape-danger.slight-danger.capping", "false");
+static settings::Boolean run_to_reload("navbot.run-to-reload", "false");
 static settings::Boolean autojump("navbot.autojump.enabled", "false");
 static settings::Boolean primary_only("navbot.primary-only", "true");
 static settings::Int force_slot("navbot.force-slot", "0");
@@ -718,8 +719,12 @@ std::optional<std::pair<CNavArea *, int>> findClosestHidingSpot(CNavArea *area, 
 }
 
 // Try to avoid enemy sightlines and reload in peace
+// TODO: As Sniper, only run away if reloading your secondary weapon
 bool runReload()
 {
+    if (!*run_to_reload)
+        return false;
+
     PROF_SECTION(runReload)
     static Timer reloadrun_cooldown{};
 

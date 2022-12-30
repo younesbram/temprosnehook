@@ -111,6 +111,8 @@
             <AutoVariable width="fill" target="esp.info.name" label="Name"/>
             <AutoVariable width="fill" target="esp.info.health" label="Health"/>
             <AutoVariable width="fill" target="esp.info.distance" label="Distance"/>
+            <AutoVariable width="fill" target="esp.info.buster-radius" label="Sentry Buster radius"
+                          tooltip="Will alert you if you're in the explosion radius of a Sentry Buster."/>
             <AutoVariable width="fill" target="esp.info.class" label="Class"/>
             <AutoVariable width="fill" target="esp.info.conditions" label="Conditions"/>
             <AutoVariable width="fill" target="esp.info.ubercharge" label="UberCharge %"/>

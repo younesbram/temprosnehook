@@ -42,7 +42,7 @@ static settings::Boolean npc{ "esp.show.npc", "true" };
 
 static settings::Boolean show_weapon{ "esp.info.weapon", "false" };
 static settings::Boolean show_distance{ "esp.info.distance", "true" };
-static settings::Boolean show_buster_distance{ "esp.info.distance-buster", "true" };
+static settings::Boolean show_buster_radius{ "esp.info.buster-radius", "true" };
 static settings::Boolean show_health{ "esp.info.health", "true" };
 static settings::Boolean show_name{ "esp.info.name", "true" };
 static settings::Boolean show_class{ "esp.info.class", "true" };
@@ -1289,14 +1289,13 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
         // If show distance, add string here
         if (show_distance)
             AddEntityString(ent, format(int(distance / 64 * 1.22f), 'm'));
-        if (show_buster_distance && ent->m_bEnemy() && IsSentryBuster(ent))
+        if (show_buster_radius && IsSentryBuster(ent))
         {
-            AddEntityString(ent, format(int(distance / 64 * 1.22f), 'm'));
             // range check with a bit extra just to be safe
             if (distance < 310)
-                AddEntityString(ent, "DANGER RANGE!", colors::FromRGBA8(255.0f, 0.0f, 0.0f, 255.0f));
+                AddEntityString(ent, "DANGER ZONE!", colors::FromRGBA8(255.0f, 0.0f, 0.0f, 255.0f));
             else
-                AddEntityString(ent, "SAFE RANGE", colors::FromRGBA8(0.0f, 255.0f, 0.0f, 255.0f));
+                AddEntityString(ent, "SAFE ZONE", colors::FromRGBA8(0.0f, 255.0f, 0.0f, 255.0f));
         }
         SetEntityColor(ent, color);
     }

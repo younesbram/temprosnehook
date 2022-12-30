@@ -34,7 +34,7 @@ static settings::Boolean draw("nav.draw", "false");
 static settings::Boolean look{ "nav.look-at-path", "false" };
 static settings::Boolean draw_debug_areas("nav.draw.debug-areas", "false");
 static settings::Boolean log_pathing{ "nav.log", "false" };
-static settings::Int stuck_time{ "nav.stuck-time", "1000" };
+static settings::Int stuck_time{ "nav.stuck-time", "4000" };
 static settings::Int vischeck_cache_time{ "nav.vischeck-cache.time", "240" };
 static settings::Boolean vischeck_runtime{ "nav.vischeck-runtime.enabled", "true" };
 static settings::Int vischeck_time{ "nav.vischeck-runtime.delay", "2000" };
@@ -697,7 +697,7 @@ static void followCrumbs()
     // Detect when jumping is necessary.
     // 1. No jumping if zoomed (or revved)
     // 2. Jump if it's necessary to do so based on z values
-    // 3. Jump if stuck (not getting closer) for more than stuck_time/2 (500ms)
+    // 3. Jump if stuck (not getting closer) for more than stuck_time/2
     if ((!(g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed) && !(g_pLocalPlayer->bRevved || g_pLocalPlayer->bRevving) && (crouch || crumbs[0].vec.z - g_pLocalPlayer->v_Origin.z > 18) && last_jump.check(200)) || (last_jump.check(200) && inactivity.check(*stuck_time / 2)))
     {
         auto local = map->findClosestNavSquare(g_pLocalPlayer->v_Origin);

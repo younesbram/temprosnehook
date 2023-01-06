@@ -1031,6 +1031,18 @@ static InitRoutine init_pyrovision(
 #endif
 
 static CatCommand print_eye_diff("debug_print_eye_diff", "debug", []() { logging::Info("%f", g_pLocalPlayer->v_Eye.z - LOCAL_E->m_vecOrigin().z); });
+
+static CatCommand print_hash("debug_print_hash", "Log the models and hashes of all entities",
+                             []()
+                             {
+                                 for (auto &ent : entity_cache::valid_ents)
+                                 {
+                                     const model_t *model = RAW_ENT(ent)->GetModel();
+                                     const auto szName = g_IModelInfo->GetModelName(model);
+                                     logging::Info("Model name: %s   Hash: %d", szName, Hash::String(szName));
+                                 }
+                             });
+
 void Shutdown()
 {
 #if ENABLE_VISUALS && !ENFORCE_STREAM_SAFETY

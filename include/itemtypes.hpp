@@ -1,8 +1,8 @@
 /*
-* itemtypes.hpp
-* This whole file is suboptimal.
-* Use this tool with "hash" algorithm selected : https://casualhacks.net/hashtool.html
-*/
+ * itemtypes.hpp
+ * This whole file is suboptimal.
+ * Use this tool with "hash" algorithm selected : https://casualhacks.net/hashtool.html
+ */
 
 #pragma once
 #include <string>
@@ -78,9 +78,11 @@ constexpr size_owned RareSpell1 = 0x28177e05;
 constexpr size_owned RareSpell2 = 0x2a1a7798;
 
 //=== Environmental Hazards ===
+constexpr size_owned PumpkinBomb    = 0xa093e718;
 constexpr size_owned BalloonBomb    = 0xda3eb058;
-constexpr size_owned WoodenBarrel  = 0x23c01644;
-constexpr size_owned WalkerExplode = 0xd530882f;
+constexpr size_owned WoodenBarrel   = 0x23c01644;
+constexpr size_owned WalkerExplode  = 0xd530882f;
+constexpr size_owned SnowmanBomb    = 0xddf06d35;
 
 //=== Flags ===
 constexpr size_owned AtomBomb        = 0x4df65bd9;
@@ -109,7 +111,7 @@ constexpr size_owned BombCartRed1 = 0xdc059338;
 bool IsAmmo(const char *szName);
 bool IsCrumpkin(const char *szName);
 bool IsPowerup(const char *szName);
-bool IsPowerupHaste(const char *szName);
+/*bool IsPowerupHaste(const char *szName);
 bool IsPowerupVampire(const char *szName);
 bool IsPowerupPrecision(const char *szName);
 bool IsPowerupRegen(const char *szName);
@@ -121,7 +123,7 @@ bool IsPowerupCrits(const char *szName);
 bool IsPowerupAgility(const char *szName);
 bool IsPowerupKing(const char *szName);
 bool IsPowerupPlague(const char *szName);
-bool IsPowerupReflect(const char *szName);
+bool IsPowerupReflect(const char *szName);*/
 bool IsHealth(const char *szName);
 bool IsSpellbook(const char *szName);
 bool IsSpellbookRare(const char *szName);

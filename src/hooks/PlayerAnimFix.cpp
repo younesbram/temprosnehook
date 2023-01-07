@@ -37,8 +37,8 @@ float FrameAdvance_hook(IClientEntity *self, float flInterval)
         }
     }
 
-    auto original = (FrameAdvance_t) frameadvance_detour.GetOriginalFunc();
-    float return_value      = original(self, newInterval);
+    auto original      = (FrameAdvance_t) frameadvance_detour.GetOriginalFunc();
+    float return_value = original(self, newInterval);
     frameadvance_detour.RestorePatch();
     return return_value;
 }
@@ -50,12 +50,14 @@ bool ShouldInterpolate_hook(IClientEntity *ent)
         if (ent && IDX_GOOD(ent->entindex()))
         {
             CachedEntity *cent = ENTITY(ent->entindex());
+            if (CE_BAD(cent))
+                return false;
             if (cent->m_Type() == ENTITY_PLAYER && cent->m_IDX != g_pLocalPlayer->entity_idx)
                 return false;
         }
     }
     auto original = (ShouldInterpolate_t) shouldinterpolate_detour.GetOriginalFunc();
-    bool ret                     = original(ent);
+    bool ret      = original(ent);
     shouldinterpolate_detour.RestorePatch();
     return ret;
 }

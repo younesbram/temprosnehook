@@ -1,7 +1,7 @@
 #include "common.hpp"
 #include "teamroundtimer.hpp"
 
-int CTeamRoundTimer::GetSetupTimeLength()
+int CTeamRoundTimer::GetSetupTimeLength() const
 {
     IClientEntity *ent;
     ent = g_IEntityList->GetClientEntity(entity);
@@ -10,7 +10,7 @@ int CTeamRoundTimer::GetSetupTimeLength()
     return NET_INT(ent, netvar.m_nSetupTimeLength);
 }
 
-round_states CTeamRoundTimer::GetRoundState()
+round_states CTeamRoundTimer::GetRoundState() const
 {
     IClientEntity *ent;
     ent = g_IEntityList->GetClientEntity(entity);
@@ -23,7 +23,7 @@ round_states CTeamRoundTimer::GetRoundState()
 void CTeamRoundTimer::Update()
 {
     entity = 0;
-    for (auto &ent : entity_cache::valid_ents)
+    for (const auto &ent : entity_cache::valid_ents)
     {
         auto result_ent = ent->InternalEntity();
         if (ent && result_ent->GetClientClass()->m_ClassID == CL_CLASS(CTeamRoundTimer))

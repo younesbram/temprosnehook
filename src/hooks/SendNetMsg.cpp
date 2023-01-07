@@ -7,9 +7,7 @@
 #include <settings/Int.hpp>
 #include "AntiAim.hpp"
 #include "HookedMethods.hpp"
-#include <MiscTemporary.hpp>
 #include "nullnexus.hpp"
-#include "e8call.hpp"
 #include "Warp.hpp"
 #include "nospread.hpp"
 #include "AntiCheatBypass.hpp"
@@ -35,7 +33,7 @@ static Timer send_achievement_reply_timer{};
 // Welcome back Achievement based identify.
 void sendAchievementKv(int value)
 {
-    KeyValues *kv = new KeyValues("AchievementEarned");
+    auto *kv = new KeyValues("AchievementEarned");
     kv->SetInt("achievementID", value);
     g_IEngine->ServerCmdKeyValues(kv);
 }
@@ -53,11 +51,11 @@ std::vector<KeyValues *> Iterate(KeyValues *event, int depth)
     for (int i = 0; i < depth; i++)
     {
         for (auto ev : peer_list)
-            for (KeyValues *dat2 = ev; dat2 != NULL; dat2 = dat2->m_pPeer)
+            for (KeyValues *dat2 = ev; dat2 != nullptr; dat2 = dat2->m_pPeer)
                 if (std::find(peer_list.begin(), peer_list.end(), dat2) == peer_list.end())
                     peer_list.push_back(dat2);
         for (auto ev : peer_list)
-            for (KeyValues *dat2 = ev; dat2 != NULL; dat2 = dat2->m_pSub)
+            for (KeyValues *dat2 = ev; dat2 != nullptr; dat2 = dat2->m_pSub)
                 if (std::find(peer_list.begin(), peer_list.end(), dat2) == peer_list.end())
                     peer_list.push_back(dat2);
     }
@@ -140,7 +138,7 @@ void ProcessAchievement(IGameEvent *ach)
     {
         // Always reply and set on CA7 and only set on CA8
         bool reply = achievement == CAT_IDENTIFY;
-        player_info_s info;
+        player_info_s info{};
         if (!g_IEngine->GetPlayerInfo(player_idx, &info))
             return;
         if (reply && *answerIdentify && player_idx != g_pLocalPlayer->entity_idx)
@@ -155,7 +153,7 @@ void ProcessAchievement(IGameEvent *ach)
 
 class AchievementListener : public IGameEventListener2
 {
-    virtual void FireGameEvent(IGameEvent *event)
+    void FireGameEvent(IGameEvent *event) override
     {
         ProcessAchievement(event);
     }
@@ -214,7 +212,6 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, boo
         if (!say_idx || !say_team_idx)
         {
             offset    = say_idx ? 26 : 21;
-            bool crpt = false;
 
 #if ENABLE_NULLNEXUS
             // Only allow !! and !!! if crypto_chat is on
@@ -235,7 +232,7 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, boo
                 }
             }
 #endif
-            if (!crpt && *newlines_msg > 0)
+            if (*newlines_msg > 0)
             {
                 // TODO move out? update in a value change callback?
                 newlines = std::string(*newlines_msg, '\n');
@@ -267,7 +264,7 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, boo
         unsigned char buf[4096];
         bf_write buffer("cathook_debug_buffer", buf, 4096);
         logging::Info("Writing %i", msg.WriteToBuffer(buffer));
-        std::string bytes    = "";
+        std::string bytes;
         constexpr char h2c[] = "0123456789abcdef";
         for (int i = 0; i < buffer.GetNumBytesWritten(); i++)
         {

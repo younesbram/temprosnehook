@@ -47,26 +47,20 @@ float GetAngle(CachedEntity *spy)
         anglediff -= 360;
     if (anglediff < -180)
         anglediff += 360;
-    // logging::Info("Angle: %.2f | %.2f | %.2f | %.2f", yaw, yaw2, anglediff,
-    // yaw - yaw2);
+    // logging::Info("Angle: %.2f | %.2f | %.2f | %.2f", yaw, yaw2, anglediff, yaw - yaw2);
     return anglediff;
 }
 
 CachedEntity *ClosestSpy()
 {
-    CachedEntity *closest, *ent;
+    CachedEntity *closest;
     float closest_dist, dist;
 
     closest      = nullptr;
     closest_dist = 0.0f;
 
-    for (int i = 1; i < PLAYER_ARRAY_SIZE && i < g_IEntityList->GetHighestEntityIndex(); i++)
+    for (const auto &ent : entity_cache::player_cache)
     {
-        ent = ENTITY(i);
-        if (CE_BAD(ent))
-            continue;
-        if (CE_BYTE(ent, netvar.iLifeState))
-            continue;
         bool ispyro  = false;
         bool isheavy = false;
         if (CE_INT(ent, netvar.iClass) != tf_class::tf_spy)

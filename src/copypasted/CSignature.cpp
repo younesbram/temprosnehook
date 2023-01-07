@@ -173,7 +173,7 @@ uintptr_t CSignature::GetSignature(const char *chPattern, sharedobj::SharedObjec
         int fd       = open(obj.path.c_str(), O_RDONLY);
         void *module = mmap(nullptr, lseek(fd, 0, SEEK_END), PROT_READ, MAP_SHARED, fd, 0);
         if ((unsigned) module == 0xffffffff)
-            return NULL;
+            return 0;
         link_map *moduleMap = obj.lmap;
 
         // static void *module = (void *)moduleMap->l_addr;
@@ -190,10 +190,10 @@ uintptr_t CSignature::GetSignature(const char *chPattern, sharedobj::SharedObjec
 
     // we need to remap the address that we got from the pattern search from our
     // mapped file to the actual memory we do this by rebasing the address
-    // (subbing the mmapped one and replacing it with the dlopened one.
+    // (subbing the mmapped one and replacing it with the dlopened one).
     uintptr_t patr = dwFindPattern(((uintptr_t) object.module) + object.textOffset, ((uintptr_t) object.module) + object.textOffset + object.textSize, chPattern);
     if (!patr)
-        return NULL;
+        return 0;
     return patr - (uintptr_t) (object.module) + object.moduleMap->l_addr;
 }
 //===================================================================================

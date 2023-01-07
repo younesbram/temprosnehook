@@ -181,13 +181,10 @@ int QueryPlayer(Query query)
     }
     std::vector<int> candidates{};
     int index_result = 0;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
-    {
-        if (PlayerPassesQuery(query, i))
-        {
-            candidates.push_back(i);
-        }
-    }
+    for (const auto &ent : entity_cache::player_cache)
+        if (PlayerPassesQuery(query, ent->m_IDX))
+            candidates.push_back(ent->m_IDX);
+
     if (!candidates.empty())
     {
         std::random_device rd;

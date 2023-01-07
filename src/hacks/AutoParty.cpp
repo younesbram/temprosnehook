@@ -86,7 +86,7 @@ void repopulate(const std::string &str)
         }
 
         std::sort(sorted_peers.begin(), sorted_peers.end(), compare_ts);
-        for (int i = 0; i < *ipc_count; i++)
+        for (int i = 0; i < *ipc_count; ++i)
             party_hosts.push_back(sorted_peers[i].friendid);
 
         return;
@@ -250,7 +250,7 @@ void party_routine()
                         logging::Info("AutoParty: %s", message.c_str());
                         if (*message_kicks)
                             client->SendPartyChat(message.c_str());
-                        for (int i = 0; i < num_to_kick; i++)
+                        for (int i = 0; i < num_to_kick; ++i)
                         {
                             CSteamID id = CSteamID(members[members.size() - (1 + i)], EUniverse::k_EUniversePublic, EAccountType::k_EAccountTypeIndividual);
                             client->KickPlayer(id);

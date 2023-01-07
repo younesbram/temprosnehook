@@ -87,7 +87,7 @@ std::vector<proj_data_s> proj_data_array;
 
 int ChargeCount()
 {
-    return (CE_FLOAT(LOCAL_W, netvar.m_flChargeLevel) / 0.25f);
+    return CE_FLOAT(LOCAL_W, netvar.m_flChargeLevel) / 0.25f;
 }
 
 // TODO Angle Checking
@@ -97,9 +97,8 @@ int BulletDangerValue(CachedEntity *patient)
         return 0;
     bool any_zoomed_snipers = false;
     // Find dangerous snipers in other team
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (const auto &ent: entity_cache::player_cache)
     {
-        CachedEntity *ent = ENTITY(i);
         if (CE_BAD(ent))
             continue;
         if (!ent->m_bAlivePlayer() || !ent->m_bEnemy())
@@ -142,9 +141,8 @@ int FireDangerValue(CachedEntity *patient)
     uint8_t should_switch = 0;
     if (auto_vacc_pop_if_pyro)
     {
-        for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+        for (const auto &ent: entity_cache::player_cache)
         {
-            CachedEntity *ent = ENTITY(i);
             if (CE_BAD(ent))
                 continue;
             if (!ent->m_bEnemy())
@@ -215,7 +213,7 @@ int BlastDangerValue(CachedEntity *patient)
         return 1;
     }
     // Find rockets/pipes nearby
-    for (auto &ent : entity_cache::valid_ents)
+    for (const auto &ent : entity_cache::valid_ents)
     {
         if (!ent->m_bEnemy())
             continue;
@@ -247,7 +245,7 @@ int NearbyEntities()
     int ret = 0;
     if (CE_BAD(LOCAL_E) || CE_BAD(LOCAL_W))
         return ret;
-    for (auto &ent : entity_cache::valid_ents)
+    for (const auto &ent : entity_cache::valid_ents)
     {
         if (ent == LOCAL_E)
             continue;
@@ -423,34 +421,33 @@ bool IsVaccinator()
 
 void UpdateData()
 {
-    for (int i = 1; i <= MAX_PLAYERS; i++)
+    for (const auto &ent: entity_cache::player_cache)
     {
-        if (reset_cd[i].test_and_set(10000))
-            data[i] = {};
-        CachedEntity *ent = ENTITY(i);
+        if (reset_cd[ent->m_IDX].test_and_set(10000))
+            data[ent->m_IDX] = {};
         if (CE_GOOD(ent) && ent->m_bAlivePlayer())
         {
             int health = ent->m_iHealth();
-            if (data[i].last_damage > g_GlobalVars->curtime)
+            if (data[ent->m_IDX].last_damage > g_GlobalVars->curtime)
             {
-                data[i].last_damage = 0.0f;
+                data[ent->m_IDX].last_damage = 0.0f;
             }
-            if (g_GlobalVars->curtime - data[i].last_damage > 5.0f)
+            if (g_GlobalVars->curtime - data[ent->m_IDX].last_damage > 5.0f)
             {
-                data[i].accum_damage       = 0;
-                data[i].accum_damage_start = 0.0f;
+                data[ent->m_IDX].accum_damage       = 0;
+                data[ent->m_IDX].accum_damage_start = 0.0f;
             }
-            const int last_health = data[i].last_health;
+            const int last_health = data[ent->m_IDX].last_health;
             if (health != last_health && health <= g_pPlayerResource->GetMaxHealth(ent))
             {
-                reset_cd[i].update();
-                data[i].last_health = health;
+                reset_cd[ent->m_IDX].update();
+                data[ent->m_IDX].last_health = health;
                 if (health < last_health)
                 {
-                    data[i].accum_damage += (last_health - health);
-                    if (!data[i].accum_damage_start)
-                        data[i].accum_damage_start = g_GlobalVars->curtime;
-                    data[i].last_damage = g_GlobalVars->curtime;
+                    data[ent->m_IDX].accum_damage += (last_health - health);
+                    if (!data[ent->m_IDX].accum_damage_start)
+                        data[ent->m_IDX].accum_damage_start = g_GlobalVars->curtime;
+                    data[ent->m_IDX].last_damage = g_GlobalVars->curtime;
                 }
             }
         }
@@ -576,12 +573,12 @@ int BestTarget()
     int best_score = INT_MIN;
     if (steamid_only)
         return best;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (const auto &ent: entity_cache::player_cache)
     {
-        int score = HealingPriority(i);
+        int score = HealingPriority(ent->m_IDX);
         if (score > best_score && score != -1)
         {
-            best       = i;
+            best       = ent->m_IDX;
             best_score = score;
         }
     }
@@ -621,23 +618,20 @@ void CreateMove()
         }
         if (current_id != steamid)
         {
-            for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+            for (const auto &ent : entity_cache::player_cache)
             {
-                CachedEntity *ent = ENTITY(i);
-                if (CE_BAD(ent) || !ent->player_info.friendsID)
+                if (!ent->player_info.friendsID)
                     continue;
-                if (ent->player_info.friendsID == steamid && CanHeal(i))
+                if (ent->player_info.friendsID == steamid && CanHeal(ent->m_IDX))
                 {
-                    CurrentHealingTargetIDX = i;
+                    CurrentHealingTargetIDX = ent->m_IDX;
                     healing_steamid         = true;
                     break;
                 }
             }
         }
         else
-        {
             healing_steamid = true;
-        }
     }
 
     if (CurrentHealingTargetIDX && (CE_BAD(ENTITY(CurrentHealingTargetIDX)) || !CanHeal(CurrentHealingTargetIDX)))

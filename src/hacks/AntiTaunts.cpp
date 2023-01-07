@@ -13,17 +13,16 @@ void cm()
 {
     if (!*enable)
         return;
-    CachedEntity *ent;
 
-    for (unsigned i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (const auto &ent : entity_cache::player_cache)
     {
-        ent = ENTITY(i);
         if (CE_BAD(ent) || ent->m_Type() != ENTITY_PLAYER)
             continue;
 
         RemoveCondition<TFCond_Taunting>(ent);
     }
 }
+
 static InitRoutine EC(
     []()
     {

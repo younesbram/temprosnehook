@@ -75,11 +75,11 @@ bool doMovedSwingTrace(CachedEntity *target, Vector new_target_origin)
     uintptr_t collisionprop = (uintptr_t) RAW_ENT(target) + netvar.m_Collision;
 
     typedef void (*MarkSurroundingBoundsDirty_t)(uintptr_t prop);
-    static auto sig_mark                                              = CSignature::GetClientSignature("55 89 E5 56 53 83 EC 10 8B 5D ? 8B 43 ? 81 88 ? ? ? ? 00 40 00 00");
+    static auto sig_mark                      = CSignature::GetClientSignature("55 89 E5 56 53 83 EC 10 8B 5D ? 8B 43 ? 81 88 ? ? ? ? 00 40 00 00");
     static auto MarkSurroundingBoundsDirty_fn = (MarkSurroundingBoundsDirty_t) sig_mark;
 
     typedef void (*UpdateParition_t)(uintptr_t prop);
-    static auto sig_update                     = CSignature::GetClientSignature("55 89 E5 57 56 53 83 EC 3C 8B 5D ? 8B 43 ? 8B 90");
+    static auto sig_update         = CSignature::GetClientSignature("55 89 E5 57 56 53 83 EC 3C 8B 5D ? 8B 43 ? 8B 90");
     static auto UpdatePartition_fn = (UpdateParition_t) sig_update;
 
     // Mark for update
@@ -107,7 +107,7 @@ int ClosestDistanceHitbox(CachedEntity *target)
 {
     int closest        = -1;
     float closest_dist = FLT_MAX, dist;
-    for (int i = pelvis; i < spine_3; i++)
+    for (int i = pelvis; i < spine_3; ++i)
     {
         auto hitbox = target->hitboxes.GetHitbox(i);
         if (!hitbox)
@@ -125,7 +125,7 @@ int ClosestDistanceHitbox(hacks::backtrack::BacktrackData btd)
 {
     int closest        = -1;
     float closest_dist = FLT_MAX, dist;
-    for (int i = pelvis; i < spine_3; i++)
+    for (int i = pelvis; i < spine_3; ++i)
     {
         dist = g_pLocalPlayer->v_Eye.DistTo(btd.hitboxes.at(i).center);
         if (dist < closest_dist)
@@ -261,9 +261,8 @@ static bool doRageBackstab()
     float swingrange = re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
     // AimAt Autobackstab
     {
-        for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+        for (const auto &ent : entity_cache::player_cache)
         {
-            auto ent = ENTITY(i);
             if (CE_BAD(ent) || ent->m_flDistance() > swingrange * 4 || !ent->m_bEnemy() || !ent->m_bAlivePlayer() || g_pLocalPlayer->entity_idx == ent->m_IDX || IsPlayerInvulnerable(ent))
                 continue;
             if (!player_tools::shouldTarget(ent))
@@ -277,7 +276,7 @@ static bool doRageBackstab()
             auto angle     = GetAimAtAngles(g_pLocalPlayer->v_Eye, aim_pos, LOCAL_E);
             if (!angleCheck(ent, std::nullopt, angle) && !canFaceStab(ent))
                 continue;
-            if (doSwingTraceAngle(angle, trace) && ((IClientEntity *) trace.m_pEnt)->entindex() == i)
+            if (doSwingTraceAngle(angle, trace) && ((IClientEntity *) trace.m_pEnt)->entindex() == ent->m_IDX)
             {
                 current_user_cmd->buttons |= IN_ATTACK;
                 g_pLocalPlayer->bUseSilentAngles = true;
@@ -352,12 +351,11 @@ static bool doBacktrackStab(bool legit = false)
     // Set for our filter
     legit_stab = legit;
     // Get the Best tick
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (const auto &ent : entity_cache::player_cache)
     {
         // Found a target, break out
         if (stab_ent)
             break;
-        CachedEntity *ent = ENTITY(i);
         // Targeting checks
         if (CE_BAD(ent) || !ent->m_bAlivePlayer() || !ent->m_bEnemy() || !player_tools::shouldTarget(ent) || IsPlayerInvulnerable(ent))
             continue;
@@ -368,7 +366,7 @@ static bool doBacktrackStab(bool legit = false)
             {
                 if (IsTickGood(bt_tick))
                 {
-                    // We found something matching the criterias, break out
+                    // We found something matching the criteria, break out
                     stab_data = bt_tick;
                     stab_ent  = ent;
                     break;

@@ -25,27 +25,26 @@ static void cm()
 {
     if (*mode == 0)
         return;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (const auto &pEntity : entity_cache::player_cache)
     {
-        if (g_pLocalPlayer->entity_idx == i)
+        if (g_pLocalPlayer->entity_idx == pEntity->m_IDX)
             continue;
-        CachedEntity *pEntity = ENTITY(i);
         if (CE_BAD(pEntity) || !pEntity->m_bAlivePlayer())
         {
-            drawEsp[i] = false;
+            drawEsp[pEntity->m_IDX] = false;
             continue;
         }
         if (pEntity->m_iTeam() == LOCAL_E->m_iTeam() && playerlist::IsDefault(pEntity) && !*teammates)
         {
-            drawEsp[i] = false;
+            drawEsp[pEntity->m_IDX] = false;
             continue;
         }
         if (!pEntity->hitboxes.GetHitbox(0))
             continue;
-        hitp[i]    = pEntity->hitboxes.GetHitbox(0)->center;
-        minp[i]    = pEntity->hitboxes.GetHitbox(0)->min;
-        maxp[i]    = pEntity->hitboxes.GetHitbox(0)->max;
-        drawEsp[i] = true;
+        hitp[pEntity->m_IDX]    = pEntity->hitboxes.GetHitbox(0)->center;
+        minp[pEntity->m_IDX]    = pEntity->hitboxes.GetHitbox(0)->min;
+        maxp[pEntity->m_IDX]    = pEntity->hitboxes.GetHitbox(0)->max;
+        drawEsp[pEntity->m_IDX] = true;
     }
 }
 
@@ -55,17 +54,16 @@ void draw()
 {
     if (*mode == 0)
         return;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (const auto &pEntity : entity_cache::player_cache)
     {
-        if (!drawEsp[i])
+        if (!drawEsp[pEntity->m_IDX])
             continue;
-        CachedEntity *pEntity = ENTITY(i);
         if (CE_BAD(pEntity) || !pEntity->m_bAlivePlayer())
             continue;
         if (pEntity == LOCAL_E)
             continue;
         Vector out;
-        if (draw::WorldToScreen(hitp[i], out))
+        if (draw::WorldToScreen(hitp[pEntity->m_IDX], out))
         {
             auto distance = pEntity->m_flDistance();
             switch (*mode)

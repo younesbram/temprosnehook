@@ -15,7 +15,7 @@
 #include "filesystem.h"
 #include "DetourHook.hpp"
 #include "AntiCheatBypass.hpp"
-
+#include <Warp.hpp>
 #include "hack.hpp"
 #include <thread>
 
@@ -38,7 +38,6 @@ static settings::Boolean ping_reducer{ "misc.ping-reducer.enable", "false" };
 static settings::Int force_ping{ "misc.ping-reducer.target", "0" };
 static settings::Boolean force_wait{ "misc.force-enable-wait", "true" };
 static settings::Boolean scc{ "misc.scoreboard.match-custom-team-colors", "false" };
-
 #if ENABLE_VISUALS
 static settings::Boolean debug_info{ "misc.debug-info", "false" };
 static settings::Boolean misc_drawhitboxes{ "misc.draw-hitboxes", "false" };
@@ -158,7 +157,7 @@ int getCarriedBuilding()
 {
     if (CE_INT(LOCAL_E, netvar.m_bCarryingObject))
         return HandleToIDX(CE_INT(LOCAL_E, netvar.m_hCarriedObject));
-    for (auto &ent : entity_cache::valid_ents)
+    for (const auto &ent : entity_cache::valid_ents)
     {
         if (ent->m_Type() != ENTITY_BUILDING)
             continue;
@@ -183,7 +182,7 @@ struct wireframe_data
 std::vector<wireframe_data> wireframe_queue;
 void QueueWireframeHitboxes(hitbox_cache::EntityHitboxCache &hb_cache)
 {
-    for (int i = 0; i < hb_cache.GetNumHitboxes(); i++)
+    for (int i = 0; i < hb_cache.GetNumHitboxes(); ++i)
     {
         auto hb        = hb_cache.GetHitbox(i);
         Vector raw_min = hb->bbox->bbmin;
@@ -230,9 +229,8 @@ void CreateMove()
 #if ENABLE_VISUALS
     if (misc_drawhitboxes)
     {
-        for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+        for (const auto &ent : entity_cache::player_cache)
         {
-            auto ent = ENTITY(i);
             if (CE_INVALID(ent) || ent == LOCAL_E || (!misc_drawhitboxes_dead && !ent->m_bAlivePlayer()))
                 continue;
             QueueWireframeHitboxes(ent->hitboxes);
@@ -409,7 +407,7 @@ void Draw()
 {
     if (misc_drawhitboxes)
     {
-        for (auto &entry : wireframe_queue)
+        for (const auto &entry : wireframe_queue)
             DrawWireframeHitbox(entry);
         wireframe_queue.clear();
     }
@@ -419,12 +417,10 @@ void Draw()
     }*/
     if (show_spectators)
     {
-        for (int i = 0; i < PLAYER_ARRAY_SIZE; i++)
+        for (const auto &ent: entity_cache::valid_ents)
         {
-            // Assign the for loops tick number to an ent
-            CachedEntity *ent = ENTITY(i);
             player_info_s info{};
-            if (!CE_BAD(ent) && ent != LOCAL_E && ent->m_Type() == ENTITY_PLAYER && HandleToIDX(CE_INT(ent, netvar.hObserverTarget)) == LOCAL_E->m_IDX && GetPlayerInfo(i, &info))
+            if (ent != LOCAL_E && ent->m_Type() == ENTITY_PLAYER && HandleToIDX(CE_INT(ent, netvar.hObserverTarget)) == LOCAL_E->m_IDX && GetPlayerInfo(ent->m_IDX, &info))
             {
                 auto observermode = "N/A";
                 rgba_t color      = ent->m_iTeam() == TEAM_BLU ? colors::blu : (ent->m_iTeam() == TEAM_RED ? colors::red : colors::white);
@@ -544,7 +540,7 @@ void Draw()
         //if (TF2C) AddSideString(colors::white, "Crits: %i", s_bCrits);
         //if (TF2C) AddSideString(colors::white, "CritMult: %i",
         RemapValClampedNC( CE_INT(LOCAL_E, netvar.iCritMult), 0, 255, 1.0, 6 ));
-        for (int i = 0; i <= HIGHEST_ENTITY; i++) {
+        for (int i = 0; i <= HIGHEST_ENTITY; ++i) {
             CachedEntity* e = ENTITY(i);
             if (CE_GOOD(e)) {
                 if (e->m_Type() == EntityType::ENTITY_PROJECTILE) {
@@ -719,7 +715,7 @@ void DumpRecvTable(CachedEntity *ent, RecvTable *table, int depth, const char *f
     bool forcetable = ft && strlen(ft);
     if (!forcetable || !strcmp(ft, table->GetName()))
         logging::Info("==== TABLE: %s", table->GetName());
-    for (int i = 0; i < table->GetNumProps(); i++)
+    for (int i = 0; i < table->GetNumProps(); ++i)
     {
         RecvProp *prop = table->GetProp(i);
         if (!prop)
@@ -779,7 +775,7 @@ static CatCommand dump_vars_by_name("debug_dump_netvars_name", "Dump netvars of 
                                         if (args.ArgC() < 2)
                                             return;
                                         std::string name(args.Arg(1));
-                                        for (auto &ent : entity_cache::valid_ents)
+                                        for (const auto &ent : entity_cache::valid_ents)
                                         {
                                             ClientClass *clz = RAW_ENT(ent)->GetClientClass();
                                             if (!clz)
@@ -801,7 +797,7 @@ static CatCommand debug_print_weaponid("debug_weaponid", "Print the weapon IDs o
                                                return;
                                            int *hWeapons = &CE_INT(LOCAL_E, netvar.hMyWeapons);
                                            // Go through the handle array and search for the item
-                                           for (int i = 0; hWeapons[i]; i++)
+                                           for (int i = 0; hWeapons[i]; ++i)
                                            {
                                                if (IDX_BAD(HandleToIDX(hWeapons[i])))
                                                    continue;
@@ -856,7 +852,7 @@ Color &GetPlayerColor(int idx, int team, bool dead = false)
     }
 
     if (dead)
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; ++i)
             returnColor[i] /= 1.5f;
 
     return returnColor;
@@ -897,18 +893,18 @@ static InitRoutine init(
 
         // Construct BytePatch1
         std::vector<unsigned char> patch1 = { 0xE8 };
-        for (size_t i = 0; i < sizeof(uintptr_t); i++)
+        for (size_t i = 0; i < sizeof(uintptr_t); ++i)
             patch1.push_back(((unsigned char *) &relAddr1)[i]);
         for (int i = patch1.size(); i < 6; i++)
             patch1.push_back(0x90);
 
         // Construct BytePatch2
         std::vector<unsigned char> patch2 = { 0xE8 };
-        for (size_t i = 0; i < sizeof(uintptr_t); i++)
+        for (size_t i = 0; i < sizeof(uintptr_t); ++i)
             patch2.push_back(((unsigned char *) &relAddr2)[i]);
         patch2.push_back(0x8B);
         patch2.push_back(0x00);
-        for (int i = patch2.size(); i < 27; i++)
+        for (int i = patch2.size(); i < 27; ++i)
             patch2.push_back(0x90);
 
         patch_scoreboardcolor1 = std::make_unique<BytePatch>(addr1, patch1);
@@ -1169,7 +1165,7 @@ static InitRoutine init(
 /*void DumpRecvTable(CachedEntity* ent, RecvTable* table, int depth, const char*
 ft, unsigned acc_offset) { bool forcetable = ft && strlen(ft); if (!forcetable
 || !strcmp(ft, table->GetName())) logging::Info("==== TABLE: %s",
-table->GetName()); for (int i = 0; i < table->GetNumProps(); i++) { RecvProp*
+table->GetName()); for (int i = 0; i < table->GetNumProps(); ++i) { RecvProp*
 prop = table->GetProp(i); if (!prop) continue; if (prop->GetDataTable()) {
             DumpRecvTable(ent, prop->GetDataTable(), depth + 1, ft, acc_offset +
 prop->GetOffset());

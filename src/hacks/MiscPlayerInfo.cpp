@@ -59,18 +59,17 @@ void Paint()
 {
     if (!*draw_kda && !*mafia_city)
         return;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (const auto &ent: entity_cache::player_cache)
     {
-        CachedEntity *ent = ENTITY(i);
         if (CE_BAD(ent))
             continue;
         if (ent->m_Type() != ENTITY_PLAYER || !ent->player_info.friendsID)
             continue;
         // Update alive state
-        if (g_pPlayerResource->isAlive(i))
-            death_timer[i] = g_GlobalVars->curtime;
+        if (g_pPlayerResource->isAlive(ent->m_IDX))
+            death_timer[ent->m_IDX] = g_GlobalVars->curtime;
         // No more processing after 3 Seconds of Death
-        if (g_GlobalVars->curtime - death_timer[i] > 3.0f)
+        if (g_GlobalVars->curtime - death_timer[ent->m_IDX] > 3.0f)
             continue;
         auto collidable = RAW_ENT(ent)->GetCollideable();
         if (draw_kda)
@@ -84,8 +83,8 @@ void Paint()
 
             // Base Color
             rgba_t color = colors::white;
-            int kills    = g_pPlayerResource->GetKills(i);
-            int deaths   = g_pPlayerResource->GetDeaths(i);
+            int kills    = g_pPlayerResource->GetKills(ent->m_IDX);
+            int deaths   = g_pPlayerResource->GetDeaths(ent->m_IDX);
             // Calculate KD
             float KDA = deaths ? (float) kills / (float) deaths : kills;
             // Green == 1+ KD
@@ -95,9 +94,9 @@ void Paint()
             else if (KDA < 1.0f && deaths)
                 color = colors::orange;
             // Make color slowly fade
-            color.g -= (float) (g_GlobalVars->curtime - death_timer[i]) / (3.0f);
-            color.b -= (float) (g_GlobalVars->curtime - death_timer[i]) / (3.0f);
-            color.r += (float) (g_GlobalVars->curtime - death_timer[i]) / (3.0f);
+            color.g -= (float) (g_GlobalVars->curtime - death_timer[ent->m_IDX]) / (3.0f);
+            color.b -= (float) (g_GlobalVars->curtime - death_timer[ent->m_IDX]) / (3.0f);
+            color.r += (float) (g_GlobalVars->curtime - death_timer[ent->m_IDX]) / (3.0f);
             // Don't go out of bounds
             color.g = fmaxf(0.0f, color.g);
             color.b = fmaxf(0.0f, color.b);
@@ -125,16 +124,16 @@ void Paint()
             // Base Color
             rgba_t color = colors::white;
             // tint LOCAL_E name slightly
-            if (i == g_IEngine->GetLocalPlayer())
+            if (ent->m_IDX == g_IEngine->GetLocalPlayer())
                 color.b += 0.5f;
             // tint CAT status people's names too
             if (playerlist::AccessData(ent->player_info.friendsID).state == playerlist::k_EState::CAT)
                 color.g = 0.8f;
 
             // Calculate Player Level
-            int death_score  = g_pPlayerResource->GetDeaths(i) * 7;
-            int kill_score   = g_pPlayerResource->GetKills(i) * 3;
-            int damage_score = g_pPlayerResource->GetDamage(i) / 100;
+            int death_score  = g_pPlayerResource->GetDeaths(ent->m_IDX) * 7;
+            int kill_score   = g_pPlayerResource->GetKills(ent->m_IDX) * 3;
+            int damage_score = g_pPlayerResource->GetDamage(ent->m_IDX) / 100;
             int level        = min(kill_score + damage_score - death_score, 100);
             level            = max(level, 1);
 
@@ -144,9 +143,9 @@ void Paint()
             std::string to_display = (playerlist::AccessData(ent->player_info.friendsID).state == playerlist::k_EState::CAT ? format("Lv.", level, " Cat") : format("Lv.", level, " ", choosen_entry[ent->player_info.friendsID].first));
 
             // Clamp to prevent oob
-            color.g -= (float) (g_GlobalVars->curtime - death_timer[i]) / (3.0f);
-            color.b -= (float) (g_GlobalVars->curtime - death_timer[i]) / (3.0f);
-            color.r += (float) (g_GlobalVars->curtime - death_timer[i]) / (3.0f);
+            color.g -= (float) (g_GlobalVars->curtime - death_timer[ent->m_IDX]) / (3.0f);
+            color.b -= (float) (g_GlobalVars->curtime - death_timer[ent->m_IDX]) / (3.0f);
+            color.r += (float) (g_GlobalVars->curtime - death_timer[ent->m_IDX]) / (3.0f);
             color.g = fmaxf(0.0f, color.g);
             color.b = fmaxf(0.0f, color.b);
             color.r = fminf(1.0f, color.r);

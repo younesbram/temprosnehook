@@ -13,6 +13,7 @@ class Timer
 {
 public:
     typedef std::chrono::system_clock clock;
+    std::chrono::time_point<clock> last{};
 
     inline Timer() = default;
 
@@ -33,8 +34,5 @@ public:
     {
         last = clock::now();
     }
-
-public:
-    std::chrono::time_point<clock> last{};
 };
 #endif

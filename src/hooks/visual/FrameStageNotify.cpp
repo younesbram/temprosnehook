@@ -3,12 +3,10 @@
   Copyright (c) 2018 nullworks. All rights reserved.
 */
 
-#include <MiscTemporary.hpp>
 #include <hacks/hacklist.hpp>
 #include <settings/Bool.hpp>
 #include <hacks/Thirdperson.hpp>
 #include "HookedMethods.hpp"
-#include "hacks/Backtrack.hpp"
 #include "AntiAntiAim.hpp"
 
 static settings::Float nightmode_gui{ "visual.night-mode.gui", "0" };
@@ -40,7 +38,7 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
     if (!isHackActive())
         return original::FrameStageNotify(this_, stage);
 
-    PROF_SECTION(FrameStageNotify_TOTAL);
+    PROF_SECTION(FrameStageNotify_TOTAL)
 
     if (update_override_textures)
     {
@@ -62,14 +60,13 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
                     continue;
                 // Don't override this stuff
                 bool good = true;
-                for (auto &entry : dont_override_strings)
-                    if (path.find(entry) != path.npos)
-                    {
+                for (const auto &entry : dont_override_strings)
+                    if (path.find(entry) != std::string::npos)
                         good = false;
-                    }
+
                 // Don't draw this stuff
-                for (auto &entry : nodraw_strings)
-                    if (path.find(entry) != path.npos)
+                for (const auto &entry : nodraw_strings)
+                    if (path.find(entry) != std::string::npos)
                     {
                         pMaterial->SetMaterialVarFlag(MATERIAL_VAR_NO_DRAW, true);
                         good = false;
@@ -110,16 +107,16 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
             int should_filter = 0;
             auto name         = std::string(pMaterial->GetTextureGroupName());
 
-            for (auto &entry : gui_strings)
-                if (name.find(entry) != name.npos)
+            for (const auto &entry : gui_strings)
+                if (name.find(entry) != std::string::npos)
                     should_filter = 1;
 
-            for (auto &entry : world_strings)
-                if (name.find(entry) != name.npos)
+            for (const auto &entry : world_strings)
+                if (name.find(entry) != std::string::npos)
                     should_filter = 2;
 
-            for (auto &entry : skybox_strings)
-                if (name.find(entry) != name.npos)
+            for (const auto &entry : skybox_strings)
+                if (name.find(entry) != std::string::npos)
                     should_filter = 3;
 
             if (should_filter)
@@ -185,11 +182,11 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
     if (!g_IEngine->IsInGame())
         g_Settings.bInvalid = true;
     {
-        PROF_SECTION(FSN_antiantiaim);
+        PROF_SECTION(FSN_antiantiaim)
         hacks::anti_anti_aim::frameStageNotify(stage);
     }
     {
-        PROF_SECTION(FSN_skinchanger);
+        PROF_SECTION(FSN_skinchanger)
         hacks::skinchanger::FrameStageNotify(stage);
     }
     std::optional<Vector> backup_punch;
@@ -220,7 +217,7 @@ static InitRoutine init_fsn(
         nightmode_world_color.installChangeCallback(rvarCallback<rgba_t>);
         nightmode_skybox_color.installChangeCallback(rvarCallback<rgba_t>);
         override_textures.installChangeCallback([](settings::VariableBase<bool> &, bool after) { update_override_textures = true; });
-        override_textures_texture.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { update_override_textures = true; });
+        override_textures_texture.installChangeCallback([](settings::VariableBase<std::string> &, const std::string &after) { update_override_textures = true; });
         EC::Register(
             EC::LevelInit,
             []()

@@ -4,10 +4,7 @@
 
 #include "common.hpp"
 #include "settings/Bool.hpp"
-#include "settings/Int.hpp"
-#include "settings/Key.hpp"
 #include "PlayerTools.hpp"
-#include "hacks/Trigger.hpp"
 #include "MiscAimbot.hpp"
 #include "DetourHook.hpp"
 #include "Backtrack.hpp"
@@ -38,7 +35,7 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
 
     bool shouldBacktrack = backtrack::backtrackEnabled() && !backtrack::hasData();
 
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < 1; ++i)
     {
         if (prevent != -1)
         {
@@ -123,9 +120,8 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
         }
     }
     prevent = -1;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (const auto &ent: entity_cache::player_cache)
     {
-        CachedEntity *ent = ENTITY(i);
         if (CE_BAD(ent) || !(ent->m_bAlivePlayer()) || (teammate && ent->m_iTeam() != LOCAL_E->m_iTeam()) || ent == LOCAL_E)
             continue;
         if (!teammate && ent->m_iTeam() == LOCAL_E->m_iTeam())
@@ -202,8 +198,7 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
         backtrack::MoveToTick(*best_data);
     return { bestent, predicted };
 }
-static float slow_change_dist_y{};
-static float slow_change_dist_p{};
+
 void DoSlowAim(Vector &input_angle, int speed)
 {
     auto viewangles = current_user_cmd->viewangles;
@@ -251,7 +246,7 @@ static void SandwichAim()
     if (LOCAL_W->m_iClassID() != CL_CLASS(CTFLunchBox))
         return;
     Vector Predict;
-    CachedEntity *bestent = nullptr;
+    CachedEntity *bestent;
     std::pair<CachedEntity *, Vector> result{};
     result  = FindBestEnt(true, true, false, false);
     bestent = result.first;
@@ -315,7 +310,7 @@ static void SapperAimbot()
     CachedEntity *target = nullptr;
     float distance       = FLT_MAX;
 
-    for (int i = 0; i < entity_cache::max; i++)
+    for (int i = 32; i < entity_cache::max; ++i)
     {
         CachedEntity *ent = ENTITY(i);
         if (CE_BAD(ent))
@@ -455,13 +450,8 @@ CachedEntity *targetBuilding(bool priority)
     float wrench_range   = re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
     CachedEntity *target = nullptr;
     float distance       = FLT_MAX;
-    for (int i = 0; i < entity_cache::max; i++)
+    for (const auto &ent: entity_cache::valid_ents)
     {
-        CachedEntity *ent = ENTITY(i);
-
-        if (CE_BAD(ent))
-            continue;
-
         // can't exactly repair Merasmus
         if (ent->m_Type() != ENTITY_BUILDING)
             continue;
@@ -528,7 +518,7 @@ CachedEntity *targetBuilding(bool priority)
         distance = new_distance;
     }
     return target;
-};
+}
 
 static void BuildingAimbot()
 {

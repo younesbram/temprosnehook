@@ -62,7 +62,7 @@ void CreateMove()
     if (shouldBacktrack)
     {
         float target_range = EffectiveTargetingRange();
-        for (auto &ent_data : backtrack::bt_data)
+        for (const auto &ent_data : backtrack::bt_data)
         {
             if (state_good)
                 break;
@@ -104,13 +104,10 @@ void CreateMove()
         if (delay)
         {
             if (target_time > g_GlobalVars->curtime)
-            {
                 target_time = 0.0f;
-            }
+
             if (!target_time)
-            {
                 target_time = g_GlobalVars->curtime;
-            }
             else
             {
                 if (g_GlobalVars->curtime - float(delay) >= target_time)
@@ -176,27 +173,19 @@ bool ShouldShoot()
     switch (GetWeaponMode())
     {
     case weapon_hitscan:
-        break;
     case weapon_melee:
         break;
     // Check if player is using a projectile based weapon
     case weapon_projectile:
-        return false;
-        break;
-    // Check if player doesnt have a weapon usable by aimbot
+    // Check if player doesn't have a weapon usable by aimbot
     default:
         return false;
-    };
-
-    // Check if player is zooming
-    if (g_pLocalPlayer->bZoomed)
-    {
-        if (!(current_user_cmd->buttons & (IN_ATTACK | IN_ATTACK2)))
-        {
-            if (!CanHeadshot())
-                return false;
-        }
     }
+
+    // Check if player is zooming, not already attacking, and cannot headshot
+    if (g_pLocalPlayer->bZoomed && !(current_user_cmd->buttons & (IN_ATTACK | IN_ATTACK2)) && !CanHeadshot())
+        return false;
+
     return true;
 }
 
@@ -211,10 +200,10 @@ bool IsTargetStateGood(CachedEntity *entity, std::optional<backtrack::BacktrackD
         // Check if target is The local player
         if (entity == LOCAL_E)
             return false;
-        // Dont aim at dead player
+        // Don't aim at dead player
         if (!entity->m_bAlivePlayer())
             return false;
-        // Dont aim at teammates
+        // Don't aim at teammates
         if (!entity->m_bEnemy() && !teammates)
             return false;
 
@@ -222,8 +211,7 @@ bool IsTargetStateGood(CachedEntity *entity, std::optional<backtrack::BacktrackD
         if (!player_tools::shouldTarget(entity))
             return false;
 
-        // If settings allow waiting for charge, and current charge cant
-        // kill target, dont aim
+        // If settings allow waiting for charge, and current charge can't kill target, don't aim
         if (*wait_for_charge && g_pLocalPlayer->holding_sniper_rifle)
         {
             float bdmg = CE_FLOAT(g_pLocalPlayer->weapon(), netvar.flChargedDamage);
@@ -234,17 +222,15 @@ bool IsTargetStateGood(CachedEntity *entity, std::optional<backtrack::BacktrackD
             //                                      1.15)
             //                                      : entity->m_iHealth()))
             if (bdmg * 3 < entity->m_iHealth())
-            {
                 return false;
-            }
         }
-        // Dont target invulnerable players, ex: uber, bonk
+        // Don't target invulnerable players, ex: uber, bonk
         if (IsPlayerInvulnerable(entity))
             return false;
-        // If settings allow, dont target cloaked players
+        // If settings allow, don't target cloaked players
         if (ignore_cloak && IsPlayerInvisible(entity))
             return false;
-        // If settings allow, dont target vaccinated players
+        // If settings allow, don't target vaccinated players
         if (ignore_vaccinator && IsPlayerResistantToCurrentWeapon(entity))
             return false;
 
@@ -255,8 +241,7 @@ bool IsTargetStateGood(CachedEntity *entity, std::optional<backtrack::BacktrackD
                 return false;
         }
 
-        // If usersettings tell us to use accuracy improvements and the cached
-        // hitbox isnt null, then we check if it hits here
+        // If usersettings tell us to use accuracy improvements and the cached hitbox isn't null, then we check if it hits here
         if (*accuracy)
         {
             // Get a cached hitbox for the one traced
@@ -276,9 +261,7 @@ bool IsTargetStateGood(CachedEntity *entity, std::optional<backtrack::BacktrackD
                 minz += smod;
                 maxz -= smod;
 
-                // Trace and test if it hits the smaller hitbox, if it fails
-                // we
-                // return false
+                // Trace and test if it hits the smaller hitbox, if it fails we return false
                 Vector hit;
                 if (!CheckLineBox(minz, maxz, g_pLocalPlayer->v_Eye, forward, hit))
                     return false;
@@ -286,9 +269,8 @@ bool IsTargetStateGood(CachedEntity *entity, std::optional<backtrack::BacktrackD
         }
         // Target passed the tests so return true
         return true;
-
-        // Check for buildings
     }
+    // Check for buildings
     else if (entity->m_Type() == ENTITY_BUILDING)
     {
         // Check if building aimbot is enabled
@@ -304,7 +286,7 @@ bool IsTargetStateGood(CachedEntity *entity, std::optional<backtrack::BacktrackD
             // Check if target is a sentrygun
             if (entity->m_iClassID() == CL_CLASS(CObjectSentrygun))
             {
-                // If sentrys are not allowed, dont target
+                // If sentries are not allowed, don't target
                 if (!buildings_sentry)
                     return false;
             }
@@ -344,8 +326,6 @@ bool IsTargetStateGood(CachedEntity *entity, std::optional<backtrack::BacktrackD
         // If target is not player, building or sticky, return false
         return false;
     }
-    // An impossible error so just return false
-    return false;
 }
 
 // A function to return a potential entity in front of the player
@@ -433,10 +413,9 @@ bool HeadPreferable(CachedEntity *target)
                 cdmg = (cdmg * .80) - 1;
             }
             // If can headshot and if bodyshot kill from charge damage, or
-            // if crit boosted and they have 150 health, or if player isnt
+            // if crit boosted, and they have 150 health, or if player isn't
             // zoomed, or if the enemy has less than 40, due to darwins, and
-            // only if they have less than 150 health will it try to
-            // bodyshot
+            // only if they have less than 150 health will it try to bodyshot
             if (CanHeadshot() && (cdmg >= target->m_iHealth() || IsPlayerCritBoosted(g_pLocalPlayer->entity) || !g_pLocalPlayer->bZoomed || target->m_iHealth() <= bdmg) && target->m_iHealth() <= 150)
             {
                 // We dont need to hit the head as a bodyshot will kill
@@ -447,25 +426,22 @@ bool HeadPreferable(CachedEntity *target)
         // Return our var of if we need to headshot
         return headonly;
     }
-    break;
     case 1:
     { // AUTO-CLOSEST priority
-        // We dont need the head so just use anything
+        // We don't need the head so just use anything
         return false;
     }
-    break;
     case 2:
     { // Head only
         // User wants the head only
         return true;
     }
-    break;
     }
-    // We dont know what the user wants so just use anything
+    // We don't know what the user wants so just use anything
     return false;
 }
 
-// A function that determins whether aimkey allows aiming
+// A function that determines whether aimkey allows aiming
 bool UpdateAimkey()
 {
     static bool trigger_key_flip  = false;

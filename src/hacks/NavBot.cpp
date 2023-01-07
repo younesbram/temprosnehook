@@ -98,7 +98,7 @@ bool shouldSearchAmmo()
         return false;
     if (g_pLocalPlayer->holding_sniper_rifle && CE_INT(LOCAL_E, netvar.m_iAmmo + 4) <= 5)
         return true;
-    for (int i = 0; weapon_list[i]; i++)
+    for (int i = 0; weapon_list[i]; ++i)
     {
         int handle = weapon_list[i];
         int eid    = HandleToIDX(handle);
@@ -116,7 +116,7 @@ bool shouldSearchAmmo()
 std::vector<CachedEntity *> getDispensers()
 {
     std::vector<CachedEntity *> entities;
-    for (auto &ent : entity_cache::valid_ents)
+    for (const auto &ent : entity_cache::valid_ents)
     {
         if (ent->m_iClassID() != CL_CLASS(CObjectDispenser) || ent->m_iTeam() != g_pLocalPlayer->team)
             continue;
@@ -139,7 +139,7 @@ std::vector<CachedEntity *> getDispensers()
 std::vector<CachedEntity *> getEntities(bool find_health)
 {
     std::vector<CachedEntity *> entities;
-    for (auto &ent : entity_cache::valid_ents)
+    for (const auto &ent : entity_cache::valid_ents)
     {
         const model_t *model = RAW_ENT(ent)->GetModel();
         if (model)
@@ -263,7 +263,7 @@ std::pair<CachedEntity *, float> getNearestPlayerDistance()
 {
     float distance         = FLT_MAX;
     CachedEntity *best_ent = nullptr;
-    for (auto &ent : entity_cache::valid_ents)
+    for (const auto &ent: entity_cache::player_cache)
     {
         if (CE_VALID(ent) && ent->m_vecDormantOrigin() && g_pPlayerResource->isAlive(ent->m_IDX) && ent->m_bEnemy() && g_pLocalPlayer->v_Origin.DistTo(ent->m_vecOrigin()) < distance && player_tools::shouldTarget(ent))
         {
@@ -380,7 +380,7 @@ static CachedEntity *myDispenser = nullptr;*/
         myDispenser = nullptr;
         if (CE_GOOD(LOCAL_E))
         {
-            for (auto &ent : entity_cache::valid_ents)
+            for (const auto &ent : entity_cache::valid_ents)
             {
                 if (ent->m_bEnemy() || !ent->m_bAlivePlayer())
                     continue;
@@ -494,14 +494,13 @@ void updateEnemyBlacklist(int slot)
     std::unordered_map<CachedEntity *, std::vector<CNavArea *>> ent_marked_normal_slight_danger;
 
     std::vector<std::pair<CachedEntity *, Vector>> checked_origins;
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (const auto &ent: entity_cache::player_cache)
     {
-        CachedEntity *ent = ENTITY(i);
         // Entity is generally invalid, ignore
-        if (CE_INVALID(ent) || !g_pPlayerResource->isAlive(i))
+        if (CE_INVALID(ent) || !g_pPlayerResource->isAlive(ent->m_IDX))
             continue;
         // On our team, do not care
-        if (g_pPlayerResource->GetTeam(i) == g_pLocalPlayer->team)
+        if (g_pPlayerResource->GetTeam(ent->m_IDX) == g_pLocalPlayer->team)
             continue;
 
         bool is_dormant = CE_BAD(ent);
@@ -748,11 +747,13 @@ bool runReload()
     if (!local_area)
         return false;
 
-    // Get the closest enemy to vicheck
+    // Get the closest enemy to vischeck
     CachedEntity *closest_visible_enemy = nullptr;
     float best_distance                 = FLT_MAX;
-    for (auto &ent : entity_cache::valid_ents)
+    for (const auto &ent : entity_cache::player_cache)
     {
+        if (CE_BAD(ent))
+            continue;
         if (!ent->m_bAlivePlayer() || !ent->m_bEnemy())
             continue;
         if (ent->m_flDistance() > best_distance)
@@ -848,7 +849,7 @@ bool stayNear()
 
     int calls = 0;
     // Test all entities
-    for (int i = lowest_check_index; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = lowest_check_index; i <= g_IEngine->GetMaxClients(); ++i)
     {
         if (calls >= advance_count)
             break;
@@ -1046,7 +1047,7 @@ bool snipeSentries()
     if (!snipe_sentries_shortrange)
         return false;
 
-    for (auto &ent : entity_cache::valid_ents)
+    for (const auto &ent : entity_cache::valid_ents)
     {
         // Invalid sentry
         if (!isSnipeTargetValid(ent))

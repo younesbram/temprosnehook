@@ -316,9 +316,8 @@ void Prediction_PaintTraverse()
                 return;
         }
 
-        for (int i = 1; i < g_GlobalVars->maxClients; i++)
+        for (const auto &ent : entity_cache::player_cache)
         {
-            auto ent = ENTITY(i);
             if (CE_BAD(ent) || !ent->m_bAlivePlayer())
                 continue;
 
@@ -416,7 +415,7 @@ void Prediction_PaintTraverse()
 
 Vector EnginePrediction(CachedEntity *entity, float time, Vector *vecVelocity)
 {
-    Vector result          = entity->m_vecOrigin();
+    Vector result;
     IClientEntity *ent     = RAW_ENT(entity);
     Vector old_vecVelocity = NET_VECTOR(ent, 0x110);
     Vector old_absVelocity = NET_VECTOR(ent, 0x14c);
@@ -614,9 +613,9 @@ std::pair<Vector, Vector> ProjectilePrediction(CachedEntity *ent, int hb, float 
     float besttime = currenttime;
     float mindelta = 65536.0f;
     Vector bestpos = origin;
-    Vector current = origin;
-    int maxsteps   = (int) debug_pp_steps;
-    bool onground  = false;
+    Vector current;
+    int maxsteps  = (int) debug_pp_steps;
+    bool onground = false;
     if (ent->m_Type() == ENTITY_PLAYER)
         if (CE_INT(ent, netvar.iFlags) & FL_ONGROUND)
             onground = true;
@@ -727,10 +726,9 @@ static InitRoutine init(
                 // Don't run if we don't use it
                 if (!hacks::aimbot::engine_projpred && !debug_pp_draw)
                     return;
-                for (int i = 1; i < g_GlobalVars->maxClients; i++)
+                for (const auto &ent : entity_cache::player_cache)
                 {
-                    auto ent     = ENTITY(i);
-                    auto &buffer = previous_positions.at(i - 1);
+                    auto &buffer = previous_positions.at(ent->m_IDX - 1);
 
                     if (CE_BAD(LOCAL_E) || CE_BAD(ent) || !ent->m_bAlivePlayer())
                     {

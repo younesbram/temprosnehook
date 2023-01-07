@@ -4,6 +4,7 @@
  *  Created on: Mar 28, 2017
  *      Author: nullifiedcat
  */
+
 #include "common.hpp"
 #include <settings/Int.hpp>
 #include <hacks/Aimbot.hpp>
@@ -97,9 +98,9 @@ static std::vector<textures::sprite> tx_sentry{};
 
 void DrawEntity(int x, int y, CachedEntity *ent)
 {
-    int idx = -1;
+    int idx;
     rgba_t clr;
-    float healthp = 0.0f;
+    float healthp;
 
     if (CE_VALID(ent))
     {
@@ -219,7 +220,6 @@ void Draw()
         return;
     int x, y;
     std::vector<CachedEntity *> enemies{};
-    CachedEntity *ent;
 
     x              = (int) radar_x;
     y              = (int) radar_y;
@@ -244,7 +244,7 @@ void Draw()
     if (enemies_over_teammates)
         enemies.clear();
     std::vector<CachedEntity *> sentries;
-    for (auto &ent : entity_cache::valid_ents)
+    for (const auto &ent : entity_cache::valid_ents)
     {
         if (CE_INVALID(ent))
             continue;
@@ -260,12 +260,9 @@ void Draw()
             continue;
         if (ent->m_iClassID() == CL_CLASS(CObjectSentrygun))
             sentries.push_back(ent);
-        else if (!enemies_over_teammates || !show_teammates || ent->m_Type() != ENTITY_PLAYER)
-            DrawEntity(x, y, ent);
         else if (ent->m_bEnemy())
             enemies.push_back(ent);
-        else
-            DrawEntity(x, y, ent);
+        DrawEntity(x, y, ent);
     }
     if (enemies_over_teammates && show_teammates)
         for (auto enemy : enemies)
@@ -302,14 +299,13 @@ static InitRoutine init(
             for (int j = 0; j < 9; ++j)
                 tx_class[i].push_back(textures::atlas().create_sprite(j * 64, 320 + i * 64, 64, 64));
         }
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 2; ++i)
             tx_buildings.push_back(textures::atlas().create_sprite(576 + i * 64, 320, 64, 64));
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 4; ++i)
             tx_sentry.push_back(textures::atlas().create_sprite(640 + i * 64, 256, 64, 64));
         logging::Info("Radar sprites loaded");
         EC::Register(EC::Draw, Draw, "radar", EC::average);
     });
 } // namespace hacks::radar
-
 #endif
 #endif

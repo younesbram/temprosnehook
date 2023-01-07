@@ -3,13 +3,11 @@
   Copyright (c) 2018 nullworks. All rights reserved.
 */
 
-#include <hacks/Aimbot.hpp>
-#include <hacks/hacklist.hpp>
 #include "HookedMethods.hpp"
+#include <ESP.hpp>
 
 namespace hooked_methods
 {
-
 DEFINE_HOOKED_METHOD(LevelShutdown, void, void *this_)
 {
     need_name_change = true;
@@ -19,11 +17,10 @@ DEFINE_HOOKED_METHOD(LevelShutdown, void, void *this_)
     EC::run(EC::LevelShutdown);
     // Free memory for hitbox cache
     entity_cache::Shutdown();
+    hacks::esp::Shutdown();
 #if ENABLE_IPC
     if (ipc::peer)
-    {
         ipc::peer->memory->peer_user_data[ipc::peer->client_id].ts_disconnected = time(nullptr);
-    }
 #endif
     return original::LevelShutdown(this_);
 }

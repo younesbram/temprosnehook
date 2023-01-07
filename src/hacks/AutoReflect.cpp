@@ -148,11 +148,11 @@ void CreateMove()
     if (idle_only && (current_user_cmd->buttons & IN_ATTACK))
         return;
 
-    // Create some book-keeping vars
+    // Create some bookkeeping vars
     float closest_dist = 0.0f;
     Vector closest_vec;
     // Loop to find the closest entity
-    for (auto &ent : entity_cache::valid_ents)
+    for (const auto &ent : entity_cache::valid_ents)
     {
         // Check if ent should be reflected
         if (!ShouldReflect(ent))

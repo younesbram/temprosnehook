@@ -35,13 +35,11 @@ CatCommand debug_hitrate("debug_hitrate", "Debug hitrate",
                              int p1 = 0;
                              int p2 = 0;
                              if (count_shots)
-                             {
                                  p1 = float(count_hits) / float(count_shots) * 100.0f;
-                             }
+
                              if (count_hits)
-                             {
                                  p2 = float(count_hits_head) / float(count_hits) * 100.0f;
-                             }
+
                              logging::Info("%d / %d (%d%%)", count_hits, count_shots, p1);
                              logging::Info("%d / %d (%d%%)", count_hits_head, count_hits_sniper, p2);
                          });
@@ -49,19 +47,17 @@ CatCommand debug_hitrate("debug_hitrate", "Debug hitrate",
 CatCommand debug_ammo("debug_ammo", "Debug ammo",
                       []()
                       {
-                          for (int i = 0; i < 4; i++)
-                          {
+                          for (int i = 0; i < 4; ++i)
                               logging::Info("%d %d", i, CE_INT(LOCAL_E, netvar.m_iAmmo + i * 4));
-                          }
                       });
 
 // If this is true, Update() will consider increasing the brutenum soon if the shot was a miss
 bool resolve_soon[PLAYER_ARRAY_SIZE];
 std::array<Timer, PLAYER_ARRAY_SIZE> resolve_timer{};
 
-static int aimbot_target_idx   = -1;
-static bool aimbot_target_body = false;
-static Timer aimbot_shot{};
+int aimbot_target_idx   = 0;
+bool aimbot_target_body = false;
+Timer aimbot_shot{};
 
 void OnShot()
 {
@@ -107,7 +103,7 @@ void Update()
     {
 
         int ammo = CE_INT(LOCAL_E, netvar.m_iAmmo + 4);
-        if (ammo < lastammo && !aimbot_shot.check(500) && aimbot_target_idx != -1)
+        if (ammo < lastammo && !aimbot_shot.check(500) && !aimbot_target_idx)
             OnShot();
         lastammo = ammo;
         // Resolver
@@ -134,7 +130,7 @@ void Update()
 class HurtListener : public IGameEventListener
 {
 public:
-    virtual void FireGameEvent(KeyValues *event)
+    void FireGameEvent(KeyValues *event) override
     {
         if (strcmp("player_hurt", event->GetName()) != 0)
             return;

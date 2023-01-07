@@ -123,12 +123,12 @@ void draw()
     // Loop all players
     if (*buildings)
     {
-        for (auto &ent : entity_cache::valid_ents)
+        for (const auto &ent : entity_cache::valid_ents)
         {
             // Get and check player
             const uint16_t curr_idx = ent->m_IDX;
             Vector origin;
-            std::optional<rgba_t> color = std::nullopt;
+            std::optional<rgba_t> color;
             if (CE_INVALID(ent))
             {
                 if (curr_idx > g_IEngine->GetMaxClients() || !g_pPlayerResource->isAlive(curr_idx))
@@ -166,7 +166,7 @@ void draw()
             Vector out;
             if (!draw::WorldToScreen(origin, out))
             {
-                // We need to flip on both x and y axis in case m_vecOrigin its not actually on screen
+                // We need to flip on both x and y-axis in case m_vecOrigin it's not actually on screen
                 out.x = draw::width - out.x;
                 out.y = draw::height - out.y;
 
@@ -179,20 +179,18 @@ void draw()
     }
     else
     {
-        for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+        for (const auto &ent : entity_cache::player_cache)
         {
-            // Get and check player
-            auto ent = ENTITY(i);
             Vector origin;
             std::optional<rgba_t> color = std::nullopt;
 
             if (CE_INVALID(ent))
             {
-                if (i > g_IEngine->GetMaxClients() || !g_pPlayerResource->isAlive(i))
+                if (ent->m_IDX > g_IEngine->GetMaxClients() || !g_pPlayerResource->isAlive(ent->m_IDX))
                     continue;
-                if (g_pPlayerResource->GetTeam(i) == g_pLocalPlayer->team && !teammates)
+                if (g_pPlayerResource->GetTeam(ent->m_IDX) == g_pLocalPlayer->team && !teammates)
                     continue;
-                auto vec = soundcache::GetSoundLocation(i);
+                auto vec = soundcache::GetSoundLocation(ent->m_IDX);
                 if (!vec)
                     continue;
                 if (*max_dist && vec->DistTo(g_pLocalPlayer->v_Origin) > *max_dist)
@@ -204,7 +202,7 @@ void draw()
             {
                 if ((!RAW_ENT(ent)->IsDormant() && !ent->m_bAlivePlayer()) || !ent->m_vecDormantOrigin())
                     continue;
-                if (i <= g_IEngine->GetMaxClients() && !g_pPlayerResource->isAlive(i))
+                if (ent->m_IDX <= g_IEngine->GetMaxClients() && !g_pPlayerResource->isAlive(ent->m_IDX))
                     continue;
                 origin = *ent->m_vecDormantOrigin();
                 if (*buildings)
@@ -236,9 +234,5 @@ void draw()
     }
 }
 
-static InitRoutine init(
-    []()
-    {
-        EC::Register(EC::Draw, draw, "DRAW_tracers");
-    });
+static InitRoutine init([]() { EC::Register(EC::Draw, draw, "DRAW_tracers"); });
 } // namespace hacks::tracers

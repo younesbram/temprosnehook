@@ -89,7 +89,7 @@ void LocalPlayer::Update()
 
     entity_idx = g_IEngine->GetLocalPlayer();
     entity     = ENTITY(entity_idx);
-    if (CE_BAD(entity))
+    if (!entity || CE_BAD(entity))
     {
         team = 0;
         return;
@@ -178,12 +178,10 @@ void LocalPlayer::Update()
     if (!life_state)
     {
         spectator_state = NONE;
-        for (int i = 0; i < PLAYER_ARRAY_SIZE; i++)
+        for (const auto &ent: entity_cache::player_cache)
         {
-            // Assign the for loops tick number to an ent
-            CachedEntity *ent = ENTITY(i);
             player_info_s info{};
-            if (!CE_BAD(ent) && ent != LOCAL_E && ent->m_Type() == ENTITY_PLAYER && HandleToIDX(CE_INT(ent, netvar.hObserverTarget)) == LOCAL_E->m_IDX && GetPlayerInfo(i, &info))
+            if (!CE_BAD(ent) && ent != LOCAL_E && ent->m_Type() == ENTITY_PLAYER && HandleToIDX(CE_INT(ent, netvar.hObserverTarget)) == LOCAL_E->m_IDX && GetPlayerInfo(ent->m_IDX, &info))
             {
                 switch (CE_INT(ent, netvar.iObserverMode))
                 {

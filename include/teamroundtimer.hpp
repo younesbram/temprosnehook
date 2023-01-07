@@ -8,8 +8,8 @@ enum round_states
 class CTeamRoundTimer
 {
 public:
-    int GetSetupTimeLength();
-    round_states GetRoundState();
+    int GetSetupTimeLength() const;
+    round_states GetRoundState() const;
     void Update();
 
     int entity;

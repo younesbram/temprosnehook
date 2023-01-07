@@ -445,7 +445,7 @@ void EffectGlow::Render(int x, int y, int w, int h)
     CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
     orig = ptr->GetRenderTarget();
     BeginRenderGlow();
-    for (auto &ent_non_raw : entity_cache::valid_ents)
+    for (const auto &ent_non_raw : entity_cache::valid_ents)
     {
         auto ent = RAW_ENT(ent_non_raw);
         if (ent && ShouldRenderGlow(ent))

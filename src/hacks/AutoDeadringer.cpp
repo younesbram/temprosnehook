@@ -4,6 +4,7 @@
  *  Created on: Apr 12, 2018
  *      Author: bencat07
  */
+
 #include <settings/Bool.hpp>
 #include "common.hpp"
 
@@ -22,7 +23,7 @@ int NearbyEntities()
     int ret = 0;
     if (CE_BAD(LOCAL_E) || CE_BAD(LOCAL_W))
         return ret;
-    for (auto &ent : entity_cache::valid_ents)
+    for (const auto &ent : entity_cache::valid_ents)
     {
         if (ent == LOCAL_E)
             continue;
@@ -52,7 +53,7 @@ static void CreateMove()
     else
         shouldm2 = false;
 
-    for (auto &ent : entity_cache::valid_ents)
+    for (const auto &ent : entity_cache::valid_ents)
     {
         if (!IsProjectile(ent) && !ent->m_bGrenadeProjectile())
             continue;

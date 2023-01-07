@@ -126,7 +126,7 @@ struct walkbot_node_s
 
     connection free_connection() const
     {
-        for (connection i = 0; i < MAX_CONNECTIONS; i++)
+        for (connection i = 0; i < MAX_CONNECTIONS; ++i)
             if (connections[i].free())
                 return i;
 
@@ -217,7 +217,7 @@ std::chrono::system_clock::time_point time{};
 // no free slots exist
 index_t free_node()
 {
-    for (index_t i = 0; i < nodes.size(); i++)
+    for (index_t i = 0; i < nodes.size(); ++i)
         if (!(nodes[i].flags & NF_GOOD))
             return i;
 
@@ -232,7 +232,7 @@ using state::nodes;
 bool HasLowAmmo()
 {
     int *weapon_list = (int *) ((unsigned) (RAW_ENT(LOCAL_E)) + netvar.hMyWeapons);
-    for (int i = 0; weapon_list[i]; i++)
+    for (int i = 0; weapon_list[i]; ++i)
     {
         int handle = weapon_list[i];
         int eid    = HandleToIDX(handle);
@@ -677,7 +677,7 @@ CatCommand c_info("wb_dump", "Show info",
                       logging::Info("[wb] Flags: Duck=%d, Jump=%d, Raw=%u", n.flags & NF_DUCK, n.flags & NF_JUMP, n.flags);
                       logging::Info("[wb] X: %.2f | Y: %.2f | Z: %.2f", n.x, n.y, n.z);
                       logging::Info("[wb] Connections:");
-                      for (size_t i = 0; i < MAX_CONNECTIONS; i++)
+                      for (size_t i = 0; i < MAX_CONNECTIONS; ++i)
                       {
                           if (n.connections[i].free())
                               continue;
@@ -708,7 +708,7 @@ CatCommand c_delete_region("wb_delete_region", "Delete region of nodes",
                                        return;
                                    }
                                    bool found_next = false;
-                                   for (size_t i = 0; i < 2; i++)
+                                   for (size_t i = 0; i < 2; ++i)
                                    {
                                        if (n.connections[i] != current)
                                        {
@@ -737,7 +737,7 @@ void UpdateClosestNode()
     float n_fov   = 360.0f;
     index_t n_idx = BAD_NODE;
 
-    for (index_t i = 0; i < state::nodes.size(); i++)
+    for (index_t i = 0; i < state::nodes.size(); ++i)
     {
         auto &node = state::nodes[i];
 
@@ -767,7 +767,7 @@ index_t FindNearestNode(bool traceray)
     index_t r_node{ BAD_NODE };
     float r_dist{ 65536.0f };
 
-    for (index_t i = 0; i < state::nodes.size(); i++)
+    for (index_t i = 0; i < state::nodes.size(); ++i)
     {
         if (state::node_good(i))
         {
@@ -1074,7 +1074,7 @@ void DrawNode(index_t node, bool draw_back)
 
 void DrawPath()
 {
-    for (index_t i = 0; i < state::nodes.size(); i++)
+    for (index_t i = 0; i < state::nodes.size(); ++i)
         DrawNode(i, true);
 }
 

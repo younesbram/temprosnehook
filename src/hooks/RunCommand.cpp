@@ -3,9 +3,6 @@
 
 namespace hooked_methods
 {
-int last_tick   = 0;
-int last_weapon = 0;
-
 // Credits to blackfire for telling me to do this :)
 DEFINE_HOOKED_METHOD(RunCommand, void, IPrediction *prediction, IClientEntity *entity, CUserCmd *usercmd, IMoveHelper *move)
 {
@@ -18,7 +15,7 @@ DEFINE_HOOKED_METHOD(RunCommand, void, IPrediction *prediction, IClientEntity *e
         return original::RunCommand(prediction, entity, usercmd, move);
 }
 
-static std::map<int, int> previous_ammo;
+static boost::unordered_flat_map<int, int> previous_ammo;
 
 // Also fix heavy M2 causing bucket to fill faster, same for pyro
 DEFINE_HOOKED_METHOD(CalcIsAttackCriticalHelper_brokenweps, bool, IClientEntity *ent)

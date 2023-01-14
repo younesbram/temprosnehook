@@ -71,7 +71,6 @@ static settings::Boolean entity_id{ "esp.debug.id", "true" };
 
 // Forward declarations
 void ResetEntityStrings(bool full_clear);
-void AddEntityString(CachedEntity *entity, const std::string &string, const rgba_t &color = colors::empty);
 // Entity Processing
 void __attribute__((fastcall)) ProcessEntity(CachedEntity *ent);
 void __attribute__((fastcall)) ProcessEntityPT(CachedEntity *ent);
@@ -117,12 +116,25 @@ public:
     bool transparent{ false };
 };
 
-std::unordered_map<CachedEntity *, ESPData> data;
+boost::unordered_flat_map<CachedEntity *, ESPData> data;
 // Don't fully understand struct but a guess is a group of something.
 // I will return once I have enough knowlage to reverse this.
 // NOTE: No idea on why we cant just use gethitbox and use the displacement on
-// that insted of having all this extra code. Shouldnt gethitbox use cached
+// that insted of having all this extra code. Shouldn't gethitbox use cached
 // hitboxes, if so it should be nicer on performance
+
+// Use to add an esp string to an entity
+inline void AddEntityString(CachedEntity *entity, const std::string &string, const rgba_t &color = colors::empty)
+{
+    ESPData &entity_data = data[entity];
+    if (entity_data.string_count >= 15)
+        return;
+    entity_data.strings[entity_data.string_count].data  = string;
+    entity_data.strings[entity_data.string_count].color = color;
+    entity_data.string_count++;
+    entity_data.needs_paint = true;
+}
+
 class bonelist_s
 {
 private:
@@ -300,8 +312,9 @@ static void cm()
                 // Get an entity from the loop tick and process it
                 ProcessEntity(ent);
                 hitboxUpdate(ent);
+                if (!data.contains(ent))
+                    data.emplace(ent, ESPData{});
 
-                data.emplace(ent, ESPData{});
                 if (data[ent].needs_paint)
                 {
                     // Checking this every tick is a waste of nanoseconds
@@ -331,7 +344,8 @@ static void cm()
                     hitboxUpdate(ent_index);
                 }
 
-                data.emplace(ent_index, ESPData{});
+                if (!data.contains(ent_index))
+                    data.emplace(ent_index, ESPData{});
                 if (data[ent_index].needs_paint)
                 {
                     // Checking this every tick is a waste of nanoseconds
@@ -1496,18 +1510,6 @@ bool GetCollide(CachedEntity *ent)
     return false;
 }
 
-// Use to add an esp string to an entity
-void AddEntityString(CachedEntity *entity, const std::string &string, const rgba_t &color)
-{
-    ESPData &entity_data = data[entity];
-    if (entity_data.string_count >= 15)
-        return;
-    entity_data.strings[entity_data.string_count].data  = string;
-    entity_data.strings[entity_data.string_count].color = color;
-    entity_data.string_count++;
-    entity_data.needs_paint = true;
-}
-
 // Function to reset entity's strings
 void ResetEntityStrings(bool full_clear)
 {
@@ -1529,7 +1531,7 @@ void ResetEntityStrings(bool full_clear)
 }
 
 // Sets an entity's esp color
-void SetEntityColor(CachedEntity *entity, const rgba_t &color)
+inline void SetEntityColor(CachedEntity *entity, const rgba_t &color)
 {
     if (entity->m_IDX > 2047 || entity->m_IDX < 0)
         return;

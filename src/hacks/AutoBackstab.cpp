@@ -41,7 +41,7 @@ void ApplySwingHook()
     melee_range_hook.RestorePatch();
 }
 
-void RemoveSwingHook()
+inline void RemoveSwingHook()
 {
     melee_range_hook.Shutdown();
 }
@@ -142,16 +142,12 @@ bool canFaceStab(CachedEntity *ent)
     int w_index = CE_INT(LOCAL_W, netvar.iItemDefinitionIndex);
 
     if (w_index == 40000)
-    {
         return false;
-    }
 
     if (HasCondition<TFCond_MiniCritOnKill>(g_pLocalPlayer->entity) || HasCondition<TFCond_Jarated>(ent))
-    {
-        return ent->m_iHealth() <= 54.0f;
-    }
+        return ent->m_iHealth() <= 54;
 
-    return ent->m_iHealth() <= 40.0f;
+    return ent->m_iHealth() <= 40;
 }
 
 bool angleCheck(CachedEntity *from, CachedEntity *to, std::optional<Vector> target_pos, Vector from_angle)

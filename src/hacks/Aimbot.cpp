@@ -98,7 +98,122 @@ settings::Boolean engine_projpred{ "aimbot.debug.engine-pp", "true" };
 int slow_aim;
 float fov;
 bool enable;
-bool projectile_self_damage = false;
+
+int PreviousX, PreviousY;
+int CurrentX, CurrentY;
+
+float last_mouse_check = 0;
+float stop_moving_time = 0;
+
+// Used to make rapidfire not knock your enemies out of range
+unsigned last_target_ignore_timer = 0;
+
+// Projectile info
+bool projectile_mode{ false };
+float cur_proj_speed{ 0.0f };
+float cur_proj_grav{ 0.0f };
+float cur_proj_start_vel{ 0.0f };
+
+bool shouldbacktrack_cache = false;
+
+inline bool isHitboxMedium(int hitbox)
+{
+    switch (hitbox)
+    {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+        return true;
+    default:
+        return false;
+    }
+}
+
+inline bool playerTeamCheck(CachedEntity *entity)
+{
+    return (int) teammates == 2 || (!teammates && entity->m_bEnemy()) || (teammates && !entity->m_bEnemy()) || (CE_GOOD(LOCAL_W) && LOCAL_W->m_iClassID() == CL_CLASS(CTFCrossbow) && entity->m_iHealth() < entity->m_iMaxHealth());
+}
+
+// Am I holding the Hitman's Heatmaker ?
+inline bool CarryingHeatmaker()
+{
+    return CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 752;
+}
+
+// A function to find the best hitbox for a target
+inline int BestHitbox(CachedEntity *target)
+{
+    // Switch based upon the hitbox mode set by the user
+    switch (*hitbox_mode)
+    {
+    case 0:
+    {
+        // AUTO priority
+        return autoHitbox(target);
+        break;
+    }
+    case 1:
+    { // AUTO priority, return closest hitbox to crosshair
+        return ClosestHitbox(target);
+        break;
+    }
+    case 2:
+    { // STATIC priority, return a user chosen hitbox
+        return *hitbox;
+        break;
+    }
+    default:
+        break;
+    }
+    // Hitbox machine :b:roke
+    return -1;
+}
+
+inline float projectileHitboxSize(int projectile_size)
+{
+    float projectile_hitbox_size = 6.3f;
+    switch (projectile_size)
+    {
+    case CL_CLASS(CTFRocketLauncher):
+    case CL_CLASS(CTFRocketLauncher_Mortar):
+    case CL_CLASS(CTFRocketLauncher_AirStrike):
+    case CL_CLASS(CTFRocketLauncher_DirectHit):
+    case CL_CLASS(CTFPipebombLauncher):
+    case CL_CLASS(CTFGrenadeLauncher):
+    case CL_CLASS(CTFCannon):
+        break;
+    case CL_CLASS(CTFFlareGun):
+    case CL_CLASS(CTFFlareGun_Revenge):
+    case CL_CLASS(CTFDRGPomson):
+        projectile_hitbox_size = 3;
+        break;
+    case CL_CLASS(CTFSyringeGun):
+    case CL_CLASS(CTFCompoundBow):
+        projectile_hitbox_size = 1;
+        break;
+    default:
+        break;
+    }
+    return projectile_hitbox_size;
+}
+
+inline void updateShouldBacktrack()
+{
+    if (hacks::backtrack::hasData() || projectile_mode || !(*backtrackAimbot || force_backtrack_aimbot))
+        shouldbacktrack_cache = false;
+    else
+        shouldbacktrack_cache = true;
+}
+
+inline bool shouldBacktrack(CachedEntity *ent)
+{
+    if (!shouldbacktrack_cache || (ent && ent->m_Type() != ENTITY_PLAYER) || !backtrack::getGoodTicks(ent))
+        return false;
+    return true;
+}
+
 void spectatorUpdate()
 {
     switch (*specmode)
@@ -129,11 +244,6 @@ void spectatorUpdate()
         break;
     }
     }
-}
-
-bool playerTeamCheck(CachedEntity *entity)
-{
-    return (int) teammates == 2 || (!teammates && entity->m_bEnemy()) || (teammates && !entity->m_bEnemy()) || (CE_GOOD(LOCAL_W) && LOCAL_W->m_iClassID() == CL_CLASS(CTFCrossbow) && entity->m_iHealth() < entity->m_iMaxHealth());
 }
 
 #define GET_MIDDLE(c1, c2) ((corners[c1] + corners[c2]) / 2.0f)
@@ -270,21 +380,6 @@ std::vector<Vector> getHitpointsVischeck(CachedEntity *ent, int hitbox)
     return hitpoints;
 }
 
-bool isHitboxMedium(int hitbox)
-{
-    switch (hitbox)
-    {
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-        return true;
-    default:
-        return false;
-    }
-}
-
 // Get the best point to aim at for a given hitbox
 std::optional<Vector> getBestHitpoint(CachedEntity *ent, int hitbox)
 {
@@ -302,42 +397,6 @@ std::optional<Vector> getBestHitpoint(CachedEntity *ent, int hitbox)
         }
     }
     return best_pos;
-}
-
-int PreviousX, PreviousY;
-int CurrentX, CurrentY;
-
-float last_mouse_check = 0;
-float stop_moving_time = 0;
-
-// Used to make rapidfire not knock your enemies out of range
-unsigned last_target_ignore_timer = 0;
-
-// Projectile info
-bool projectile_mode{ false };
-float cur_proj_speed{ 0.0f };
-float cur_proj_grav{ 0.0f };
-float cur_proj_start_vel{ 0.0f };
-
-bool shouldbacktrack_cache = false;
-
-void updateShouldBacktrack()
-{
-    if (hacks::backtrack::hasData() || projectile_mode || !(*backtrackAimbot || force_backtrack_aimbot))
-        shouldbacktrack_cache = false;
-    else
-        shouldbacktrack_cache = true;
-}
-
-bool shouldBacktrack(CachedEntity *ent)
-{
-    if (!shouldbacktrack_cache)
-        return false;
-    else if (ent && ent->m_Type() != ENTITY_PLAYER)
-        return false;
-    else if (!backtrack::getGoodTicks(ent))
-        return false;
-    return true;
 }
 
 // Reduce Backtrack lag by checking if the ticks hitboxes are within a reasonable FOV range
@@ -359,12 +418,6 @@ bool validateTickFOV(backtrack::BacktrackData &tick)
         return valid_fov;
     }
     return true;
-}
-
-// Am I holding the Hitman's Heatmaker ?
-bool CarryingHeatmaker()
-{
-    return CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 752;
 }
 
 // Am I holding the Machina ?
@@ -1100,34 +1153,6 @@ bool IsTargetStateGood(CachedEntity *entity)
     return false;
 }
 
-float projectileHitboxSize(int projectile_size)
-{
-    float projectile_hitbox_size = 6.3f;
-    switch (projectile_size)
-    {
-    case CL_CLASS(CTFRocketLauncher):
-    case CL_CLASS(CTFRocketLauncher_Mortar):
-    case CL_CLASS(CTFRocketLauncher_AirStrike):
-    case CL_CLASS(CTFRocketLauncher_DirectHit):
-    case CL_CLASS(CTFPipebombLauncher):
-    case CL_CLASS(CTFGrenadeLauncher):
-    case CL_CLASS(CTFCannon):
-        break;
-    case CL_CLASS(CTFFlareGun):
-    case CL_CLASS(CTFFlareGun_Revenge):
-    case CL_CLASS(CTFDRGPomson):
-        projectile_hitbox_size = 3;
-        break;
-    case CL_CLASS(CTFSyringeGun):
-    case CL_CLASS(CTFCompoundBow):
-        projectile_hitbox_size = 1;
-        break;
-    default:
-        break;
-    }
-    return projectile_hitbox_size;
-}
-
 // A function to aim at a specific entity
 bool Aim(CachedEntity *entity)
 {
@@ -1435,33 +1460,6 @@ int autoHitbox(CachedEntity *target)
             preferred = notVisibleHitbox(target, hitbox_t::foot_L); // Only time it is worth the penalty
     }
     return preferred;
-}
-
-// A function to find the best hitbox for a target
-int BestHitbox(CachedEntity *target)
-{
-    // Switch based upon the hitbox mode set by the user
-    switch (*hitbox_mode)
-    {
-    case 0:
-        // AUTO priority
-        return autoHitbox(target);
-        break;
-    case 1:
-    { // AUTO priority, return closest hitbox to crosshair
-        return ClosestHitbox(target);
-    }
-    break;
-    case 2:
-    { // STATIC priority, return a user chosen hitbox
-        return *hitbox;
-    }
-    break;
-    default:
-        break;
-    }
-    // Hitbox machine :b:roke
-    return -1;
 }
 
 // Function to find the closest hitbox to the crosshair for a given ent

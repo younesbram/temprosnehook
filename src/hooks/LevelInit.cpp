@@ -49,6 +49,7 @@ DEFINE_HOOKED_METHOD(LevelInit, void, void *this_, const char *name)
 #endif
     hacks::anti_anti_aim::resolver_map.clear();
     g_IEngine->ClientCmd_Unrestricted("exec cat_matchexec");
+    entity_cache::array.reserve(500);
     chat_stack::Reset();
     original::LevelInit(this_, name);
     EC::run(EC::LevelInit);

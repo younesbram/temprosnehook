@@ -1,8 +1,7 @@
 #pragma once
 
 #include <unordered_map>
-//#include <cstring>
-#include <string.h>
+#include <cstring>
 #include <memory>
 #include "core/logging.hpp"
 
@@ -38,7 +37,7 @@ public:
 class netvar_tree
 {
     struct node;
-    using map_type = std::unordered_map<const char *, std::shared_ptr<node>, hash_char, equal_char>;
+    using map_type = boost::unordered_flat_map<const char *, std::shared_ptr<node>, hash_char, equal_char>;
 
     struct node
     {
@@ -70,7 +69,7 @@ private:
      * Get the offset of the last netvar from map and return the sum of it and
      * accum
      */
-    int get_offset_recursive(map_type &map, int acc, const char *name)
+    static int get_offset_recursive(map_type &map, int acc, const char *name)
     {
         if (!map.count(name))
         {
@@ -101,7 +100,7 @@ private:
         return get_offset_recursive(node->nodes, acc + node->offset, args...);
     }
 
-    RecvProp *get_prop_recursive(map_type &map, const char *name)
+    static RecvProp *get_prop_recursive(map_type &map, const char *name)
     {
         return map[name]->prop;
     }
@@ -124,7 +123,7 @@ public:
     template <typename... args_t> int get_offset(const char *name, args_t... args)
     {
         const auto &node = nodes[name];
-        if (node == 0)
+        if (node == nullptr)
         {
             logging::Info("Invalid NetVar node: %s", name);
             return 0;

@@ -3,7 +3,6 @@
 */
 
 #include "common.hpp"
-#include <unordered_map>
 #include <playerlist.hpp>
 #include "PlayerTools.hpp"
 #include "entitycache.hpp"
@@ -18,17 +17,14 @@ static settings::Boolean betrayal_sync{ "player-tools.betrayal-ipc-sync", "true"
 static settings::Boolean taunting{ "player-tools.ignore.taunting", "true" };
 static settings::Boolean ignoreCathook{ "player-tools.ignore.cathook", "true" };
 
-static std::unordered_map<unsigned, unsigned> betrayal_list{};
+static boost::unordered_flat_map<unsigned, unsigned> betrayal_list{};
 
 static CatCommand forgive_all("pt_forgive_all", "Clear betrayal list", []() { betrayal_list.clear(); });
 
 bool shouldTargetSteamId(unsigned id)
 {
-    if (betrayal_limit)
-    {
-        if (betrayal_list[id] > (unsigned) *betrayal_limit)
-            return true;
-    }
+    if (betrayal_limit && betrayal_list[id] > (unsigned) *betrayal_limit)
+        return true;
 
     auto &pl = playerlist::AccessData(id);
     if (playerlist::IsFriendly(pl.state) || (pl.state == playerlist::k_EState::CAT && *ignoreCathook))
@@ -69,9 +65,7 @@ bool shouldAlwaysRenderEspSteamId(unsigned id)
 bool shouldAlwaysRenderEsp(CachedEntity *entity)
 {
     if (entity->m_Type() == ENTITY_PLAYER)
-    {
         return shouldAlwaysRenderEspSteamId(entity->player_info.friendsID);
-    }
 
     return false;
 }

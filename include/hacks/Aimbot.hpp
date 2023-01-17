@@ -17,21 +17,9 @@ namespace hacks::aimbot
 extern settings::Boolean aim_sentrybuster;
 extern settings::Boolean ignore_cloak;
 extern unsigned last_target_ignore_timer;
-// Used to store aimbot data to prevent calculating it again
-struct AimbotCalculatedData_s
-{
-    unsigned long predict_tick{ 0 };
-    bool predict_type{ false };
-    Vector aim_position{ 0 };
-    unsigned long vcheck_tick{ 0 };
-    bool visible{ false };
-    float fov{ 0 };
-    int hitbox{ 0 };
-};
 
 // Functions used to calculate aimbot data, and if already calculated use it
 Vector PredictEntity(CachedEntity *entity);
-bool BacktrackVisCheck(CachedEntity *entity);
 
 // Functions called by other functions for when certain game calls are run
 void Reset();
@@ -55,5 +43,4 @@ bool isHitboxMedium(int hitbox);
 int ClosestHitbox(CachedEntity *target);
 void DoSlowAim(Vector &inputAngle);
 bool UpdateAimkey();
-float EffectiveTargetingRange();
 } // namespace hacks::aimbot

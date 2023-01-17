@@ -14,7 +14,7 @@
 
 namespace playerlist
 {
-std::unordered_map<unsigned, userdata> data{};
+boost::unordered_flat_map<unsigned, userdata> data{};
 
 const std::string k_Names[]                                     = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "PAZER", "ABUSE", "PARTY" };
 const char *const k_pszNames[]                                  = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "PAZER", "ABUSE", "PARTY" };
@@ -289,7 +289,7 @@ static void pl_cleanup()
     size_t counter = 0;
     for (auto it = data.begin(); it != data.end(); ++it)
     {
-        if (std::memcmp(&it->second, &empty, sizeof(empty)) != 0)
+        if (std::memcmp(&it->second, &empty, sizeof(empty)))
             continue;
 
         ++counter;

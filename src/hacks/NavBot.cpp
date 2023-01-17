@@ -486,12 +486,12 @@ void updateEnemyBlacklist(int slot)
         return;
 
     // Store the danger of the individual nav areas
-    std::unordered_map<CNavArea *, int> dormant_slight_danger;
-    std::unordered_map<CNavArea *, int> normal_slight_danger;
+    boost::unordered_flat_map<CNavArea *, int> dormant_slight_danger;
+    boost::unordered_flat_map<CNavArea *, int> normal_slight_danger;
 
     // This is used to cache Dangerous areas between ents
-    std::unordered_map<CachedEntity *, std::vector<CNavArea *>> ent_marked_dormant_slight_danger;
-    std::unordered_map<CachedEntity *, std::vector<CNavArea *>> ent_marked_normal_slight_danger;
+    boost::unordered_flat_map<CachedEntity *, std::vector<CNavArea *>> ent_marked_dormant_slight_danger;
+    boost::unordered_flat_map<CachedEntity *, std::vector<CNavArea *>> ent_marked_normal_slight_danger;
 
     std::vector<std::pair<CachedEntity *, Vector>> checked_origins;
     for (const auto &ent: entity_cache::player_cache)
@@ -505,11 +505,10 @@ void updateEnemyBlacklist(int slot)
 
         bool is_dormant = CE_BAD(ent);
         // Should not run on dormant and entity is dormant, ignore.
-        if (!should_run_dormant && is_dormant)
-            continue;
         // Should not run on normal entity and entity is not dormant, ignore
-        else if (!should_run_normal && !is_dormant)
+        if (!should_run_dormant || !is_dormant)
             continue;
+
 
         // Avoid excessive calls by ignoring new checks if people are too close to each other
         auto origin = ent->m_vecDormantOrigin();

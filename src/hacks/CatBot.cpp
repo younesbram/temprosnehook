@@ -65,8 +65,6 @@ struct catbot_user_state
     int treacherous_kills{ 0 };
 };
 
-static std::unordered_map<unsigned, catbot_user_state> human_detecting_map{};
-
 int globerr(const char *path, int eerrno)
 {
     logging::Info("%s: %s\n", path, strerror(eerrno));
@@ -770,10 +768,10 @@ void update()
     {
         unstucks++;
         // Send menuclosed to tell the server that we want to respawn
-        hack::command_stack().push("menuclosed");
-        // If that didnt work, force pick a team and class
+        hack::command_stack().emplace("menuclosed");
+        // If that didn't work, force pick a team and class
         if (unstucks > 3)
-            hack::command_stack().push("autoteam; join_class sniper");
+            hack::command_stack().emplace("autoteam; join_class sniper");
     }
 
     if (micspam)

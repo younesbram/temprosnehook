@@ -78,11 +78,11 @@ constexpr size_owned RareSpell1 = 0x28177e05;
 constexpr size_owned RareSpell2 = 0x2a1a7798;
 
 //=== Environmental Hazards ===
-constexpr size_owned PumpkinBomb    = 0xa093e718;
-constexpr size_owned BalloonBomb    = 0xda3eb058;
-constexpr size_owned WoodenBarrel   = 0x23c01644;
-constexpr size_owned WalkerExplode  = 0xd530882f;
-constexpr size_owned SnowmanBomb    = 0xddf06d35;
+constexpr size_owned PumpkinBomb   = 0xa093e718;
+constexpr size_owned BalloonBomb   = 0xda3eb058;
+constexpr size_owned WoodenBarrel  = 0x23c01644;
+constexpr size_owned WalkerExplode = 0xd530882f;
+constexpr size_owned SnowmanBomb   = 0xddf06d35;
 
 //=== Flags ===
 constexpr size_owned AtomBomb        = 0x4df65bd9;

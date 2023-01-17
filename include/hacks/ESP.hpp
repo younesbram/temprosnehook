@@ -13,8 +13,6 @@
 
 namespace hacks::esp
 {
-// Init
-void Init();
 void Shutdown();
 // Strings
 void SetEntityColor(CachedEntity *entity, const rgba_t &color);

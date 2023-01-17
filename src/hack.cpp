@@ -355,14 +355,14 @@ free(logname);*/
     }
     logging::Info("Initializer stack done");
 #if ENABLE_TEXTMODE
-    hack::command_stack().push("exec cat_autoexec_textmode");
-    hack::command_stack().push("exec betrayals");
+    hack::command_stack().emplace("exec cat_autoexec_textmode");
+    hack::command_stack().emplace("exec betrayals");
 #else
-    hack::command_stack().push("exec cat_autoexec");
+    hack::command_stack().emplace("exec cat_autoexec");
 #endif
     auto extra_exec = std::getenv("CH_EXEC");
     if (extra_exec)
-        hack::command_stack().push(extra_exec);
+        hack::command_stack().emplace(extra_exec);
 
     hack::initialized = true;
     for (int i = 0; i < 12; i++)

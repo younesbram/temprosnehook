@@ -26,15 +26,18 @@ void GetSkeleton(IClientEntity *ent, CStudioHdr *pStudioHdr, Vector pos[], Quate
     boneSetup.AccumulatePose(pos, q, NET_INT(ent, netvar.m_nSequence), NET_FLOAT(ent, netvar.m_flCycle), 1.0, g_GlobalVars->curtime, *m_pIk);
 
     // sort the layers
-    static int layer[MAX_OVERLAYS];
-    memset(layer,MAX_OVERLAYS,m_AnimOverlay.Count()*4);
-    for (int i = 0; i < m_AnimOverlay.Count(); i++)
+    int layer[MAX_OVERLAYS] = {};
+    int i;
+    for (i = 0; i < m_AnimOverlay.Count(); i++)
+        layer[i] = MAX_OVERLAYS;
+
+    for (i = 0; i < m_AnimOverlay.Count(); i++)
     {
         CAnimationLayer &pLayer = m_AnimOverlay[i];
         if ((pLayer.m_flWeight > 0) && pLayer.IsActive() && pLayer.m_nOrder >= 0 && pLayer.m_nOrder < m_AnimOverlay.Count())
             layer[pLayer.m_nOrder] = i;
 
-        if (layer[i] >= 0 && layer[i] < m_AnimOverlay.Count())
+        for (i = 0; i < m_AnimOverlay.Count(); i++)
             CAnimationLayer &pLayer = m_AnimOverlay[layer[i]];
     }
 
@@ -61,8 +64,8 @@ bool SetupBones(IClientEntity *ent, matrix3x4_t *pBoneToWorld, int boneMask)
     // EFL_SETTING_UP_BONES
     *entity_flags |= 1 << 3;
 
-    static Vector pos[MAXSTUDIOBONES];
-    static Quaternion q[MAXSTUDIOBONES];
+    Vector pos[MAXSTUDIOBONES];
+    Quaternion q[MAXSTUDIOBONES];
 
     static uintptr_t m_pIK_offset = 0x568;
 

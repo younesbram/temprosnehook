@@ -12,16 +12,18 @@ DEFINE_HOOKED_METHOD(SetRichPresence, bool, const char *pchKey, const char *pchV
 namespace richpresence
 {
 static settings::Boolean enable{ "steam.presence-enable", "false" };     // Rich Presence
-static settings::Boolean override{ "steam.presence-override", "false" }; // Overide Match  (This makes it so the "Main Menu" effect never happens)
+static settings::Boolean marquee{ "steam.presence-marquee", "false" };   // Apply a scrolling effect
+static settings::Boolean override{ "steam.presence-override", "false" }; // Override Match  (This makes it so the "Main Menu" effect never happens)
 static settings::Int matchstate{ "steam.presence-match", "0" };          // Match Info     4 CHOICES
 static settings::Int groupsize{ "steam.presence-group", "6" };           // Party Size
 static settings::String custom{ "steam.presence-value", "Cathook" };     // Custom input
 
-// Steam cannot use a made up value,
-// so we need to fix these values for it
-auto &value             = *custom;
+// Steam cannot use a made up value, so we need to fix these values for it
+std::string value = *custom;
 inline auto &groupvalue = *groupsize;
 
+std::chrono::time_point<std::chrono::system_clock> lastExecutionTimestamp;
+std::chrono::duration<double> interval(5);
 void CreateMove()
 {
     if (!enable)
@@ -63,6 +65,19 @@ void CreateMove()
         }
 
         // Custom String
+        if (*marquee)
+        {
+            std::chrono::time_point<std::chrono::system_clock> currentTimestamp = std::chrono::system_clock::now();
+            std::chrono::duration<double> timeElapsed                           = currentTimestamp - lastExecutionTimestamp;
+            if (timeElapsed >= interval)
+            {
+                std::string temp = value;
+                value.erase(0, 1);
+                value += temp[0];
+                lastExecutionTimestamp = currentTimestamp;
+            }
+        }
+
         g_ISteamFriends->SetRichPresence("currentmap", value.c_str());
 
         // Group Sizing

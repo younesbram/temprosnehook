@@ -5,7 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include <stdarg.h>
+#include <cstdarg>
 #include <string>
 
 #include <pwd.h>
@@ -35,7 +35,7 @@ static inline void Log(const char *result, bool file_only)
     if (!logging::handle.is_open())
         logging::Initialize();
     time_t current_time;
-    struct tm *time_info = nullptr;
+    struct tm *time_info;
     char timeString[10];
     time(&current_time);
     time_info = localtime(&current_time);

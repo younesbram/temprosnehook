@@ -176,7 +176,7 @@ public:
 
     rgba_t rgba_overlay = colors::empty;
 
-    ChamColors(rgba_t col = colors::empty, float r = 1.0f, float g = 1.0f, float b = 1.0f)
+    explicit ChamColors(rgba_t col = colors::empty, float r = 1.0f, float g = 1.0f, float b = 1.0f)
     {
         rgba     = col;
         envmap_r = r;
@@ -335,9 +335,9 @@ static ChamColors GetChamColors(IClientEntity *entity, bool ignorez)
     CachedEntity *ent = ENTITY(entity->entindex());
 
     if (CE_BAD(ent))
-        return { colors::white };
+        return ChamColors(colors::white);
     if (ent == hacks::aimbot::CurrentTarget() && aimbot_color)
-        return { colors::target };
+        return ChamColors(colors::target);
     if (re::C_BaseCombatWeapon::IsBaseCombatWeapon(entity))
     {
         IClientEntity *owner = re::C_TFWeaponBase::GetOwnerViaInterface(entity);
@@ -348,15 +348,15 @@ static ChamColors GetChamColors(IClientEntity *entity, bool ignorez)
     {
     case ENTITY_BUILDING:
         if (!ent->m_bEnemy() && !(teammates || teammate_buildings) && ent != LOCAL_E)
-            return {};
+            return ChamColors();
         if (health)
-            return { colors::Health_dimgreen(ent->m_iHealth(), ent->m_iMaxHealth()) };
+            return ChamColors(colors::Health_dimgreen(ent->m_iHealth(), ent->m_iMaxHealth()));
         break;
     case ENTITY_PLAYER:
         if (!players)
-            return {};
+            return ChamColors();
         if (health)
-            return { colors::Health_dimgreen(ent->m_iHealth(), ent->m_iMaxHealth()) };
+            return ChamColors(colors::Health_dimgreen(ent->m_iHealth(), ent->m_iMaxHealth()));
         break;
     default:
         break;
@@ -399,7 +399,7 @@ static ChamColors GetChamColors(IClientEntity *entity, bool ignorez)
 
         return result;
     }
-    return { colors::EntityF(ent) };
+    return ChamColors(colors::EntityF(ent));
 }
 
 // Purpose => Render entity attachments (weapons, hats)
@@ -652,7 +652,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                     colors.rgba_overlay = LOCAL_E->m_iTeam() == TEAM_RED ? *chams_overlay_color_red : LOCAL_E->m_iTeam() == TEAM_BLU ? *chams_overlay_color_blu : colors::white;
                     if (!arms_chams_team_color)
                     {
-                        colors              = *arm_basechams_color;
+                        colors              = ChamColors(*arm_basechams_color);
                         colors.rgba_overlay = *arm_overlaychams_color;
                         colors.envmap_r     = *envmap_tint_arms_r;
                         colors.envmap_g     = *envmap_tint_arms_g;
@@ -705,7 +705,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                 }
                 else
                 {
-                    colors              = *local_weapon_basechams_color;
+                    colors              = ChamColors(*local_weapon_basechams_color);
                     colors.rgba_overlay = *local_weapon_overlaychams_color;
                     colors.envmap_r     = *envmap_tint_local_weapon_r;
                     colors.envmap_g     = *envmap_tint_local_weapon_g;

@@ -476,10 +476,10 @@ void updateEnemyBlacklist(int slot)
 
     // Clear blacklist for normal entities
     if (should_run_normal)
-        navparser::NavEngine::clearFreeBlacklist(navparser::ENEMY_NORMAL);
+        navparser::NavEngine::clearFreeBlacklist(navparser::BlacklistReason(navparser::ENEMY_NORMAL));
     // Clear blacklist for dormant entities
     if (should_run_dormant || !blacklist_dormat)
-        navparser::NavEngine::clearFreeBlacklist(navparser::ENEMY_DORMANT);
+        navparser::NavEngine::clearFreeBlacklist(navparser::BlacklistReason(navparser::ENEMY_DORMANT));
 
     // #NoFear
     if (slot == melee)

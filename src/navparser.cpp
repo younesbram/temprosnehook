@@ -348,7 +348,7 @@ public:
             return;
 
         // Sentries make sounds, so we can just rely on soundcache here and always clear sentries
-        NavEngine::clearFreeBlacklist(SENTRY);
+        NavEngine::clearFreeBlacklist(BlacklistReason(SENTRY));
         // Find sentries and stickies
         for (int i = g_IEngine->GetMaxClients() + 1; i < MAX_ENTITIES; i++)
         {

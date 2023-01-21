@@ -57,7 +57,7 @@ public:
         this->value = (BlacklistReason_enum) -1;
         this->time  = 0;
     }
-    BlacklistReason(BlacklistReason_enum reason)
+    explicit BlacklistReason(BlacklistReason_enum reason)
     {
         this->value = reason;
         this->time  = 0;

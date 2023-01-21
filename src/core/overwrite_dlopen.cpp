@@ -4,8 +4,8 @@
 typedef void *(*dlopen_t)(const char *__file, int __mode);
 void *dlopen(const char *__file, int __mode) noexcept(true)
 {
-    dlopen_t dlopen_fn = (dlopen_t) dlsym(RTLD_NEXT, "dlopen");
-    auto ret           = dlopen_fn(__file, __mode);
+    auto dlopen_fn = (dlopen_t) dlsym(RTLD_NEXT, "dlopen");
+    auto ret       = dlopen_fn(__file, __mode);
     if (!strcmp(__file, "bin/launcher.so"))
     {
         logging::Info("Intercepted launcher.so");

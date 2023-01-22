@@ -25,7 +25,7 @@ public:
     /*
      * Initialize Averager with a given size
      */
-    inline Averager(size_t _size)
+    inline explicit Averager(size_t _size)
     {
         resize(_size);
     }
@@ -59,13 +59,10 @@ public:
         values_[value_index_++] = value;
         value_ += value;
         if (value_index_ > value_count_)
-        {
             value_count_ = value_index_;
-        }
+
         if (value_index_ >= size_)
-        {
             value_index_ = 0;
-        }
     }
     /*
      * Pushes all values in initializer list
@@ -73,9 +70,7 @@ public:
     inline void push(std::initializer_list<T> list)
     {
         for (const auto &f : list)
-        {
             push(f);
-        }
     }
     /*
      * Returns the average value, returns 0 if no values were pushed

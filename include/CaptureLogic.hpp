@@ -31,7 +31,7 @@ struct flag_info
     CachedEntity *ent{ nullptr };
     std::optional<Vector> spawn_pos;
     int team{ TEAM_UNK };
-    flag_info(){};
+    flag_info() = default;
     flag_info(CachedEntity *ent, Vector spawn_pos, int team)
     {
         this->ent       = ent;
@@ -42,9 +42,9 @@ struct flag_info
 
 struct pl_info
 {
-    CachedEntity *ent;
+    CachedEntity *ent{};
     std::optional<Vector> position;
-    pl_info(){};
+    pl_info() = default;
 };
 
 #define MAX_CONTROL_POINTS 8
@@ -56,7 +56,7 @@ struct cp_info
     std::optional<Vector> position;
     // For BLU and RED to show who can and who cannnot cap
     std::array<bool, 2> can_cap{};
-    cp_info(){};
+    cp_info() = default;
 };
 
 namespace flagcontroller

@@ -1,5 +1,5 @@
 /*
- * playerresource.h
+ * playerresource.hpp
  *
  *  Created on: Nov 13, 2016
  *      Author: nullifiedcat

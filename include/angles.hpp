@@ -9,9 +9,9 @@
 
 #include "mathlib/vector.h"
 #include "entitycache.hpp"
+
 namespace angles
 {
-
 struct angle_data_s
 {
     static constexpr size_t count = 16;

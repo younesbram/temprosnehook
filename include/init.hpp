@@ -15,11 +15,11 @@ std::stack<void (*)()> &init_stack_early();
 class InitRoutine
 {
 public:
-    InitRoutine(void (*func)());
+    explicit InitRoutine(void (*func)());
 };
 
 class InitRoutineEarly
 {
 public:
-    InitRoutineEarly(void (*func)());
+    explicit InitRoutineEarly(void (*func)());
 };

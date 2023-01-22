@@ -1,6 +1,6 @@
 #include "common.hpp"
 #include "PlayerTools.hpp"
-#include "playerresource.h"
+#include "playerresource.hpp"
 #include "soundcache.hpp"
 
 namespace hacks::tracers

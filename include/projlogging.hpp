@@ -9,6 +9,5 @@
 
 namespace projectile_logging
 {
-
 void Update();
 }

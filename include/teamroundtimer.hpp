@@ -1,4 +1,5 @@
 #pragma once
+
 enum round_states
 {
     RT_STATE_SETUP = 0,

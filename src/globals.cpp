@@ -5,7 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include <globals.h>
+#include <globals.hpp>
 #include <settings/Bool.hpp>
 
 #include "common.hpp"

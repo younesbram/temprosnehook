@@ -15,18 +15,16 @@ class IClientEntity;
 
 namespace trace
 {
-
 class FilterDefault : public ITraceFilter
 {
 public:
     IClientEntity *m_pSelf;
 
-public:
     virtual ~FilterDefault();
     FilterDefault();
-    virtual bool ShouldHitEntity(IHandleEntity *entity, int mask);
+    bool ShouldHitEntity(IHandleEntity *entity, int mask) override;
     void SetSelf(IClientEntity *self);
-    virtual TraceType_t GetTraceType() const;
+    TraceType_t GetTraceType() const override;
 };
 
 class FilterNoPlayer : public ITraceFilter
@@ -34,21 +32,20 @@ class FilterNoPlayer : public ITraceFilter
 public:
     IClientEntity *m_pSelf;
 
-public:
     virtual ~FilterNoPlayer();
     FilterNoPlayer();
-    virtual bool ShouldHitEntity(IHandleEntity *entity, int mask);
+    bool ShouldHitEntity(IHandleEntity *entity, int mask) override;
     void SetSelf(IClientEntity *self);
-    virtual TraceType_t GetTraceType() const;
+    TraceType_t GetTraceType() const override;
 };
+
 class FilterNavigation : public ITraceFilter
 {
-
 public:
     virtual ~FilterNavigation();
     FilterNavigation();
-    virtual bool ShouldHitEntity(IHandleEntity *entity, int mask);
-    virtual TraceType_t GetTraceType() const;
+    bool ShouldHitEntity(IHandleEntity *entity, int mask) override;
+    TraceType_t GetTraceType() const override;
 };
 
 class FilterNoEntity : public ITraceFilter
@@ -56,12 +53,11 @@ class FilterNoEntity : public ITraceFilter
 public:
     IClientEntity *m_pSelf;
 
-public:
     virtual ~FilterNoEntity();
     FilterNoEntity();
-    virtual bool ShouldHitEntity(IHandleEntity *entity, int mask);
+    bool ShouldHitEntity(IHandleEntity *entity, int mask) override;
     void SetSelf(IClientEntity *self);
-    virtual TraceType_t GetTraceType() const;
+    TraceType_t GetTraceType() const override;
 };
 
 class FilterPenetration : public ITraceFilter
@@ -70,13 +66,12 @@ public:
     IClientEntity *m_pSelf;
     IClientEntity *m_pIgnoreFirst;
 
-public:
     virtual ~FilterPenetration();
     FilterPenetration();
-    virtual bool ShouldHitEntity(IHandleEntity *entity, int mask);
+    bool ShouldHitEntity(IHandleEntity *entity, int mask) override;
     void SetSelf(IClientEntity *self);
     void Reset();
-    virtual TraceType_t GetTraceType() const;
+    TraceType_t GetTraceType() const override;
 };
 
 extern FilterDefault filter_default;

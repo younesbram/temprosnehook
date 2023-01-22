@@ -16,7 +16,6 @@ constexpr float CHATSTACK_INTERVAL = 0.8f;
 
 namespace chat_stack
 {
-
 struct msg_t
 {
     std::string text;

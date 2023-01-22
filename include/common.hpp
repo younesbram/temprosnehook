@@ -45,14 +45,14 @@
 #include <enums.hpp>
 #include "projlogging.hpp"
 #include "velocity.hpp"
-#include "globals.h"
+#include "globals.hpp"
 #include <helpers.hpp>
 #include "playerlist.hpp"
 #include <core/interfaces.hpp>
 #include <localplayer.hpp>
 #include <conditions.hpp>
 #include <core/logging.hpp>
-#include "playerresource.h"
+#include "playerresource.hpp"
 #include "sdk/usercmd.hpp"
 #include "trace.hpp"
 #include <core/cvwrapper.hpp>

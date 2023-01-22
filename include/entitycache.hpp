@@ -18,8 +18,8 @@
 #include <itemtypes.hpp>
 #include "localplayer.hpp"
 #include <core/netvars.hpp>
-#include "playerresource.h"
-#include "globals.h"
+#include "playerresource.hpp"
+#include "globals.hpp"
 #include "classinfo/classinfo.hpp"
 #include "client_class.h"
 #include "Constants.hpp"
@@ -76,6 +76,7 @@ public:
     {
         return g_IEntityList->GetClientEntity(m_IDX);
     }
+
     __attribute__((always_inline, hot, const)) bool Good() const
     {
         if (!RAW_ENT(this) || !RAW_ENT(this)->GetClientClass()->m_ClassID)
@@ -83,6 +84,7 @@ public:
         IClientEntity *const entity = InternalEntity();
         return entity && !entity->IsDormant();
     }
+
     __attribute__((always_inline, hot, const)) bool Valid() const
     {
         if (!RAW_ENT(this) || !RAW_ENT(this)->GetClientClass()->m_ClassID)
@@ -90,6 +92,7 @@ public:
         IClientEntity *const entity = InternalEntity();
         return entity;
     }
+
     template <typename T> __attribute__((always_inline, hot, const)) T &var(uintptr_t offset) const
     {
         return *reinterpret_cast<T *>(uintptr_t(RAW_ENT(this)) + offset);
@@ -105,10 +108,12 @@ public:
                     return RAW_ENT(this)->GetClientClass()->m_ClassID;
         return 0;
     };
+
     Vector m_vecOrigin() const
     {
         return RAW_ENT(this)->GetAbsOrigin();
     };
+
     std::optional<Vector> m_vecDormantOrigin() const
     {
         if (!RAW_ENT(this)->IsDormant())
@@ -118,20 +123,24 @@ public:
             return *vec;
         return std::nullopt;
     }
+
     int m_iTeam() const
     {
         return NET_INT(RAW_ENT(this), netvar.iTeamNum);
     };
+
     bool m_bAlivePlayer() const
     {
         return !(NET_BYTE(RAW_ENT(this), netvar.iLifeState));
     };
+
     bool m_bEnemy() const
     {
         if (CE_BAD(g_pLocalPlayer->entity))
             return true;
         return m_iTeam() != g_pLocalPlayer->team;
     };
+
     int m_iMaxHealth()
     {
         switch (m_Type())
@@ -144,6 +153,7 @@ public:
             return 0.0f;
         }
     };
+
     int m_iHealth() const
     {
         switch (m_Type())
@@ -156,6 +166,7 @@ public:
             return 0.0f;
         }
     };
+
     Vector &m_vecAngle() const
     {
         return CE_VECTOR(this, netvar.m_angEyeAngles);
@@ -234,6 +245,7 @@ public:
             return false;
         }
     };
+
     bool m_bGrenadeProjectile() const
     {
         return m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile) || m_iClassID() == CL_CLASS(CTFProjectile_Cleaver) || m_iClassID() == CL_CLASS(CTFProjectile_Jar) || m_iClassID() == CL_CLASS(CTFProjectile_JarMilk);
@@ -271,10 +283,12 @@ public:
         m_vecVelocity.Zero();
         m_fLastUpdate = 0;
     }
+
     bool was_dormant() const
     {
         return RAW_ENT(this)->IsDormant();
     };
+
     bool velocity_is_valid{ false };
 #if !PROXY_ENTITY
     IClientEntity *m_pEntity{ nullptr };
@@ -298,7 +312,6 @@ inline CachedEntity *Get(const u_int16_t &idx)
     else
         return &test->second;
 }
-
 void dodgeProj(CachedEntity *proj_ptr);
 void Update();
 void Invalidate();

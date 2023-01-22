@@ -1,13 +1,13 @@
 #pragma once
 #include <functional>
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include "core/logging.hpp"
 #include <sys/mman.h>
 
 class BytePatch
 {
-    void *addr{ 0 };
+    void *addr{ nullptr };
     size_t size;
     std::vector<unsigned char> patch_bytes;
     std::vector<unsigned char> original;
@@ -18,7 +18,8 @@ public:
     {
         Shutdown();
     }
-    BytePatch(std::function<uintptr_t(const char *)> SigScanFunc, const char *pattern, size_t offset, std::vector<unsigned char> patch) : patch_bytes{ patch }
+
+    BytePatch(const std::function<uintptr_t(const char *)> &SigScanFunc, const char *pattern, size_t offset, const std::vector<unsigned char> &patch) : patch_bytes{ patch }
     {
         addr = (void *) SigScanFunc(pattern);
         if (!addr)
@@ -31,13 +32,15 @@ public:
         original.resize(size);
         Copy();
     }
-    BytePatch(uintptr_t addr, std::vector<unsigned char> patch) : addr{ reinterpret_cast<void *>(addr) }, patch_bytes{ patch }
+
+    BytePatch(uintptr_t addr, const std::vector<unsigned char> &patch) : addr{ reinterpret_cast<void *>(addr) }, patch_bytes{ patch }
     {
         size = patch.size();
         original.resize(size);
         Copy();
     }
-    BytePatch(void *addr, std::vector<unsigned char> patch) : addr{ addr }, patch_bytes{ patch }
+
+    BytePatch(void *addr, const std::vector<unsigned char> &patch) : addr{ addr }, patch_bytes{ patch }
     {
         size = patch.size();
         original.resize(size);
@@ -52,6 +55,7 @@ public:
 
         mprotect(page, mprot_len, flags);
     }
+
     void Copy()
     {
         void *page          = (void *) ((uint64_t) addr & ~0xFFF);
@@ -62,6 +66,7 @@ public:
         memcpy(&original[0], addr, size);
         mprotect(page, mprot_len, PROT_EXEC);
     }
+
     void Patch()
     {
         if (!patched)
@@ -76,6 +81,7 @@ public:
             patched = true;
         }
     }
+
     void Shutdown()
     {
         if (patched)

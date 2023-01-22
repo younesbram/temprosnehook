@@ -167,21 +167,15 @@ template <typename... ConditionList> constexpr condition_data_s CreateConditionM
     for (const auto &cond : { conds... })
     {
         if (cond >= 32 * 3)
-        {
             c3 |= (1u << (cond % 32));
-        }
+
         if (cond >= 32 * 2)
-        {
             c2 |= (1u << (cond % 32));
-        }
+
         if (cond >= 32 * 1)
-        {
             c1 |= (1u << (cond % 32));
-        }
         else
-        {
             c0 |= (1u << (cond));
-        }
     }
     return condition_data_s{ c0, c1, c2, c3 };
 }
@@ -202,22 +196,15 @@ constexpr condition_data_s KMiniCritBoostMask   = CreateConditionMask(TFCond_Buf
 template <condition cond> inline bool CondBitCheck(condition_data_s &data)
 {
     if (cond >= 32 * 3)
-    {
         return data.cond_3 & (1u << (cond % 32));
-    }
+
     if (cond >= 32 * 2)
-    {
         return data.cond_2 & (1u << (cond % 32));
-    }
-    if (cond >= 32 * 1)
-    {
+
+    if (cond >= 32)
         return data.cond_1 & (1u << (cond % 32));
-    }
-    if (cond < 32)
-    {
-        return data.cond_0 & (1u << (cond));
-    }
-    return false;
+
+    return data.cond_0 & (1u << (cond));
 }
 
 // I haven't figured out how to pass a struct as a parameter, sorry.
@@ -238,50 +225,32 @@ template <condition cond, bool state> inline void CondBitSet(condition_data_s &d
     if (state)
     {
         if (cond > 32 * 3)
-        {
             data.cond_3 |= (1u << (cond % 32));
-        }
         else if (cond > 32 * 2)
-        {
             data.cond_2 |= (1u << (cond % 32));
-        }
         else if (cond > 32 * 1)
-        {
             data.cond_1 |= (1u << (cond % 32));
-        }
         else
-        {
             data.cond_0 |= (1u << (cond));
-        }
     }
     else
     {
         if (cond > 32 * 3)
-        {
             data.cond_3 &= ~(1u << (cond % 32));
-        }
         else if (cond > 32 * 2)
-        {
             data.cond_2 &= ~(1u << (cond % 32));
-        }
         else if (cond > 32 * 1)
-        {
             data.cond_1 &= ~(1u << (cond % 32));
-        }
         else
-        {
             data.cond_0 &= ~(1u << (cond));
-        }
     }
 }
 
 template <condition cond> inline bool HasCondition(CachedEntity *ent)
 {
-    if (cond < condition(96))
-    {
-        if (CondBitCheck<cond>(CE_VAR(ent, netvar._condition_bits, condition_data_s)))
-            return true;
-    }
+    if (cond < condition(96) && CondBitCheck<cond>(CE_VAR(ent, netvar._condition_bits, condition_data_s)))
+        return true;
+
     return CondBitCheck<cond>(CE_VAR(ent, netvar.iCond, condition_data_s));
 }
 

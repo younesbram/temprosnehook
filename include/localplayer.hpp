@@ -48,7 +48,7 @@ public:
     Vector v_Origin;
     Vector v_Eye;
     int entity_idx;
-    CachedEntity *entity{ 0 };
+    CachedEntity *entity{ nullptr };
     CachedEntity *weapon();
     bool weapon_melee_damage_tick;
     Vector v_OrigViewangles;

@@ -37,8 +37,8 @@ private:
     model_t *m_pLastModel = nullptr;
     CachedEntity *parent_ref{};
 
-    bool m_VisCheckValidationFlags[CACHE_MAX_HITBOXES]{ false };
-    bool m_VisCheck[CACHE_MAX_HITBOXES]{ false };
+    uint_fast64_t m_VisCheckValidationFlags = 0;
+    uint_fast64_t m_VisCheck                = 0;
     void Init();
 
 public:
@@ -48,7 +48,15 @@ public:
     }
 
     CachedHitbox *GetHitbox(int id);
-    void InvalidateCache();
+    uint_fast64_t m_CacheValidationFlags = 0;
+    void InvalidateCache()
+    {
+        bones_setup               = false;
+        m_CacheValidationFlags    = 0;
+        m_VisCheckValidationFlags = 0;
+        m_bInit                   = false;
+        m_bSuccess                = false;
+    }
     bool VisibilityCheck(int id);
     int GetNumHitboxes()
     {
@@ -58,12 +66,12 @@ public:
             return 0;
         return m_nNumHitboxes;
     }
+
     matrix3x4_t *GetBones(int numbones = -1);
 
     // for "fixing" bones to use the reconstructed ones
     void UpdateBones();
 
-    bool m_CacheValidationFlags[CACHE_MAX_HITBOXES]{ false };
     int m_nNumHitboxes = 0;
     std::vector<CachedHitbox> m_CacheInternal;
 

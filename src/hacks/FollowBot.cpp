@@ -10,7 +10,7 @@
 #include <settings/Bool.hpp>
 #include "navparser.hpp"
 #include "soundcache.hpp"
-#include "playerresource.h"
+#include "playerresource.hpp"
 #include "PlayerTools.hpp"
 
 namespace hacks::followbot

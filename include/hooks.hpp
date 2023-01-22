@@ -15,7 +15,6 @@
 
 namespace hooks
 {
-
 typedef void *ptr_t;
 typedef void *method_t;
 typedef method_t *method_table_t;

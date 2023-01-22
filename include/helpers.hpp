@@ -175,9 +175,8 @@ extern const std::string classes[10];
 inline const char *classname(int clazz)
 {
     if (clazz > 0 && clazz < 10)
-    {
         return classes[clazz - 1].c_str();
-    }
+
     return "Unknown";
 }
 
@@ -238,6 +237,7 @@ template <typename T, typename... Targs> void format_internal(std::stringstream 
     stream << value;
     format_internal(stream, args...);
 }
+
 template <typename... Args> std::string format(const Args &...args)
 {
     std::stringstream stream;

@@ -16,13 +16,10 @@
 
 namespace sconvar
 {
-
 class SpoofedConVar
 {
 public:
-    SpoofedConVar(ConVar *var);
-
-public:
+    explicit SpoofedConVar(ConVar *var);
     ConVar *original;
     ConVar *spoof;
 };

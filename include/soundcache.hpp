@@ -26,6 +26,7 @@ inline void cache_sound(const Vector *Origin, int source)
     sound_cache[source].sound.m_pOrigin = *Origin;
     sound_cache[source].last_update.update();
 }
+
 inline std::optional<Vector> GetSoundLocation(int entid)
 {
     auto it = sound_cache.find(entid);

@@ -5,7 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#include <playerresource.h>
+#include <playerresource.hpp>
 
 #include "common.hpp"
 

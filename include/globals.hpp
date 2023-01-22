@@ -1,12 +1,12 @@
 /*
- * globals.h
+ * globals.hpp
  *
  *  Created on: Nov 16, 2016
  *      Author: nullifiedcat
  */
 
 #pragma once
-#include <time.h>
+#include <ctime>
 #include <mathlib/vector.h>
 #include "Constants.hpp"
 

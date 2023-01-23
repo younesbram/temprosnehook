@@ -37,13 +37,9 @@ void Update(CachedEntity *player)
     if (ground)
     {
         if (!data.was_on_ground)
-        {
             data.ticks_on_ground = 1;
-        }
         else
-        {
             data.ticks_on_ground++;
-        }
     }
     else
     {
@@ -64,9 +60,7 @@ void Update(CachedEntity *player)
                 }
             }
             else
-            {
                 data.detections = 0;
-            }
         }
         data.ticks_on_ground = 0;
     }

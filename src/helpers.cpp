@@ -790,7 +790,7 @@ void MatrixAngles(const matrix3x4_t &matrix, float *angles)
     left[2]    = matrix[2][1];
     up[2]      = matrix[2][2];
 
-    float xyDist = std::sqrt(forward[0] * forward[0] + forward[1] * forward[1]);
+    float xyDist = std::sqrt(SQR(forward[0]) + SQR(forward[1]));
 
     // enough here to get angles?
     if (xyDist > 0.001f)
@@ -835,7 +835,7 @@ void VectorAngles(Vector &forward, Vector &angles)
         if (yaw < 0)
             yaw += 360;
 
-        tmp   = sqrt((forward[0] * forward[0] + forward[1] * forward[1]));
+        tmp   = sqrt((SQR(forward[0]) + SQR(forward[1])));
         pitch = (atan2(-forward[2], tmp) * 180 / PI);
         if (pitch < 0)
             pitch += 360;

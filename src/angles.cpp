@@ -24,9 +24,8 @@ void angle_data_s::push(const Vector &angle)
         if (ai < 0) ai = count - 1;
         float dx = std::abs(angles[ai].x - angle.x);
         float dy = std::abs(angles[ai].y - angle.y);
-        if (sqrt(dx * dx + dy * dy) > 45.0f) {
-            //logging::Info("%.2f %.2f %.2f", dx, dy, sqrt(dx * dx + dy *
-    dy));
+        if (sqrt(SQR(dx) + SQR(dy)) > 45.0f) {
+            //logging::Info("%.2f %.2f %.2f", dx, dy, sqrt(SQR(dx) + SQR(dy)));
         }
     }*/
     if (angle_count < count)
@@ -61,7 +60,7 @@ float angle_data_s::deviation(int steps) const
     }
     if (hy > 180)
         hy = 360 - hy;
-    return sqrt(hx * hx + hy * hy);
+    return sqrt(SQR(hx) + SQR(hy));
 }
 
 angle_data_s &data_idx(int index)

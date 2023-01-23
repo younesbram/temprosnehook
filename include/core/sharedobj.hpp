@@ -16,7 +16,6 @@ typedef void *(*fn_CreateInterface_t)(const char *, int *);
 
 namespace sharedobj
 {
-
 bool LocateSharedObject(std::string &name, std::string &out_full_path);
 
 class SharedObject

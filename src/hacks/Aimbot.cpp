@@ -287,10 +287,8 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
 
     trace_t trace;
     if (IsEntityVectorVisible(ent, hb->center, true, MASK_SHOT_HULL, &trace, true))
-    {
         if (trace.hitbox == hitbox)
             hitpoints.push_back(hb->center);
-    }
 
     // Multipoint
     auto bboxmin = hb->bbox->bbmin;

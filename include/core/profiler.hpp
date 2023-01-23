@@ -16,7 +16,7 @@ class ProfilerNode;
 class ProfilerSection
 {
 public:
-    ProfilerSection(std::string name, ProfilerSection *parent = nullptr);
+    explicit ProfilerSection(std::string name, ProfilerSection *parent = nullptr);
 
     void OnNodeDeath(ProfilerNode &node);
 
@@ -33,7 +33,7 @@ public:
 class ProfilerNode
 {
 public:
-    ProfilerNode(ProfilerSection &section);
+    explicit ProfilerNode(ProfilerSection &section);
     ~ProfilerNode();
 
     std::chrono::time_point<std::chrono::high_resolution_clock> m_start;

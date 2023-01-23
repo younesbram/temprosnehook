@@ -384,7 +384,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
                 vsilent.x = cmd->forwardmove;
                 vsilent.y = cmd->sidemove;
                 vsilent.z = cmd->upmove;
-                speed     = sqrt(vsilent.x * vsilent.x + vsilent.y * vsilent.y);
+                speed     = sqrt(SQR(vsilent.x) + SQR(vsilent.y));
                 VectorAngles(vsilent, ang);
                 yaw                 = DEG2RAD(ang.y - g_pLocalPlayer->v_OrigViewangles.y + cmd->viewangles.y);
                 cmd->forwardmove    = cos(yaw) * speed;

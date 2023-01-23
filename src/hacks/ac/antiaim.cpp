@@ -40,7 +40,7 @@ void Update(CachedEntity *player)
     {
         int idx = d.angle_index - 1;
         if (idx < 0)
-            idx = d.count - 1;
+            idx = angles::angle_data_s::count - 1;
         if ((d.angles[idx].x < -89 || d.angles[idx].x > 89) && (d.angles[idx].x < 89.2941 || d.angles[idx].x > 89.2942))
         {
             am++;
@@ -53,13 +53,10 @@ void Update(CachedEntity *player)
             }
             std::string reason = format("Pitch: ", d.angles[idx].x, " Yaw: ", d.angles[idx].y);
             if (d.angles[idx].x == -271.0f)
-            {
                 reason += " (Fakeup)";
-            }
             else if (d.angles[idx].x == 271.0f)
-            {
                 reason += " (Fakedown)";
-            }
+
             hacks::anticheat::Accuse(player->m_IDX, "AntiAim", reason);
             last_accusation[player->m_IDX - 1] = tickcount;
         }

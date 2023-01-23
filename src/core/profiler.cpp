@@ -5,6 +5,8 @@
  *      Author: nullifiedcat
  */
 
+#include <utility>
+
 #include "common.hpp"
 
 unsigned g_spewcount{ 0 };
@@ -13,7 +15,7 @@ static CatCommand profiler_begin("profiler_spew", "Spew and reset", []() { g_spe
 
 ProfilerSection::ProfilerSection(std::string name, ProfilerSection *parent)
 {
-    m_name   = name;
+    m_name   = std::move(name);
     m_calls  = 0;
     m_log    = std::chrono::high_resolution_clock::now();
     m_min    = std::chrono::nanoseconds::zero();
@@ -25,14 +27,10 @@ ProfilerSection::ProfilerSection(std::string name, ProfilerSection *parent)
 void ProfilerSection::OnNodeDeath(ProfilerNode &node)
 {
     auto dur = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - node.m_start);
-    if (m_min == std::chrono::nanoseconds::zero())
-        m_min = dur;
-    else if (dur < m_min)
+    if (m_min == std::chrono::nanoseconds::zero() || dur < m_min)
         m_min = dur;
 
-    if (m_max == std::chrono::nanoseconds::zero())
-        m_max = dur;
-    else if (dur > m_max)
+    if (m_max == std::chrono::nanoseconds::zero() || dur > m_max)
         m_max = dur;
     m_sum += dur;
     m_calls++;

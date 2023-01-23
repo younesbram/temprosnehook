@@ -59,13 +59,10 @@ void reset()
 void check_combos()
 {
     if (last_kill.check(5000))
-    {
         killcombo = 0;
-    }
+
     if (last_headshot.check(5000))
-    {
         headshotcombo = 0;
-    }
 }
 
 void on_kill(IGameEvent *event)
@@ -114,9 +111,7 @@ void on_kill(IGameEvent *event)
     }
     entry = find_entry(announces_kill, killstreak);
     if (entry)
-    {
         playsound(entry->sound);
-    }
 }
 
 void on_spawn(IGameEvent *event)
@@ -124,9 +119,7 @@ void on_spawn(IGameEvent *event)
     int userid = GetPlayerForUserID(event->GetInt("userid"));
 
     if (userid == g_IEngine->GetLocalPlayer())
-    {
         reset();
-    }
 }
 
 class AnnouncerEventListener : public IGameEventListener2

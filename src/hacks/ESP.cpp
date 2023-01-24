@@ -83,10 +83,10 @@ public:
     bool transparent{ false };
 };
 
-boost::unordered_flat_map<CachedEntity *, ESPData> data;
+boost::unordered_flat_map<u_int16_t, ESPData> data;
 inline void AddEntityString(CachedEntity *entity, const std::string &string, const rgba_t &color = colors::empty)
 {
-    ESPData &entity_data = data[entity];
+    ESPData &entity_data = data[entity->m_IDX];
     if (entity_data.strings.try_emplace(string, color).second)
         ++(entity_data.string_count);
     entity_data.needs_paint = true;
@@ -105,7 +105,7 @@ inline bool hitboxUpdate(CachedEntity *ent)
 // Sets an entitys esp color
 void SetEntityColor(CachedEntity *entity, const rgba_t &color)
 {
-    data[entity].color = color;
+    data[entity->m_IDX].color = color;
 }
 
 void ResetEntityStrings(bool full_clear);
@@ -324,13 +324,13 @@ static void cm()
                 // Get an entity from the loop tick and process it
                 ProcessEntity(ent);
                 hitboxUpdate(ent);
-                data.try_emplace(ent, ESPData{});
+                ESPData &ent_dat = data.try_emplace(ent->m_IDX, ESPData{}).first->second;
 
-                if (data[ent].needs_paint)
+                if (ent_dat.needs_paint)
                 {
                     // Checking this every tick is a waste of nanoseconds
                     if (vischeck_tick && vischeck)
-                        data[ent].transparent = !ent->IsVisible();
+                        ent_dat.transparent = !ent->IsVisible();
                     entities_need_repaint.emplace_back(ent, ent->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin));
                 }
             }
@@ -357,13 +357,13 @@ static void cm()
                 else if (entity_tick)
                     ProcessEntity(ent_index);
 
-                data.try_emplace(ent_index, ESPData{});
-                if (data[ent_index].needs_paint)
+                ESPData &ent_data = data.try_emplace(ent_index->m_IDX, ESPData{}).first->second;
+                if (ent_data.needs_paint)
                 {
                     // Checking this every tick is a waste of nanoseconds
                     // Get an entity from the loop tick and process iProcessEntityPT nanoseconds
                     if (vischeck_tick && vischeck)
-                        data[ent_index].transparent = !ent_index->IsVisible();
+                        ent_data.transparent = !ent_index->IsVisible();
                     entities_need_repaint.emplace_back(ent_index, ent_index->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin));
                 }
             }
@@ -559,7 +559,7 @@ void DrawStrings(EntityType &type, bool &transparent, Vector &draw_point, ESPDat
             break;
             case 1:
             { // BOTTOM RIGHT
-                draw_point = Vector(max_x + 2, max_y - data.at(ent).string_count * 16, 0);
+                draw_point = Vector(max_x + 2, max_y - data.at(ent->m_IDX).string_count * 16, 0);
             }
             break;
             case 2:
@@ -569,7 +569,7 @@ void DrawStrings(EntityType &type, bool &transparent, Vector &draw_point, ESPDat
             break;
             case 3:
             { // ABOVE CENTER
-                draw_point = Vector((min_x + max_x) / 2.0f, min_y - data.at(ent).string_count * 16, 0);
+                draw_point = Vector((min_x + max_x) / 2.0f, min_y - data.at(ent->m_IDX).string_count * 16, 0);
             }
             break;
             case 4:
@@ -579,12 +579,12 @@ void DrawStrings(EntityType &type, bool &transparent, Vector &draw_point, ESPDat
             break;
             case 5:
             { // ABOVE LEFT
-                draw_point = Vector(min_x + 2, min_y - data.at(ent).string_count * 16, 0);
+                draw_point = Vector(min_x + 2, min_y - data.at(ent->m_IDX).string_count * 16, 0);
             }
             break;
             case 6:
             { // ABOVE RIGHT
-                draw_point = Vector(max_x + 2, min_y - data.at(ent).string_count * 16, 0);
+                draw_point = Vector(max_x + 2, min_y - data.at(ent->m_IDX).string_count * 16, 0);
             }
             }
         }
@@ -720,7 +720,7 @@ void ProcessEntityPT()
         int classid     = ent->m_iClassID();
         EntityType type = ent->m_Type();
         // Grab esp data
-        ESPData &ent_data = data[ent];
+        ESPData &ent_data = data[ent->m_IDX];
 
         // Get color of entity
         // TODO, check if we can move this after world to screen check
@@ -829,7 +829,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
     }
 
     // Get esp data from current ent
-    ESPData &espdata = data[ent];
+    ESPData &espdata = data[ent->m_IDX];
 
     switch (ent->m_Type())
     {
@@ -1356,7 +1356,7 @@ void _FASTCALL DrawBox(CachedEntity *ent, const rgba_t &clr)
         return;
 
     // Pull the cached collide info
-    ESPData &ent_data = data[ent];
+    ESPData &ent_data = data[ent->m_IDX];
     int max_x         = ent_data.collide_max.x;
     int max_y         = ent_data.collide_max.y;
     int min_x         = ent_data.collide_min.x;
@@ -1429,7 +1429,7 @@ bool GetCollide(CachedEntity *ent)
         return false;
 
     // Grab esp data
-    ESPData &ent_data = data[ent];
+    ESPData &ent_data = data[ent->m_IDX];
 
     // If entity has cached collides, return it. Otherwise, generate new bounds
     if (!ent_data.has_collide)
@@ -1529,9 +1529,9 @@ void ResetEntityStrings(bool full_clear)
     }
     else
     {
-        for (int i = 1; i < g_GlobalVars->maxClients; ++i)
+        for (u_int16_t i = 1; i < g_GlobalVars->maxClients; ++i)
         {
-            auto &element        = data[ENTITY(i)];
+            auto &element        = data[i];
             element.string_count = 0;
             element.color        = colors::empty;
             element.needs_paint  = false;

@@ -585,7 +585,7 @@ int BestTarget()
     return best;
 }
 
-void CreateMove()
+static void CreateMove()
 {
     if (CE_BAD(LOCAL_W))
         return;

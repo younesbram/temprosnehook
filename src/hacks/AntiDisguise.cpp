@@ -17,7 +17,7 @@ static settings::Boolean enable{ "remove.disguise", "false" };
 #endif
 static settings::Boolean no_invisibility{ "remove.cloak", "false" };
 
-void cm()
+static void CreateMove()
 {
     if (!*enable && !*no_invisibility)
         return;
@@ -39,7 +39,7 @@ void cm()
 static InitRoutine EC(
     []()
     {
-        EC::Register(EC::CreateMove, cm, "antidisguise", EC::average);
-        EC::Register(EC::CreateMoveWarp, cm, "antidisguise_w", EC::average);
+        EC::Register(EC::CreateMove, CreateMove, "antidisguise", EC::average);
+        EC::Register(EC::CreateMoveWarp, CreateMove, "antidisguise_w", EC::average);
     });
 } // namespace hacks::antidisguise

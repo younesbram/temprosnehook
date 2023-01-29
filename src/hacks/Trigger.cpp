@@ -56,7 +56,7 @@ inline float EffectiveTargetingRange()
 }
 
 // The main function of the triggerbot
-void CreateMove()
+static void CreateMove()
 {
     float backup_time = target_time;
     target_time       = 0;

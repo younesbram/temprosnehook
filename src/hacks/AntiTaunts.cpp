@@ -9,7 +9,7 @@ static settings::Boolean enable{ "remove.taunts", "true" };
 static settings::Boolean enable{ "remove.taunts", "false" };
 #endif
 
-void cm()
+static void CreateMove()
 {
     if (!*enable)
         return;
@@ -26,7 +26,7 @@ void cm()
 static InitRoutine EC(
     []()
     {
-        EC::Register(EC::CreateMove, cm, "antitaunts", EC::average);
-        EC::Register(EC::CreateMoveWarp, cm, "antitaunts_w", EC::average);
+        EC::Register(EC::CreateMove, CreateMove, "antitaunts", EC::average);
+        EC::Register(EC::CreateMoveWarp, CreateMove, "antitaunts_w", EC::average);
     });
 } // namespace hacks::antitaunts

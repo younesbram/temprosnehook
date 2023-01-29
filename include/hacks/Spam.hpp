@@ -22,6 +22,4 @@ extern const std::vector<std::string> builtin_lithium;
 
 bool isActive();
 void init();
-void createMove();
-void reload();
 } // namespace hacks::spam

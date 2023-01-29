@@ -120,7 +120,7 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
         }
     }
     prevent = -1;
-    for (const auto &ent: entity_cache::player_cache)
+    for (const auto &ent : entity_cache::player_cache)
     {
         if (CE_BAD(ent) || !(ent->m_bAlivePlayer()) || (teammate && ent->m_iTeam() != LOCAL_E->m_iTeam()) || ent == LOCAL_E)
             continue;
@@ -310,9 +310,8 @@ static void SapperAimbot()
     CachedEntity *target = nullptr;
     float distance       = FLT_MAX;
 
-    for (int i = 32; i < entity_cache::max; ++i)
+    for (const auto &ent : entity_cache::valid_ents)
     {
-        CachedEntity *ent = ENTITY(i);
         if (CE_BAD(ent))
             continue;
         if (ent->m_Type() != ENTITY_BUILDING)
@@ -450,7 +449,7 @@ CachedEntity *targetBuilding(bool priority)
     float wrench_range   = re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
     CachedEntity *target = nullptr;
     float distance       = FLT_MAX;
-    for (const auto &ent: entity_cache::valid_ents)
+    for (const auto &ent : entity_cache::valid_ents)
     {
         // can't exactly repair Merasmus
         if (ent->m_Type() != ENTITY_BUILDING)
@@ -615,10 +614,11 @@ static InitRoutine init(
 
         CAM_CapYaw_detour.Init(signature, (void *) CAM_CapYaw_Hook);
         EC::Register(
-            EC::Shutdown, []()
+            EC::Shutdown,
+            []()
             {
                 CAM_CapYaw_detour.Shutdown();
-                
-            }, "chargeaim_shutdown");
+            },
+            "chargeaim_shutdown");
     });
 } // namespace hacks::misc_aimbot

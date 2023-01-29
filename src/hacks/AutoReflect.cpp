@@ -130,13 +130,13 @@ static bool ShouldReflect(CachedEntity *ent)
 }
 
 // Function called by game for movement
-void CreateMove()
+static void CreateMove()
 {
     // Check if user settings allow Auto Reflect
     if (!enable || CE_BAD(LOCAL_W) || (blastkey && !blastkey.isKeyDown()))
         return;
 
-    // Check if player is using a flame thrower
+    // Check if player is using a flamethrower
     if (LOCAL_W->m_iClassID() != CL_CLASS(CTFFlameThrower) && LOCAL_W->m_iClassID() != CL_CLASS(CTFWeaponFlameBall) && CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) != 528)
         return;
 

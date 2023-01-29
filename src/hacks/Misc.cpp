@@ -225,7 +225,7 @@ static float angleDiffRad(float a1, float a2) noexcept
     return delta;
 }
 
-void CreateMove()
+static void CreateMove()
 {
 #if ENABLE_VISUALS
     if (misc_drawhitboxes)

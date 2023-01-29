@@ -390,7 +390,7 @@ inline bool HasKnife()
     return false;
 }
 
-void CreateMove()
+static void CreateMove()
 {
     if (!enabled)
         return;

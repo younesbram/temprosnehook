@@ -20,7 +20,6 @@ DEFINE_HOOKED_METHOD(GetMaxItemCount, int, int *)
 static Timer hook_cooldown{};
 namespace hacks::backpack_expander
 {
-
 void Paint()
 {
     if (!enabled)

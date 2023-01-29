@@ -237,7 +237,7 @@ static std::vector<std::string> teamspam_text = { "CAT", "HOOK" };
 // Current spam index
 static size_t current_teamspam_idx = 0;
 
-void createMove()
+static void CreateMove()
 {
     // Spam changes the tournament name in casual and compeditive gamemodes
     if (teamname_spam)
@@ -415,7 +415,7 @@ static InitRoutine EC(
     []()
     {
         teamname_file.installChangeCallback([](settings::VariableBase<std::string> &, const std::string &after) { teamspam_reload(after); });
-        EC::Register(EC::CreateMove, createMove, "spam", EC::average);
+        EC::Register(EC::CreateMove, CreateMove, "spam", EC::average);
         init();
     });
 

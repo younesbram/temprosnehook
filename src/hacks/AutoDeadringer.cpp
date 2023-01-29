@@ -35,8 +35,6 @@ int NearbyEntities()
     return ret;
 }
 
-static Timer deadringer{};
-static bool previouslyringered;
 static void CreateMove()
 {
     if (!enable)
@@ -70,13 +68,7 @@ static void CreateMove()
             continue;
         if (!IsVectorVisible(g_pLocalPlayer->v_Eye, ent->m_vecOrigin()))
             continue;
-        if (ent->m_bCritProjectile() && ent->m_flDistance() <= 500.0f)
-        {
-            shouldm2 = true;
-            if (!CE_BYTE(LOCAL_E, netvar.m_bFeignDeathReady))
-                current_user_cmd->buttons |= IN_ATTACK2;
-        }
-        else if (ent->m_flDistance() < 200.0f)
+        if (ent->m_bCritProjectile() && ent->m_flDistance() <= 500.0f || ent->m_flDistance() < 200.0f)
         {
             shouldm2 = true;
             if (!CE_BYTE(LOCAL_E, netvar.m_bFeignDeathReady))

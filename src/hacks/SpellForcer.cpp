@@ -155,7 +155,7 @@ CachedEntity *getClosestSpell()
     return ent;
 }
 
-void CreateMoveLate()
+static void CreateMoveLate()
 {
     if (!isEnabled() || !g_pGameRules->isUsingSpells_fn())
         return;

@@ -1202,6 +1202,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 {
                     if (HandleToIDX(CE_INT(ent, netvar.m_hTargetPlayer)) == g_pLocalPlayer->entity_idx)
                         AddEntityString(ent, gargoyle_str, colors::FromRGBA8(199, 21, 133, 255));
+                    return;
                 }
                 // Explosive/Environmental hazard esp
                 else if (item_explosive && (classid == CL_CLASS(CTFPumpkinBomb) || Hash::IsHazard(szName)))
@@ -1210,6 +1211,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                         AddEntityString(ent, pumpkinbomb_str, colors::FromRGBA8(255, 162, 0, 255));
                     else
                         AddEntityString(ent, explosive_str, colors::FromRGBA8(255, 162, 0, 255));
+                    return;
                 }
                 if (item_objectives && (classid == CL_CLASS(CCaptureFlag) || (Hash::IsFlag(szName) || Hash::IsBombCart(szName) || Hash::IsBombCartRed(szName))))
                 {
@@ -1228,6 +1230,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
 
                     if (resettime && classid == CL_CLASS(CCaptureFlag))
                         AddEntityString(ent, time, colors::white);
+                    return;
                 }
                 // Health pack esp
                 if (item_health_packs && Hash::IsHealth(szName))

@@ -287,9 +287,8 @@ public:
             if (g_pLocalPlayer->v_Origin == vec)
             {
                 auto key = std::pair<CNavArea *, CNavArea *>(&i, &i);
-                if (vischeck_cache.find(key) != vischeck_cache.end())
-                    if (!vischeck_cache[key].vischeck_state)
-                        continue;
+                if (vischeck_cache.find(key) != vischeck_cache.end() && !vischeck_cache[key].vischeck_state)
+                    continue;
             }
 
             float dist = i.m_center.DistTo(vec);
@@ -302,9 +301,8 @@ public:
             center_corrected.z += PLAYER_JUMP_HEIGHT;
             // Check if we are within x and y bounds of an area
             if (ovBestDist < dist || !i.IsOverlapping(vec) || !IsVectorVisibleNavigation(vec_corrected, center_corrected))
-            {
                 continue;
-            }
+
             ovBestDist   = dist;
             ovBestSquare = &i;
         }
@@ -387,7 +385,7 @@ public:
                     Vector area = i.m_center;
                     area.z += PLAYER_JUMP_HEIGHT;
                     // Out of range
-                    if (building_origin.DistToSqr(area) > (1100 + HALF_PLAYER_WIDTH) * (1100 + HALF_PLAYER_WIDTH))
+                    if (building_origin.DistToSqr(area) > SQR(1100 + HALF_PLAYER_WIDTH))
                         continue;
                     // Check if sentry can see us
                     if (!IsVectorVisibleNavigation(building_origin, area))
@@ -423,39 +421,11 @@ public:
         if (previous_blacklist_size != free_blacklist.size())
             erased = true;
         previous_blacklist_size = free_blacklist.size();
-        // When we switch to c++20, we can use std::erase_if
-        for (auto it = begin(free_blacklist); it != end(free_blacklist);)
-        {
-            // Clear entries from the free blacklist when expired and if it has a set time
-            if (it->second.time && it->second.time < g_GlobalVars->tickcount)
-            {
-                it     = free_blacklist.erase(it); // previously this was something like m_map.erase(it++);
-                erased = true;
-            }
-            else
-                ++it;
-        }
 
-        for (auto it = begin(vischeck_cache); it != end(vischeck_cache);)
-        {
-            if (it->second.expire_tick < g_GlobalVars->tickcount)
-            {
-                it     = vischeck_cache.erase(it); // previously this was something like m_map.erase(it++);
-                erased = true;
-            }
-            else
-                ++it;
-        }
-        for (auto it = begin(connection_stuck_time); it != end(connection_stuck_time);)
-        {
-            if (it->second.expire_tick < g_GlobalVars->tickcount)
-            {
-                it     = connection_stuck_time.erase(it); // previously this was something like m_map.erase(it++);
-                erased = true;
-            }
-            else
-                ++it;
-        }
+        std::erase_if(free_blacklist, [](const auto &entry) { return entry.second.time && entry.second.time < g_GlobalVars->tickcount; });
+        std::erase_if(vischeck_cache, [](const auto &entry) { return entry.second.expire_tick < g_GlobalVars->tickcount; });
+        std::erase_if(connection_stuck_time, [](const auto &entry) { return entry.second.expire_tick < g_GlobalVars->tickcount; });
+
         if (erased)
             pather.Reset();
     }
@@ -629,10 +599,9 @@ static void followCrumbs()
 
     bool reset_z = true;
     for (const auto &entry : fall_vec)
-    {
         if (!(entry <= 0.01f && entry >= -0.01f))
             reset_z = false;
-    }
+
     if (reset_z)
     {
         reset_z = false;
@@ -939,13 +908,7 @@ void clearFreeBlacklist()
 // Clear by category
 void clearFreeBlacklist(BlacklistReason reason)
 {
-    for (auto it = begin(map->free_blacklist); it != end(map->free_blacklist);)
-    {
-        if (it->second.value == reason.value)
-            it = map->free_blacklist.erase(it); // previously this was something like m_map.erase(it++);
-        else
-            ++it;
-    }
+    std::erase_if(map->free_blacklist, [&reason](const auto &entry) { return entry.second.value == reason.value; });
 }
 
 #if ENABLE_VISUALS

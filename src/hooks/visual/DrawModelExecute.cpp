@@ -628,10 +628,9 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
             bool good         = true;
             std::string sname = name;
             for (auto &entry : dontdraw_strings)
-            {
                 if (sname.find(entry) != std::string::npos)
                     good = false;
-            }
+
             if (!good)
                 return;
 
@@ -678,9 +677,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
             for (auto &drawer : attachment_draw_list)
             {
                 if (drawer.entidx == info.entity_index)
-                {
                     do_draw = false;
-                }
                 else
                     tmp_list.push_back(drawer);
             }
@@ -809,10 +806,9 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
     if (unk)
     {
         IClientEntity *ent = unk->GetIClientEntity();
-        if (ent)
-            if (ent->entindex() == spectator_target)
-                return;
+        if (ent && ent->entindex() == spectator_target)
+            return;
     }
     return original::DrawModelExecute(this_, state, info, bone);
-} // namespace hooked_methods
+}
 } // namespace hooked_methods

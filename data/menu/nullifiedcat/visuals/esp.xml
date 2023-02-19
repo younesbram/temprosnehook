@@ -120,7 +120,7 @@
             <AutoVariable width="fill" target="esp.info.weapon" label="Weapon"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Dominatemark" x="330" y="140">
+    <Box padding="12 6 6 6" width="content" height="content" name="Dominatemark" x="330" y="155">
         <List width="150">
             <AutoVariable width="fill" target="dominatemark.enable" label="Enable"
                           tooltip="Enables a mark on people you are dominating, similar to the one shown if someone is dominating you."/>
@@ -128,7 +128,7 @@
             <AutoVariable width="fill" target="dominatemark.max-size" label="Draw max size"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Head ESP" x="330" y="205">
+    <Box padding="12 6 6 6" width="content" height="content" name="Head ESP" x="330" y="225">
         <List width="150">
             <LabeledObject width="fill" label="Head ESP mode"
                            tooltip="Puts a certain icon over players' heads, independent of regular ESP settings.">

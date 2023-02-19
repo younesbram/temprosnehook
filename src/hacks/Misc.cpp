@@ -1050,7 +1050,7 @@ static CatCommand print_hash("debug_print_hash", "Log the models and hashes of a
                                  {
                                      const model_t *model = RAW_ENT(ent)->GetModel();
                                      const auto szName = g_IModelInfo->GetModelName(model);
-                                     logging::Info("Model name: %s   Hash: %d", szName, Hash::String(szName));
+                                     logging::Info("Model name: %s   Hash: %#x", szName, Hash::String(szName));
                                  }
                              });
 

@@ -267,10 +267,12 @@ bool Hash::IsHazard(const char *szName)
     switch (String(szName))
     {
     case PumpkinBomb:
+    case PumpkinBombTeamcolor:
     case BalloonBomb:
     case WoodenBarrel:
     case WalkerExplode:
     case SnowmanBomb:
+    case BreadFatty:
         return true;
     default:
         return false;

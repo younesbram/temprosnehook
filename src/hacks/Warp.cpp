@@ -39,7 +39,7 @@ static settings::Boolean charge_passively{ "warp.charge-passively", "true" };
 static settings::Boolean charge_in_jump{ "warp.charge-passively.jump", "true" };
 static settings::Boolean charge_no_input{ "warp.charge-passively.no-inputs", "true" };
 static settings::Int warp_movement_ratio{ "warp.movement-ratio", "6" };
-settings::Boolean dodge_projectile{ "warp.dodge_proj", "true" };
+settings::Boolean dodge_projectile{ "warp.dodge-proj", "false" };
 static settings::Boolean warp_demoknight{ "warp.demoknight", "false" };
 static settings::Boolean warp_peek{ "warp.peek", "false" };
 static settings::Boolean warp_on_damage{ "warp.on-hit", "false" };

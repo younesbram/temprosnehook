@@ -64,7 +64,6 @@ static settings::Boolean minigun_tapfire{ "aimbot.auto.tapfire", "false" };
 static settings::Boolean auto_zoom{ "aimbot.auto.zoom", "false" };
 static settings::Boolean auto_unzoom{ "aimbot.auto.unzoom", "false" };
 static settings::Int zoom_distance{ "aimbot.zoom.distance", "1250" };
-static settings::Boolean target_hazards{ "aimbot.target-hazards", "false" };
 
 static settings::Boolean backtrackAimbot{ "aimbot.backtrack", "false" };
 static settings::Boolean backtrackLastTickOnly("aimbot.backtrack.only-last-tick", "true");
@@ -786,12 +785,11 @@ bool ShouldAim()
 }
 
 // Function to find a suitable target
-bool isLastTargetHazard = false;
 CachedEntity *RetrieveBestTarget(bool aimkey_state)
 {
     // If target lock is on, we've already chosen a target, it's not a hazard, and the aimkey
     // is allowed, then attempt to keep the previous target
-    if (*target_lock && target_last && !isLastTargetHazard && aimkey_state)
+    if (*target_lock && target_last && aimkey_state)
     {
         if (ShouldBacktrack(target_last))
         {
@@ -1591,7 +1589,6 @@ void Reset()
 {
     target_last        = nullptr;
     projectile_mode    = false;
-    isLastTargetHazard = false;
 }
 
 #if ENABLE_VISUALS

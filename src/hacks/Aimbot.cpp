@@ -64,11 +64,11 @@ static settings::Boolean minigun_tapfire{ "aimbot.auto.tapfire", "false" };
 static settings::Boolean auto_zoom{ "aimbot.auto.zoom", "false" };
 static settings::Boolean auto_unzoom{ "aimbot.auto.unzoom", "false" };
 static settings::Int zoom_distance{ "aimbot.zoom.distance", "1250" };
+static settings::Boolean target_hazards{ "aimbot.target-hazards", "false" };
 
 static settings::Boolean backtrackAimbot{ "aimbot.backtrack", "false" };
 static settings::Boolean backtrackLastTickOnly("aimbot.backtrack.only-last-tick", "true");
 static bool force_backtrack_aimbot = false;
-static settings::Boolean backtrackVischeckAll{ "aimbot.backtrack.vischeck-all", "false" };
 
 // TODO maybe these should be moved into "Targeting"
 static settings::Float max_range{ "aimbot.target.max-range", "4096" };
@@ -98,7 +98,7 @@ settings::Boolean engine_projpred{ "aimbot.debug.engine-pp", "true" };
 struct AimbotCalculatedData_s
 {
     unsigned long predict_tick{ 0 };
-    bool predict_type{ 0 };
+    bool predict_type{ false };
     Vector aim_position{ 0 };
     unsigned long vcheck_tick{ 0 };
     bool visible{ false };
@@ -146,7 +146,7 @@ inline float EffectiveTargetingRange()
     return (float) max_range;
 }
 
-inline bool isHitboxMedium(int hitbox)
+inline bool IsHitboxMedium(int hitbox)
 {
     switch (hitbox)
     {
@@ -161,7 +161,7 @@ inline bool isHitboxMedium(int hitbox)
     }
 }
 
-inline bool playerTeamCheck(CachedEntity *entity)
+inline bool PlayerTeamCheck(CachedEntity *entity)
 {
     return (int) teammates == 2 || (!teammates && entity->m_bEnemy()) || (teammates && !entity->m_bEnemy()) || (CE_GOOD(LOCAL_W) && LOCAL_W->m_iClassID() == CL_CLASS(CTFCrossbow) && entity->m_iHealth() < entity->m_iMaxHealth());
 }
@@ -170,6 +170,12 @@ inline bool playerTeamCheck(CachedEntity *entity)
 inline bool CarryingHeatmaker()
 {
     return CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 752;
+}
+
+// Am I holding the Machina ?
+inline bool CarryingMachina()
+{
+    return CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 526 || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 30665;
 }
 
 // A function to find the best hitbox for a target
@@ -181,7 +187,7 @@ inline int BestHitbox(CachedEntity *target)
     case 0:
     {
         // AUTO priority
-        return autoHitbox(target);
+        return AutoHitbox(target);
         break;
     }
     case 1:
@@ -201,7 +207,7 @@ inline int BestHitbox(CachedEntity *target)
     return -1;
 }
 
-inline float projectileHitboxSize(int projectile_size)
+inline float ProjectileHitboxSize(int projectile_size)
 {
     float projectile_hitbox_size = 6.3f;
     switch (projectile_size)
@@ -223,13 +229,11 @@ inline float projectileHitboxSize(int projectile_size)
     case CL_CLASS(CTFCompoundBow):
         projectile_hitbox_size = 1;
         break;
-    default:
-        break;
     }
     return projectile_hitbox_size;
 }
 
-inline void updateShouldBacktrack()
+inline void UpdateShouldBacktrack()
 {
     if (hacks::backtrack::hasData() || projectile_mode || !(*backtrackAimbot || force_backtrack_aimbot))
         shouldbacktrack_cache = false;
@@ -237,14 +241,14 @@ inline void updateShouldBacktrack()
         shouldbacktrack_cache = true;
 }
 
-inline bool shouldBacktrack(CachedEntity *ent)
+inline bool ShouldBacktrack(CachedEntity *ent)
 {
     if (!shouldbacktrack_cache || (ent && ent->m_Type() != ENTITY_PLAYER) || !backtrack::getGoodTicks(ent))
         return false;
     return true;
 }
 
-void spectatorUpdate()
+void SpectatorUpdate()
 {
     switch (*specmode)
     {
@@ -279,7 +283,7 @@ void spectatorUpdate()
 #define GET_MIDDLE(c1, c2) ((corners[c1] + corners[c2]) / 2.0f)
 
 // Get all the valid aim positions
-std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
+std::vector<Vector> GetValidHitpoints(CachedEntity *ent, int hitbox)
 {
     // Recorded vischeckable points
     std::vector<Vector> hitpoints;
@@ -305,7 +309,7 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
 
     float shrink_size = 1;
 
-    if (!isHitboxMedium(hitbox)) // hitbox should be chosen based on size.
+    if (!IsHitboxMedium(hitbox)) // hitbox should be chosen based on size.
         shrink_size = 3;
     else
         shrink_size = 6;
@@ -348,7 +352,7 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
                 ++i;
                 continue;
             }
-            hitpoints = getHitpointsVischeck(ent, i);
+            hitpoints = GetHitpointsVischeck(ent, i);
             ++i;
         }
     }
@@ -356,7 +360,7 @@ std::vector<Vector> getValidHitpoints(CachedEntity *ent, int hitbox)
     return hitpoints;
 }
 
-std::vector<Vector> getHitpointsVischeck(CachedEntity *ent, int hitbox)
+std::vector<Vector> GetHitpointsVischeck(CachedEntity *ent, int hitbox)
 {
     std::vector<Vector> hitpoints;
     auto hb      = ent->hitboxes.GetHitbox(hitbox);
@@ -374,7 +378,7 @@ std::vector<Vector> getHitpointsVischeck(CachedEntity *ent, int hitbox)
 
     float shrink_size = 1;
 
-    if (!isHitboxMedium(hitbox)) // hitbox should be chosen based on size.
+    if (!IsHitboxMedium(hitbox)) // hitbox should be chosen based on size.
         shrink_size = 3;
     else
         shrink_size = 6;
@@ -385,7 +389,6 @@ std::vector<Vector> getHitpointsVischeck(CachedEntity *ent, int hitbox)
 
     // Generate middle points on line segments
     // Define cleans up code
-
     const Vector line_positions[12] = { GET_MIDDLE(0, 1), GET_MIDDLE(0, 2), GET_MIDDLE(1, 3), GET_MIDDLE(2, 3), GET_MIDDLE(7, 6), GET_MIDDLE(7, 5), GET_MIDDLE(6, 4), GET_MIDDLE(5, 4), GET_MIDDLE(0, 4), GET_MIDDLE(1, 5), GET_MIDDLE(2, 6), GET_MIDDLE(3, 7) };
 
     // Create combined vector
@@ -407,9 +410,9 @@ std::vector<Vector> getHitpointsVischeck(CachedEntity *ent, int hitbox)
 }
 
 // Get the best point to aim at for a given hitbox
-std::optional<Vector> getBestHitpoint(CachedEntity *ent, int hitbox)
+std::optional<Vector> GetBestHitpoint(CachedEntity *ent, int hitbox)
 {
-    auto positions = getValidHitpoints(ent, hitbox);
+    auto positions = GetValidHitpoints(ent, hitbox);
 
     std::optional<Vector> best_pos = std::nullopt;
     float max_score                = FLT_MAX;
@@ -426,7 +429,7 @@ std::optional<Vector> getBestHitpoint(CachedEntity *ent, int hitbox)
 }
 
 // Reduce Backtrack lag by checking if the ticks hitboxes are within a reasonable FOV range
-bool validateTickFOV(backtrack::BacktrackData &tick)
+bool ValidateTickFov(backtrack::BacktrackData &tick)
 {
     if (fov)
     {
@@ -446,13 +449,7 @@ bool validateTickFOV(backtrack::BacktrackData &tick)
     return true;
 }
 
-// Am I holding the Machina ?
-bool CarryingMachina()
-{
-    return CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 526 || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 30665;
-}
-
-bool allowNoScope(CachedEntity *target)
+bool AllowNoScope(CachedEntity *target)
 {
     if (CarryingMachina())
         return false;
@@ -483,7 +480,7 @@ bool allowNoScope(CachedEntity *target)
     return false;
 }
 
-void doAutoZoom(bool target_found, CachedEntity *target)
+void DoAutoZoom(bool target_found, CachedEntity *target)
 {
     bool isIdle = !target_found && hacks::followbot::isIdle();
 
@@ -501,7 +498,7 @@ void doAutoZoom(bool target_found, CachedEntity *target)
     }
 
     auto nearest = hacks::NavBot::getNearestPlayerDistance();
-    if (!allowNoScope(target) && g_pLocalPlayer->holding_sniper_rifle && (target_found || isIdle || nearest.second <= *zoom_distance))
+    if (!AllowNoScope(target) && g_pLocalPlayer->holding_sniper_rifle && (target_found || isIdle || nearest.second <= *zoom_distance))
     {
         if (target_found)
             zoomTime.update();
@@ -537,7 +534,7 @@ static void CreateMove()
     bool aimkey_status = UpdateAimkey();
 
     if (*specmode != 0)
-        spectatorUpdate();
+        SpectatorUpdate();
     if (!enable)
     {
         target_last = nullptr;
@@ -554,7 +551,7 @@ static void CreateMove()
         return;
     }
 
-    doAutoZoom(false, nullptr);
+    DoAutoZoom(false, nullptr);
 
     if (hacks::antianticheat::enabled)
         fov = std::min(fov > 0.0f ? fov : FLT_MAX, 10.0f);
@@ -568,14 +565,14 @@ static void CreateMove()
     case weapon_hitscan:
     {
         if (should_backtrack)
-            updateShouldBacktrack();
+            UpdateShouldBacktrack();
         target_last = RetrieveBestTarget(aimkey_status);
         if (target_last)
         {
             if (should_zoom)
-                doAutoZoom(true, target_last);
+                DoAutoZoom(true, target_last);
             int weapon_case = LOCAL_W->m_iClassID();
-            if (!hitscanSpecialCases(target_last, weapon_case))
+            if (!HitscanSpecialCases(target_last, weapon_case))
                 DoAutoshoot(target_last);
         }
         break;
@@ -583,7 +580,7 @@ static void CreateMove()
     case weapon_melee:
     {
         if (should_backtrack)
-            updateShouldBacktrack();
+            UpdateShouldBacktrack();
         target_last = RetrieveBestTarget(aimkey_status);
         if (target_last)
             DoAutoshoot(target_last);
@@ -611,7 +608,7 @@ static void CreateMove()
             if (target_last)
             {
                 int weapon_case = g_pLocalPlayer->weapon()->m_iClassID();
-                if (projectileSpecialCases(target_last, weapon_case))
+                if (ProjectileSpecialCases(target_last, weapon_case))
                     DoAutoshoot(target_last);
             }
         }
@@ -620,9 +617,8 @@ static void CreateMove()
     }
 }
 
-bool projectileSpecialCases(CachedEntity *target_entity, int weapon_case)
+bool ProjectileSpecialCases(CachedEntity *target_entity, int weapon_case)
 {
-
     switch (weapon_case)
     {
     case CL_CLASS(CTFCompoundBow):
@@ -690,7 +686,7 @@ bool projectileSpecialCases(CachedEntity *target_entity, int weapon_case)
 }
 
 int tapfire_delay = 0;
-bool hitscanSpecialCases(CachedEntity *target_entity, int weapon_case)
+bool HitscanSpecialCases(CachedEntity *target_entity, int weapon_case)
 {
     if (weapon_case == CL_CLASS(CTFMinigun))
     {
@@ -754,7 +750,6 @@ bool MouseMoving()
 bool ShouldAim()
 {
     // Checks should be in order: cheap -> expensive
-
     // Check for +use
     if (current_user_cmd->buttons & IN_USE)
         return false;
@@ -791,13 +786,14 @@ bool ShouldAim()
 }
 
 // Function to find a suitable target
+bool isLastTargetHazard = false;
 CachedEntity *RetrieveBestTarget(bool aimkey_state)
 {
-    // If we have a previously chosen target, target lock is on, and the aimkey
+    // If target lock is on, we've already chosen a target, it's not a hazard, and the aimkey
     // is allowed, then attempt to keep the previous target
-    if (target_lock && target_last && aimkey_state)
+    if (*target_lock && target_last && !isLastTargetHazard && aimkey_state)
     {
-        if (shouldBacktrack(target_last))
+        if (ShouldBacktrack(target_last))
         {
             auto good_ticks_tmp = hacks::backtrack::getGoodTicks(target_last);
             if (good_ticks_tmp)
@@ -810,7 +806,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                 }
                 for (auto &bt_tick : good_ticks)
                 {
-                    if (!validateTickFOV(bt_tick))
+                    if (!ValidateTickFov(bt_tick))
                         continue;
                     hacks::backtrack::MoveToTick(bt_tick);
                     if (IsTargetStateGood(target_last) && Aim(target_last))
@@ -841,7 +837,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
         bool isTargetGood = false;
 
         static std::optional<hacks::backtrack::BacktrackData> temp_bt_tick = std::nullopt;
-        if (shouldBacktrack(ent))
+        if (ShouldBacktrack(ent))
         {
             auto good_ticks_tmp = backtrack::getGoodTicks(ent);
             if (good_ticks_tmp)
@@ -854,7 +850,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                 }
                 for (auto &bt_tick : good_ticks)
                 {
-                    if (!validateTickFOV(bt_tick))
+                    if (!ValidateTickFov(bt_tick))
                         continue;
                     hacks::backtrack::MoveToTick(bt_tick);
                     if (IsTargetStateGood(ent) && Aim(ent))
@@ -867,11 +863,9 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
                 }
             }
         }
-        else
-        {
-            if (IsTargetStateGood(ent) && Aim(ent))
-                isTargetGood = true;
-        }
+        else if (IsTargetStateGood(ent) && Aim(ent))
+            isTargetGood = true;
+
         if (isTargetGood) // Melee mode straight up won't swing if the target is too far away. No need to prioritize based on distance. Just use whatever the user chooses.
         {
             switch ((int) priority_mode)
@@ -913,9 +907,8 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
             }
             // Crossbow logic
             if (!ent->m_bEnemy() && ent->m_Type() == ENTITY_PLAYER && CE_GOOD(LOCAL_W) && LOCAL_W->m_iClassID() == CL_CLASS(CTFCrossbow))
-            {
                 scr = ((ent->m_iMaxHealth() - ent->m_iHealth()) / ent->m_iMaxHealth()) * (*priority_mode == 2 ? 16384.0f : 2000.0f);
-            }
+
             // Compare the top score to our current ents score
             if (scr > target_highest_score)
             {
@@ -926,7 +919,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
         }
 
         // Restore tick
-        if (shouldBacktrack(ent))
+        if (ShouldBacktrack(ent))
             hacks::backtrack::RestoreEntity(ent->m_IDX);
     }
 
@@ -952,7 +945,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         else if (!entity->m_bAlivePlayer())
             return false;
         // Teammates
-        else if (!playerTeamCheck(entity))
+        else if (!PlayerTeamCheck(entity))
             return false;
         else if (!player_tools::shouldTarget(entity))
             return false;
@@ -1184,7 +1177,7 @@ bool Aim(CachedEntity *entity)
     Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, is_it_good, LOCAL_E);
 
     if (projectileAimbotRequired) // unfortunately you have to check this twice, otherwise you'd have to run GetAimAtAngles far too early
-        if (!didProjectileHit(getShootPos(angles), is_it_good, entity, projectileHitboxSize(LOCAL_W->m_iClassID()), (0.01f < cur_proj_grav)))
+        if (!didProjectileHit(getShootPos(angles), is_it_good, entity, ProjectileHitboxSize(LOCAL_W->m_iClassID()), (0.01f < cur_proj_grav)))
             return false;
 
     if (fov > 0 && cd.fov > fov)
@@ -1203,7 +1196,7 @@ bool Aim(CachedEntity *entity)
     if (silent && !slow_aim)
         g_pLocalPlayer->bUseSilentAngles = true;
     // Set tick count to targets (backtrack messes with this)
-    if (!shouldBacktrack(entity) && nolerp && entity->m_IDX <= g_IEngine->GetMaxClients())
+    if (!ShouldBacktrack(entity) && nolerp && entity->m_IDX <= g_IEngine->GetMaxClients())
     {
         auto ratio                   = std::clamp(cl_interp_ratio->GetFloat(), sv_client_min_interp_ratio->GetFloat(), sv_client_max_interp_ratio->GetFloat());
         auto lerptime                = (std::max)(cl_interp->GetFloat(), (ratio / ((sv_maxupdaterate) ? sv_maxupdaterate->GetFloat() : cl_updaterate->GetFloat())));
@@ -1274,7 +1267,7 @@ void DoAutoshoot(CachedEntity *target_entity)
     {
         if (g_pLocalPlayer->holding_sniper_rifle)
         {
-            if (zoomed_only && !CanHeadshot() && !allowNoScope(target_entity))
+            if (zoomed_only && !CanHeadshot() && !AllowNoScope(target_entity))
                 attack = false;
         }
     }
@@ -1348,7 +1341,7 @@ Vector PredictEntity(CachedEntity *entity)
                     break;
                 }
 
-                std::optional<Vector> best_pos = getBestHitpoint(entity, cd.hitbox);
+                std::optional<Vector> best_pos = GetBestHitpoint(entity, cd.hitbox);
                 if (best_pos)
                     result = *best_pos;
             }
@@ -1387,7 +1380,7 @@ Vector PredictEntity(CachedEntity *entity)
     return result;
 }
 
-int notVisibleHitbox(CachedEntity *target, int preferred)
+int NotVisibleHitbox(CachedEntity *target, int preferred)
 {
     if (target->hitboxes.VisibilityCheck(preferred))
         return preferred;
@@ -1396,7 +1389,7 @@ int notVisibleHitbox(CachedEntity *target, int preferred)
         return hitbox_t::spine_1;
 }
 
-int autoHitbox(CachedEntity *target)
+int AutoHitbox(CachedEntity *target)
 {
     int preferred     = 3;
     int target_health = target->m_iHealth(); // This was used way too many times. Due to how pointers work (defrencing)+the compiler already dealing with tons of AIDS global variables it likely derefrenced it every time it was called.
@@ -1474,7 +1467,7 @@ int autoHitbox(CachedEntity *target)
     {
         bool ground = CE_INT(target, netvar.iFlags) & (1 << 0);
         if (ground)
-            preferred = notVisibleHitbox(target, hitbox_t::foot_L); // Only time it is worth the penalty
+            preferred = NotVisibleHitbox(target, hitbox_t::foot_L); // Only time it is worth the penalty
     }
     return preferred;
 }
@@ -1582,7 +1575,7 @@ bool UpdateAimkey()
 }
 
 // Used mostly by navbot to not accidentally look at path when aiming
-bool isAiming()
+bool IsAiming()
 {
     return aimed_this_tick;
 }
@@ -1596,14 +1589,15 @@ CachedEntity *CurrentTarget()
 // Used for when you join and leave maps to reset aimbot vars
 void Reset()
 {
-    target_last     = nullptr;
-    projectile_mode = false;
+    target_last        = nullptr;
+    projectile_mode    = false;
+    isLastTargetHazard = false;
 }
 
 #if ENABLE_VISUALS
 static void DrawText()
 {
-    // Dont draw to screen when aimbot is disabled
+    // Don't draw to screen when aimbot is disabled
     if (!enable)
         return;
 
@@ -1613,7 +1607,7 @@ static void DrawText()
         // It cant use fovs greater than 180, so we check for that
         if (float(fov) > 0.0f && float(fov) < 180)
         {
-            // Dont show ring while player is dead
+            // Don't show ring while player is dead
             if (CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
             {
                 rgba_t color = colors::gui;
@@ -1650,14 +1644,15 @@ static void DrawText()
 }
 #endif
 
-void rvarCallback(settings::VariableBase<float> &, float after)
+void RvarCallback(settings::VariableBase<float> &, float after)
 {
     force_backtrack_aimbot = after >= 200.0f;
 }
+
 static InitRoutine EC(
     []()
     {
-        hacks::backtrack::latency.installChangeCallback(rvarCallback);
+        hacks::backtrack::latency.installChangeCallback(RvarCallback);
         EC::Register(EC::LevelInit, Reset, "INIT_Aimbot", EC::average);
         EC::Register(EC::LevelShutdown, Reset, "RESET_Aimbot", EC::average);
         EC::Register(EC::CreateMove, CreateMove, "CM_Aimbot", EC::late);

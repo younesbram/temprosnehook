@@ -297,7 +297,6 @@ public:
 
 namespace entity_cache
 {
-// b1g fat array in
 extern u_int16_t max;
 extern u_int16_t previous_max;
 extern std::vector<CachedEntity *> valid_ents;
@@ -311,7 +310,6 @@ inline CachedEntity *Get(const u_int16_t &idx)
     else
         return &test->second;
 }
-void dodgeProj(CachedEntity *proj_ptr);
 __attribute__((hot)) void Update();
 void Invalidate();
 void Shutdown();

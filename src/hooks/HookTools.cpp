@@ -1,13 +1,11 @@
 #include "common.hpp"
 #include "HookTools.hpp"
 
-#include <utility>
-
 namespace EC
 {
 struct EventCallbackData
 {
-    explicit EventCallbackData(EventFunction function, const std::string &name, enum ec_priority priority) : function{ std::move(function) }, priority{ int(priority) }, section(name), event_name{ name }
+    explicit EventCallbackData(EventFunction function, const std::string &name, enum ec_priority priority) : function{ function }, priority{ int(priority) }, section(name), event_name{ name }
     {
     }
     EventFunction function;

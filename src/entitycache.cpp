@@ -8,7 +8,6 @@
 #include "common.hpp"
 #include <settings/Float.hpp>
 #include "soundcache.hpp"
-#include <Warp.hpp>
 
 inline void CachedEntity::Update()
 {
@@ -32,10 +31,6 @@ inline CachedEntity::CachedEntity(u_int16_t idx) : m_IDX(idx), hitboxes(hitbox_c
 }
 
 CachedEntity::~CachedEntity() = default;
-
-static settings::Float ve_window{ "debug.ve.window", "0" };
-static settings::Boolean ve_smooth{ "debug.ve.smooth", "true" };
-static settings::Int ve_averager_size{ "debug.ve.averaging", "0" };
 
 bool CachedEntity::IsVisible()
 {

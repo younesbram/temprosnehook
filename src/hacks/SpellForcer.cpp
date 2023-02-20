@@ -7,7 +7,7 @@ static settings::Boolean enabled("spellforce.enabled", "false");
 
 bool isEnabled()
 {
-    return enabled && g_pGameRules->halloweenScenario != 0;
+    return *enabled && g_pGameRules->halloweenScenario != 0;
 }
 
 static settings::Int default_spell("spellforce.default_spell", "-1");
@@ -284,11 +284,11 @@ static InitRoutine init(
     []()
     {
 #if ENABLE_VISUALS
-        EC::Register(EC::Draw, Draw, "spellforcer_draw", EC::early);
+        EC::Register(EC::Draw, Draw, "DRAW_SpellForcer", EC::early);
         EC::Register(
-            EC::LevelInit, []() { draw_timer.update(); }, "spellforcer_lvlinit");
+            EC::LevelInit, []() { draw_timer.update(); }, "INIT_SpellForcer");
 #endif
-        EC::Register(EC::CreateMoveLate, CreateMoveLate, "spellforcer_cml", EC::early);
+        EC::Register(EC::CreateMoveLate, CreateMoveLate, "CML_SpellForcer", EC::early);
     });
 
 } // namespace hacks::spellforcer

@@ -11,7 +11,6 @@
 
 namespace hacks::ragdolls
 {
-
 static settings::Int mode{ "visual.ragdoll-mode", "0" };
 static settings::Boolean only_local{ "visual.ragdoll-only-local", "1" };
 
@@ -202,7 +201,7 @@ static InitRoutine init(
     []()
     {
         hook();
-        EC::Register(EC::Shutdown, unhook, "ragdoll_shutdown");
+        EC::Register(EC::Shutdown, unhook, "SD_Ragdolls");
     });
 
 } // namespace hacks::ragdolls

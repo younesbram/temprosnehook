@@ -5,7 +5,7 @@
 
 namespace player_danger
 {
-static settings::Boolean dangercheck{ "danger.enable", "true" };
+static settings::Boolean dangercheck{ "danger.enable", "false" };
 static settings::Int draw_string_x{ "danger.draw-info.x", "1500" };
 static settings::Int draw_string_y{ "danger.draw-info.y", "600" };
 static settings::Int fov1{ "danger.fov-looking-at", "15" };

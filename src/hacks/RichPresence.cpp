@@ -1,6 +1,7 @@
 /*
  * Author: Lesshy
  */
+
 #include "HookedMethods.hpp"
 #include "common.hpp"
 #include <iostream>
@@ -86,6 +87,6 @@ void CreateMove()
 }
 
 // Make sure we register this!
-static InitRoutine init([]() { EC::Register(EC::CreateMove, CreateMove, "rsp_presence", EC::average); });
+static InitRoutine init([]() { EC::Register(EC::CreateMove, CreateMove, "CM_RichPresence", EC::average); });
 
 } // namespace richpresence

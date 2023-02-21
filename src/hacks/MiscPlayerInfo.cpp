@@ -63,7 +63,7 @@ void Paint()
     {
         if (CE_BAD(ent))
             continue;
-        if (ent->m_Type() != ENTITY_PLAYER || !ent->player_info.friendsID)
+        if (ent->m_Type() != ENTITY_PLAYER || !ent->player_info->friendsID)
             continue;
         // Update alive state
         if (g_pPlayerResource->isAlive(ent->m_IDX))
@@ -127,7 +127,7 @@ void Paint()
             if (ent->m_IDX == g_IEngine->GetLocalPlayer())
                 color.b += 0.5f;
             // tint CAT status people's names too
-            if (playerlist::AccessData(ent->player_info.friendsID).state == playerlist::k_EState::CAT)
+            if (playerlist::AccessData(ent->player_info->friendsID).state == playerlist::k_EState::CAT)
                 color.g = 0.8f;
 
             // Calculate Player Level
@@ -138,9 +138,9 @@ void Paint()
             level            = max(level, 1);
 
             // String to draw, {Level} Cat for cathook users, else gotten from std::vector at random.
-            if (choosen_entry[ent->player_info.friendsID].first.empty() || choosen_entry[ent->player_info.friendsID].second != level)
-                choosen_entry[ent->player_info.friendsID] = { random_mafia_entry(level, ent->player_info.friendsID), level };
-            std::string to_display = (playerlist::AccessData(ent->player_info.friendsID).state == playerlist::k_EState::CAT ? format("Lv.", level, " Cat") : format("Lv.", level, " ", choosen_entry[ent->player_info.friendsID].first));
+            if (choosen_entry[ent->player_info->friendsID].first.empty() || choosen_entry[ent->player_info->friendsID].second != level)
+                choosen_entry[ent->player_info->friendsID] = { random_mafia_entry(level, ent->player_info->friendsID), level };
+            std::string to_display = (playerlist::AccessData(ent->player_info->friendsID).state == playerlist::k_EState::CAT ? format("Lv.", level, " Cat") : format("Lv.", level, " ", choosen_entry[ent->player_info->friendsID].first));
 
             // Clamp to prevent oob
             color.g -= (float) (g_GlobalVars->curtime - death_timer[ent->m_IDX]) / (3.0f);
@@ -166,6 +166,6 @@ void Paint()
     }
 }
 
-static InitRoutine init([]() { EC::Register(EC::Draw, Paint, "DRAW_Miscplayerinfo", EC::average); });
+static InitRoutine init([]() { EC::Register(EC::Draw, Paint, "DRAW_MiscPlayerInfo", EC::average); });
 #endif
 } // namespace hacks::miscplayerinfo

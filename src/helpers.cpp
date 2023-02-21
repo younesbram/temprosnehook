@@ -884,19 +884,6 @@ bool isRapidFire(IClientEntity *wep)
     return ret || wep->GetClientClass()->m_ClassID == CL_CLASS(CTFMinigun);
 }
 
-// Get forward vector
-void AngleVectors2(const QAngle &angles, Vector *forward)
-{
-    float sp, sy, cp, cy;
-
-    SinCos(DEG2RAD(angles[YAW]), &sy, &cy);
-    SinCos(DEG2RAD(angles[PITCH]), &sp, &cp);
-
-    forward->x = cp * cy;
-    forward->y = cp * sy;
-    forward->z = -sp;
-}
-
 char GetUpperChar(ButtonCode_t button)
 {
     switch (button)
@@ -1869,6 +1856,11 @@ Vector getShootPos(Vector angle)
         {
             if (CE_INT(LOCAL_E, netvar.iFlags) & FL_DUCKING)
                 vecOffset->z = 8.0f;
+            break;
+        }
+        case CL_CLASS(CTFCompoundBow):
+        {
+            vecOffset->y = -4.0f;
             break;
         }
         default:

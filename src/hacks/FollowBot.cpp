@@ -65,7 +65,7 @@ static CatCommand steam_debug("debug_steamid", "Print steamids",
                               []()
                               {
                                   for (const auto &ent : entity_cache::player_cache)
-                                      logging::Info("%u", ent->player_info.friendsID);
+                                      logging::Info("%u", ent->player_info->friendsID);
                               });
 
 // Something to store breadcrumbs created by followed players
@@ -331,14 +331,14 @@ static void cm()
         // Find a target with the steam id, as it is prioritized
         if (steamid)
         {
-            if (ENTITY(valid_target)->player_info.friendsID != steamid)
+            if (ENTITY(valid_target)->player_info->friendsID != steamid)
             {
                 for (const auto &entity: entity_cache::player_cache)
                 {
                     if (!isValidTarget(entity))
                         continue;
                     // No enemy check, since steamid is very specific
-                    if (steamid != entity->player_info.friendsID) // steamid check
+                    if (steamid != entity->player_info->friendsID) // steamid check
                         continue;
                     if (startFollow(entity, isNavBotCM))
                     {
@@ -361,10 +361,10 @@ static void cm()
                 CSteamID steamid;
                 pc->GetCurrentPartyLeader(steamid);
                 auto accountid = steamid.GetAccountID();
-                // if (steamid.GetAccountID() != ENTITY(follow_target)->player_info.friendsID)
+                // if (steamid.GetAccountID() != ENTITY(follow_target)->player_info->friendsID)
                 //    continue;
 
-                if (accountid != ENTITY(valid_target)->player_info.friendsID)
+                if (accountid != ENTITY(valid_target)->player_info->friendsID)
                 {
                     for (const auto &entity: entity_cache::player_cache)
                     {
@@ -372,7 +372,7 @@ static void cm()
                             continue;
                         if (entity->m_bEnemy())
                             continue;
-                        if (accountid != entity->player_info.friendsID)
+                        if (accountid != entity->player_info->friendsID)
                             continue;
                         if (startFollow(entity, isNavBotCM))
                         {
@@ -744,9 +744,9 @@ void rvarCallback(settings::VariableBase<int> &var, int after)
 static InitRoutine runinit(
     []()
     {
-        EC::Register(EC::CreateMove_NoEnginePred, cm, "cm_followbot", EC::average);
+        EC::Register(EC::CreateMove_NoEnginePred, cm, "CM_FollowBot", EC::average);
 #if ENABLE_VISUALS
-        EC::Register(EC::Draw, draw, "draw_followbot", EC::average);
+        EC::Register(EC::Draw, draw, "DRAW_FollowBot", EC::average);
 #endif
         steam_var.installChangeCallback(rvarCallback);
     });

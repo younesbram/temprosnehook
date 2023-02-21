@@ -614,15 +614,15 @@ static void CreateMove()
         {
             CachedEntity *current_ent = ENTITY(CurrentHealingTargetIDX);
             if (CE_GOOD(current_ent))
-                current_id = current_ent->player_info.friendsID;
+                current_id = current_ent->player_info->friendsID;
         }
         if (current_id != steamid)
         {
             for (const auto &ent : entity_cache::player_cache)
             {
-                if (!ent->player_info.friendsID)
+                if (!ent->player_info->friendsID)
                     continue;
-                if (ent->player_info.friendsID == steamid && CanHeal(ent->m_IDX))
+                if (ent->player_info->friendsID == steamid && CanHeal(ent->m_IDX))
                 {
                     CurrentHealingTargetIDX = ent->m_IDX;
                     healing_steamid         = true;

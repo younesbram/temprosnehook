@@ -84,7 +84,7 @@ inline std::optional<rgba_t> getColor(CachedEntity *ent)
     else
     {
 
-        auto state = playerlist::AccessData(ent->player_info.friendsID);
+        auto state = playerlist::AccessData(ent->player_info->friendsID);
         if (state.state == playerlist::k_EState::DEFAULT)
         {
             if (!ent->m_vecDormantOrigin())
@@ -99,7 +99,7 @@ inline std::optional<rgba_t> getColor(CachedEntity *ent)
             else if (*coloring_mode == 1)
                 return colors::EntityF(ent);
         }
-        if (!player_tools::shouldTargetSteamId(ent->player_info.friendsID))
+        if (!player_tools::shouldTargetSteamId(ent->player_info->friendsID))
         {
             if (*draw_friendlies == 1)
             {
@@ -112,7 +112,7 @@ inline std::optional<rgba_t> getColor(CachedEntity *ent)
         }
         if (!ent->m_bEnemy())
             return std::nullopt;
-        return playerlist::Color(ent->player_info.friendsID);
+        return playerlist::Color(ent->player_info->friendsID);
     }
 }
 

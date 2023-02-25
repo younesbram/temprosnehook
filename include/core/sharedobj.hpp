@@ -1,5 +1,5 @@
 /*
- * sharedobj.h
+ * sharedobj.hpp
  *
  *  Created on: Oct 3, 2016
  *      Author: nullifiedcat
@@ -27,7 +27,6 @@ public:
     char *Pointer(uintptr_t offset) const;
     void *CreateInterface(const std::string &interface);
 
-public:
     std::string file;
     std::string path;
     bool factory{ false };
@@ -37,7 +36,6 @@ public:
     link_map *lmap{ nullptr };
 };
 
-SharedObject &serverbrowser();
 SharedObject &steamclient();
 SharedObject &client();
 SharedObject &engine();

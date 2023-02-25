@@ -658,14 +658,18 @@ powerup_type GetPowerupOnPlayer(CachedEntity *player)
     return powerup_type::not_powerup;
 }
 
-bool didProjectileHit(Vector start_point, Vector end_point, CachedEntity *entity, float projectile_size, bool grav_comp)
+bool DidProjectileHit(Vector start_point, Vector end_point, CachedEntity *entity, float projectile_size, bool grav_comp, trace_t *tracer)
 {
     trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
     Ray_t ray;
-    trace_t trace_obj;
+    trace_t *trace_obj;
+    if (tracer)
+        trace_obj = tracer;
+    else
+        trace_obj = new trace_t;
     ray.Init(start_point, end_point, Vector(0, -projectile_size, -projectile_size), Vector(0, projectile_size, projectile_size));
-    g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, &trace_obj);
-    return (((IClientEntity *) trace_obj.m_pEnt) == RAW_ENT(entity) || (grav_comp && !trace_obj.DidHit()));
+    g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, trace_obj);
+    return (((IClientEntity *) trace_obj->m_pEnt) == RAW_ENT(entity) || grav_comp && !trace_obj->DidHit());
 }
 
 // A function to find a weapon by WeaponID

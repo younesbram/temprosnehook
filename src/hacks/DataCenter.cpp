@@ -228,7 +228,7 @@ static void Init()
         {
             if (!g_ISteamNetworkingUtils)
             {
-                g_ISteamNetworkingUtils = ((void *(*) ())(dlsym(sharedobj::steamnetworkingsockets().lmap, "SteamNetworkingUtils_LibV4")))();
+                g_ISteamNetworkingUtils = ((void *(*) ())(dlsym(sharedobj::libsteamnetworkingsockets().lmap, "SteamNetworkingUtils_LibV4")))();
                 if (!g_ISteamNetworkingUtils)
                 {
                     logging::Info("DataCenter.cpp: Failed to create ISteamNetworkingUtils!");

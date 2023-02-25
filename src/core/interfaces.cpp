@@ -95,7 +95,7 @@ void CreateEarlyInterfaces()
 
 void CreateInterfaces()
 {
-    g_ICvar             = BruteforceInterface<ICvar>("VEngineCvar", sharedobj::vstdlib());
+    g_ICvar             = BruteforceInterface<ICvar>("VEngineCvar", sharedobj::libvstdlib());
     g_IEngine           = BruteforceInterface<IVEngineClient013>("VEngineClient", sharedobj::engine());
     demoplayer          = **(unsigned ***) (CSignature::GetEngineSignature("89 15 ? ? ? ? BA ? ? ? ? 83 38 01") + 2);
     g_ISoundEngine      = BruteforceInterface<IEngineSound>("IEngineSoundClient", sharedobj::engine());
@@ -109,14 +109,14 @@ void CreateInterfaces()
     g_IServerTools      = BruteforceInterface<CServerTools>("VSERVERTOOLS", sharedobj::server());
 
     logging::Info("Initing SteamAPI");
-    auto GetHSteamPipe = reinterpret_cast<GetHSteamPipe_t>(dlsym(sharedobj::steamapi().lmap, "SteamAPI_GetHSteamPipe"));
+    auto GetHSteamPipe = reinterpret_cast<GetHSteamPipe_t>(dlsym(sharedobj::libsteam_api().lmap, "SteamAPI_GetHSteamPipe"));
     HSteamPipe sp      = GetHSteamPipe();
     if (!sp)
     {
         logging::Info("Connecting to Steam User");
         sp = g_ISteamClient->CreateSteamPipe();
     }
-    auto GetHSteamUser = reinterpret_cast<GetHSteamUser_t>(dlsym(sharedobj::steamapi().lmap, "SteamAPI_GetHSteamUser"));
+    auto GetHSteamUser = reinterpret_cast<GetHSteamUser_t>(dlsym(sharedobj::libsteam_api().lmap, "SteamAPI_GetHSteamUser"));
     HSteamUser su      = GetHSteamUser();
     if (!su)
     {
@@ -125,7 +125,7 @@ void CreateInterfaces()
     }
     logging::Info("Inited SteamAPI");
 
-    g_ISteamNetworkingSockets = (ISteamNetworkingSockets *) reinterpret_cast<SteamInternal_FindOrCreateUserInterface_t>(dlsym(sharedobj::steamapi().lmap, "SteamInternal_FindOrCreateUserInterface"))(su, "SteamNetworkingSockets009");
+    g_ISteamNetworkingSockets = (ISteamNetworkingSockets *) reinterpret_cast<SteamInternal_FindOrCreateUserInterface_t>(dlsym(sharedobj::libsteam_api().lmap, "SteamInternal_FindOrCreateUserInterface"))(su, "SteamNetworkingSockets009");
 
     g_IVModelRender        = BruteforceInterface<IVModelRender>("VEngineModel", sharedobj::engine(), 16);
     g_ISteamFriends        = nullptr;

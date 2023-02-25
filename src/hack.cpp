@@ -185,7 +185,6 @@ void hack::Hook()
     hooks::vstd.HookMethod(HOOK_ARGS(RandomInt));
     hooks::vstd.Apply();
 #if ENABLE_VISUALS
-
     auto chat_hud = g_CHUD->FindElement("CHudChat");
     while (!(chat_hud = g_CHUD->FindElement("CHudChat")))
         usleep(1000);
@@ -272,7 +271,6 @@ free(logname);*/
 // Essential files must always exist, except when the game is running in text
 // mode.
 #if ENABLE_VISUALS
-
     {
         std::vector<std::string> essential = { "fonts/tf2build.ttf" };
         for (const auto &s : essential)
@@ -288,8 +286,7 @@ free(logname);*/
             }
         }
     }
-
-#endif /* TEXTMODE */
+#endif
     logging::Info("Initializing...");
     InitRandom();
     sharedobj::LoadLauncher();
@@ -301,10 +298,14 @@ free(logname);*/
 
     sharedobj::LoadEarlyObjects();
 
-// Fix locale issues caused by steam update
 #if ENABLE_TEXTMODE
+    // Fix locale issues caused by steam update
     static BytePatch patch(CSignature::GetEngineSignature, "74 ? 89 5C 24 ? 8D 9D ? ? ? ? 89 74 24", 0, { 0x71 });
     patch.Patch();
+
+    // Remove intro video which also causes some crashes
+    static BytePatch patch_intro_video(CSignature::GetEngineSignature, "55 89 E5 57 56 53 83 EC 5C 8B 5D ? 8B 55", 0x9, { 0x83, 0xc4, 0x5c, 0x5b, 0x5e, 0x5f, 0x5d, 0xc3 });
+    patch_intro_video.Patch();
 #endif
 
     CreateEarlyInterfaces();
@@ -334,8 +335,7 @@ free(logname);*/
 #if ENABLE_GUI
 // FIXME put gui here
 #endif
-
-#endif /* TEXTMODE */
+#endif
 
     gNetvars.init();
     InitNetVars();

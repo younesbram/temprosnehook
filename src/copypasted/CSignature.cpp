@@ -214,12 +214,12 @@ uintptr_t CSignature::GetLauncherSignature(const char *chPattern)
 //===================================================================================
 uintptr_t CSignature::GetSteamAPISignature(const char *chPattern)
 {
-    return GetSignature(chPattern, sharedobj::steamapi(), CSignature_space::steamapi);
+    return GetSignature(chPattern, sharedobj::libsteam_api(), CSignature_space::steamapi);
 }
 //===================================================================================
 uintptr_t CSignature::GetVstdSignature(const char *chPattern)
 {
-    return GetSignature(chPattern, sharedobj::vstdlib(), CSignature_space::vstd);
+    return GetSignature(chPattern, sharedobj::libvstdlib(), CSignature_space::vstd);
 }
 //===================================================================================
 uintptr_t CSignature::GetServerSignature(const char *chPattern)

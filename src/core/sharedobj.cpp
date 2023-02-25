@@ -20,7 +20,7 @@ bool LocateSharedObject(std::string &name, std::string &out_full_path)
     {
         char *path     = strchr(buffer, '/');
         char *filename = strrchr(buffer, '/') + 1;
-        if (not path or not filename)
+        if (!path || !filename)
             continue;
         if (!strncmp(name.c_str(), filename, name.length()))
         {
@@ -41,27 +41,22 @@ SharedObject::SharedObject(const char *_file, bool _factory) : file(_file), path
 
 void SharedObject::Load()
 {
-    while (not LocateSharedObject(file, path))
-    {
+    while (!LocateSharedObject(file, path))
         sleep(1);
-    }
+
     while (!(lmap = (link_map *) dlopen(path.c_str(), RTLD_LAZY | RTLD_NOLOAD)))
     {
         sleep(1);
         char *error = dlerror();
         if (error)
-        {
             logging::Info("DLERROR: %s", error);
-        }
     }
     logging::Info("Shared object %s loaded at 0x%08x", basename(lmap->l_name), lmap->l_addr);
     if (factory)
     {
         fptr = reinterpret_cast<fn_CreateInterface_t>(dlsym(lmap, "CreateInterface"));
         if (!this->fptr)
-        {
             logging::Info("Failed to create interface factory for %s", basename(lmap->l_name));
-        }
     }
 }
 
@@ -78,13 +73,9 @@ void SharedObject::Unload()
 char *SharedObject::Pointer(uintptr_t offset) const
 {
     if (this->lmap != nullptr)
-    {
         return reinterpret_cast<char *>(uintptr_t(lmap->l_addr) + offset);
-    }
     else
-    {
         return nullptr;
-    }
 }
 
 void *SharedObject::CreateInterface(const std::string &interface)
@@ -110,7 +101,7 @@ void LoadEarlyObjects()
     {
         engine().Load();
         filesystem_stdio().Load();
-        tier0().Load();
+        libtier0().Load();
         materialsystem().Load();
     }
     catch (std::exception &ex)
@@ -126,9 +117,9 @@ void LoadAllSharedObjects()
         steamclient().Load();
         client().Load();
         server().Load();
-        steamapi().Load();
-        steamnetworkingsockets().Load();
-        vstdlib().Load();
+        libsteam_api().Load();
+        libsteamnetworkingsockets().Load();
+        libvstdlib().Load();
         inputsystem().Load();
         datacache().Load();
         vgui2().Load();
@@ -148,8 +139,8 @@ void UnloadAllSharedObjects()
 {
     steamclient().Unload();
     client().Unload();
-    steamapi().Unload();
-    vstdlib().Unload();
+    libsteam_api().Unload();
+    libvstdlib().Unload();
     inputsystem().Unload();
     datacache().Unload();
     vgui2().Unload();
@@ -161,7 +152,7 @@ void UnloadAllSharedObjects()
     launcher().Unload();
     engine().Unload();
     filesystem_stdio().Unload();
-    tier0().Unload();
+    libtier0().Unload();
     materialsystem().Unload();
 }
 
@@ -170,46 +161,55 @@ SharedObject &steamclient()
     static SharedObject obj("steamclient.so", true);
     return obj;
 }
-SharedObject &steamapi()
+
+SharedObject &libsteam_api()
 {
     static SharedObject obj("libsteam_api.so", false);
     return obj;
 }
-SharedObject &steamnetworkingsockets()
+
+SharedObject &libsteamnetworkingsockets()
 {
     static SharedObject obj("libsteamnetworkingsockets.so", true);
     return obj;
 }
+
 SharedObject &client()
 {
     static SharedObject obj("client.so", true);
     return obj;
 }
+
 SharedObject &engine()
 {
     static SharedObject obj("engine.so", true);
     return obj;
 }
+
 SharedObject &launcher()
 {
     static SharedObject obj("launcher.so", true);
     return obj;
 }
-SharedObject &vstdlib()
+
+SharedObject &libvstdlib()
 {
     static SharedObject obj("libvstdlib.so", true);
     return obj;
 }
-SharedObject &tier0()
+
+SharedObject &libtier0()
 {
     static SharedObject obj("libtier0.so", false);
     return obj;
 }
+
 SharedObject &inputsystem()
 {
     static SharedObject obj("inputsystem.so", true);
     return obj;
 }
+
 SharedObject &materialsystem()
 {
     static SharedObject obj("materialsystem.so", true);
@@ -245,16 +245,17 @@ SharedObject &vguimatsurface()
     static SharedObject obj("vguimatsurface.so", true);
     return obj;
 }
+
 SharedObject &studiorender()
 {
     static SharedObject obj("studiorender.so", true);
     return obj;
 }
+
 SharedObject &libsdl()
 {
     static SharedObject obj("libSDL2-2.0.so.0", false);
     return obj;
 }
-
 #endif
 } // namespace sharedobj

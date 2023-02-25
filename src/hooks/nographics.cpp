@@ -274,7 +274,9 @@ static void UnHookFs()
 static InitRoutineEarly nullify_textmode(
     []()
     {
-        // SDL_CreateWindow has a "flag" parameter. We simply give it HIDDEN as a flag
+        // --------------------------- Not needed when starting with -textmode ---------------------------
+
+        /*// SDL_CreateWindow has a "flag" parameter. We simply give it HIDDEN as a flag
         // 0x8 = SDL_HIDDEN
         static BytePatch patch1(CSignature::GetLauncherSignature, "C7 43 ? ? ? ? ? C7 44 24 ? ? ? ? ? C7 44 24", 0xb, { 0x8 });
 
@@ -284,7 +286,9 @@ static InitRoutineEarly nullify_textmode(
         // Hide the SDL window
         static BytePatch patch2(CSignature::GetLauncherSignature, "E8 ? ? ? ? C6 43 25 01 83 C4 5C", 0x0, patch_arr);
         static BytePatch patch3(CSignature::GetLauncherSignature, "E8 ? ? ? ? 8B 43 14 89 04 24 E8 ? ? ? ? C6 43 25 01 83 C4 1C", 0x0, patch_arr);
-        static BytePatch patch4(CSignature::GetLauncherSignature, "89 14 24 E8 ? ? ? ? 8B 45 B4", 0x3, patch_arr);
+        static BytePatch patch4(CSignature::GetLauncherSignature, "89 14 24 E8 ? ? ? ? 8B 45 B4", 0x3, patch_arr);*/
+
+        // --------------------------- Not needed when starting with -textmode ---------------------------
 
         ReduceRamUsage();
         // CVideoMode_Common::Init  SetupStartupGraphic
@@ -296,17 +300,16 @@ static InitRoutineEarly nullify_textmode(
         // V_RenderView
         static BytePatch patch7(CSignature::GetEngineSignature, "55 89 E5 56 53 83 C4 80 C7 45 ? 00 00 00 00 A1 ? ? ? ? C7 45 ? 00 00 00 00 85 C0", 0x1d3, { 0x90, 0x90, 0x90, 0x90, 0x90 });
 
-        patch1.Patch();
+        /*patch1.Patch();
         patch2.Patch();
         patch3.Patch();
-        patch4.Patch();
+        patch4.Patch();*/
         patch5.Patch();
         patch6.Patch();
         patch7.Patch();
     });
 #endif
 
-static Timer signon_timer;
 static InitRoutine nullifiy_textmode2(
     []()
     {

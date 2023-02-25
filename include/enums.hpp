@@ -1,5 +1,5 @@
 /*
- * enums.h
+ * enums.hpp
  *
  *  Created on: Oct 7, 2016
  *      Author: nullifiedcat

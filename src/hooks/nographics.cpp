@@ -80,6 +80,7 @@ static InitRoutine init_nographics(
             },
             "material_cm");
     });
+
 static bool blacklist_file(const char *&filename)
 {
     const static char *blacklist[] = { ".ani", ".wav", ".mp3", ".vvd", ".vtx", ".vtf", ".vfe", ".cache" , ".pcf" };
@@ -296,7 +297,7 @@ static InitRoutineEarly nullify_textmode(
         auto setup_graphic_addr = e8call_direct(CSignature::GetEngineSignature("E8 ? ? ? ? 8B 93 ? ? ? ? 85 D2 0F 84")) + 0x18;
         static BytePatch patch5(setup_graphic_addr, { 0x81, 0xC4, 0x6C, 0x20, 0x00, 0x00, 0x5B, 0x5E, 0x5F, 0x5D, 0xC3 });
         // CMaterialSystem::SwapBuffers
-        static BytePatch patch6(sharedobj::materialsystem().Pointer(0x3ed90), { 0x31, 0xC0, 0x40, 0xC3 });
+        // static BytePatch patch6(sharedobj::materialsystem().Pointer(0x3ed70), { 0x31, 0xC0, 0x40, 0xC3 });
         // V_RenderView
         static BytePatch patch7(CSignature::GetEngineSignature, "55 89 E5 56 53 83 C4 80 C7 45 ? 00 00 00 00 A1 ? ? ? ? C7 45 ? 00 00 00 00 85 C0", 0x1d3, { 0x90, 0x90, 0x90, 0x90, 0x90 });
 
@@ -305,7 +306,7 @@ static InitRoutineEarly nullify_textmode(
         patch3.Patch();
         patch4.Patch();*/
         patch5.Patch();
-        patch6.Patch();
+        // patch6.Patch();
         patch7.Patch();
     });
 #endif
@@ -334,8 +335,8 @@ static InitRoutine nullifiy_textmode2(
 
         bool *g_bTextMode_ptr = *((bool **) g_bTextMode_ptrptr);
         *g_bTextMode_ptr      = true;
-        // Skip downloading ressources
-        static BytePatch patch1(CSignature::GetEngineSignature, "0F 85 ? ? ? ? A1 ? ? ? ? 8D 8B ? ? ? ?", 0x1, { 0x81 });
+        // Skip downloading resources
+        static BytePatch patch1(CSignature::GetEngineSignature, "0F 85 ? ? ? ? A1 ? ? ? ? 8D 8B", 0x1, { 0x81 });
         patch1.Patch();
         // CViewRender::Render
         static BytePatch patch2(CSignature::GetClientSignature, "55 89 E5 57 56 53 81 EC DC 03 00 00 C7 85 ? ? ? ? 00 00 00 00", 0x0, { 0x31, 0xC0, 0x40, 0xC3 });

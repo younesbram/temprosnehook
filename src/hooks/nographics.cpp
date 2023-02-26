@@ -275,9 +275,7 @@ static void UnHookFs()
 static InitRoutineEarly nullify_textmode(
     []()
     {
-        // --------------------------- Not needed when starting with -textmode ---------------------------
-
-        /*// SDL_CreateWindow has a "flag" parameter. We simply give it HIDDEN as a flag
+        // SDL_CreateWindow has a "flag" parameter. We simply give it HIDDEN as a flag
         // 0x8 = SDL_HIDDEN
         static BytePatch patch1(CSignature::GetLauncherSignature, "C7 43 ? ? ? ? ? C7 44 24 ? ? ? ? ? C7 44 24", 0xb, { 0x8 });
 
@@ -287,9 +285,7 @@ static InitRoutineEarly nullify_textmode(
         // Hide the SDL window
         static BytePatch patch2(CSignature::GetLauncherSignature, "E8 ? ? ? ? C6 43 25 01 83 C4 5C", 0x0, patch_arr);
         static BytePatch patch3(CSignature::GetLauncherSignature, "E8 ? ? ? ? 8B 43 14 89 04 24 E8 ? ? ? ? C6 43 25 01 83 C4 1C", 0x0, patch_arr);
-        static BytePatch patch4(CSignature::GetLauncherSignature, "89 14 24 E8 ? ? ? ? 8B 45 B4", 0x3, patch_arr);*/
-
-        // --------------------------- Not needed when starting with -textmode ---------------------------
+        static BytePatch patch4(CSignature::GetLauncherSignature, "89 14 24 E8 ? ? ? ? 8B 45 B4", 0x3, patch_arr);
 
         ReduceRamUsage();
         // CVideoMode_Common::Init  SetupStartupGraphic
@@ -297,16 +293,16 @@ static InitRoutineEarly nullify_textmode(
         auto setup_graphic_addr = e8call_direct(CSignature::GetEngineSignature("E8 ? ? ? ? 8B 93 ? ? ? ? 85 D2 0F 84")) + 0x18;
         static BytePatch patch5(setup_graphic_addr, { 0x81, 0xC4, 0x6C, 0x20, 0x00, 0x00, 0x5B, 0x5E, 0x5F, 0x5D, 0xC3 });
         // CMaterialSystem::SwapBuffers
-        // static BytePatch patch6(sharedobj::materialsystem().Pointer(0x3ed70), { 0x31, 0xC0, 0x40, 0xC3 });
+        static BytePatch patch6(sharedobj::materialsystem().Pointer(0x3ed70), { 0x31, 0xC0, 0x40, 0xC3 });
         // V_RenderView
         static BytePatch patch7(CSignature::GetEngineSignature, "55 89 E5 56 53 83 C4 80 C7 45 ? 00 00 00 00 A1 ? ? ? ? C7 45 ? 00 00 00 00 85 C0", 0x1d3, { 0x90, 0x90, 0x90, 0x90, 0x90 });
 
-        /*patch1.Patch();
+        patch1.Patch();
         patch2.Patch();
         patch3.Patch();
-        patch4.Patch();*/
+        patch4.Patch();
         patch5.Patch();
-        // patch6.Patch();
+        patch6.Patch();
         patch7.Patch();
     });
 #endif

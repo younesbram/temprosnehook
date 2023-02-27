@@ -29,7 +29,7 @@ pushd "$TF2_PATH" || exit
 LD_PRELOAD="$FILENAME" LD_LIBRARY_PATH="$TF2_PATH/bin" "$TF2_PATH/hl2_linux" -game tf &
 echo "Game preloading!"
 popd || exit
-sleep 10
+sleep 1
 
 line=$(pgrep -u "$RUNUSER" hl2_linux)
 arr=($line)

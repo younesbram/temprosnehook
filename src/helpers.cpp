@@ -42,7 +42,6 @@ void BeginConVars()
     {
         std::ofstream cfg_autoexec_textmode("tf/cfg/cat_autoexec_textmode.cfg", std::ios::out | std::ios::trunc);
         if (cfg_autoexec_textmode.good())
-        {
             cfg_autoexec_textmode << "// Put your custom cathook settings in this "
                                      "file\n// This script will be executed EACH TIME "
                                      "YOU INJECT TEXTMODE CATHOOK\n"
@@ -52,7 +51,7 @@ void BeginConVars()
                                      "tf_medigun_autoheal 1\n"
                                      "fps_max 67\n"
                                      "cat_ipc_connect";
-        }
+
         cfg_autoexec_textmode.close();
     }
 
@@ -60,11 +59,10 @@ void BeginConVars()
     {
         std::ofstream cfg_autoexec("tf/cfg/cat_autoexec.cfg", std::ios::out | std::ios::trunc);
         if (cfg_autoexec.good())
-        {
             cfg_autoexec << "// Put your custom cathook settings in this "
                             "file\n// This script will be executed EACH TIME "
                             "YOU INJECT CATHOOK\n";
-        }
+
         cfg_autoexec.close();
     }
 
@@ -72,11 +70,10 @@ void BeginConVars()
     {
         std::ofstream cat_matchexec("tf/cfg/cat_matchexec.cfg", std::ios::out | std::ios::trunc);
         if (cat_matchexec.good())
-        {
             cat_matchexec << "// Put your custom cathook settings in this "
                              "file\n// This script will be executed EACH TIME "
                              "YOU JOIN A MATCH\n";
-        }
+
         cat_matchexec.close();
     }
 
@@ -98,14 +95,11 @@ void EndConVars()
                         "make edits to this file\n\n// Every registered "
                         "variable dump\n";
         for (const auto &i : RegisteredVarsList())
-        {
             cfg_defaults << i->GetName() << " \"" << i->GetDefault() << "\"\n";
-        }
+
         cfg_defaults << "\n// Every registered command dump\n";
         for (const auto &i : RegisteredCommandsList())
-        {
             cfg_defaults << "// " << i->GetName() << "\n";
-        }
     }
 }
 
@@ -145,11 +139,8 @@ Vector VischeckCorner(CachedEntity *player, CachedEntity *target, float maxdist,
     Vector origin     = player->m_vecOrigin();
 
     // if we can see an entity, we don't need to run calculations
-    if (VisCheckEntFromEnt(player, target))
-    {
-        if (!checkWalkable || canReachVector(origin, target->m_vecOrigin()))
-            return origin;
-    }
+    if (VisCheckEntFromEnt(player, target) && (!checkWalkable || canReachVector(origin, target->m_vecOrigin())))
+        return origin;
 
     for (int i = 0; i < 8; i++) // for loop for all 4 directions
     {
@@ -957,9 +948,7 @@ char GetChar(ButtonCode_t button)
         return ';';
     default:
         if (button >= KEY_PAD_0 && button <= KEY_PAD_9)
-        {
             return button - KEY_PAD_0 + '0';
-        }
         if (strlen(g_IInputSystem->ButtonCodeToString(button)) != 1)
             return 0;
         return *g_IInputSystem->ButtonCodeToString(button);
@@ -982,11 +971,9 @@ void FixMovement(CUserCmd &cmd, Vector &viewangles)
 
 bool AmbassadorCanHeadshot()
 {
-    if (IsAmbassador(LOCAL_W))
-    {
-        if ((CE_FLOAT(LOCAL_W, netvar.flLastFireTime) - SERVER_TIME) <= 1.0f)
-            return false;
-    }
+    if (IsAmbassador(LOCAL_W) && (CE_FLOAT(LOCAL_W, netvar.flLastFireTime) - SERVER_TIME) <= 1.0f)
+        return false;
+
     return true;
 }
 
@@ -1076,12 +1063,10 @@ bool VisCheckEntFromEnt(CachedEntity *startEnt, CachedEntity *endEnt)
         g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, &trace);
     }
     // Is the entity that we hit our target ent? if so, the vis check passes
-    if (trace.m_pEnt)
-    {
-        if ((((IClientEntity *) trace.m_pEnt)) == RAW_ENT(endEnt))
-            return true;
-    }
-    // Since we didnt hit our target ent, the vis check failed so return false
+    if (trace.m_pEnt && (((IClientEntity *) trace.m_pEnt)) == RAW_ENT(endEnt))
+        return true;
+
+    // Since we didn't hit our target ent, the vis check failed so return false
     return false;
 }
 
@@ -1103,12 +1088,10 @@ bool VisCheckEntFromEntVector(Vector startVector, CachedEntity *startEnt, Cached
         g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, &trace);
     }
     // Is the entity that we hit our target ent? if so, the vis check passes
-    if (trace.m_pEnt)
-    {
-        if ((((IClientEntity *) trace.m_pEnt)) == RAW_ENT(endEnt))
-            return true;
-    }
-    // Since we didnt hit our target ent, the vis check failed so return false
+    if (trace.m_pEnt && (((IClientEntity *) trace.m_pEnt)) == RAW_ENT(endEnt))
+        return true;
+
+    // Since we didn't hit our target ent, the vis check failed so return false
     return false;
 }
 
@@ -1273,11 +1256,6 @@ weaponmode GetWeaponMode(CachedEntity *ent)
     }
 }
 
-weaponmode GetWeaponMode()
-{
-    return g_pLocalPlayer->weapon_mode;
-}
-
 bool LineIntersectsBox(Vector &bmin, Vector &bmax, Vector &lmin, Vector &lmax)
 {
     if (lmax.x < bmin.x && lmin.x < bmin.x)
@@ -1308,29 +1286,22 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
     switch (weapon->m_iClassID())
     {
     case CL_CLASS(CTFRocketLauncher_DirectHit):
-    {
         rspeed = 1980.0f;
         break;
-    }
     case CL_CLASS(CTFParticleCannon): // Cow Mangler 5000
     case CL_CLASS(CTFRocketLauncher_AirStrike):
     case CL_CLASS(CTFRocketLauncher):
-    {
         rspeed = 1100.0f;
         // Libery Launcher
         if (CE_INT(weapon, netvar.iItemDefinitionIndex) == 414)
             rspeed = 1540.0f;
         break;
-    }
     case CL_CLASS(CTFCannon):
-    {
         rspeed       = 1453.9f;
         rgrav        = 1.0f;
         rinitial_vel = 200.0f;
         break;
-    }
     case CL_CLASS(CTFGrenadeLauncher):
-    {
         rspeed       = 1217.0f;
         rgrav        = 1.0f;
         rinitial_vel = 200.0f;
@@ -1338,7 +1309,6 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
         if (CE_INT(weapon, netvar.iItemDefinitionIndex) == 308)
             rspeed = 1513.3f;
         break;
-    }
     case CL_CLASS(CTFPipebombLauncher):
     {
         float chargetime = SERVER_TIME - CE_FLOAT(weapon, netvar.flChargeBeginTime);
@@ -1362,9 +1332,7 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
             if (!pUpdateRate)
                 pUpdateRate = g_pCVar->FindVar("cl_updaterate");
             else
-            {
                 chargetime += TICKS_TO_TIME(1);
-            }
         }
         rspeed = RemapValClamped(chargetime, 0.0f, 1.f, 1800, 2600);
         rgrav  = RemapValClamped(chargetime, 0.0f, 1.f, 0.5, 0.1);
@@ -1372,68 +1340,46 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
     }
     case CL_CLASS(CTFBat_Giftwrap):
     case CL_CLASS(CTFBat_Wood):
-    {
         rspeed = 3000.0f;
         rgrav  = 0.5f;
         break;
-    }
     case CL_CLASS(CTFFlareGun):
     case CL_CLASS(CTFFlareGun_Revenge): // Detonator
-    {
         rspeed = 2000.0f;
         rgrav  = 0.3f;
         break;
-    }
     case CL_CLASS(CTFSyringeGun):
-    {
         rspeed = 1000.0f;
         rgrav  = 0.3f;
         break;
-    }
     case CL_CLASS(CTFCrossbow):
     case CL_CLASS(CTFShotgunBuildingRescue):
-    {
         rspeed = 2400.0f;
         rgrav  = 0.2f;
         break;
-    }
     case CL_CLASS(CTFDRGPomson):
     case CL_CLASS(CTFRaygun): // Righteous Bison
-    {
         rspeed = 1200.0f;
         break;
-    }
     case CL_CLASS(CTFWeaponFlameBall):
     case CL_CLASS(CTFCleaver):
-    {
         rspeed = 3000.0f;
         break;
-    }
     case CL_CLASS(CTFFlameThrower):
-    {
         rspeed = 1000.0f;
         break;
-    }
     case CL_CLASS(CTFGrapplingHook):
-    {
         rspeed = 1500.0f;
         break;
-    }
     case CL_CLASS(CTFJarMilk):
-    {
         rspeed = 1019.9f;
         break;
-    }
     case CL_CLASS(CTFJar):
-    {
         rspeed = 1017.9f;
         break;
-    }
     case CL_CLASS(CTFJarGas):
-    {
         rspeed = 2009.2f;
         break;
-    }
     }
 
     speed          = rspeed;
@@ -1453,7 +1399,7 @@ bool IsVectorVisible(Vector origin, Vector target, bool enviroment_only, CachedE
         ray.Init(origin, target);
         PROF_SECTION(IEVV_TraceRay)
         g_ITrace->TraceRay(ray, mask, &trace::filter_no_player, &trace_visible);
-        return (trace_visible.fraction == 1.0f);
+        return trace_visible.fraction == 1.0f;
     }
     else
     {
@@ -1464,7 +1410,7 @@ bool IsVectorVisible(Vector origin, Vector target, bool enviroment_only, CachedE
         ray.Init(origin, target);
         PROF_SECTION(IEVV_TraceRay)
         g_ITrace->TraceRay(ray, mask, &trace::filter_no_entity, &trace_visible);
-        return (trace_visible.fraction == 1.0f);
+        return trace_visible.fraction == 1.0f;
     }
 }
 
@@ -1476,7 +1422,7 @@ bool IsVectorVisibleNavigation(Vector origin, Vector target, unsigned int mask)
     ray.Init(origin, target);
     PROF_SECTION(IEVV_TraceRay)
     g_ITrace->TraceRay(ray, mask, &trace::filter_navigation, &trace_visible);
-    return (trace_visible.fraction == 1.0f);
+    return trace_visible.fraction == 1.0f;
 }
 
 void WhatIAmLookingAt(int *result_eindex, Vector *result_pos)
@@ -1723,9 +1669,7 @@ void FastStop()
         current_user_cmd->sidemove    = negated_direction.y;
     }
     else
-    {
         current_user_cmd->forwardmove = current_user_cmd->sidemove = 0.0f;
-    }
 }
 
 bool IsEntityVisiblePenetration(CachedEntity *entity, int hb)
@@ -1740,9 +1684,8 @@ bool IsEntityVisiblePenetration(CachedEntity *entity, int hb)
     trace::filter_penetration.Reset();
     ret = GetHitbox(entity, hb, hit);
     if (ret)
-    {
         return false;
-    }
+
     ray.Init(g_pLocalPlayer->v_Origin + g_pLocalPlayer->v_ViewOffset, hit);
     {
         PROF_SECTION(IEVV_TraceRay)
@@ -1750,9 +1693,8 @@ bool IsEntityVisiblePenetration(CachedEntity *entity, int hb)
     }
     correct_entity = false;
     if (trace_visible.m_pEnt)
-    {
         correct_entity = ((IClientEntity *) trace_visible.m_pEnt) == RAW_ENT(entity);
-    }
+
     if (!correct_entity)
         return false;
     {
@@ -1769,9 +1711,7 @@ bool IsEntityVisiblePenetration(CachedEntity *entity, int hb)
                 if (ent == RAW_ENT(entity))
                     return false;
                 if (trace_visible.hitbox >= 0)
-                {
                     return true;
-                }
             }
         }
     }
@@ -1782,9 +1722,7 @@ void ValidateUserCmd(CUserCmd *cmd, int sequence_nr)
 {
     CRC32_t crc = GetChecksum(cmd);
     if (crc != GetVerifiedCmds(g_IInput)[sequence_nr % VERIFIED_CMD_SIZE].m_crc)
-    {
         *cmd = GetVerifiedCmds(g_IInput)[sequence_nr % VERIFIED_CMD_SIZE].m_cmd;
-    }
 }
 
 // Used for getting class names
@@ -1836,14 +1774,12 @@ Vector getShootPos(Vector angle)
     case CL_CLASS(CTFRocketLauncher):
     case CL_CLASS(CTFFlareGun):
     case CL_CLASS(CTFFlareGun_Revenge): // Detonator
-    {
         vecOffset = Vector(23.5f, 12.0f, -3.0f);
         if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 513) // The Original
             vecOffset->y = 0.0f;
         if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) != 513 && CE_INT(LOCAL_E, netvar.iFlags) & FL_DUCKING)
             vecOffset->z = 8.0f;
         break;
-    }
     case CL_CLASS(CTFParticleCannon): // Cow Mangler 5000
     case CL_CLASS(CTFDRGPomson):
     case CL_CLASS(CTFRaygun): // Righteous Bison
@@ -1851,60 +1787,44 @@ Vector getShootPos(Vector angle)
     case CL_CLASS(CTFCrossbow):
     case CL_CLASS(CTFShotgunBuildingRescue):
     case CL_CLASS(CTFGrapplingHook):
-    {
         vecOffset = Vector(23.5f, 8.0f, -3.0f);
         switch (LOCAL_W->m_iClassID())
         {
         case CL_CLASS(CTFParticleCannon): // Cow Mangler 5000
         case CL_CLASS(CTFRaygun):         // Righteous Bison
-        {
             if (CE_INT(LOCAL_E, netvar.iFlags) & FL_DUCKING)
                 vecOffset->z = 8.0f;
             break;
-        }
         case CL_CLASS(CTFCompoundBow):
-        {
             vecOffset->y = -4.0f;
             break;
-        }
         default:
             break;
         }
         break;
-    }
     case CL_CLASS(CTFCannon):
     case CL_CLASS(CTFGrenadeLauncher):
     case CL_CLASS(CTFPipebombLauncher):
     case CL_CLASS(CTFJarMilk):
     case CL_CLASS(CTFJar):
     case CL_CLASS(CTFJarGas):
-    {
         vecOffset = Vector(16.0f, 8.0f, -6.0f);
         break;
-    }
     case CL_CLASS(CTFBat_Giftwrap):
     case CL_CLASS(CTFBat_Wood):
     case CL_CLASS(CTFCleaver):
-    {
         vecOffset = Vector(32.0f, 0.0f, -15.0f);
         break;
-    }
     case CL_CLASS(CTFSyringeGun):
-    {
         vecOffset = Vector(16.0f, 6.0f, -8.0f);
         break;
-    }
     case CL_CLASS(CTFFlameThrower):
     case CL_CLASS(CTFWeaponFlameBall):
-    {
         vecOffset = Vector(0.0f, 12.0f, 0.0f);
         break;
-    }
     case CL_CLASS(CTFLunchBox):
-    {
         vecOffset = Vector(0.0f, 0.0f, -8.0f);
         break;
-    }
     default:
         break;
     }
@@ -1971,6 +1891,7 @@ void ChangeName(std::string name)
         ch->SendNetMsg(setname, false);
     }
 }
+
 const char *powerups[] = { "Strength", "Resistance", "Vampire", "Reflect", "Haste", "Regeneration", "Precision", "Agility", "Knockout", "King", "Plague", "Supernova", "Revenge" };
 
 const std::string classes[] = { "Scout", "Sniper", "Soldier", "Demoman", "Medic", "Heavy", "Pyro", "Spy", "Engineer" };
@@ -1988,7 +1909,7 @@ static int SeedFileLineHash(int seedvalue, const char *sharedname, int additiona
 
     CRC32_Final(&retval);
 
-    return (int) (retval);
+    return (int) retval;
 }
 
 int SharedRandomInt(unsigned iseed, const char *sharedname, int iMinVal, int iMaxVal, int additionalSeed /*=0*/)

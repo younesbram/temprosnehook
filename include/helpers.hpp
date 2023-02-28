@@ -21,7 +21,7 @@ void SetCVarInterface(ICvar *iface);
 
 constexpr float PI    = 3.14159265358979323846f;
 constexpr float RADPI = 57.295779513082f;
-// #define DEG2RAD(x) (float)(x) * (float)(PI / 180.0f)
+// #define DEG2RAD(x) ((float)(x) * (float)(PI / 180.0f))
 
 #include <enums.hpp>
 #include <conditions.hpp>
@@ -91,7 +91,10 @@ powerup_type GetPowerupOnPlayer(CachedEntity *player);
 // It's better if it won't create a new object each time it gets called.
 // So it returns a success state, and the values are stored in out reference.
 bool GetHitbox(CachedEntity *entity, int hb, Vector &out);
-weaponmode GetWeaponMode();
+inline weaponmode GetWeaponMode()
+{
+    return g_pLocalPlayer->weapon_mode;
+}
 weaponmode GetWeaponMode(CachedEntity *ent);
 
 void FixMovement(CUserCmd &cmd, Vector &viewangles);
@@ -146,7 +149,7 @@ bool IsVectorVisible(Vector a, Vector b, bool enviroment_only = false, CachedEnt
 // A Special function for navparser to check if a Vector is visible.
 bool IsVectorVisibleNavigation(Vector a, Vector b, unsigned int mask = MASK_SHOT_HULL);
 float ProjGravMult(int class_id, float x_speed);
-bool DidProjectileHit(Vector start_point, Vector end_point, CachedEntity *entity, float projectile_size, bool grav_comp, trace_t* tracer = nullptr);
+bool DidProjectileHit(Vector start_point, Vector end_point, CachedEntity *entity, float projectile_size, bool grav_comp, trace_t *tracer = nullptr);
 Vector getShootPos(Vector angle);
 Vector GetForwardVector(Vector origin, Vector viewangles, float distance, CachedEntity *punch_entity = nullptr);
 Vector GetForwardVector(float distance, CachedEntity *punch_entity = nullptr);

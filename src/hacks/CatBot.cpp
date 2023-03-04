@@ -717,7 +717,7 @@ static void cm()
         int teamtodisguise = (LOCAL_E->m_iTeam() == TEAM_RED) ? TEAM_RED - 1 : TEAM_BLU - 1;
         std::random_device rd;
         std::mt19937 mt(rd());
-        std::uniform_int_distribution<byte> dist(0, 3);
+        std::uniform_int_distribution<uint8> dist(0, 3);
         int classtojoin = classes[dist(mt)];
         g_IEngine->ClientCmd_Unrestricted(format("disguise ", classtojoin, " ", teamtodisguise).c_str());
     }

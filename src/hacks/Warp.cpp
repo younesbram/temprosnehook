@@ -1051,7 +1051,7 @@ void warpLogic()
 // Only called if *bSendPackets is true.
 void CL_SendMove_hook()
 {
-    byte data[4000];
+    uint8 data[4000];
 
     // the +4 one is choked commands
     int nextcommandnr = NET_INT(g_IBaseClientState, offsets::lastoutgoingcommand()) + NET_INT(g_IBaseClientState, offsets::lastoutgoingcommand() + 4) + 1;

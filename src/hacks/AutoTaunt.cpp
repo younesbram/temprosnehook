@@ -26,6 +26,7 @@ enum slots
     disguise     = 4,
     destruct_pda = 5
 };
+
 static bool in_taunt = false;
 static int prev_slot = -1;
 static Timer taunt_t{};
@@ -34,14 +35,14 @@ class AutoTauntListener : public IGameEventListener2
 public:
     void FireGameEvent(IGameEvent *event) override
     {
-        if (!enable)
+        if (!*enable)
             return;
         if (GetPlayerForUserID(event->GetInt("attacker")) == g_IEngine->GetLocalPlayer())
         {
             bool nearby = false;
             for (const auto &ent : entity_cache::valid_ents)
             {
-                if (CE_VALID(ent) && (ent->m_Type() == ENTITY_PLAYER || ent->m_iClassID() == CL_CLASS(CObjectSentrygun)) && ent->m_bEnemy() && ent->m_bAlivePlayer())
+                if ((ent->m_Type() == ENTITY_PLAYER || ent->m_iClassID() == CL_CLASS(CObjectSentrygun)) && ent->m_bEnemy() && ent->m_bAlivePlayer())
                 {
                     if (!player_tools::shouldTarget(ent))
                         continue;
@@ -52,9 +53,9 @@ public:
                     }
                 }
             }
-            if (!nearby && RandomFloat(0, 100) <= float(chance))
+            if (!nearby && RandomFloat(0, 100) <= *chance)
             {
-                if (switch_weapon)
+                if (*switch_weapon)
                 {
                     if (CE_GOOD(LOCAL_E) && CE_GOOD(LOCAL_W))
                     {

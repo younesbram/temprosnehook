@@ -85,10 +85,11 @@ void Update()
         for (auto &[key, val] : array)
         {
             val.Update();
-            if (val.InternalEntity())
+            auto internalEntity = val.InternalEntity();
+            if (internalEntity)
             {
                 // Non-dormant entities that need bone updates
-                if (!val.InternalEntity()->IsDormant())
+                if (!internalEntity->IsDormant())
                 {
                     valid_ents.emplace_back(&val);
                     if (val.m_Type() == ENTITY_PLAYER || val.m_Type() == ENTITY_BUILDING || val.m_Type() == ENTITY_NPC)
@@ -117,10 +118,11 @@ void Update()
                 continue;
             CachedEntity &ent = array.try_emplace(i, CachedEntity{ i }).first->second;
             ent.Update();
-            if (ent.InternalEntity())
+            auto internalEntity = ent.InternalEntity();
+            if (internalEntity)
             {
                 // Non-dormant entities that need bone updates
-                if (!ent.InternalEntity()->IsDormant())
+                if (!internalEntity->IsDormant())
                 {
                     valid_ents.emplace_back(&ent);
                     if (ent.m_Type() == ENTITY_PLAYER || ent.m_Type() == ENTITY_BUILDING || ent.m_Type() == ENTITY_NPC)

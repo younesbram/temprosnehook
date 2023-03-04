@@ -115,15 +115,13 @@ static void updateAntiAfk()
         // Trigger 10 seconds before kick
         else if (afk_timer->GetInt() != 0 && anti_afk_timer.check(afk_timer->m_nValue * 60 * 1000 - 10000))
         {
-            // Game also checks if you move if you are in spawn, so spam movement keys alternatingly
+            // Game also checks if you move in spawn, so spam movement keys alternatively
             bool flip = false;
             current_user_cmd->buttons |= flip ? IN_FORWARD : IN_BACK;
             // Flip flip
             flip = !flip;
             if (anti_afk_timer.check(afk_timer->GetInt() * 60 * 1000 + 1000))
-            {
                 anti_afk_timer.update();
-            }
         }
         last_buttons = current_user_cmd->buttons;
     }
@@ -136,7 +134,7 @@ CatCommand fix_cursor("fix_cursor", "Fix the GUI cursor being visible",
                           g_ISurface->SetCursorAlwaysVisible(false);
                       });
 
-// Use to send a autobalance request to the server that doesnt prevent you from
+// Use to send an autobalance request to the server that doesn't prevent you from
 // using it again, Allowing infinite use of it.
 void SendAutoBalanceRequest()
 { // Credits to blackfire
@@ -151,7 +149,6 @@ void SendAutoBalanceRequest()
 CatCommand SendAutoBlRqCatCom("request_balance", "Request Infinite Auto-Balance", [](const CCommand &args) { SendAutoBalanceRequest(); });
 
 int last_number{ 0 };
-static bool flash_light_spam_switch{ false };
 static Timer auto_balance_timer{};
 
 int getCarriedBuilding()
@@ -170,8 +167,8 @@ int getCarriedBuilding()
     }
     return -1;
 }
-#if ENABLE_VISUALS
 
+#if ENABLE_VISUALS
 struct wireframe_data
 {
     Vector raw_min;
@@ -183,7 +180,7 @@ struct wireframe_data
 std::vector<wireframe_data> wireframe_queue;
 void QueueWireframeHitboxes(hitbox_cache::EntityHitboxCache &hb_cache)
 {
-    for (int i = 0; i < hb_cache.GetNumHitboxes(); ++i)
+    for (unsigned i = 0; i < hb_cache.GetNumHitboxes(); ++i)
     {
         auto hb        = hb_cache.GetHitbox(i);
         Vector raw_min = hb->bbox->bbmin;
@@ -196,17 +193,18 @@ void QueueWireframeHitboxes(hitbox_cache::EntityHitboxCache &hb_cache)
         wireframe_queue.push_back(wireframe_data{ raw_min, raw_max, rotation, origin });
     }
 }
+
 void DrawWireframeHitbox(wireframe_data data)
 {
     g_IVDebugOverlay->AddBoxOverlay2(data.origin, data.raw_min, data.raw_max, VectorToQAngle(data.rotation), Color(0, 0, 0, 0), Color(255, 0, 0, 255), g_GlobalVars->interval_per_tick * 2);
 }
-
 #endif
 
 static float normalizeRad(float a) noexcept
 {
     return std::isfinite(a) ? std::remainder(a, PI * 2) : 0.0f;
 }
+
 static float angleDiffRad(float a1, float a2) noexcept
 {
     float delta;
@@ -217,22 +215,20 @@ static float angleDiffRad(float a1, float a2) noexcept
         if (delta >= PI)
             delta -= PI * 2;
     }
-    else
-    {
-        if (delta <= -PI)
-            delta += PI * 2;
-    }
+    else if (delta <= -PI)
+        delta += PI * 2;
+
     return delta;
 }
 
 static void CreateMove()
 {
 #if ENABLE_VISUALS
-    if (misc_drawhitboxes)
+    if (*misc_drawhitboxes)
     {
         for (const auto &ent : entity_cache::player_cache)
         {
-            if (CE_INVALID(ent) || ent == LOCAL_E || (!misc_drawhitboxes_dead && !ent->m_bAlivePlayer()))
+            if ((!*misc_drawhitboxes_dead && !ent->m_bAlivePlayer()) || ent == LOCAL_E)
                 continue;
             QueueWireframeHitboxes(ent->hitboxes);
         }
@@ -242,10 +238,10 @@ static void CreateMove()
         last_number = current_user_cmd->command_number;
     // AntiAfk That after a certain time without movement keys depressed, causes
     // random keys to be spammed for 1 second
-    if (anti_afk)
+    if (*anti_afk)
         updateAntiAfk();
 
-    if (auto_jump && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
+    if (*auto_jump && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
     {
         static int ticks_last_jump = 0;
 
@@ -255,16 +251,15 @@ static void CreateMove()
         bool ground = CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND;
         bool jump   = current_user_cmd->buttons & IN_JUMP;
 
-        if (!ground && jump)
-            if (ticks_last_jump++ >= 9)
-                current_user_cmd->buttons = current_user_cmd->buttons & ~IN_JUMP;
+        if (!ground && jump && ticks_last_jump++ >= 9)
+            current_user_cmd->buttons = current_user_cmd->buttons & ~IN_JUMP;
 
         if (!jump)
             ticks_last_jump = 0;
     }
 
     // Automatically strafes in the air
-    if (auto_strafe && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
+    if (*auto_strafe && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
     {
         auto movetype = (unsigned) CE_VAR(LOCAL_E, 0x194, unsigned char);
 
@@ -282,9 +277,8 @@ static void CreateMove()
             break;
         case 1: // Regular strafe
         {
-            if (!(flags & (FL_ONGROUND | FL_INWATER)) && (!is_jumping || was_jumping))
-                if (current_user_cmd->mousedx)
-                    current_user_cmd->sidemove = current_user_cmd->mousedx > 1 ? 450.f : -450.f;
+            if (!(flags & (FL_ONGROUND | FL_INWATER)) && (!is_jumping || was_jumping) && current_user_cmd->mousedx)
+                current_user_cmd->sidemove = current_user_cmd->mousedx > 1 ? 450.f : -450.f;
 
             was_jumping = is_jumping;
 
@@ -334,7 +328,7 @@ static void CreateMove()
         }
     }
 
-    if (accurate_movement && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
+    if (*accurate_movement && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
     {
         if (!(CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND))
             return;
@@ -373,7 +367,7 @@ static void CreateMove()
         {
             current_user_cmd->buttons |= IN_ATTACK;
 
-            static float flLastSendTime = g_GlobalVars->curtime;    // don't get disconnected
+            static float flLastSendTime = g_GlobalVars->curtime; // don't get disconnected
             if (fabsf(g_GlobalVars->curtime - flLastSendTime) > .5f)
             {
                 g_IEngine->ClientCmd_Unrestricted("taunt");
@@ -383,14 +377,14 @@ static void CreateMove()
     }
 
     // Spams infinite autobalance spam function
-    if (auto_balance_spam && auto_balance_timer.test_and_set(150))
+    if (*auto_balance_spam && auto_balance_timer.test_and_set(150))
         SendAutoBalanceRequest();
 
     // Simple No-Push through cvars
-    g_ICvar->FindVar("tf_avoidteammates_pushaway")->SetValue(!nopush_enabled);
+    g_ICvar->FindVar("tf_avoidteammates_pushaway")->SetValue(!*nopush_enabled);
 
     // Ping Reducer
-    if (ping_reducer && !hacks::antianticheat::enabled)
+    if (*ping_reducer && !*hacks::antianticheat::enabled)
     {
         static ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
         if (cmdrate == nullptr)
@@ -417,22 +411,17 @@ static void CreateMove()
 }
 
 #if ENABLE_VISUALS
-// Timer ussr{};
 void Draw()
 {
-    if (misc_drawhitboxes)
+    if (*misc_drawhitboxes)
     {
         for (const auto &entry : wireframe_queue)
             DrawWireframeHitbox(entry);
         wireframe_queue.clear();
     }
-    /*if (ussr.test_and_set(207000))
+    if (*show_spectators)
     {
-        g_ISurface->PlaySound()
-    }*/
-    if (show_spectators)
-    {
-        for (const auto &ent: entity_cache::valid_ents)
+        for (const auto &ent : entity_cache::valid_ents)
         {
             player_info_s info{};
             if (ent != LOCAL_E && ent->m_Type() == ENTITY_PLAYER && HandleToIDX(CE_INT(ent, netvar.hObserverTarget)) == LOCAL_E->m_IDX && GetPlayerInfo(ent->m_IDX, &info))
@@ -485,12 +474,11 @@ void Draw()
         }
         DrawSpectatorStrings();
     }
-    if (!debug_info)
+    if (!*debug_info)
         return;
-    auto local = LOCAL_W;
-    if (CE_GOOD(local))
+    if (CE_GOOD(LOCAL_W))
     {
-        AddSideString(format("Slot: ", re::C_BaseCombatWeapon::GetSlot(RAW_ENT(local))));
+        AddSideString(format("Slot: ", re::C_BaseCombatWeapon::GetSlot(RAW_ENT(LOCAL_W))));
         AddSideString(format("Taunt Concept: ", CE_INT(LOCAL_E, netvar.m_iTauntConcept)));
         AddSideString(format("Taunt Index: ", CE_INT(LOCAL_E, netvar.m_iTauntIndex)));
         AddSideString(format("Sequence: ", CE_INT(LOCAL_E, netvar.m_nSequence)));
@@ -507,7 +495,7 @@ void Draw()
             AddSideString(format("command_number: ", last_cmd_number));
         AddSideString(format("clip: ", CE_INT(g_pLocalPlayer->weapon(), netvar.m_iClip1)));
         AddSideString(format("Weapon state: ", CE_INT(LOCAL_W, netvar.iWeaponState)));
-        AddSideString(format("ItemDefinitionIndex: ", CE_INT(local, netvar.iItemDefinitionIndex)));
+        AddSideString(format("ItemDefinitionIndex: ", CE_INT(LOCAL_W, netvar.iItemDefinitionIndex)));
         AddSideString(format("Maxspeed: ", CE_FLOAT(LOCAL_E, netvar.m_flMaxspeed)));
         /*AddSideString(colors::white, "Weapon: %s [%i]",
         RAW_ENT(g_pLocalPlayer->weapon())->GetClientClass()->GetName(),
@@ -586,7 +574,6 @@ void Draw()
         L"S\u0FD5");*/
     }
 }
-
 #endif
 
 void generate_schema()
@@ -601,6 +588,7 @@ void generate_schema()
     out.close();
     logging::Info("Generating complete!");
 }
+
 static CatCommand generateschema("schema_generate", "Generate custom schema", generate_schema);
 
 bool InitSchema(const char *fileName, const char *pathID, CUtlVector<CUtlString> *pVecErrors /* = NULL */)
@@ -620,7 +608,6 @@ bool InitSchema(const char *fileName, const char *pathID, CUtlVector<CUtlString>
         logging::Info(("Failed reading item schema from " + std::string(fileName)).c_str());
         return false;
     }
-
     else
         logging::Info(("Read item schema from " + std::string(fileName)).c_str());
 
@@ -671,6 +658,7 @@ CatCommand name("name_set", "Immediate name change",
                         ch->SendNetMsg(setname, false);
                     }
                 });
+
 CatCommand set_value("set", "Set value",
                      [](const CCommand &args)
                      {
@@ -686,6 +674,7 @@ CatCommand set_value("set", "Set value",
                          var->SetValue(value.c_str());
                          logging::Info("Set '%s' to '%s'", args.Arg(1), value.c_str());
                      });
+
 CatCommand get_value("get", "Set value",
                      [](const CCommand &args)
                      {
@@ -696,6 +685,7 @@ CatCommand get_value("get", "Set value",
                              return;
                          logging::Info("'%s': '%s'", args.Arg(1), var->GetString());
                      });
+
 CatCommand say_lines("say_lines", "Say with newlines (\\n)",
                      [](const CCommand &args)
                      {
@@ -704,6 +694,7 @@ CatCommand say_lines("say_lines", "Say with newlines (\\n)",
                          std::string cmd = format("say ", message);
                          g_IEngine->ServerCmd(cmd.c_str());
                      });
+
 CatCommand disconnect("disconnect", "Disconnect with custom reason",
                       [](const CCommand &args)
                       {
@@ -736,9 +727,7 @@ void DumpRecvTable(CachedEntity *ent, RecvTable *table, int depth, const char *f
         if (!prop)
             continue;
         if (prop->GetDataTable())
-        {
             DumpRecvTable(ent, prop->GetDataTable(), depth + 1, ft, acc_offset + prop->GetOffset());
-        }
         if (forcetable && strcmp(ft, table->GetName()) != 0)
             continue;
         switch (prop->GetType())
@@ -784,6 +773,7 @@ static CatCommand dump_vars("debug_dump_netvars", "Dump netvars of entity",
                                 const char *ft = (args.ArgC() > 1 ? args[2] : nullptr);
                                 DumpRecvTable(ent, clz->m_pRecvTable, 0, ft, 0);
                             });
+
 static CatCommand dump_vars_by_name("debug_dump_netvars_name", "Dump netvars of entity with target name",
                                     [](const CCommand &args)
                                     {
@@ -867,7 +857,7 @@ Color &GetPlayerColor(int idx, int team, bool dead = false)
     }
 
     if (dead)
-        for (int i = 0; i < 3; ++i)
+        for (uint8 i = 0; i < 3; ++i)
             returnColor[i] /= 1.5f;
 
     return returnColor;
@@ -966,7 +956,8 @@ void UpdateLocalPlayerVisionFlags()
         *g_nLocalPlayerVisionFlagsWeaponsCheck |= PYROVISION;
     }
 }
-#define access_ptr(p, i) ((unsigned char *) &(p))[i]
+
+#define access_ptr(p, i) ((uint8 *) &(p))[i]
 
 static InitRoutine init_pyrovision(
     []()
@@ -991,11 +982,8 @@ static InitRoutine init_pyrovision(
             EC::Paint,
             []()
             {
-                if (CE_GOOD(LOCAL_E))
-                {
-                    if (HasCondition<TFCond_HalloweenKartNoTurn>(LOCAL_E))
-                        RemoveCondition<TFCond_HalloweenKartNoTurn>(LOCAL_E);
-                }
+                if (CE_GOOD(LOCAL_E) && HasCondition<TFCond_HalloweenKartNoTurn>(LOCAL_E))
+                    RemoveCondition<TFCond_HalloweenKartNoTurn>(LOCAL_E);
             },
             "remove_cart_cond");
         static BytePatch cart_patch1(CSignature::GetClientSignature, "0F 84 ? ? ? ? F3 0F 10 A2", 0x0, { 0x90, 0xE9 });
@@ -1049,7 +1037,7 @@ static CatCommand print_hash("debug_print_hash", "Log the models and hashes of a
                                  for (auto &ent : entity_cache::valid_ents)
                                  {
                                      const model_t *model = RAW_ENT(ent)->GetModel();
-                                     const auto szName = g_IModelInfo->GetModelName(model);
+                                     const auto szName    = g_IModelInfo->GetModelName(model);
                                      logging::Info("Model name: %s   Hash: %#x", szName, Hash::String(szName));
                                  }
                              });

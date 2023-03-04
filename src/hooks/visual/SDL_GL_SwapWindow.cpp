@@ -60,8 +60,8 @@ DEFINE_HOOKED_METHOD(SDL_GL_SwapWindow, void, SDL_Window *window)
         SDL_GL_MakeCurrent(window, imgui_sdl);
 #endif
         static int prev_width, prev_height;
-        PROF_SECTION(SWAPWINDOW_cathook);
-        if (not swapwindow_init || draw::width != prev_width || draw::height != prev_height)
+        PROF_SECTION(SWAPWINDOW_cathook)
+        if (!swapwindow_init || draw::width != prev_width || draw::height != prev_height)
         {
             prev_width  = draw::width;
             prev_height = draw::height;
@@ -75,7 +75,7 @@ DEFINE_HOOKED_METHOD(SDL_GL_SwapWindow, void, SDL_Window *window)
         draw::EndGL();
     }
     {
-        PROF_SECTION(SWAPWINDOW_tf2);
+        PROF_SECTION(SWAPWINDOW_tf2)
 #if ENABLE_IMGUI_DRAWING
         SDL_GL_MakeCurrent(window, tf2_sdl);
 #endif

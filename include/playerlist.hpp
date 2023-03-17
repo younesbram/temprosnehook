@@ -64,11 +64,8 @@ rgba_t Color(unsigned steamid);
 rgba_t Color(CachedEntity *player);
 #endif
 userdata &AccessData(unsigned steamid);
-userdata &AccessData(CachedEntity *player);
 bool IsDefault(unsigned steamid);
-bool IsDefault(CachedEntity *player);
 bool IsFriend(unsigned steamid);
-bool IsFriend(CachedEntity *player);
 bool ChangeState(unsigned int steamid, k_EState state, bool force = false);
 bool ChangeState(CachedEntity *entity, k_EState state, bool force = false);
 } // namespace playerlist

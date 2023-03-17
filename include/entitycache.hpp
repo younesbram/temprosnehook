@@ -79,7 +79,8 @@ public:
 
     __attribute__((always_inline, hot, const)) bool Good() const
     {
-        if (!RAW_ENT(this) || !RAW_ENT(this)->GetClientClass()->m_ClassID)
+        auto internalEntity = RAW_ENT(this);
+        if (!internalEntity || !internalEntity->GetClientClass()->m_ClassID)
             return false;
         IClientEntity *const entity = InternalEntity();
         return entity && !entity->IsDormant();
@@ -87,7 +88,8 @@ public:
 
     __attribute__((always_inline, hot, const)) bool Valid() const
     {
-        if (!RAW_ENT(this) || !RAW_ENT(this)->GetClientClass()->m_ClassID)
+        auto internalEntity = RAW_ENT(this);
+        if (!internalEntity || !internalEntity->GetClientClass()->m_ClassID)
             return false;
         IClientEntity *const entity = InternalEntity();
         return entity;
@@ -102,10 +104,20 @@ public:
 
     int m_iClassID() const
     {
-        if (this && RAW_ENT(this))
-            if (RAW_ENT(this)->GetClientClass())
-                if (RAW_ENT(this)->GetClientClass()->m_ClassID)
-                    return RAW_ENT(this)->GetClientClass()->m_ClassID;
+        if (this)
+        {
+            auto internalEntity = RAW_ENT(this);
+            if (internalEntity)
+            {
+                auto clientClass = internalEntity->GetClientClass();
+                if (clientClass)
+                {
+                    int classID = clientClass->m_ClassID;
+                    if (classID)
+                        return classID;
+                }
+            }
+        }
         return 0;
     };
 
@@ -179,9 +191,7 @@ public:
         switch (classid)
         {
         case CL_CLASS(CTFPlayer):
-        {
             return ENTITY_PLAYER;
-        }
         case CL_CLASS(CTFGrenadePipebombProjectile):
         case CL_CLASS(CTFProjectile_Cleaver):
         case CL_CLASS(CTFProjectile_Jar):
@@ -195,28 +205,20 @@ public:
         case CL_CLASS(CTFProjectile_SentryRocket):
         case CL_CLASS(CTFProjectile_BallOfFire):
         case CL_CLASS(CTFProjectile_Flare):
-        {
             return ENTITY_PROJECTILE;
-        }
         case CL_CLASS(CObjectTeleporter):
         case CL_CLASS(CObjectSentrygun):
         case CL_CLASS(CObjectDispenser):
-        {
             return ENTITY_BUILDING;
-        }
         case CL_CLASS(CZombie):
         case CL_CLASS(CTFTankBoss):
         case CL_CLASS(CMerasmus):
         case CL_CLASS(CMerasmusDancer):
         case CL_CLASS(CEyeballBoss):
         case CL_CLASS(CHeadlessHatman):
-        {
             return ENTITY_NPC;
-        }
         default:
-        {
             return ENTITY_GENERIC;
-        }
         }
     };
 
@@ -224,13 +226,13 @@ public:
     {
         if (CE_GOOD(g_pLocalPlayer->entity))
             return g_pLocalPlayer->v_Origin.DistTo(m_vecOrigin());
-        else
-            return FLT_MAX;
+        return FLT_MAX;
     };
 
     bool m_bGrenadeProjectile() const
     {
-        return m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile) || m_iClassID() == CL_CLASS(CTFProjectile_Cleaver) || m_iClassID() == CL_CLASS(CTFProjectile_Jar) || m_iClassID() == CL_CLASS(CTFProjectile_JarMilk);
+        int classID = m_iClassID();
+        return classID == CL_CLASS(CTFGrenadePipebombProjectile) || classID == CL_CLASS(CTFProjectile_Cleaver) || classID == CL_CLASS(CTFProjectile_Jar) || classID == CL_CLASS(CTFProjectile_JarMilk);
     };
 
     static bool IsProjectileACrit(CachedEntity *ent)
@@ -242,13 +244,9 @@ public:
 
     bool m_bCritProjectile()
     {
-        switch (m_Type())
-        {
-        case EntityType::ENTITY_PROJECTILE:
+        if (m_Type() == EntityType::ENTITY_PROJECTILE)
             return IsProjectileACrit(this);
-        default:
-            return false;
-        }
+        return false;
     };
 
     bool m_bAnyHitboxVisible{ false };
@@ -277,11 +275,6 @@ public:
         m_vecAcceleration.Zero();
         m_vecVelocity.Zero();
     }
-
-    bool was_dormant() const
-    {
-        return RAW_ENT(this)->IsDormant();
-    };
 
     bool velocity_is_valid{ false };
 #if !PROXY_ENTITY

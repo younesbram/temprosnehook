@@ -20,9 +20,6 @@
 /* Assuming given entity is a valid target range 0 to 100 */
 int GetScoreForEntity(CachedEntity *entity)
 {
-    if (!entity)
-        return 0;
-
     if (entity->m_Type() == ENTITY_BUILDING)
     {
         if (entity->m_iClassID() == CL_CLASS(CObjectSentrygun))
@@ -72,6 +69,7 @@ int GetScoreForEntity(CachedEntity *entity)
     case tf_soldier:
         if (HasCondition<TFCond_BlastJumping>(entity))
             total += 30;
+    default:
         break;
     }
 
@@ -85,11 +83,11 @@ int GetScoreForEntity(CachedEntity *entity)
 
         if (distance != 0)
         {
-            int distance_factor = (4096 / distance) * 4;
+            int distance_factor = 4096 / distance * 4;
             total += distance_factor;
             if (health != 0)
             {
-                int health_factor = (450 / health) * 4;
+                int health_factor = 450 / health * 4;
                 if (health_factor > 30)
                     health_factor = 30;
                 total += health_factor;
@@ -99,9 +97,10 @@ int GetScoreForEntity(CachedEntity *entity)
 
     if (total > 99)
         total = 99;
-    if (playerlist::AccessData(entity).state == playerlist::k_EState::ABUSE || playerlist::AccessData(entity).state == playerlist::k_EState::PAZER || playerlist::AccessData(entity).state == playerlist::k_EState::RAGE)
+    auto playerState = playerlist::AccessData(entity->player_info->friendsID).state;
+    if (playerState == playerlist::k_EState::ABUSE || playerState == playerlist::k_EState::PAZER || playerState == playerlist::k_EState::RAGE)
         total = 999;
-    if (!hacks::aimbot::aim_sentrybuster && IsSentryBuster(entity))
+    if (!*hacks::aimbot::aim_sentrybuster && IsSentryBuster(entity))
         total = 0;
     if (g_pGameRules->isPVEMode && clazz == tf_medic)
         total = 999;

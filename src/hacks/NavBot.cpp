@@ -35,7 +35,7 @@ static settings::Int blacklist_delay("navbot.proximity-blacklist.delay", "500");
 static settings::Boolean blacklist_dormat("navbot.proximity-blacklist.dormant", "false");
 static settings::Int blacklist_delay_dormat("navbot.proximity-blacklist.delay-dormant", "1000");
 static settings::Int blacklist_slightdanger_limit("navbot.proximity-blacklist.slight-danger.amount", "2");
-//static settings::Boolean engie_mode("navbot.engineer-mode", "true");
+// static settings::Boolean engie_mode("navbot.engineer-mode", "true");
 #if ENABLE_VISUALS
 static settings::Boolean draw_danger("navbot.draw-danger", "false");
 #endif
@@ -56,19 +56,19 @@ struct bot_class_config
     bool prefer_far;
 };
 
-constexpr bot_class_config CONFIG_SHORT_RANGE         = { 140.0f, 400.0f, 600.0f, false };
-constexpr bot_class_config CONFIG_MID_RANGE           = { 200.0f, 500.0f, 3000.0f, true };
-constexpr bot_class_config CONFIG_LONG_RANGE          = { 300.0f, 500.0f, 4000.0f, true };
+constexpr bot_class_config CONFIG_SHORT_RANGE = { 140.0f, 400.0f, 600.0f, false };
+constexpr bot_class_config CONFIG_MID_RANGE   = { 200.0f, 500.0f, 3000.0f, true };
+constexpr bot_class_config CONFIG_LONG_RANGE  = { 300.0f, 500.0f, 4000.0f, true };
 /*constexpr bot_class_config CONFIG_ENGINEER            = { 200.0f, 500.0f, 3000.0f, false };
 constexpr bot_class_config CONFIG_GUNSLINGER_ENGINEER = { 50.0f, 300.0f, 2000.0f, false };*/
-bot_class_config selected_config                      = CONFIG_MID_RANGE;
+bot_class_config selected_config = CONFIG_MID_RANGE;
 
 static Timer health_cooldown{};
 static Timer ammo_cooldown{};
 // Should we search health at all?
 bool shouldSearchHealth(bool low_priority = false)
 {
-    if (!search_health)
+    if (!*search_health)
         return false;
     // Check if being gradually healed in any way
     if (HasCondition<TFCond_Healing>(LOCAL_E))
@@ -77,15 +77,15 @@ bool shouldSearchHealth(bool low_priority = false)
     // Priority too high
     if (navparser::NavEngine::current_priority > health)
         return false;
-    float health_percent = LOCAL_E->m_iHealth() / (float) g_pPlayerResource->GetMaxHealth(LOCAL_E);
+    float health_percent = LOCAL_E->m_iHealth() / g_pPlayerResource->GetMaxHealth(LOCAL_E);
     // Get health when below 65%, or below 80% and just patrolling
-    return health_percent < 0.64f || (low_priority && (navparser::NavEngine::current_priority <= patrol || navparser::NavEngine::current_priority == lowprio_health) && health_percent <= 0.80f);
+    return health_percent < 0.64f || low_priority && (navparser::NavEngine::current_priority <= patrol || navparser::NavEngine::current_priority == lowprio_health) && health_percent <= 0.80f;
 }
 
 // Should we search ammo at all?
 bool shouldSearchAmmo()
 {
-    if (!search_ammo)
+    if (!*search_ammo)
         return false;
     if (CE_BAD(LOCAL_W))
         return false;
@@ -105,7 +105,7 @@ bool shouldSearchAmmo()
         if (eid > MAX_PLAYERS && eid <= HIGHEST_ENTITY)
         {
             IClientEntity *weapon = g_IEntityList->GetClientEntity(eid);
-            if (weapon and re::C_BaseCombatWeapon::IsBaseCombatWeapon(weapon) && re::C_TFWeaponBase::UsesPrimaryAmmo(weapon) && !re::C_TFWeaponBase::HasPrimaryAmmo(weapon))
+            if (weapon && re::C_BaseCombatWeapon::IsBaseCombatWeapon(weapon) && re::C_TFWeaponBase::UsesPrimaryAmmo(weapon) && !re::C_TFWeaponBase::HasPrimaryAmmo(weapon))
                 return true;
         }
     }
@@ -145,7 +145,7 @@ std::vector<CachedEntity *> getEntities(bool find_health)
         if (model)
         {
             const auto szName = g_IModelInfo->GetModelName(model);
-            if ((find_health && Hash::IsHealth(szName)) || (!find_health && Hash::IsAmmo(szName)))
+            if (find_health && Hash::IsHealth(szName) || !find_health && Hash::IsAmmo(szName))
             {
                 entities.push_back(ent);
                 break;
@@ -185,7 +185,7 @@ bool getHealth(bool low_priority = false)
             std::sort(total_ents.begin(), total_ents.end(), [](CachedEntity *a, CachedEntity *b) { return a->m_flDistance() < b->m_flDistance(); });
         }
 
-        for (auto healthpack : total_ents)
+        for (const auto healthpack : total_ents)
             // If we succeed, don't try to path to other packs
             if (navparser::NavEngine::navTo(healthpack->m_vecOrigin(), priority, true, healthpack->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) > 200.0f * 200.0f))
                 return true;
@@ -225,13 +225,15 @@ bool getAmmo(bool force = false)
             total_ents.insert(total_ents.end(), dispensers.begin(), dispensers.end());
             std::sort(total_ents.begin(), total_ents.end(), [](CachedEntity *a, CachedEntity *b) { return a->m_flDistance() < b->m_flDistance(); });
         }
-        for (auto ammopack : total_ents)
+        for (const auto ammopack : total_ents)
+        {
             // If we succeeed, don't try to path to other packs
             if (navparser::NavEngine::navTo(ammopack->m_vecOrigin(), ammo, true, ammopack->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) > 200.0f * 200.0f))
             {
                 was_force = force;
                 return true;
             }
+        }
         ammo_cooldown.update();
     }
     else if (navparser::NavEngine::current_priority == ammo && !was_force)
@@ -241,7 +243,6 @@ bool getAmmo(bool force = false)
 
 // Vector of sniper spot positions we can nav to
 std::vector<Vector> sniper_spots;
-
 // Used for time between refreshing sniperspots
 static Timer refresh_sniperspots_timer{};
 void refreshSniperSpots()
@@ -263,13 +264,21 @@ std::pair<CachedEntity *, float> getNearestPlayerDistance()
 {
     float distance         = FLT_MAX;
     CachedEntity *best_ent = nullptr;
-    for (const auto &ent: entity_cache::player_cache)
+
+    const auto local_origin = g_pLocalPlayer->v_Origin;
+    for (const auto &ent : entity_cache::player_cache)
     {
-        if (ent->m_vecDormantOrigin() && g_pPlayerResource->isAlive(ent->m_IDX) && ent->m_bEnemy() && g_pLocalPlayer->v_Origin.DistTo(ent->m_vecOrigin()) < distance && player_tools::shouldTarget(ent))
-        {
-            distance = g_pLocalPlayer->v_Origin.DistTo(*ent->m_vecDormantOrigin());
-            best_ent = ent;
-        }
+        if (!ent->m_vecDormantOrigin() || !g_pPlayerResource->isAlive(ent->m_IDX) || !ent->m_bEnemy() || !player_tools::shouldTarget(ent))
+            continue;
+
+        const auto ent_origin = *ent->m_vecDormantOrigin();
+        const auto dist_sq    = local_origin.DistToSqr(ent_origin);
+
+        if (dist_sq >= SQR(distance))
+            continue;
+
+        distance = FastSqrt(dist_sq);
+        best_ent = ent;
     }
     return { best_ent, distance };
 }
@@ -454,9 +463,9 @@ enum slots
 {
     primary   = 1,
     secondary = 2,
-    melee     = 3/*,
-    pda1      = 4,
-    pda2      = 5*/
+    melee     = 3 /*,
+     pda1      = 4,
+     pda2      = 5*/
 };
 
 #if ENABLE_VISUALS
@@ -469,7 +478,7 @@ void updateEnemyBlacklist(int slot)
 {
     static int last_slot_blacklist = primary;
     bool should_run_normal         = blacklist_update_timer.test_and_set(*blacklist_delay) || last_slot_blacklist != slot;
-    bool should_run_dormant        = blacklist_dormat && (dormant_update_timer.test_and_set(*blacklist_delay_dormat) || last_slot_blacklist != slot);
+    bool should_run_dormant        = *blacklist_dormat && (dormant_update_timer.test_and_set(*blacklist_delay_dormat) || last_slot_blacklist != slot);
     // Don't run since we do not care here
     if (!should_run_dormant && !should_run_normal)
         return;
@@ -478,7 +487,7 @@ void updateEnemyBlacklist(int slot)
     if (should_run_normal)
         navparser::NavEngine::clearFreeBlacklist(navparser::BlacklistReason(navparser::ENEMY_NORMAL));
     // Clear blacklist for dormant entities
-    if (should_run_dormant || !blacklist_dormat)
+    if (should_run_dormant || !*blacklist_dormat)
         navparser::NavEngine::clearFreeBlacklist(navparser::BlacklistReason(navparser::ENEMY_DORMANT));
 
     // #NoFear
@@ -494,7 +503,7 @@ void updateEnemyBlacklist(int slot)
     boost::unordered_flat_map<CachedEntity *, std::vector<CNavArea *>> ent_marked_normal_slight_danger;
 
     std::vector<std::pair<CachedEntity *, Vector>> checked_origins;
-    for (const auto &ent: entity_cache::player_cache)
+    for (const auto &ent : entity_cache::player_cache)
     {
         // Entity is generally invalid, ignore
         if (CE_INVALID(ent) || !g_pPlayerResource->isAlive(ent->m_IDX))
@@ -509,7 +518,6 @@ void updateEnemyBlacklist(int slot)
         if (!should_run_dormant || !is_dormant)
             continue;
 
-
         // Avoid excessive calls by ignoring new checks if people are too close to each other
         auto origin = ent->m_vecDormantOrigin();
         if (!origin)
@@ -522,7 +530,7 @@ void updateEnemyBlacklist(int slot)
         // Add new danger entries
         auto to_mark = is_dormant ? &dormant_slight_danger : &normal_slight_danger;
 
-        for (auto &checked_origin : checked_origins)
+        for (const auto &checked_origin : checked_origins)
         {
             // If this origin is closer than a quarter of the min HU (or less than 100 HU) to a cached one, don't go through
             // all nav areas again DistToSqr is much faster than DistTo which is why we use it here
@@ -539,14 +547,15 @@ void updateEnemyBlacklist(int slot)
                 should_check = false;
 
                 bool is_absolute_danger = distance < selected_config.min_full_danger;
-                if (!is_absolute_danger && (enable_slight_danger_when_capping || navparser::NavEngine::current_priority != capture))
+                if (!is_absolute_danger && (*enable_slight_danger_when_capping || navparser::NavEngine::current_priority != capture))
+                {
                     for (auto &area : (*to_loop)[checked_origin.first])
                     {
                         (*to_mark)[area]++;
                         if ((*to_mark)[area] >= *blacklist_slightdanger_limit)
                             (*navparser::NavEngine::getFreeBlacklist())[area] = is_dormant ? navparser::ENEMY_DORMANT : navparser::ENEMY_NORMAL;
                     }
-
+                }
                 break;
             }
         }
@@ -575,7 +584,7 @@ void updateEnemyBlacklist(int slot)
                 (*to_loop)[ent].push_back(&nav_area);
 
                 // Just slightly dangerous, only mark as such if it's clear
-                if (!is_absolute_danger && (enable_slight_danger_when_capping || navparser::NavEngine::current_priority != capture))
+                if (!is_absolute_danger && (*enable_slight_danger_when_capping || navparser::NavEngine::current_priority != capture))
                 {
                     (*to_mark)[&nav_area]++;
                     if ((*to_mark)[&nav_area] < *blacklist_slightdanger_limit)
@@ -595,13 +604,18 @@ void updateEnemyBlacklist(int slot)
     // Store slight danger areas for drawing
     if (!normal_slight_danger.empty())
     {
-        for (auto &area : normal_slight_danger)
+        // Reserve space in order to reduce number of reallocations
+        slight_danger_drawlist_normal.reserve(normal_slight_danger.size());
+        for (const auto &area : normal_slight_danger)
             if (area.second < *blacklist_slightdanger_limit)
                 slight_danger_drawlist_normal.push_back(area.first->m_center);
     }
+
     if (!dormant_slight_danger.empty())
     {
-        for (auto &area : dormant_slight_danger)
+        // Reserve space in order to reduce number of reallocations
+        slight_danger_drawlist_dormant.reserve(dormant_slight_danger.size());
+        for (const auto &area : dormant_slight_danger)
             if (area.second < *blacklist_slightdanger_limit)
                 slight_danger_drawlist_dormant.push_back(area.first->m_center);
     }
@@ -694,7 +708,6 @@ std::optional<std::pair<CNavArea *, int>> findClosestHidingSpot(CNavArea *area, 
     // If the area works, return it
     if (!IsVectorVisibleNavigation(area_origin, vischeck_point))
         return std::pair<CNavArea *, int>{ area, index - 1 };
-
     // Termination condition not hit yet
     else if (index != recursion_count)
     {
@@ -730,7 +743,7 @@ bool runReload()
     if (!(CE_GOOD(LOCAL_E) && !HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E) && CE_GOOD(LOCAL_W) && re::C_BaseCombatWeapon::GetSlot(RAW_ENT(LOCAL_W)) + 1 != melee && !CanShoot()))
         return false;
 
-    if (!stay_near)
+    if (!*stay_near)
         return false;
 
     // Re-calc only every once in a while
@@ -799,7 +812,7 @@ bool stayNear()
     static int lowest_check_index           = 0;
 
     // Stay near is off
-    if (!stay_near)
+    if (!*stay_near)
         return false;
     // Don't constantly path, it's slow.
     // Far range classes do not need to repath nearly as often as close range ones.
@@ -1020,7 +1033,7 @@ bool snipeSentries()
     static Timer sentry_snipe_cooldown;
     static CachedEntity *previous_target = nullptr;
 
-    if (!snipe_sentries)
+    if (!*snipe_sentries)
         return false;
 
     // Sentries don't move often, so we can use a slightly longer timer
@@ -1043,7 +1056,7 @@ bool snipeSentries()
     }
 
     // Make sure we don't try to do it unless specified
-    if (!snipe_sentries_shortrange)
+    if (!*snipe_sentries_shortrange)
         return false;
 
     for (const auto &ent : entity_cache::valid_ents)
@@ -1290,7 +1303,7 @@ bool captureObjectives()
     static Timer capture_timer;
     static Vector previous_target(0.0f);
     // Not active or on a doomsday map
-    if (!capture_objectives || is_doomsday || !capture_timer.check(2000))
+    if (!*capture_objectives || is_doomsday || !capture_timer.check(2000))
         return false;
 
     // Priority too high, don't try
@@ -1390,10 +1403,10 @@ bool doRoam()
 // Run away from dangerous areas
 bool escapeDanger()
 {
-    if (!escape_danger)
+    if (!*escape_danger)
         return false;
     // Don't escape while we have the intel
-    if (!escape_danger_ctf_cap)
+    if (!*escape_danger_ctf_cap)
     {
         auto flag_carrier = flagcontroller::getCarrier(g_pLocalPlayer->team);
         if (flag_carrier == LOCAL_E)
@@ -1453,7 +1466,7 @@ static int slot = primary;
 
 static void autoJump(std::pair<CachedEntity *, float> &nearest)
 {
-    if (!autojump)
+    if (!*autojump)
         return;
     static Timer last_jump{};
     if (!last_jump.test_and_set(200) || CE_BAD(nearest.first))
@@ -1465,7 +1478,7 @@ static void autoJump(std::pair<CachedEntity *, float> &nearest)
 
 static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &nearest)
 {
-    if (force_slot)
+    if (*force_slot)
         return (slots) *force_slot;
     switch (g_pLocalPlayer->clazz)
     {
@@ -1545,7 +1558,7 @@ static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &ne
 static void updateSlot(std::pair<CachedEntity *, float> &nearest)
 {
     static Timer slot_timer{};
-    if ((!force_slot && !primary_only) || !slot_timer.test_and_set(300))
+    if (!*force_slot && !*primary_only || !slot_timer.test_and_set(300))
         return;
     if (CE_GOOD(LOCAL_E) && !HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E) && CE_GOOD(LOCAL_W) && LOCAL_E->m_bAlivePlayer())
     {
@@ -1562,7 +1575,7 @@ static void updateSlot(std::pair<CachedEntity *, float> &nearest)
 
 static void CreateMove()
 {
-    if (!enabled || !navparser::NavEngine::isReady())
+    if (!*enabled || !navparser::NavEngine::isReady())
         return;
     if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E))
         return;
@@ -1571,7 +1584,7 @@ static void CreateMove()
     /*refreshLocalBuildings();
     refreshBuildingSpots();*/
 
-    if (danger_config_custom)
+    if (*danger_config_custom)
         selected_config = { *danger_config_custom_min_full_danger, *danger_config_custom_min_slight_danger, *danger_config_custom_max_slight_danger, *danger_config_custom_prefer_far };
     else
     {
@@ -1649,21 +1662,24 @@ void LevelInit()
 #if ENABLE_VISUALS
 void Draw()
 {
-    if (!draw_danger || !navparser::NavEngine::isReady())
+    if (!*draw_danger || !navparser::NavEngine::isReady())
         return;
-    for (auto &area : slight_danger_drawlist_normal)
+
+    for (const auto &area : slight_danger_drawlist_normal)
     {
         Vector out;
         if (draw::WorldToScreen(area, out))
             draw::Rectangle(out.x - 2.0f, out.y - 2.0f, 4.0f, 4.0f, colors::orange);
     }
-    for (auto &area : slight_danger_drawlist_dormant)
+
+    for (const auto &area : slight_danger_drawlist_dormant)
     {
         Vector out;
         if (draw::WorldToScreen(area, out))
             draw::Rectangle(out.x - 2.0f, out.y - 2.0f, 4.0f, 4.0f, colors::orange);
     }
-    for (auto &area : *navparser::NavEngine::getFreeBlacklist())
+
+    for (const auto &area : *navparser::NavEngine::getFreeBlacklist())
     {
         Vector out;
 

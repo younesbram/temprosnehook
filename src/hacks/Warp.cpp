@@ -314,7 +314,7 @@ void dodgeProj(CachedEntity *proj_ptr)
         if (proj_ptr->m_Type() == ENTITY_PROJECTILE)
             add_grav = true;
         // Couldn't find a cleaner way to get the projectiles gravity based on just having a pointer to the projectile itself
-        curr_grav = curr_grav * ProjGravMult(proj_ptr->m_iClassID(), eav.Length());
+        curr_grav *= ProjGravMult(proj_ptr->m_iClassID(), eav.Length());
         // Optimization loop. Just checks if the projectile can possibly hit within ~141HU
         while (displacement_temp < displacement)
         {
@@ -411,19 +411,22 @@ static void dodgeProj_cm()
 // Should we warp?
 bool shouldWarp(bool check_amount)
 {
+    if (!g_IEngine->IsInGame())
+        return false;
     auto nearest = hacks::NavBot::getNearestPlayerDistance();
-    return g_IEngine->IsInGame() &&
-           // Warp key held?
-           (((((warp_key && warp_key.isKeyDown())
-               // Hurt warp?
-               || was_hurt
-               // Rapidfire and trying to attack?
-               || shouldRapidfire())
-              // Option is enabled, in melee range and target is visible to us
-              || (warp_melee && nearest.second < 175 && hacks::NavBot::isVisible))
-             // Do we have enough to warp?
-             && (!check_amount || warp_amount)) ||
-            warp_dodge);
+    return
+        // Warp key held?
+        (warp_key && warp_key.isKeyDown()
+         // Hurt warp?
+         || was_hurt
+         // Rapidfire and trying to attack?
+         || shouldRapidfire()
+         // Option is enabled, in melee range and target is visible to us
+         || *warp_melee && nearest.second < 175 && hacks::NavBot::isVisible)
+            // Do we have enough to warp?
+            && (!check_amount || warp_amount) ||
+        // Warp to dodge projectiles?
+        warp_dodge;
 }
 
 // How many ticks of excess we have (for decimal speeds)

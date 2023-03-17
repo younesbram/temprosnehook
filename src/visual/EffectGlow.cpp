@@ -237,9 +237,9 @@ rgba_t EffectGlow::GlowColor(IClientEntity *entity)
             return colors::Health_dimgreen(ent->m_iHealth(), ent->m_iMaxHealth());
         break;
     case ENTITY_PLAYER:
-        if (health && playerlist::IsDefault(ent))
+        if (health && playerlist::IsDefault(ent->player_info->friendsID))
             return colors::Health_dimgreen(ent->m_iHealth(), ent->m_iMaxHealth());
-        else if (!playerlist::IsDefault(ent))
+        else if (!playerlist::IsDefault(ent->player_info->friendsID))
             return playerlist::Color(ent);
     default:
         break;
@@ -276,7 +276,7 @@ bool EffectGlow::ShouldRenderGlow(IClientEntity *entity)
             return false;
         if (!disguised && IsPlayerDisguised(ent))
             return false;
-        if (!teammates && !ent->m_bEnemy() && playerlist::IsDefault(ent))
+        if (!teammates && !ent->m_bEnemy() && playerlist::IsDefault(ent->player_info->friendsID))
             return false;
         if (CE_BYTE(ent, netvar.iLifeState) != LIFE_ALIVE)
             return false;

@@ -15,7 +15,7 @@ static bool drawEsp[PLAYER_ARRAY_SIZE];
 
 rgba_t HeadESPColor(CachedEntity *ent)
 {
-    if (!playerlist::IsDefault(ent))
+    if (!playerlist::IsDefault(ent->player_info->friendsID))
         return playerlist::Color(ent);
 
     return colors::green;
@@ -34,7 +34,7 @@ static void cm()
             drawEsp[pEntity->m_IDX] = false;
             continue;
         }
-        if (pEntity->m_iTeam() == LOCAL_E->m_iTeam() && playerlist::IsDefault(pEntity) && !*teammates)
+        if (pEntity->m_iTeam() == LOCAL_E->m_iTeam() && playerlist::IsDefault(pEntity->player_info->friendsID) && !*teammates)
         {
             drawEsp[pEntity->m_IDX] = false;
             continue;

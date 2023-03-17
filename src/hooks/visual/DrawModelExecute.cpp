@@ -285,7 +285,7 @@ bool ShouldRenderChams(IClientEntity *entity)
             return false;
         if (!disguised && IsPlayerDisguised(ent))
             return false;
-        if (!teammates && !ent->m_bEnemy() && playerlist::IsDefault(ent))
+        if (!teammates && !ent->m_bEnemy() && playerlist::IsDefault(ent->player_info->friendsID))
             return false;
         if (CE_BYTE(ent, netvar.iLifeState))
             return false;

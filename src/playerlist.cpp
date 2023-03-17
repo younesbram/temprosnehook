@@ -22,7 +22,8 @@ const std::array<std::pair<k_EState, size_t>, 5> k_arrGUIStates = { std::pair(k_
 #if ENABLE_VISUALS
 std::array<rgba_t, 8> k_Colors = { colors::empty, colors::FromRGBA8(99, 226, 161, 255), colors::FromRGBA8(226, 204, 99, 255), colors::FromRGBA8(232, 134, 6, 255), colors::FromRGBA8(232, 134, 6, 255), colors::empty, colors::FromRGBA8(150, 75, 0, 255), colors::FromRGBA8(99, 226, 161, 255) };
 #endif
-bool ShouldSave(const userdata &data)
+
+static bool ShouldSave(const userdata &data)
 {
 #if ENABLE_VISUALS
     return data.color || data.state == k_EState::FRIEND || data.state == k_EState::RAGE || data.state == k_EState::PAZER || data.state == k_EState::ABUSE;
@@ -35,8 +36,7 @@ void Save()
     DIR *cathook_directory = opendir(paths::getDataPath().c_str());
     if (!cathook_directory)
     {
-        logging::Info("[ERROR] cathook data directory doesn't exist! How did "
-                      "the cheat even get injected?");
+        logging::Info("[ERROR] cathook data directory doesn't exist! How did the cheat even get injected?");
         return;
     }
     else
@@ -73,8 +73,7 @@ void Load()
     DIR *cathook_directory = opendir(paths::getDataPath().c_str());
     if (!cathook_directory)
     {
-        logging::Info("[ERROR] cathook data directory doesn't exist! How did "
-                      "the cheat even get injected?");
+        logging::Info("[ERROR] cathook data directory doesn't exist! How did the cheat even get injected?");
         return;
     }
     else
@@ -93,7 +92,7 @@ void Load()
         int count = 0;
         file.read(reinterpret_cast<char *>(&count), sizeof(count));
         logging::Info("Reading %i entries...", count);
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < count; ++i)
         {
             int steamid;
             userdata udata;
@@ -109,6 +108,7 @@ void Load()
         logging::Info("Reading unsuccessful: %s", e.what());
     }
 }
+
 #if ENABLE_VISUALS
 rgba_t Color(unsigned steamid)
 {
@@ -132,17 +132,10 @@ rgba_t Color(CachedEntity *player)
     return colors::empty;
 }
 #endif
+
 userdata &AccessData(unsigned steamid)
 {
     return data[steamid];
-}
-
-// Assume player is non-null
-userdata &AccessData(CachedEntity *player)
-{
-    if (player && player->player_info->friendsID)
-        return AccessData(player->player_info->friendsID);
-    return AccessData(0U);
 }
 
 bool IsDefault(unsigned steamid)
@@ -154,24 +147,10 @@ bool IsDefault(unsigned steamid)
     return data.state == k_EState ::DEFAULT;
 }
 
-bool IsDefault(CachedEntity *entity)
-{
-    if (entity && entity->player_info->friendsID)
-        return IsDefault(entity->player_info->friendsID);
-    return true;
-}
-
 bool IsFriend(unsigned steamid)
 {
     const userdata &data = AccessData(steamid);
     return data.state == k_EState::PARTY || data.state == k_EState::FRIEND;
-}
-
-bool IsFriend(CachedEntity *entity)
-{
-    if (entity && entity->player_info->friendsID)
-        return IsFriend(entity->player_info->friendsID);
-    return false;
 }
 
 bool ChangeState(unsigned int steamid, k_EState state, bool force)
@@ -273,12 +252,14 @@ CatCommand pl_add_id("pl_add_id", "Sets state for steamid",
 
                          uint32_t id       = std::strtoul(args.Arg(1), nullptr, 10);
                          const char *state = args.Arg(2);
-                         for (int i = 0; i <= int(k_EState::STATE_LAST); ++i)
+                         for (uint8 i = 0; i <= uint8(k_EState::STATE_LAST); ++i)
+                         {
                              if (k_Names[i] == state)
                              {
                                  AccessData(id).state = k_EState(i);
                                  return;
                              }
+                         }
 
                          logging::Info("Unknown State");
                      });
@@ -289,7 +270,7 @@ static void pl_cleanup()
     size_t counter = 0;
     for (auto it = data.begin(); it != data.end(); ++it)
     {
-        if (std::memcmp(&it->second, &empty, sizeof(empty)))
+        if (std::memcmp(&it->second, &empty, sizeof(empty)) != 0)
             continue;
 
         ++counter;
@@ -336,12 +317,14 @@ CatCommand pl_set_state("pl_set_state", "cat_pl_set_state [playername] [state] (
                             player_info_s info{};
                             GetPlayerInfo(id, &info);
 
-                            for (int i = 0; i <= int(k_EState::STATE_LAST); ++i)
+                            for (uint8 i = 0; i <= uint8(k_EState::STATE_LAST); ++i)
+                            {
                                 if (k_Names[i] == state)
                                 {
                                     AccessData(info.friendsID).state = k_EState(i);
                                     return;
                                 }
+                            }
 
                             logging::Info("Unknown State %s. (Use tab for autocomplete)", state.c_str());
                         });
@@ -431,6 +414,7 @@ CatCommand pl_set_color("pl_set_color", "pl_set_color uniqueid r g b",
                             logging::Info("Changed %d's color", steamid);
                         });
 #endif
+
 CatCommand pl_info("pl_info", "pl_info uniqueid",
                    [](const CCommand &args)
                    {

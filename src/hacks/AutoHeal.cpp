@@ -120,7 +120,7 @@ int BulletDangerValue(CachedEntity *patient)
         {
             if (IsEntityVisible(ent, head))
             {
-                if (playerlist::AccessData(ent).state == playerlist::k_EState::RAGE)
+                if (playerlist::AccessData(ent->player_info->friendsID).state == playerlist::k_EState::RAGE)
                     return 2;
                 else
                 {
@@ -429,9 +429,8 @@ void UpdateData()
         {
             int health = ent->m_iHealth();
             if (data[ent->m_IDX].last_damage > g_GlobalVars->curtime)
-            {
                 data[ent->m_IDX].last_damage = 0.0f;
-            }
+
             if (g_GlobalVars->curtime - data[ent->m_IDX].last_damage > 5.0f)
             {
                 data[ent->m_IDX].accum_damage       = 0;
@@ -480,7 +479,7 @@ bool CanHeal(int idx)
         return false;
     if (IsPlayerInvisible(ent))
         return false;
-    if (friendsonly && !playerlist::IsFriend(ent))
+    if (friendsonly && !playerlist::IsFriend(ent->player_info->friendsID))
         return false;
     if (!heal_disguised && IsPlayerDisguised(ent))
         return false;
@@ -510,9 +509,7 @@ int HealingPriority(int idx)
 
     CachedEntity *ent = ENTITY(idx);
     if (share_uber && IsPopped())
-    {
         return !HasCondition<TFCond_Ubercharged>(ent);
-    }
 
     int priority        = 0;
     int health          = CE_INT(ent, netvar.iHealth);
@@ -520,8 +517,8 @@ int HealingPriority(int idx)
     int maxbuffedhealth = maxhealth * 1.5;
     int maxoverheal     = maxbuffedhealth - maxhealth;
     int overheal        = maxoverheal - (maxbuffedhealth - health);
-    float overhealp     = ((float) overheal / (float) maxoverheal);
-    float healthp       = ((float) health / (float) maxhealth);
+    float overhealp     = (float) overheal / (float) maxoverheal;
+    float healthp       = (float) health / (float) maxhealth;
     // Base Class priority
     priority += hacks::followbot::ClassPriority(ent) * 1.3;
 
@@ -530,7 +527,7 @@ int HealingPriority(int idx)
         return 0.0f;
     // Healthpoint priority
     float healpp = **class_list[g_pPlayerResource->GetClass(ent) - 1];
-    switch (playerlist::AccessData(ent).state)
+    switch (playerlist::AccessData(ent->player_info->friendsID).state)
     {
     case playerlist::k_EState::PARTY:
     case playerlist::k_EState::FRIEND:
@@ -551,15 +548,10 @@ int HealingPriority(int idx)
         priority += healpp / 3 * (1 - overhealp);
     }
 #if ENABLE_IPC
-    if (ipc::peer)
-    {
-        if (hacks::followbot::isEnabled() && hacks::followbot::follow_target == idx)
-        {
-            priority *= 6.0f;
-        }
-    }
+    if (ipc::peer && hacks::followbot::isEnabled() && hacks::followbot::follow_target == idx)
+        priority *= 6.0f;
 #endif
-    /*    player_info_s info;
+    /*  player_info_s info;
         GetPlayerInfo(idx, &info);
         info.name[31] = 0;
         if (strcasestr(info.name, ignore.GetString()))
@@ -596,13 +588,9 @@ static void CreateMove()
         DoResistSwitching();
         int my_opt = OptimalResistance(LOCAL_E, &pop);
         if (my_opt >= 0 && my_opt != CurrentResistance())
-        {
             SetResistance(my_opt);
-        }
         if (pop && CurrentResistance() == my_opt)
-        {
             current_user_cmd->buttons |= IN_ATTACK2;
-        }
     }
     if ((!steamid && !enable) || GetWeaponMode() != weapon_medigun)
         return;
@@ -637,14 +625,9 @@ static void CreateMove()
     if (CurrentHealingTargetIDX && (CE_BAD(ENTITY(CurrentHealingTargetIDX)) || !CanHeal(CurrentHealingTargetIDX)))
         CurrentHealingTargetIDX = 0;
 
-    if (enable)
-    {
-        // if no target or after 2 seconds, pick new target
-        if (!CurrentHealingTargetIDX || ((g_GlobalVars->tickcount % 132) == 0 && !healing_steamid))
-        {
-            CurrentHealingTargetIDX = BestTarget();
-        }
-    }
+    // if no target or after 2 seconds, pick new target
+    if (enable && (!CurrentHealingTargetIDX || g_GlobalVars->tickcount % 132 == 0) && !healing_steamid)
+        CurrentHealingTargetIDX = BestTarget();
 
     UpdateData();
 
@@ -652,7 +635,6 @@ static void CreateMove()
         return;
 
     CachedEntity *target = ENTITY(CurrentHealingTargetIDX);
-
     bool target_is_healing_target = HandleToIDX(CE_INT(LOCAL_W, netvar.m_hHealingTarget)) == CurrentHealingTargetIDX;
     auto out                      = target->hitboxes.GetHitbox(spine_2);
     if (out)
@@ -688,15 +670,10 @@ static void CreateMove()
         if (!pop && opt != -1)
             SetResistance(opt);
         if (pop && CurrentResistance() == opt)
-        {
-            current_user_cmd->buttons |= IN_ATTACK2;
-        }
-    }
-    else
-    {
-        if (pop_uber_auto && ShouldPop())
             current_user_cmd->buttons |= IN_ATTACK2;
     }
+    else if (pop_uber_auto && ShouldPop())
+        current_user_cmd->buttons |= IN_ATTACK2;
 
     // Uber on "CHARGE ME DOCTOR!"
     if (pop_uber_voice)

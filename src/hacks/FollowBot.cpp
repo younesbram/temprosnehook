@@ -280,7 +280,7 @@ static bool isValidTarget(CachedEntity *entity)
     // Don't follow target that was determined afk
     if (afk && afkTicks[entity->m_IDX].check(*afktime))
         return false;
-    if (ignore_textmode && playerlist::AccessData(entity).state == playerlist::k_EState::TEXTMODE)
+    if (ignore_textmode && playerlist::AccessData(entity->player_info->friendsID).state == playerlist::k_EState::TEXTMODE)
         return false;
     return true;
 }
@@ -390,7 +390,7 @@ static void cm()
 
         if (follow_friends && !foundPreferredTarget)
         {
-            if (!playerlist::IsFriend(ENTITY(valid_target)))
+            if (!playerlist::IsFriend(ENTITY(valid_target)->player_info->friendsID))
             {
                 for (const auto &entity: entity_cache::player_cache)
                 {
@@ -398,7 +398,7 @@ static void cm()
                         continue;
                     if (entity->m_bEnemy())
                         continue;
-                    if (!playerlist::IsFriend(entity))
+                    if (!playerlist::IsFriend(entity->player_info->friendsID))
                         continue;
                     if (startFollow(entity, isNavBotCM))
                     {

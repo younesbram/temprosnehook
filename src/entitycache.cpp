@@ -16,7 +16,7 @@ inline void CachedEntity::Update()
     if (!m_pEntity)
         return;
 #endif
-    m_lLastSeen  = 0;
+    m_lLastSeen = 0;
     hitboxes.InvalidateCache();
     m_bVisCheckComplete = false;
 }
@@ -80,6 +80,10 @@ void Update()
     if (max >= MAX_ENTITIES)
         max = MAX_ENTITIES - 1;
 
+    // pre-allocate memory
+    valid_ents.reserve(max);
+    player_cache.reserve(g_IEngine->GetMaxClients());
+
     if (previous_max == max && previous_ent == current_ents)
     {
         for (auto &[key, val] : array)
@@ -92,17 +96,18 @@ void Update()
                 if (!internalEntity->IsDormant())
                 {
                     valid_ents.emplace_back(&val);
-                    if (val.m_Type() == ENTITY_PLAYER || val.m_Type() == ENTITY_BUILDING || val.m_Type() == ENTITY_NPC)
+                    auto valType = val.m_Type();
+                    if (valType == ENTITY_PLAYER || valType == ENTITY_BUILDING || valType == ENTITY_NPC)
                     {
                         if (val.m_bAlivePlayer()) [[likely]]
                         {
                             val.hitboxes.UpdateBones();
-                            if (val.m_Type() == ENTITY_PLAYER)
+                            if (valType == ENTITY_PLAYER)
                                 player_cache.emplace_back(&val);
                         }
                     }
 
-                    if (val.m_Type() == ENTITY_PLAYER)
+                    if (valType == ENTITY_PLAYER)
                         GetPlayerInfo(val.m_IDX, val.player_info);
                 }
             }
@@ -121,23 +126,24 @@ void Update()
             auto internalEntity = ent.InternalEntity();
             if (internalEntity)
             {
+                auto entType = ent.m_Type();
                 // Non-dormant entities that need bone updates
                 if (!internalEntity->IsDormant())
                 {
                     valid_ents.emplace_back(&ent);
-                    if (ent.m_Type() == ENTITY_PLAYER || ent.m_Type() == ENTITY_BUILDING || ent.m_Type() == ENTITY_NPC)
+                    if (entType == ENTITY_PLAYER || entType == ENTITY_BUILDING || entType == ENTITY_NPC)
                     {
                         if (ent.m_bAlivePlayer()) [[likely]]
                         {
                             ent.hitboxes.UpdateBones();
-                            if (ent.m_Type() == ENTITY_PLAYER)
+                            if (entType == ENTITY_PLAYER)
                                 player_cache.emplace_back(&ent);
                         }
                     }
                 }
 
                 // Even dormant players have player info
-                if (ent.m_Type() == ENTITY_PLAYER)
+                if (entType == ENTITY_PLAYER)
                 {
                     if (!ent.player_info)
                         ent.player_info = new player_info_s;

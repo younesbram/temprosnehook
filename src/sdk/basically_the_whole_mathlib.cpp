@@ -144,7 +144,7 @@ float QuaternionNormalize(Quaternion &q)
 
     if (radius) // > FLT_EPSILON && ((radius < 1.0f - 4*FLT_EPSILON) || (radius > 1.0f + 4*FLT_EPSILON))
     {
-        radius  = sqrt(radius);
+        radius  = FastSqrt(radius);
         iradius = 1.0f / radius;
         q[3] *= iradius;
         q[2] *= iradius;
@@ -319,7 +319,7 @@ void QuaternionScale(const Quaternion &p, float t, Quaternion &q)
 
     // FIXME: nick, this isn't overly sensitive to accuracy, and it may be faster to
     // use the cos part (w) of the quaternion (sin(omega)*N,cos(omega)) to figure the new scale.
-    float sinom = sqrt(DotProduct(&p.x, &p.x));
+    float sinom = FastSqrt(DotProduct(&p.x, &p.x));
     sinom       = min(sinom, 1.f);
 
     float sinsom = sin(asin(sinom) * t);
@@ -333,7 +333,7 @@ void QuaternionScale(const Quaternion &p, float t, Quaternion &q)
     // Assert( r >= 0 );
     if (r < 0.0f)
         r = 0.0f;
-    r = sqrt(r);
+    r = FastSqrt(r);
 
     // keep sign of rotation
     if (p.w < 0)
@@ -343,8 +343,6 @@ void QuaternionScale(const Quaternion &p, float t, Quaternion &q)
 #endif
 
     Assert(q.IsValid());
-
-    return;
 }
 
 // qt = p * q

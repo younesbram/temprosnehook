@@ -131,8 +131,7 @@ void WalkTo(const Vector &vector)
     current_user_cmd->upmove      = result.z;
 }
 
-// Function to get the corner location that a vischeck to an entity is possible
-// from
+// Function to get the corner location that a vischeck to an entity is possible from
 Vector VischeckCorner(CachedEntity *player, CachedEntity *target, float maxdist, bool checkWalkable)
 {
     int maxiterations = maxdist / 40;
@@ -142,10 +141,10 @@ Vector VischeckCorner(CachedEntity *player, CachedEntity *target, float maxdist,
     if (VisCheckEntFromEnt(player, target) && (!checkWalkable || canReachVector(origin, target->m_vecOrigin())))
         return origin;
 
-    for (int i = 0; i < 8; i++) // for loop for all 4 directions
+    for (uint8 i = 0; i < 8; ++i) // for loop for all 4 directions
     {
         // 40 * maxiterations = range in HU
-        for (int j = 0; j < maxiterations; j++)
+        for (int j = 0; j < maxiterations; ++j)
         {
             Vector virtualOrigin = origin;
             // what direction to go in
@@ -178,6 +177,7 @@ Vector VischeckCorner(CachedEntity *player, CachedEntity *target, float maxdist,
             case 7:
                 virtualOrigin.x = virtualOrigin.x + 20 * (j + 1);
                 virtualOrigin.y = virtualOrigin.y - 20 * (j + 1);
+            default:
                 break;
             }
             // check if player can see the players virtualOrigin
@@ -214,10 +214,10 @@ std::pair<Vector, Vector> VischeckWall(CachedEntity *player, CachedEntity *targe
             return orig;
     }
 
-    for (int i = 0; i < 8; i++) // for loop for all 4 directions
+    for (uint8 i = 0; i < 8; ++i) // for loop for all 4 directions
     {
         // 40 * maxiterations = range in HU
-        for (int j = 0; j < maxiterations; j++)
+        for (int j = 0; j < maxiterations; ++j)
         {
             Vector virtualOrigin = origin;
             // what direction to go in
@@ -250,15 +250,16 @@ std::pair<Vector, Vector> VischeckWall(CachedEntity *player, CachedEntity *targe
             case 7:
                 virtualOrigin.x = virtualOrigin.x + 20 * (j + 1);
                 virtualOrigin.y = virtualOrigin.y - 20 * (j + 1);
+            default:
                 break;
             }
             // check if player can see the players virtualOrigin
             if (!IsVectorVisible(origin, virtualOrigin, true))
                 continue;
-            for (int i = 0; i < 8; i++) // for loop for all 4 directions
+            for (uint8 i = 0; i < 8; ++i) // for loop for all 4 directions
             {
                 // 40 * maxiterations = range in HU
-                for (int j = 0; j < maxiterations; j++)
+                for (int j = 0; j < maxiterations; ++j)
                 {
                     Vector virtualOrigin2 = target->m_vecOrigin();
                     // what direction to go in
@@ -291,6 +292,7 @@ std::pair<Vector, Vector> VischeckWall(CachedEntity *player, CachedEntity *targe
                     case 7:
                         virtualOrigin2.x = virtualOrigin2.x + 20 * (j + 1);
                         virtualOrigin2.y = virtualOrigin2.y - 20 * (j + 1);
+                    default:
                         break;
                     }
                     // check if the virtualOrigin2 can see the target
@@ -330,26 +332,32 @@ float vectorMax(Vector i)
     return fmaxf(fmaxf(i.x, i.y), i.z);
 }
 
-// Returns a vectors absolute value. For example {123,-150, 125} = {123,150,
-// 125}
+// Returns a vectors absolute value. For example {123, -150, 125} = {123, 150, 125}
 Vector vectorAbs(Vector i)
 {
+#ifdef __SSE2__
+    __m128 sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
+    __m128 v         = _mm_loadu_ps(&i.x);
+    v                = _mm_andnot_ps(sign_mask, v);
+    Vector result;
+    _mm_storeu_ps(&result.x, v);
+#else
     Vector result = i;
     result.x      = fabsf(result.x);
     result.y      = fabsf(result.y);
     result.z      = fabsf(result.z);
+#endif
     return result;
 }
 
-// check to see if we can reach a vector or if it is too high / doesn't leave
-// enough space for the player, optional second vector
+// check to see if we can reach a vector or if it is too high / doesn't leave enough space for the player, optional second vector
 bool canReachVector(Vector loc, Vector dest)
 {
     if (!dest.IsZero())
     {
         Vector dist       = dest - loc;
         int maxiterations = floor(dest.DistTo(loc)) / 40;
-        for (int i = 0; i < maxiterations; i++)
+        for (int i = 0; i < maxiterations; ++i)
         {
             // math to get the next vector 40.0f in the direction of dest
             Vector vec = loc + dist / vectorMax(vectorAbs(dist)) * 40.0f * (i + 1);
@@ -357,7 +365,7 @@ bool canReachVector(Vector loc, Vector dest)
             if (DistanceToGround({ vec.x, vec.y, vec.z + 5 }) >= 40)
                 return false;
 
-            for (int j = 0; j < 4; j++)
+            for (uint8 j = 0; j < 4; ++j)
             {
                 Vector directionalLoc = vec;
                 // what direction to check
@@ -374,6 +382,7 @@ bool canReachVector(Vector loc, Vector dest)
                     break;
                 case 3:
                     directionalLoc.y = directionalLoc.y - 40;
+                default:
                     break;
                 }
                 trace_t trace;
@@ -384,7 +393,7 @@ bool canReachVector(Vector loc, Vector dest)
                     g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_no_player, &trace);
                 }
                 // distance of trace < than 26
-                if (trace.startpos.DistTo(trace.endpos) < 26.0f)
+                if (trace.startpos.DistToSqr(trace.endpos) < SQR(26.0f))
                     return false;
             }
         }
@@ -400,7 +409,7 @@ bool canReachVector(Vector loc, Vector dest)
 
         // check if there is enough space arround the vector for a player to fit
         // for loop for all 4 directions
-        for (int i = 0; i < 4; i++)
+        for (uint8 i = 0; i < 4; ++i)
         {
             Vector directionalLoc = loc;
             // what direction to check
@@ -417,6 +426,7 @@ bool canReachVector(Vector loc, Vector dest)
                 break;
             case 3:
                 directionalLoc.y = directionalLoc.y - 40;
+            default:
                 break;
             }
             trace_t trace;
@@ -427,7 +437,7 @@ bool canReachVector(Vector loc, Vector dest)
                 g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_no_player, &trace);
             }
             // distance of trace < than 26
-            if (trace.startpos.DistTo(trace.endpos) < 26.0f)
+            if (trace.startpos.DistToSqr(trace.endpos) < SQR(26.0f))
                 return false;
         }
     }
@@ -513,7 +523,7 @@ const char *GetBuildingName(CachedEntity *ent)
 
 void format_internal(std::stringstream &stream)
 {
-    (void) (stream);
+    (void) stream;
 }
 
 void ReplaceString(std::string &input, const std::string &what, const std::string &with_what)
@@ -660,7 +670,7 @@ bool DidProjectileHit(Vector start_point, Vector end_point, CachedEntity *entity
         trace_obj = new trace_t;
     ray.Init(start_point, end_point, Vector(0, -projectile_size, -projectile_size), Vector(0, projectile_size, projectile_size));
     g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, trace_obj);
-    return (((IClientEntity *) trace_obj->m_pEnt) == RAW_ENT(entity) || grav_comp && !trace_obj->DidHit());
+    return ((IClientEntity *) trace_obj->m_pEnt == RAW_ENT(entity) || grav_comp && !trace_obj->DidHit());
 }
 
 // A function to find a weapon by WeaponID
@@ -671,7 +681,7 @@ int getWeaponByID(CachedEntity *player, int weaponid)
         return -1;
     int *hWeapons = &CE_INT(player, netvar.hMyWeapons);
     // Go through the handle array and search for the item
-    for (int i = 0; hWeapons[i]; i++)
+    for (int i = 0; hWeapons[i]; ++i)
     {
         if (IDX_BAD(HandleToIDX(hWeapons[i])))
             continue;
@@ -695,7 +705,7 @@ bool HasWeapon(CachedEntity *ent, int wantedId)
     if (!hWeapons)
         return false;
     // Go through the handle array and search for the item
-    for (int i = 0; hWeapons[i]; i++)
+    for (int i = 0; hWeapons[i]; ++i)
     {
         if (IDX_BAD(HandleToIDX(hWeapons[i])))
             continue;
@@ -715,11 +725,16 @@ CachedEntity *getClosestEntity(Vector vec)
     CachedEntity *best_ent = nullptr;
     for (const auto &ent : entity_cache::player_cache)
     {
-        if (ent->m_vecDormantOrigin() && ent->m_bAlivePlayer() && ent->m_bEnemy() && vec.DistTo(ent->m_vecOrigin()) < distance)
-        {
-            distance = vec.DistTo(*ent->m_vecDormantOrigin());
-            best_ent = ent;
-        }
+        if (!ent->m_vecDormantOrigin() || !ent->m_bAlivePlayer() || !ent->m_bEnemy())
+            continue;
+
+        const auto dist_sq = vec.DistToSqr(*ent->m_vecDormantOrigin());
+
+        if (dist_sq >= SQR(distance))
+            continue;
+
+        distance = FastSqrt(dist_sq);
+        best_ent = ent;
     }
     return best_ent;
 }
@@ -730,11 +745,16 @@ CachedEntity *getClosestNonlocalEntity(Vector vec)
     CachedEntity *best_ent = nullptr;
     for (const auto &ent : entity_cache::player_cache)
     {
-        if (ent->m_IDX != g_pLocalPlayer->entity_idx && ent->m_vecDormantOrigin() && ent->m_bAlivePlayer() && ent->m_bEnemy() && vec.DistTo(ent->m_vecOrigin()) < distance)
-        {
-            distance = vec.DistTo(*ent->m_vecDormantOrigin());
-            best_ent = ent;
-        }
+        if (!ent->m_IDX != g_pLocalPlayer->entity_idx || !ent->m_vecDormantOrigin() || !ent->m_bAlivePlayer() || !ent->m_bEnemy())
+            continue;
+
+        const auto dist_sq = vec.DistToSqr(*ent->m_vecDormantOrigin());
+
+        if (dist_sq >= SQR(distance))
+            continue;
+
+        distance = FastSqrt(dist_sq);
+        best_ent = ent;
     }
     return best_ent;
 }
@@ -785,7 +805,7 @@ void MatrixAngles(const matrix3x4_t &matrix, float *angles)
     left[2]    = matrix[2][1];
     up[2]      = matrix[2][2];
 
-    float xyDist = std::sqrt(SQR(forward[0]) + SQR(forward[1]));
+    float xyDist = FastSqrt(SQR(forward[0]) + SQR(forward[1]));
 
     // enough here to get angles?
     if (xyDist > 0.001f)
@@ -818,20 +838,17 @@ void VectorAngles(Vector &forward, Vector &angles)
 
     if (forward[1] == 0 && forward[0] == 0)
     {
-        yaw = 0;
-        if (forward[2] > 0)
-            pitch = 270;
-        else
-            pitch = 90;
+        yaw   = 0;
+        pitch = forward[2] >= 0 ? 270 : 90;
     }
     else
     {
-        yaw = (atan2(forward[1], forward[0]) * 180 / PI);
+        yaw = atan2(forward[1], forward[0]) * 180 / PI;
         if (yaw < 0)
             yaw += 360;
 
-        tmp   = sqrt((SQR(forward[0]) + SQR(forward[1])));
-        pitch = (atan2(-forward[2], tmp) * 180 / PI);
+        tmp   = FastSqrt((SQR(forward[0]) + SQR(forward[1])));
+        pitch = atan2(-forward[2], tmp) * 180 / PI;
         if (pitch < 0)
             pitch += 360;
     }
@@ -962,7 +979,7 @@ void FixMovement(CUserCmd &cmd, Vector &viewangles)
     movement.x = cmd.forwardmove;
     movement.y = cmd.sidemove;
     movement.z = cmd.upmove;
-    speed      = sqrt(movement.x * movement.x + movement.y * movement.y);
+    speed      = FastSqrt(SQR(movement.x) + SQR(movement.y));
     VectorAngles(movement, ang);
     yaw             = DEG2RAD(ang.y - viewangles.y + cmd.viewangles.y);
     cmd.forwardmove = cos(yaw) * speed;
@@ -1035,7 +1052,7 @@ void GenerateBoxVertices(const Vector &vOrigin, const QAngle &angles, const Vect
     AngleMatrix(angles, fRotateMatrix);
 
     Vector vecPos;
-    for (int i = 0; i < 8; ++i)
+    for (uint8 i = 0; i < 8; ++i)
     {
         vecPos[0] = (i & 0x1) ? vMaxs[0] : vMins[0];
         vecPos[1] = (i & 0x2) ? vMaxs[1] : vMins[1];
@@ -1112,26 +1129,9 @@ bool IsBuildingVisible(CachedEntity *ent)
 
 void fClampAngle(Vector &qaAng)
 {
-    while (qaAng[0] > 89)
-        qaAng[0] -= 180;
-
-    while (qaAng[0] < -89)
-        qaAng[0] += 180;
-
-    while (qaAng[1] > 180)
-        qaAng[1] -= 360;
-
-    while (qaAng[1] < -180)
-        qaAng[1] += 360;
-
-    qaAng.z = 0;
-}
-
-float DistToSqr(CachedEntity *entity)
-{
-    if (CE_BAD(entity))
-        return 0.0f;
-    return g_pLocalPlayer->v_Origin.DistToSqr(entity->m_vecOrigin());
+    qaAng[0] = std::max(-89.0f, std::min(89.0f, qaAng[0]));
+    qaAng[1] = fmodf(qaAng[1] + 180.0f, 360.0f) - 180.0f;
+    qaAng[2] = 0;
 }
 
 bool IsProjectileCrit(CachedEntity *ent)
@@ -1558,17 +1558,16 @@ bool IsPlayerResistantToCurrentWeapon(CachedEntity *player)
     return false;
 }
 
-// F1 c&p
 Vector CalcAngle(Vector src, Vector dst)
 {
     Vector AimAngles, delta;
-    float hyp;
+    float hyp2;
     delta       = src - dst;
-    hyp         = sqrtf((delta.x * delta.x) + (delta.y * delta.y)); // SUPER SECRET IMPROVEMENT CODE NAME DONUT STEEL
-    AimAngles.x = atanf(delta.z / hyp) * RADPI;
-    AimAngles.y = atanf(delta.y / delta.x) * RADPI;
+    hyp2        = SQR(delta.x) + SQR(delta.y);
+    AimAngles.x = atanf(delta.z / FastSqrt(hyp2)) * RADPI;
+    AimAngles.y = atan2f(delta.y, delta.x) * RADPI;
     AimAngles.z = 0.0f;
-    if (delta.x >= 0.0)
+    if (delta.x < 0.0f)
         AimAngles.y += 180.0f;
     return AimAngles;
 }
@@ -1593,7 +1592,7 @@ float GetFov(Vector angle, Vector src, Vector dst)
     MakeVector(angle, aim);
     MakeVector(ang, ang);
 
-    mag     = sqrtf(pow(aim.x, 2) + pow(aim.y, 2) + pow(aim.z, 2));
+    mag     = FastSqrt(pow(aim.x, 2) + pow(aim.y, 2) + pow(aim.z, 2));
     u_dot_v = aim.Dot(ang);
 
     // Congratulations! you managed to go out of domain. That means you are directly on the target
@@ -1797,7 +1796,6 @@ Vector getShootPos(Vector angle)
             break;
         case CL_CLASS(CTFCompoundBow):
             vecOffset->y = -4.0f;
-            break;
         default:
             break;
         }
@@ -1824,7 +1822,6 @@ Vector getShootPos(Vector angle)
         break;
     case CL_CLASS(CTFLunchBox):
         vecOffset = Vector(0.0f, 0.0f, -8.0f);
-        break;
     default:
         break;
     }
@@ -1862,8 +1859,7 @@ Vector getShootPos(Vector angle)
     return eye;
 }
 
-// You shouldn't delete[] this unique_ptr since it
-// does it on its own
+// You shouldn't delete[] this unique_ptr since it does it on its own
 std::unique_ptr<char[]> strfmt(const char *fmt, ...)
 {
     // char *buf = new char[1024];
@@ -1944,10 +1940,10 @@ bool HookNetvar(std::vector<std::string> path, ProxyFnHook &hook, RecvVarProxyFn
         if (!strcmp(pClass->m_pRecvTable->m_pNetTableName, path[0].c_str()))
         {
             RecvTable *curr_table = pClass->m_pRecvTable;
-            for (size_t i = 1; i < path.size(); i++)
+            for (size_t i = 1; i < path.size(); ++i)
             {
                 bool found = false;
-                for (int j = 0; j < curr_table->m_nProps; j++)
+                for (int j = 0; j < curr_table->m_nProps; ++j)
                 {
                     auto *pProp = (RecvPropRedef *) &(curr_table->m_pProps[j]);
                     if (!pProp)
@@ -1986,6 +1982,7 @@ bool isTruce()
 {
     return is_truce_active;
 }
+
 void setTruce(bool status)
 {
     is_truce_active = status;

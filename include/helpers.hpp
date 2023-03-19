@@ -142,6 +142,7 @@ bool canReachVector(Vector loc, Vector dest = { 0, 0, 0 });
 bool LineIntersectsBox(Vector &bmin, Vector &bmax, Vector &lmin, Vector &lmax);
 void GenerateBoxVertices(const Vector &vOrigin, const QAngle &angles, const Vector &vMins, const Vector &vMaxs, Vector pVerts[8]);
 
+float DistToSqr(CachedEntity *entity);
 // const char* MakeInfoString(IClientEntity* player);
 bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float &start_velocity);
 bool IsVectorVisible(Vector a, Vector b, bool enviroment_only = false, CachedEntity *self = LOCAL_E, unsigned int mask = MASK_SHOT_HULL);

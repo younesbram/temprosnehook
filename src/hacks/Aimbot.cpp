@@ -438,8 +438,10 @@ bool AllowNoScope(CachedEntity *target)
     if (!target || CarryingMachina())
         return false;
 
-    int targetHealth         = target->m_iHealth();
-    bool isCarryingHeatmaker = CarryingHeatmaker();
+    int targetHealth                  = target->m_iHealth();
+    bool isLocalPlayerCritBoosted     = IsPlayerCritBoosted(LOCAL_E);
+    bool isLocalPlayerMiniCritBoosted = IsPlayerMiniCritBoosted(LOCAL_E);
+    bool isCarryingHeatmaker          = CarryingHeatmaker();
 
     if (!isCarryingHeatmaker && targetHealth <= 50)
         return true;
@@ -447,11 +449,9 @@ bool AllowNoScope(CachedEntity *target)
     if (isCarryingHeatmaker && targetHealth <= 40)
         return true;
 
-    bool isLocalPlayerCritBoosted = IsPlayerCritBoosted(LOCAL_E);
     if (isLocalPlayerCritBoosted && targetHealth <= 150)
         return true;
 
-    bool isLocalPlayerMiniCritBoosted = IsPlayerMiniCritBoosted(LOCAL_E);
     if (isLocalPlayerMiniCritBoosted && targetHealth <= 68 && !isCarryingHeatmaker)
         return true;
 
@@ -690,7 +690,7 @@ static void CreateMoveWarp()
 #if ENABLE_VISUALS
 bool MouseMoving()
 {
-    if (SERVER_TIME - last_mouse_check < 0.02)
+    if ((SERVER_TIME - last_mouse_check) < 0.02)
         SDL_GetMouseState(&PreviousX, &PreviousY);
     else
     {
@@ -1129,10 +1129,10 @@ bool Aim(CachedEntity *entity)
             fwd *= cur_proj_speed;
             Vector dist_between = (end_targ - orig) / fwd;
             const float gravity = cur_proj_grav * g_ICvar->FindVar("sv_gravity")->GetFloat() * -1.0f;
-            float z_diff        = end_targ.z - orig.z;
-            const float sol_1   = (fwd.z + FastSqrt(fwd.z * fwd.z + 2.0f * gravity * z_diff)) / (-1.0f * gravity);
+            float z_diff        = (end_targ.z - orig.z);
+            const float sol_1   = ((fwd.z + std::sqrt(fwd.z * fwd.z + 2.0f * gravity * (z_diff))) / (-1.0f * gravity));
             if (std::isnan(sol_1))
-                dist_between.z = (fwd.z - FastSqrt(fwd.z * fwd.z + 2.0f * gravity * z_diff)) / (-1.0f * gravity);
+                dist_between.z = ((fwd.z - std::sqrt(fwd.z * fwd.z + 2.0f * gravity * (z_diff))) / (-1.0f * gravity));
             else
                 dist_between.z = sol_1;
             float maxTime = dist_between.Length();

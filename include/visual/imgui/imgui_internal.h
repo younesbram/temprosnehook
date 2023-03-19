@@ -286,7 +286,7 @@ static inline float ImFabs(float x)
 }
 static inline float ImSqrt(float x)
 {
-    return FastSqrt(x);
+    return sqrtf(x);
 }
 static inline float ImPow(float x, float y)
 {

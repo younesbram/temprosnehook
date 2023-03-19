@@ -2416,7 +2416,7 @@ public:
     }
     static float findE(float a, float d)
     {
-        return FastSqrt(SQR(a) - SQR(d));
+        return sqrt(a * a - d * d);
     }
 
     // This leads to a solution to the more general problem:
@@ -2486,7 +2486,7 @@ public:
 
     static float length(float const v[])
     {
-        return FastSqrt(dot(v, v));
+        return sqrt(dot(v, v));
     }
 
     static void normalize(float v[])

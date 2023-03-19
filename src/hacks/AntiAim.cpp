@@ -303,7 +303,7 @@ float edgeDistance(float edgeRayYaw)
     // trace::g_pFilterNoPlayer to only focus on the enviroment
     g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_no_player, &trace);
     // Pythagorean theorem to calculate distance
-    float edgeDistance = FastSqrt(pow(trace.startpos.x - trace.endpos.x, 2) + pow(trace.startpos.y - trace.endpos.y, 2));
+    float edgeDistance = (sqrt(pow(trace.startpos.x - trace.endpos.x, 2) + pow(trace.startpos.y - trace.endpos.y, 2)));
     return edgeDistance;
 }
 

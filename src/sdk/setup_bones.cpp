@@ -2412,11 +2412,11 @@ public:
 
     static float findD(float a, float b, float c)
     {
-        return (c + (a * a - b * b) / c) / 2;
+        return (c + (SQR(a) - SQR(b)) / c) / 2;
     }
     static float findE(float a, float d)
     {
-        return sqrt(a * a - d * d);
+        return FastSqrt(SQR(a) - SQR(d));
     }
 
     // This leads to a solution to the more general problem:
@@ -2486,7 +2486,7 @@ public:
 
     static float length(float const v[])
     {
-        return sqrt(dot(v, v));
+        return FastSqrt(dot(v, v));
     }
 
     static void normalize(float v[])
@@ -3434,7 +3434,7 @@ void CIKTarget::SetPosWithNormalOffset(const Vector &pos, const Vector &normal)
     else if (normal.z > 0.707)
     {
         // tan == sin / cos
-        float tan = sqrt(1 - normal.z * normal.z) / normal.z;
+        float tan = FastSqrt(1 - SQR(normal.z)) / normal.z;
         est.pos.z = est.pos.z - est.radius * tan;
     }
     else

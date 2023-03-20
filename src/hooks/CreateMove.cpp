@@ -39,12 +39,11 @@ void RunEnginePrediction(IClientEntity *ent, CUserCmd *ucmd)
     typedef void (*SetupMoveFn)(IPrediction *, IClientEntity *, CUserCmd *, class IMoveHelper *, CMoveData *);
     typedef void (*FinishMoveFn)(IPrediction *, IClientEntity *, CUserCmd *, CMoveData *);
 
-    void **predictionVtable = *((void ***) g_IPrediction);
+    void **predictionVtable = *(void ***) g_IPrediction;
 
-    auto oSetupMove         = (SetupMoveFn) (*(unsigned *) (predictionVtable + 19));
-    auto oFinishMove        = (FinishMoveFn) (*(unsigned *) (predictionVtable + 20));
-    // CMoveData *pMoveData = (CMoveData*)(sharedobj::client->lmap->l_addr +
-    // 0x1F69C0C);  CMoveData movedata {};
+    auto oSetupMove  = (SetupMoveFn) (*(unsigned *) (predictionVtable + 19));
+    auto oFinishMove = (FinishMoveFn) (*(unsigned *) (predictionVtable + 20));
+    // CMoveData *pMoveData = (CMoveData*)(sharedobj::client->lmap->l_addr + 0x1F69C0C);  CMoveData movedata {};
     auto object     = std::make_unique<char[]>(165);
     auto *pMoveData = (CMoveData *) object.get();
 
@@ -255,12 +254,10 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
     {
         PROF_SECTION(CM_PlayerResource)
         g_pPlayerResource->Update();
-         
     }
     {
         PROF_SECTION(CM_LocalPlayer)
         g_pLocalPlayer->Update();
-   
     }
     PrecalculateCanShoot();
     if (firstcm)
@@ -285,7 +282,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
             }
             g_pLocalPlayer->isFakeAngleCM = false;
             static int fakelag_queue      = 0;
-                 
+
             if (CE_GOOD(LOCAL_E))
                 if (!hacks::nospread::is_syncing && (fakelag_amount || (hacks::antiaim::force_fakelag && hacks::antiaim::isEnabled())))
                 {
@@ -333,7 +330,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
     }
     else
         return false;
-        
+
     {
         PROF_SECTION(CM_WRAPPER)
         EC::run(EC::CreateMove_NoEnginePred);
@@ -343,13 +340,11 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
             engine_prediction::RunEnginePrediction(RAW_ENT(LOCAL_E), current_user_cmd);
             g_pLocalPlayer->UpdateEye();
         }
-        
 
         if (hacks::warp::in_warp)
             EC::run(EC::CreateMoveWarp);
         else
             EC::run(EC::CreateMove);
-         
     }
     if (time_replaced)
         g_GlobalVars->curtime = curtime_old;
@@ -384,7 +379,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
                 vsilent.x = cmd->forwardmove;
                 vsilent.y = cmd->sidemove;
                 vsilent.z = cmd->upmove;
-                speed     = sqrt(SQR(vsilent.x) + SQR(vsilent.y));
+                speed     = FastSqrt(SQR(vsilent.x) + SQR(vsilent.y));
                 VectorAngles(vsilent, ang);
                 yaw                 = DEG2RAD(ang.y - g_pLocalPlayer->v_OrigViewangles.y + cmd->viewangles.y);
                 cmd->forwardmove    = cos(yaw) * speed;

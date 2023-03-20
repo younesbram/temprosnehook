@@ -14,7 +14,6 @@
 
 namespace zerokernel
 {
-
 namespace resource::font
 {
 extern fonts::font base;

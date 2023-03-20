@@ -5,8 +5,7 @@
  *      Author: nullifiedcat
  */
 
-#ifndef AVERAGER_HPP_
-#define AVERAGER_HPP_
+#pragma once
 
 #include <cstddef>
 #include <vector>
@@ -104,5 +103,3 @@ private:
     size_t value_index_{ 0 };
     T value_{};
 };
-
-#endif /* AVERAGER_HPP_ */

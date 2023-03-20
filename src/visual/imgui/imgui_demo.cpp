@@ -3410,7 +3410,7 @@ void ImGui::ShowStyleEditor(ImGuiStyle *ref)
                     ImGui::InputFloat("Font offset", &font->DisplayOffset.y, 1, 1, "%.0f");
                     ImGui::Text("Ascent: %f, Descent: %f, Height: %f", font->Ascent, font->Descent, font->Ascent - font->Descent);
                     ImGui::Text("Fallback character: '%c' (%d)", font->FallbackChar, font->FallbackChar);
-                    const float surface_sqrt = sqrtf((float) font->MetricsTotalSurface);
+                    const float surface_sqrt = FastSqrt((float) font->MetricsTotalSurface);
                     ImGui::Text("Texture surface: %d pixels (approx) ~ %dx%d", font->MetricsTotalSurface, (int) surface_sqrt, (int) surface_sqrt);
                     for (int config_i = 0; config_i < font->ConfigDataCount; config_i++)
                         if (const ImFontConfig *cfg = &font->ConfigData[config_i])

@@ -6,8 +6,6 @@
  */
 
 #pragma once
-#ifndef __CATHOOK_COMMON_HPP
-#define __CATHOOK_COMMON_HPP
 
 #include "config.h"
 
@@ -82,7 +80,7 @@
 
 template <typename T> constexpr T _clamp(T _min, T _max, T _val)
 {
-    return ((_val > _max) ? _max : ((_val < _min) ? _min : _val));
+    return _val > _max ? _max : _val < _min ? _min : _val;
 }
 
 #define _FASTCALL __attribute__((fastcall))
@@ -100,7 +98,4 @@ template <typename T> constexpr T _clamp(T _min, T _max, T _val)
 #define DEG2RAD(x) (float) (x) * (PI / 180.0f)
 #endif
 
-#define STR(c) #c
-
 #define GET_RENDER_CONTEXT (g_IMaterialSystem->GetRenderContext())
-#endif

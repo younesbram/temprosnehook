@@ -45,7 +45,7 @@ inline float EffectiveTargetingRange()
     if (GetWeaponMode() == weapon_melee)
         return re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W));
     // Pyros only have so much until their flames hit
-    else if (g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFFlameThrower))
+    else if (LOCAL_W->m_iClassID() == CL_CLASS(CTFFlameThrower))
         return 300.0f;
     // If user has set a max range, then use their setting,
     if (max_range)
@@ -144,7 +144,6 @@ static void CreateMove()
 // The first check to see if the player should shoot in the first place
 bool ShouldShoot()
 {
-
     // Check for +use
     if (current_user_cmd->buttons & IN_USE)
         return false;
@@ -158,33 +157,31 @@ bool ShouldShoot()
         return false;
 
     // Check if Carrying A building
-    if (CE_BYTE(g_pLocalPlayer->entity, netvar.m_bCarryingObject))
-        return false;
-    // Check if deadringer out
-    if (CE_BYTE(g_pLocalPlayer->entity, netvar.m_bFeignDeathReady))
-        return false;
-    // If zoomed only is on, check if zoomed
-    if (zoomed_only && g_pLocalPlayer->holding_sniper_rifle)
-    {
-        if (!g_pLocalPlayer->bZoomed && !(current_user_cmd->buttons & IN_ATTACK))
-            return false;
-    }
-    // Check if player is bonked
-    if (HasCondition<TFCond_Bonked>(g_pLocalPlayer->entity))
-        return false;
-    // Check if player is taunting
-    if (HasCondition<TFCond_Taunting>(g_pLocalPlayer->entity))
-        return false;
-    // Check if player is cloaked
-    if (IsPlayerInvisible(g_pLocalPlayer->entity))
+    if (CE_BYTE(LOCAL_E, netvar.m_bCarryingObject))
         return false;
 
-    if (IsAmbassador(LOCAL_W))
-    {
-        // Check if ambasador can headshot
-        if (!AmbassadorCanHeadshot())
-            return false;
-    }
+    // Check if deadringer out
+    if (CE_BYTE(LOCAL_E, netvar.m_bFeignDeathReady))
+        return false;
+
+    // If zoomed only is on, check if zoomed
+    if (*zoomed_only && g_pLocalPlayer->holding_sniper_rifle && !g_pLocalPlayer->bZoomed && !(current_user_cmd->buttons & IN_ATTACK))
+        return false;
+
+    // Check if player is bonked
+    if (HasCondition<TFCond_Bonked>(LOCAL_E))
+        return false;
+
+    // Check if player is taunting
+    if (HasCondition<TFCond_Taunting>(LOCAL_E))
+        return false;
+
+    // Check if player is cloaked
+    if (IsPlayerInvisible(LOCAL_E))
+        return false;
+
+    if (IsAmbassador(LOCAL_W) && !AmbassadorCanHeadshot())
+        return false;
 
     switch (GetWeaponMode())
     {
@@ -230,7 +227,7 @@ bool IsTargetStateGood(CachedEntity *entity, std::optional<backtrack::BacktrackD
         // If settings allow waiting for charge, and current charge can't kill target, don't aim
         if (*wait_for_charge && g_pLocalPlayer->holding_sniper_rifle)
         {
-            float bdmg = CE_FLOAT(g_pLocalPlayer->weapon(), netvar.flChargedDamage);
+            float bdmg = CE_FLOAT(LOCAL_W, netvar.flChargedDamage);
             if (g_GlobalVars->curtime - g_pLocalPlayer->flZoomBegin <= 1.0f)
                 bdmg = 50.0f;
             //                if ((bdmg * 3) < (HasDarwins(entity)
@@ -347,15 +344,14 @@ bool IsTargetStateGood(CachedEntity *entity, std::optional<backtrack::BacktrackD
 // A function to return a potential entity in front of the player
 CachedEntity *FindEntInSight(float range, bool no_players)
 {
-    // We dont want to hit ourself so we set an ignore
+    // We don't want to hit ourselves, so we set as ignored
     trace_t trace;
-    trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
+    trace::filter_default.SetSelf(RAW_ENT(LOCAL_E));
 
     // Get Forward vector
     forward = GetForwardVector(range, LOCAL_E);
 
-    // Setup the trace starting with the origin of the local players eyes
-    // attemting to hit the end vector we determined
+    // Set up the trace starting with the origin of the local players eyes attempting to hit the end vector we determined
     Ray_t ray;
     ray.Init(g_pLocalPlayer->v_Eye, forward);
 
@@ -372,7 +368,7 @@ CachedEntity *FindEntInSight(float range, bool no_players)
             return ent;
     }
 
-    // Since we didnt hit and entity, the vis check failed so return 0
+    // Since we didn't hit and entity, the vis check failed so return 0
     return nullptr;
 }
 

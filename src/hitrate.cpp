@@ -35,10 +35,10 @@ CatCommand debug_hitrate("debug_hitrate", "Debug hitrate",
                              int p1 = 0;
                              int p2 = 0;
                              if (count_shots)
-                                 p1 = float(count_hits) / float(count_shots) * 100.0f;
+                                 p1 = count_hits / count_shots * 100;
 
                              if (count_hits)
-                                 p2 = float(count_hits_head) / float(count_hits) * 100.0f;
+                                 p2 = count_hits_head / count_hits * 100;
 
                              logging::Info("%d / %d (%d%%)", count_hits, count_shots, p1);
                              logging::Info("%d / %d (%d%%)", count_hits_head, count_hits_sniper, p2);
@@ -74,16 +74,13 @@ void OnHit(bool crit, int idx, bool is_sniper)
         count_hits_sniper++;
     if (crit)
         count_hits_head++;
-    if (crit || aimbot_target_body)
+    if ((crit || aimbot_target_body) && idx == aimbot_target_idx)
     {
-        if (idx == aimbot_target_idx)
+        auto ent = ENTITY(idx);
+        if (CE_GOOD(ent))
         {
-            auto ent = ENTITY(idx);
-            if (CE_GOOD(ent))
-            {
-                hacks::anti_anti_aim::resolver_map[ent->player_info->friendsID].hits_in_a_row++;
-                resolve_soon[idx] = false;
-            }
+            hacks::anti_anti_aim::resolver_map[ent->player_info->friendsID].hits_in_a_row++;
+            resolve_soon[idx] = false;
         }
     }
 }

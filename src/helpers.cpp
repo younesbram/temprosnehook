@@ -7,7 +7,6 @@
 
 #include "common.hpp"
 #include "DetourHook.hpp"
-#include <sys/mman.h>
 #include "settings/Bool.hpp"
 #include "MiscTemporary.hpp"
 #include "PlayerTools.hpp"
@@ -441,15 +440,24 @@ bool canReachVector(Vector loc, Vector dest)
 
 std::string GetLevelName()
 {
-    std::string name(g_IEngine->GetLevelName());
-    size_t slash = name.find('/');
-    if (slash == std::string::npos)
-        slash = 0;
-    else
-        slash++;
-    size_t bsp    = name.find(".bsp");
-    size_t length = (bsp == std::string::npos ? name.length() - slash : bsp - slash);
-    return name.substr(slash, length);
+    const std::string &name = g_IEngine->GetLevelName();
+    const char *data        = name.data();
+    const size_t length     = name.length();
+    size_t slash            = 0;
+    size_t bsp              = length;
+
+    for (size_t i = length - 1; i != std::string::npos; --i)
+    {
+        if (data[i] == '/')
+        {
+            slash = i + 1;
+            break;
+        }
+        if (data[i] == '.')
+            bsp = i;
+    }
+
+    return { data + slash, bsp - slash };
 }
 
 std::pair<float, float> ComputeMovePrecise(const Vector &a, const Vector &b)
@@ -756,9 +764,9 @@ CachedEntity *getClosestNonlocalEntity(Vector vec)
 
 void VectorTransform(const float *in1, const matrix3x4_t &in2, float *out)
 {
-    out[0] = (in1[0] * in2[0][0] + in1[1] * in2[0][1] + in1[2] * in2[0][2]) + in2[0][3];
-    out[1] = (in1[0] * in2[1][0] + in1[1] * in2[1][1] + in1[2] * in2[1][2]) + in2[1][3];
-    out[2] = (in1[0] * in2[2][0] + in1[1] * in2[2][1] + in1[2] * in2[2][2]) + in2[2][3];
+    out[0] = in1[0] * in2[0][0] + in1[1] * in2[0][1] + in1[2] * in2[0][2] + in2[0][3];
+    out[1] = in1[0] * in2[1][0] + in1[1] * in2[1][1] + in1[2] * in2[1][2] + in2[1][3];
+    out[2] = in1[0] * in2[2][0] + in1[1] * in2[2][1] + in1[2] * in2[2][2] + in2[2][3];
 }
 
 bool GetHitbox(CachedEntity *entity, int hb, Vector &out)
@@ -983,10 +991,7 @@ void FixMovement(CUserCmd &cmd, Vector &viewangles)
 
 bool AmbassadorCanHeadshot()
 {
-    if (IsAmbassador(LOCAL_W) && (CE_FLOAT(LOCAL_W, netvar.flLastFireTime) - SERVER_TIME) <= 1.0f)
-        return false;
-
-    return true;
+    return CE_FLOAT(LOCAL_W, netvar.flLastFireTime) - SERVER_TIME <= 1.0f;
 }
 
 static std::random_device random_device;
@@ -1033,7 +1038,7 @@ bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos, bool use_weapon_
     ray.Init(eye, endpos);
     {
         PROF_SECTION(IEVV_TraceRay)
-        if (!tcm || g_Settings.is_create_move)
+        if (!*tcm || g_Settings.is_create_move)
             g_ITrace->TraceRay(ray, mask, &trace::filter_default, trace);
     }
     return (((IClientEntity *) trace->m_pEnt) == RAW_ENT(entity) || (!hit && !trace->DidHit()));
@@ -1432,33 +1437,45 @@ bool IsVectorVisibleNavigation(Vector origin, Vector target, unsigned int mask)
 
 void WhatIAmLookingAt(int *result_eindex, Vector *result_pos)
 {
-    Ray_t ray;
-    Vector forward;
-    float sp, sy, cp, cy;
-    QAngle angle;
-    trace_t trace;
+    static QAngle prev_angle   = QAngle(0, 0, 0);
+    static Vector prev_forward = Vector(0, 0, 0);
 
-    trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
+    // Check if the player's view direction has changed since the last call to this function.
+    QAngle angle;
     g_IEngine->GetViewAngles(angle);
-    sy        = sinf(DEG2RAD(angle[1]));
-    cy        = cosf(DEG2RAD(angle[1]));
-    sp        = sinf(DEG2RAD(angle[0]));
-    cp        = cosf(DEG2RAD(angle[0]));
-    forward.x = cp * cy;
-    forward.y = cp * sy;
-    forward.z = -sp;
-    forward   = forward * 8192.0f + g_pLocalPlayer->v_Eye;
-    ray.Init(g_pLocalPlayer->v_Eye, forward);
+    bool angle_changed = angle != prev_angle;
+    prev_angle         = angle;
+
+    // Compute the forward vector if the angle has changed or if it has not been computed before.
+    static Vector forward = Vector(0, 0, 0);
+    if (angle_changed || prev_forward == Vector(0, 0, 0))
     {
-        PROF_SECTION(IEVV_TraceRay)
-        g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_default, &trace);
+        float sp, sy, cp, cy;
+        sincosf(DEG2RAD(angle[0]), &sp, &cp);
+        sincosf(DEG2RAD(angle[1]), &sy, &cy);
+        forward.x    = cp * cy;
+        forward.y    = cp * sy;
+        forward.z    = -sp;
+        prev_forward = forward;
     }
+
+    // Perform the raycast if the angle has changed or if the forward vector has not been computed before.
+    static trace_t trace;
+    if (angle_changed || prev_forward == Vector(0, 0, 0))
+    {
+        Vector endpos = g_pLocalPlayer->v_Eye + forward * 8192.0f;
+        Ray_t ray;
+        ray.Init(g_pLocalPlayer->v_Eye, endpos);
+        {
+            PROF_SECTION(IEVV_TraceRay)
+            g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_default, &trace);
+        }
+    }
+
     if (result_pos)
         *result_pos = trace.endpos;
     if (result_eindex)
-        *result_eindex = -1;
-    if (trace.m_pEnt && result_eindex)
-        *result_eindex = ((IClientEntity *) (trace.m_pEnt))->entindex();
+        *result_eindex = trace.m_pEnt ? ((IClientEntity *) trace.m_pEnt)->entindex() : -1;
 }
 
 Vector GetForwardVector(Vector origin, Vector viewangles, float distance, CachedEntity *punch_entity)
@@ -1467,13 +1484,11 @@ Vector GetForwardVector(Vector origin, Vector viewangles, float distance, Cached
     float sp, sy, cp, cy;
     QAngle angle = VectorToQAngle(viewangles);
     // Compensate for punch angle
-    if (punch_entity && should_correct_punch)
+    if (punch_entity && *should_correct_punch)
         angle -= VectorToQAngle(CE_VECTOR(punch_entity, netvar.vecPunchAngle));
 
-    sy        = sinf(DEG2RAD(angle[1]));
-    cy        = cosf(DEG2RAD(angle[1]));
-    sp        = sinf(DEG2RAD(angle[0]));
-    cp        = cosf(DEG2RAD(angle[0]));
+    sincosf(DEG2RAD(angle[1]), &sy, &cy);
+    sincosf(DEG2RAD(angle[0]), &sp, &cp);
     forward.x = cp * cy;
     forward.y = cp * sy;
     forward.z = -sp;
@@ -1580,12 +1595,12 @@ Vector CalcAngle(Vector src, Vector dst)
 void MakeVector(Vector angle, Vector &vector)
 {
     float pitch, yaw, tmp;
-    pitch     = float(angle[0] * PI / 180);
-    yaw       = float(angle[1] * PI / 180);
-    tmp       = float(cos(pitch));
-    vector[0] = float(-tmp * -cos(yaw));
-    vector[1] = float(sin(yaw) * tmp);
-    vector[2] = float(-sin(pitch));
+    pitch     = angle[0] * PI / 180;
+    yaw       = angle[1] * PI / 180;
+    tmp       = cos(pitch);
+    vector[0] = -tmp * -cos(yaw);
+    vector[1] = sin(yaw) * tmp;
+    vector[2] = -sin(pitch);
 }
 
 float GetFov(Vector angle, Vector src, Vector dst)
@@ -1597,20 +1612,20 @@ float GetFov(Vector angle, Vector src, Vector dst)
     MakeVector(angle, aim);
     MakeVector(ang, ang);
 
-    mag     = FastSqrt(pow(aim.x, 2) + pow(aim.y, 2) + pow(aim.z, 2));
+    mag     = hypot(aim.x, aim.y, aim.z);
     u_dot_v = aim.Dot(ang);
 
     // Congratulations! you managed to go out of domain. That means you are directly on the target
     // And floating point imprecision breaks this function making it return NAN, so we "fix" it via this.
-    if (u_dot_v / pow(mag, 2) > 1.0f)
+    if (u_dot_v / SQR(mag) > 1.0f)
         return 0;
 
-    return RAD2DEG(acos(u_dot_v / (pow(mag, 2))));
+    return RAD2DEG(acos(u_dot_v * (1.0f / SQR(mag))));
 }
 
 bool CanHeadshot()
 {
-    return (g_pLocalPlayer->flZoomBegin > 0.0f && (SERVER_TIME - g_pLocalPlayer->flZoomBegin > 0.2f));
+    return g_pLocalPlayer->flZoomBegin > 0.0f && SERVER_TIME - g_pLocalPlayer->flZoomBegin > 0.2f;
 }
 
 bool CanShoot()
@@ -1653,7 +1668,7 @@ void FastStop()
 
     auto speed    = vel.Length2D();
     auto friction = sv_friction->GetFloat() * CE_FLOAT(LOCAL_E, 0x12b8);
-    auto control  = (speed < sv_stopspeed->GetFloat()) ? sv_stopspeed->GetFloat() : speed;
+    auto control  = speed < sv_stopspeed->GetFloat() ? sv_stopspeed->GetFloat() : speed;
     auto drop     = control * friction * g_GlobalVars->interval_per_tick;
 
     if (speed > drop - 1.0f)
@@ -1777,7 +1792,7 @@ Vector getShootPos(Vector angle)
     case CL_CLASS(CTFRocketLauncher_AirStrike):
     case CL_CLASS(CTFRocketLauncher):
     case CL_CLASS(CTFFlareGun):
-    case CL_CLASS(CTFFlareGun_Revenge): // Detonator
+    case CL_CLASS(CTFFlareGun_Revenge):                          // Detonator
         vecOffset = Vector(23.5f, 12.0f, -3.0f);
         if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 513) // The Original
             vecOffset->y = 0.0f;
@@ -1786,7 +1801,7 @@ Vector getShootPos(Vector angle)
         break;
     case CL_CLASS(CTFParticleCannon): // Cow Mangler 5000
     case CL_CLASS(CTFDRGPomson):
-    case CL_CLASS(CTFRaygun): // Righteous Bison
+    case CL_CLASS(CTFRaygun):         // Righteous Bison
     case CL_CLASS(CTFCompoundBow):
     case CL_CLASS(CTFCrossbow):
     case CL_CLASS(CTFShotgunBuildingRescue):
@@ -1847,7 +1862,7 @@ Vector getShootPos(Vector angle)
 
         trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
         ray.Init(eye, endpos);
-        if (!tcm || g_Settings.is_create_move)
+        if (!*tcm || g_Settings.is_create_move)
             g_ITrace->TraceRay(ray, MASK_SOLID, &trace::filter_default, &tr);
 
         // Replicate game behaviour, only use the offset if our trace has a big enough fraction

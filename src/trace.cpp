@@ -10,7 +10,6 @@
 // This file is a mess. I need to fix it. TODO
 
 /* Default Filter */
-
 trace::FilterDefault::FilterDefault()
 {
     m_pSelf = nullptr;
@@ -46,11 +45,10 @@ bool trace::FilterDefault::ShouldHitEntity(IHandleEntity *handle, int mask)
         return false;
     // Sniper rifles can shoot through teammates!
     case CL_CLASS(CTFPlayer):
-    {
         if (m_pSelf)
         {
             // If what we hit is an enemy it does not matter
-            if (m_pSelf && entity && entity->entindex() != 0 && IDX_GOOD(entity->entindex()) && CE_VALID(ENTITY(entity->entindex())) && ENTITY(entity->entindex())->m_iTeam() == ENTITY(m_pSelf->entindex())->m_iTeam())
+            if (m_pSelf && entity->entindex() != 0 && IDX_GOOD(entity->entindex()) && CE_VALID(ENTITY(entity->entindex())) && ENTITY(entity->entindex())->m_iTeam() == ENTITY(m_pSelf->entindex())->m_iTeam())
             {
                 auto ent = ENTITY(m_pSelf->entindex());
                 if (CE_GOOD(ent) && ent->m_bAlivePlayer())
@@ -70,7 +68,6 @@ bool trace::FilterDefault::ShouldHitEntity(IHandleEntity *handle, int mask)
         }
         break;
     }
-    }
     /* Do not hit yourself. Idiot. */
     if (entity == m_pSelf)
         return false;
@@ -83,7 +80,6 @@ TraceType_t trace::FilterDefault::GetTraceType() const
 }
 
 /* No-Player filter */
-
 trace::FilterNoPlayer::FilterNoPlayer()
 {
     m_pSelf = nullptr;
@@ -134,7 +130,6 @@ TraceType_t trace::FilterNoPlayer::GetTraceType() const
 }
 
 /* Navigation filter */
-
 trace::FilterNavigation::FilterNavigation() = default;
 
 trace::FilterNavigation::~FilterNavigation() = default;
@@ -174,7 +169,6 @@ TraceType_t trace::FilterNavigation::GetTraceType() const
 }
 
 /* No-Entity filter */
-
 trace::FilterNoEntity::FilterNoEntity()
 {
     m_pSelf = nullptr;
@@ -219,8 +213,8 @@ TraceType_t trace::FilterNoEntity::GetTraceType() const
 {
     return TRACE_EVERYTHING;
 }
-/* Penetration Filter */
 
+/* Penetration Filter */
 trace::FilterPenetration::FilterPenetration()
 {
     m_pSelf = nullptr;
@@ -231,9 +225,7 @@ trace::FilterPenetration::~FilterPenetration() = default;
 void trace::FilterPenetration::SetSelf(IClientEntity *self)
 {
     if (self == nullptr)
-    {
         logging::Info("nullptr in FilterPenetration::SetSelf");
-    }
     m_pSelf = self;
 }
 

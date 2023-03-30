@@ -49,7 +49,7 @@ static void FOVCheck()
         return;
     for (const auto &ent : entity_cache::player_cache)
     {
-        if (CE_BAD(ent))
+        if (ent->InternalEntity()->IsDormant())
             continue;
         if (!ent->m_bAlivePlayer() || !ent->m_bEnemy())
             continue;
@@ -68,17 +68,18 @@ static void FOVCheck()
             if (IsVectorVisible(local_origin, target, true))
             {
                 rgba_t color;
-                if (GetFov(ent->m_vecAngle(), ent->hitboxes.GetHitbox(head)->center, LOCAL_E->hitboxes.GetHitbox(head)->center) < *fov1)
+                float fov = GetFov(ent->m_vecAngle(), ent->hitboxes.GetHitbox(head)->center, LOCAL_E->hitboxes.GetHitbox(head)->center);
+                if (fov < *fov1)
                 {
                     color = colors::red;
                     AddDangerString(name + " is looking at you!", color);
                 }
-                else if (GetFov(ent->m_vecAngle(), ent->hitboxes.GetHitbox(head)->center, LOCAL_E->hitboxes.GetHitbox(head)->center) < *fov2)
+                else if (fov < *fov2)
                 {
                     color = colors::yellow;
                     AddDangerString(name + " can see you", color);
                 }
-                else if (GetFov(ent->m_vecAngle(), ent->hitboxes.GetHitbox(head)->center, LOCAL_E->hitboxes.GetHitbox(head)->center) < *fov3)
+                else if (fov < *fov3)
                 {
                     color = colors::green;
                     AddDangerString(name + " is visible", color);

@@ -34,7 +34,7 @@ static settings::Boolean draw("nav.draw", "false");
 static settings::Boolean look{ "nav.look-at-path", "false" };
 static settings::Boolean draw_debug_areas("nav.draw.debug-areas", "false");
 static settings::Boolean log_pathing{ "nav.log", "false" };
-static settings::Int stuck_time{ "nav.stuck-time", "4000" };
+static settings::Int stuck_time{ "nav.stuck-time", "1000" };
 static settings::Int vischeck_cache_time{ "nav.vischeck-cache.time", "240" };
 static settings::Boolean vischeck_runtime{ "nav.vischeck-runtime.enabled", "true" };
 static settings::Int vischeck_time{ "nav.vischeck-runtime.delay", "2000" };
@@ -311,6 +311,7 @@ public:
 
         return ovBestSquare;
     }
+
     std::vector<void *> findPath(CNavArea *local, CNavArea *dest)
     {
         using namespace std::chrono;
@@ -318,7 +319,7 @@ public:
         if (state != NavState::Active)
             return {};
 
-        if (log_pathing)
+        if (*log_pathing)
         {
             logging::Info("Start: (%f,%f,%f)", local->m_center.x, local->m_center.y, local->m_center.z);
             logging::Info("End: (%f,%f,%f)", dest->m_center.x, dest->m_center.y, dest->m_center.z);
@@ -330,7 +331,7 @@ public:
         time_point begin_pathing = high_resolution_clock::now();
         int result               = pather.Solve(reinterpret_cast<void *>(local), reinterpret_cast<void *>(dest), &pathNodes, &cost);
         long long timetaken      = duration_cast<nanoseconds>(high_resolution_clock::now() - begin_pathing).count();
-        if (log_pathing)
+        if (*log_pathing)
             logging::Info("Pathing: Pather result: %i. Time taken (NS): %lld", result, timetaken);
         // Start and end are the same, return start node
         if (result == micropather::MicroPather::START_END_SAME)
@@ -366,12 +367,12 @@ public:
                 bool is_strong_class = g_pLocalPlayer->clazz == tf_heavy;
                 int bullet           = CE_INT(ent, netvar.m_iAmmoShells);
                 int rocket           = CE_INT(ent, netvar.m_iAmmoRockets);
-                if ((is_strong_class && (CE_BYTE(ent, netvar.m_bMiniBuilding) || CE_INT(ent, netvar.iUpgradeLevel) == 1)) || (bullet == 0 && (CE_INT(ent, netvar.iUpgradeLevel) != 3 || rocket == 0)))
+                if (is_strong_class && (CE_BYTE(ent, netvar.m_bMiniBuilding) || CE_INT(ent, netvar.iUpgradeLevel) == 1) || bullet == 0 && (CE_INT(ent, netvar.iUpgradeLevel) != 3 || rocket == 0))
                     continue;
 
                 // It's still building/being sapped, ignore.
                 // Unless it just was deployed from a carry, then it's dangerous
-                if ((!CE_BYTE(ent, netvar.m_bCarryDeploy) && CE_BYTE(ent, netvar.m_bBuilding)) || CE_BYTE(ent, netvar.m_bPlacing) || CE_BYTE(ent, netvar.m_bHasSapper))
+                if (!CE_BYTE(ent, netvar.m_bCarryDeploy) && CE_BYTE(ent, netvar.m_bBuilding) || CE_BYTE(ent, netvar.m_bPlacing) || CE_BYTE(ent, netvar.m_bHasSapper))
                     continue;
 
                 // Get origin of the sentry
@@ -458,7 +459,7 @@ Vector last_destination;
 bool isReady()
 {
     // F you Pipeline
-    return enabled && map && map->state == NavState::Active && (path_during_setup || GetLevelName() == "plr_pipeline" || (g_pGameRules->roundmode > 3 && (g_pTeamRoundTimer->GetRoundState() != RT_STATE_SETUP || g_pLocalPlayer->team != TEAM_BLU)));
+    return *enabled && map && map->state == NavState::Active && (*path_during_setup || GetLevelName() == "plr_pipeline" || g_pGameRules->roundmode > 3 && (g_pTeamRoundTimer->GetRoundState() != RT_STATE_SETUP || g_pLocalPlayer->team != TEAM_BLU));
 }
 
 bool isPathing()
@@ -491,7 +492,7 @@ bool navTo(const Vector &destination, int priority, bool should_repath, bool nav
     // Don't path, priority is too low
     if (priority < current_priority)
         return false;
-    if (log_pathing)
+    if (*log_pathing)
         logging::Info("Priority: %d", priority);
 
     CNavArea *start_area = map->findClosestNavSquare(g_pLocalPlayer->v_Origin);
@@ -703,7 +704,7 @@ static void followCrumbs()
     }*/
 
     // Look at path
-    if (look && !hacks::aimbot::IsAiming())
+    if (*look && !hacks::aimbot::IsAiming())
     {
         Vector next{ crumbs[0].vec.x, crumbs[0].vec.y, g_pLocalPlayer->v_Eye.z };
         next = GetAimAtAngles(g_pLocalPlayer->v_Eye, next);
@@ -813,9 +814,9 @@ void updateStuckTime()
         // We are stuck for too long, blastlist node for a while and repath
         if (map->connection_stuck_time[key].time_stuck > TIME_TO_TICKS(*stuck_detect_time))
         {
-            map->vischeck_cache[key].expire_tick    = path_during_setup ? TICKCOUNT_TIMESTAMP(30) : TICKCOUNT_TIMESTAMP(*stuck_blacklist_time);
+            map->vischeck_cache[key].expire_tick    = *path_during_setup ? TICKCOUNT_TIMESTAMP(30) : TICKCOUNT_TIMESTAMP(*stuck_blacklist_time);
             map->vischeck_cache[key].vischeck_state = false;
-            if (log_pathing)
+            if (*log_pathing)
                 logging::Info("Blackisted connection %d->%d", key.first->m_id, key.second->m_id);
             abandonPath();
         }
@@ -834,14 +835,14 @@ static void CreateMove()
     round_states round_state = g_pTeamRoundTimer->GetRoundState();
     // Still in setup time, if on fitting team, then do not path yet
     // F you Pipeline
-    if (round_state == RT_STATE_SETUP && GetLevelName() != "plr_pipeline" && g_pLocalPlayer->team == TEAM_BLU && !path_during_setup)
+    if (round_state == RT_STATE_SETUP && GetLevelName() != "plr_pipeline" && g_pLocalPlayer->team == TEAM_BLU && !*path_during_setup)
     {
         if (navparser::NavEngine::isPathing())
             navparser::NavEngine::cancelPath();
         return;
     }
 
-    if (vischeck_runtime)
+    if (*vischeck_runtime)
         vischeckPath();
     checkBlacklist();
 
@@ -936,9 +937,9 @@ void drawNavArea(CNavArea *area)
 
 void Draw()
 {
-    if (!isReady() || !draw)
+    if (!isReady() || !*draw)
         return;
-    if (draw_debug_areas && CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
+    if (*draw_debug_areas && CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
     {
         auto area = map->findClosestNavSquare(g_pLocalPlayer->v_Origin);
         auto edge = area->getNearestPoint(g_pLocalPlayer->v_Origin.AsVector2D());
@@ -952,7 +953,7 @@ void Draw()
     if (crumbs.empty())
         return;
 
-    for (size_t i = 0; i < crumbs.size(); i++)
+    for (size_t i = 0; i < crumbs.size(); ++i)
     {
         Vector start_pos = crumbs[i].vec;
 

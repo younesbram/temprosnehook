@@ -428,7 +428,7 @@ bool HeadPreferable(CachedEntity *target)
             // if crit boosted, and they have 150 health, or if player isn't
             // zoomed, or if the enemy has less than 40, due to darwins, and
             // only if they have less than 150 health will it try to bodyshot
-            if (CanHeadshot() && (cdmg >= target->m_iHealth() || IsPlayerCritBoosted(g_pLocalPlayer->entity) || !g_pLocalPlayer->bZoomed || target->m_iHealth() <= bdmg) && target->m_iHealth() <= 150)
+            if (CanHeadshot() && (cdmg >= target->m_iHealth() || IsPlayerCritBoosted(LOCAL_E) || !g_pLocalPlayer->bZoomed || target->m_iHealth() <= bdmg) && target->m_iHealth() <= 150)
             {
                 // We dont need to hit the head as a bodyshot will kill
                 headonly = false;

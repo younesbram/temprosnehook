@@ -148,7 +148,7 @@ public:
 
     bool m_bEnemy() const
     {
-        if (CE_BAD(g_pLocalPlayer->entity))
+        if (CE_BAD(LOCAL_E))
             return true;
         return m_iTeam() != g_pLocalPlayer->team;
     };
@@ -224,7 +224,7 @@ public:
 
     float m_flDistance() const
     {
-        if (CE_GOOD(g_pLocalPlayer->entity))
+        if (CE_GOOD(LOCAL_E))
             return g_pLocalPlayer->v_Origin.DistTo(m_vecOrigin());
         return FLT_MAX;
     };

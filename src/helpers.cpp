@@ -664,7 +664,7 @@ powerup_type GetPowerupOnPlayer(CachedEntity *player)
 
 bool DidProjectileHit(Vector start_point, Vector end_point, CachedEntity *entity, float projectile_size, bool grav_comp, trace_t *tracer)
 {
-    trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
+    trace::filter_default.SetSelf(RAW_ENT(LOCAL_E));
     Ray_t ray;
     trace_t *trace_obj;
     if (tracer)
@@ -1013,7 +1013,7 @@ bool IsEntityVisible(CachedEntity *entity, int hb)
 {
     if (g_Settings.bInvalid)
         return false;
-    if (entity == g_pLocalPlayer->entity)
+    if (entity == LOCAL_E)
         return true;
     if (hb == -1)
         return IsEntityVectorVisible(entity, entity->m_vecOrigin());
@@ -1028,9 +1028,9 @@ bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos, bool use_weapon_
         trace = &trace_object;
     Ray_t ray;
 
-    if (entity == g_pLocalPlayer->entity)
+    if (entity == LOCAL_E)
         return true;
-    trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
+    trace::filter_default.SetSelf(RAW_ENT(LOCAL_E));
     Vector eye = g_pLocalPlayer->v_Eye;
     // Adjust for weapon offsets if needed
     if (use_weapon_offset)
@@ -1699,7 +1699,7 @@ bool IsEntityVisiblePenetration(CachedEntity *entity, int hb)
     int ret;
     bool correct_entity;
     IClientEntity *ent;
-    trace::filter_penetration.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
+    trace::filter_penetration.SetSelf(RAW_ENT(LOCAL_E));
     trace::filter_penetration.Reset();
     ret = GetHitbox(entity, hb, hit);
     if (ret)
@@ -1860,7 +1860,7 @@ Vector getShootPos(Vector angle)
         trace_t tr;
         Ray_t ray;
 
-        trace::filter_default.SetSelf(RAW_ENT(g_pLocalPlayer->entity));
+        trace::filter_default.SetSelf(RAW_ENT(LOCAL_E));
         ray.Init(eye, endpos);
         if (!*tcm || g_Settings.is_create_move)
             g_ITrace->TraceRay(ray, MASK_SOLID, &trace::filter_default, &tr);

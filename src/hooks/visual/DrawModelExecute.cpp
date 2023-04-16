@@ -299,7 +299,7 @@ bool ShouldRenderChams(IClientEntity *entity)
                     if (pipes)
                     {
                         if (pipes_local && chamsself)
-                            if (HandleToIDX(CE_INT(ent, netvar.hThrower)) == g_pLocalPlayer->entity->m_IDX) // Check if the sticky is the players own
+                            if (HandleToIDX(CE_INT(ent, netvar.hThrower)) == LOCAL_E->m_IDX) // Check if the sticky is the players own
                                 return true;
                         if (ent->m_bEnemy())
                             return true;
@@ -308,7 +308,7 @@ bool ShouldRenderChams(IClientEntity *entity)
                         return false;
                 }
                 if (stickies_local && chamsself)
-                    if (HandleToIDX(CE_INT(ent, netvar.hThrower)) == g_pLocalPlayer->entity->m_IDX) // Check if the sticky is the players own
+                    if (HandleToIDX(CE_INT(ent, netvar.hThrower)) == LOCAL_E->m_IDX) // Check if the sticky is the players own
                         return true;
                 if (ent->m_bEnemy())
                     return true;

@@ -92,9 +92,9 @@ void FinishEnginePrediction(IClientEntity *ent, CUserCmd *ucmd)
 
 void PrecalculateCanShoot()
 {
-    auto weapon = g_pLocalPlayer->weapon();
+    auto weapon = LOCAL_W;
     // Check if player and weapon are good
-    if (CE_BAD(g_pLocalPlayer->entity) || CE_BAD(weapon))
+    if (CE_BAD(LOCAL_E) || CE_BAD(weapon))
     {
         calculated_can_shoot = false;
         return;
@@ -106,7 +106,7 @@ void PrecalculateCanShoot()
     static float last_attack = 0.0f;
     // Last weapon used
     static CachedEntity *last_weapon = nullptr;
-    float server_time                = (float) (CE_INT(g_pLocalPlayer->entity, netvar.nTickBase)) * g_GlobalVars->interval_per_tick;
+    float server_time                = (float) (CE_INT(LOCAL_E, netvar.nTickBase)) * g_GlobalVars->interval_per_tick;
     float new_next_attack            = CE_FLOAT(weapon, netvar.flNextPrimaryAttack);
     float new_last_attack            = CE_FLOAT(weapon, netvar.flLastFireTime);
 
@@ -126,7 +126,7 @@ namespace hooked_methods
 void speedHack(CUserCmd *cmd)
 {
     float speed;
-    if (cmd->buttons & IN_DUCK && (CE_INT(g_pLocalPlayer->entity, netvar.iFlags) & FL_ONGROUND) && !(cmd->buttons & IN_ATTACK) && !HasCondition<TFCond_Charging>(LOCAL_E))
+    if (cmd->buttons & IN_DUCK && (CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND) && !(cmd->buttons & IN_ATTACK) && !HasCondition<TFCond_Charging>(LOCAL_E))
     {
         speed                     = Vector{ cmd->forwardmove, cmd->sidemove, 0.0f }.Length();
         static float prevspeedang = 0.0f;
@@ -234,9 +234,9 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
     time_replaced = false;
     curtime_old   = g_GlobalVars->curtime;
 
-    if (CE_GOOD(g_pLocalPlayer->entity))
+    if (CE_GOOD(LOCAL_E))
     {
-        servertime            = (float) CE_INT(g_pLocalPlayer->entity, netvar.nTickBase) * g_GlobalVars->interval_per_tick;
+        servertime            = (float) CE_INT(LOCAL_E, netvar.nTickBase) * g_GlobalVars->interval_per_tick;
         g_GlobalVars->curtime = servertime;
         time_replaced         = true;
     }
@@ -270,7 +270,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
     }
     g_Settings.bInvalid = false;
 
-    if (CE_GOOD(g_pLocalPlayer->entity))
+    if (CE_GOOD(LOCAL_E))
     {
         if (!g_pLocalPlayer->life_state && CE_GOOD(g_pLocalPlayer->weapon()))
         {
@@ -365,7 +365,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
             ipc::UpdatePlayerlist();
     }
 #endif
-    if (CE_GOOD(g_pLocalPlayer->entity))
+    if (CE_GOOD(LOCAL_E))
     {
         if (roll_speedhack)
             speedHack(cmd);

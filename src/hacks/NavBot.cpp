@@ -1599,7 +1599,7 @@ static void CreateMove()
             selected_config = isEngieMode() ? HasGunslinger(LOCAL_E) ? CONFIG_GUNSLINGER_ENGINEER : CONFIG_ENGINEER : CONFIG_SHORT_RANGE;
             break;*/
         case tf_sniper:
-            selected_config = g_pLocalPlayer->weapon()->m_iClassID() == CL_CLASS(CTFCompoundBow) ? CONFIG_MID_RANGE : CONFIG_LONG_RANGE;
+            selected_config = LOCAL_W->m_iClassID() == CL_CLASS(CTFCompoundBow) ? CONFIG_MID_RANGE : CONFIG_LONG_RANGE;
             break;
         default:
             selected_config = CONFIG_MID_RANGE;

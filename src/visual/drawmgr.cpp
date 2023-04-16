@@ -85,7 +85,7 @@ void DrawCheatVisuals()
         PROF_SECTION(DRAW_WRAPPER)
         EC::run(EC::Draw);
     }
-    if (CE_GOOD(g_pLocalPlayer->entity))
+    if (CE_GOOD(LOCAL_E))
     {
         PROF_SECTION(DRAW_skinchanger)
         hacks::skinchanger::DrawText();

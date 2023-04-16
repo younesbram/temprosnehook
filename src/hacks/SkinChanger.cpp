@@ -281,7 +281,7 @@ void FrameStageNotify(int stage)
     }
 
     weapon_list   = (int *) ((unsigned) (RAW_ENT(LOCAL_E)) + netvar.hMyWeapons);
-    my_weapon     = CE_INT(g_pLocalPlayer->entity, netvar.hActiveWeapon);
+    my_weapon     = CE_INT(LOCAL_E, netvar.hActiveWeapon);
     my_weapon_ptr = g_IEntityList->GetClientEntity(HandleToIDX(my_weapon));
     if (!my_weapon_ptr)
         return;

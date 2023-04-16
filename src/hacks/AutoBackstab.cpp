@@ -144,7 +144,7 @@ bool canFaceStab(CachedEntity *ent)
     if (w_index == 40000)
         return false;
 
-    if (HasCondition<TFCond_MiniCritOnKill>(g_pLocalPlayer->entity) || HasCondition<TFCond_Jarated>(ent))
+    if (HasCondition<TFCond_MiniCritOnKill>(LOCAL_E) || HasCondition<TFCond_Jarated>(ent))
         return ent->m_iHealth() <= 54;
 
     return ent->m_iHealth() <= 40;

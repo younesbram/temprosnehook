@@ -753,7 +753,7 @@ static void CreateMovePrePredict()
 static void CreateMove()
 {
     warpLogic();
-    if ((bool) hacks::warp::dodge_projectile && CE_GOOD(g_pLocalPlayer->entity))
+    if ((bool) hacks::warp::dodge_projectile && CE_GOOD(LOCAL_E))
         for (const auto &ent : entity_cache::valid_ents)
             if (ent->m_Type() == ENTITY_PROJECTILE && ent->m_bEnemy() && std::find_if(proj_map.begin(), proj_map.end(), [=](const auto &item) { return std::get<1>(item) == ent; }) == proj_map.end())
                 dodgeProj(ent);

@@ -369,7 +369,7 @@ static CatCommand vaccinator_fire("vacc_fire", "Fire Vaccinator", []() { SetResi
 
 bool IsPopped()
 {
-    CachedEntity *weapon = g_pLocalPlayer->weapon();
+    CachedEntity *weapon = LOCAL_W;
     if (CE_BAD(weapon) || weapon->m_iClassID() != CL_CLASS(CWeaponMedigun))
         return false;
     return CE_BYTE(weapon, netvar.bChargeRelease);

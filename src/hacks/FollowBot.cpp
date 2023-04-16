@@ -612,7 +612,7 @@ static void cm()
             lastJump.update();
         }
         // Check if still moving. 70 HU = Sniper Zoomed Speed
-        if (idle_time.check(3000) && CE_VECTOR(g_pLocalPlayer->entity, netvar.vVelocity).IsZero(60.0f))
+        if (idle_time.check(3000) && CE_VECTOR(LOCAL_E, netvar.vVelocity).IsZero(60.0f))
         {
             follow_target = 0;
             return;

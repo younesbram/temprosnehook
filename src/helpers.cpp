@@ -332,7 +332,10 @@ std::pair<Vector, Vector> VischeckWall(CachedEntity *player, CachedEntity *targe
 // Returns a vectors max value. For example: {123,-150, 125} = 125
 float vectorMax(Vector i)
 {
-    return fmaxf(fmaxf(i.x, i.y), i.z);
+    __m128 vec = _mm_set_ps(i.z, i.y, i.x, -FLT_MAX);
+    __m128 max = _mm_max_ps(vec, _mm_shuffle_ps(vec, vec, _MM_SHUFFLE(0, 1, 2, 3)));
+    max        = _mm_max_ps(max, _mm_shuffle_ps(max, max, _MM_SHUFFLE(0, 1, 0, 1)));
+    return _mm_cvtss_f32(max);
 }
 
 // Returns a vector's absolute value. For example {123, -150, 125} -> {123, 150, 125}
@@ -732,12 +735,11 @@ CachedEntity *getClosestEntity(Vector vec)
             continue;
 
         const auto dist_sq = vec.DistToSqr(*ent->m_vecDormantOrigin());
-
-        if (dist_sq >= SQR(distance))
-            continue;
-
-        distance = FastSqrt(dist_sq);
-        best_ent = ent;
+        if (dist_sq < distance)
+        {
+            distance = dist_sq;
+            best_ent = ent;
+        }
     }
     return best_ent;
 }
@@ -752,12 +754,11 @@ CachedEntity *getClosestNonlocalEntity(Vector vec)
             continue;
 
         const auto dist_sq = vec.DistToSqr(*ent->m_vecDormantOrigin());
-
-        if (dist_sq >= SQR(distance))
-            continue;
-
-        distance = FastSqrt(dist_sq);
-        best_ent = ent;
+        if (dist_sq < distance)
+        {
+            distance = dist_sq;
+            best_ent = ent;
+        }
     }
     return best_ent;
 }
@@ -1129,20 +1130,11 @@ bool IsBuildingVisible(CachedEntity *ent)
 
 void fClampAngle(Vector &qaAng)
 {
-    while (qaAng[0] > 89)
-        qaAng[0] -= 180;
-
-    while (qaAng[0] < -89)
-        qaAng[0] += 180;
-
-    while (qaAng[1] > 180)
-        qaAng[1] -= 360;
-
-    while (qaAng[1] < -180)
-        qaAng[1] += 360;
-
-    qaAng.z = 0;
+    qaAng[0] = fmod(qaAng[0] + 89.0f, 180.0f) - 89.0f;
+    qaAng[1] = fmod(qaAng[1] + 180.0f, 360.0f) - 180.0f;
+    qaAng.z = 0.0f;
 }
+
 
 bool IsProjectileCrit(CachedEntity *ent)
 {

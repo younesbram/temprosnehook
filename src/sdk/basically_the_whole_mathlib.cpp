@@ -43,8 +43,8 @@ void AngleMatrix(const QAngle &angles, matrix3x4_t &matrix)
     matrix[1][1] = sp * srsy + crcy;
     matrix[2][1] = sr * cp;
 
-    matrix[0][2] = (sp * crcy + srsy);
-    matrix[1][2] = (sp * crsy - srcy);
+    matrix[0][2] = sp * crcy + srsy;
+    matrix[1][2] = sp * crsy - srcy;
     matrix[2][2] = cr * cp;
 
     matrix[0][3] = 0.0f;
@@ -106,30 +106,23 @@ void QuaternionAlign(const Quaternion &p, const Quaternion &q, Quaternion &qt)
 {
     Assert(s_bMathlibInitialized);
 
-    // FIXME: can this be done with a quat dot product?
+    // Calculate dot product of p and q
+    float dot_product = 0.0f;
+    for (uint8 i = 0; i < 4; ++i)
+        dot_product += p[i] * q[i];
 
-    int i;
-    // decide if one of the quaternions is backwards
-    float a = 0;
-    float b = 0;
-    for (i = 0; i < 4; i++)
+    // If dot product is negative, q is anti-parallel to p
+    if (dot_product < 0.0f)
     {
-        a += (p[i] - q[i]) * (p[i] - q[i]);
-        b += (p[i] + q[i]) * (p[i] + q[i]);
-    }
-    if (a > b)
-    {
-        for (i = 0; i < 4; i++)
-        {
+        // Negate q to make it parallel to p
+        for (uint8 i = 0; i < 4; ++i)
             qt[i] = -q[i];
-        }
     }
     else if (&qt != &q)
     {
-        for (i = 0; i < 4; i++)
-        {
+        // q and qt are not the same object, copy q to qt
+        for (uint8 i = 0; i < 4; ++i)
             qt[i] = q[i];
-        }
     }
 }
 
@@ -140,7 +133,7 @@ float QuaternionNormalize(Quaternion &q)
 
     Assert(q.IsValid());
 
-    radius = q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3];
+    radius = SQR(q[0]) + SQR(q[1]) + SQR(q[2]) + SQR(q[3]);
 
     if (radius) // > FLT_EPSILON && ((radius < 1.0f - 4*FLT_EPSILON) || (radius > 1.0f + 4*FLT_EPSILON))
     {
@@ -157,9 +150,7 @@ float QuaternionNormalize(Quaternion &q)
 void QuaternionMatrix(const Quaternion &q, const Vector &pos, matrix3x4_t &matrix)
 {
     if (!HushAsserts())
-    {
         Assert(pos.IsValid());
-    }
 
     QuaternionMatrix(q, matrix);
 
@@ -315,8 +306,6 @@ void QuaternionScale(const Quaternion &p, float t, Quaternion &q)
         q.w = -q.w;
     }
 #else
-    float r;
-
     // FIXME: nick, this isn't overly sensitive to accuracy, and it may be faster to use the cos part (w) of the quaternion (sin(omega)*N,cos(omega)) to figure the new scale.
     float sinom = FastSqrt(DotProduct(&p.x, &p.x));
     sinom       = min(sinom, 1.f);
@@ -327,18 +316,11 @@ void QuaternionScale(const Quaternion &p, float t, Quaternion &q)
     VectorScale(&p.x, t, &q.x);
 
     // rescale rotation
-    r = 1.0f - sinsom * sinsom;
-
-    // Assert( r >= 0 );
-    if (r < 0.0f)
-        r = 0.0f;
-    r = FastSqrt(r);
+    float r = 1.0f - sinsom * sinsom;
+    r = r < 0.0f ? 0.0f : FastSqrt(r);
 
     // keep sign of rotation
-    if (p.w < 0)
-        q.w = -r;
-    else
-        q.w = r;
+    q.w = p.w < 0.0f ? -r : r;
 #endif
 
     Assert(q.IsValid());
@@ -473,15 +455,12 @@ void QuaternionBlendNoAlign(const Quaternion &p, const Quaternion &q, float t, Q
 {
     Assert(s_bMathlibInitialized);
     float sclp, sclq;
-    int i;
 
     // 0.0 returns p, 1.0 return q.
     sclp = 1.0f - t;
     sclq = t;
-    for (i = 0; i < 4; i++)
-    {
+    for (uint8 i = 0; i < 4; ++i)
         qt[i] = sclp * p[i] + sclq * q[i];
-    }
     QuaternionNormalize(qt);
 }
 
@@ -495,14 +474,10 @@ void QuaternionIdentityBlend(const Quaternion &p, float t, Quaternion &qt)
     qt.x = p.x * sclp;
     qt.y = p.y * sclp;
     qt.z = p.z * sclp;
-    if (qt.w < 0.0)
-    {
+    if (qt.w < 0.0f)
         qt.w = p.w * sclp - t;
-    }
     else
-    {
         qt.w = p.w * sclp + t;
-    }
     QuaternionNormalize(qt);
 }
 
@@ -510,9 +485,7 @@ void QuaternionMatrix(const Quaternion &q, matrix3x4_t &matrix)
 {
     Assert(s_bMathlibInitialized);
     if (!HushAsserts())
-    {
         Assert(q.IsValid());
-    }
 
 #ifdef _VPROF_MATHLIB
     VPROF_BUDGET("QuaternionMatrix", "Mathlib");
@@ -522,9 +495,9 @@ void QuaternionMatrix(const Quaternion &q, matrix3x4_t &matrix)
 // This should produce the same code as below with optimization, but looking at the assmebly,
 // it doesn't.  There are 7 extra multiplies in the release build of this, go figure.
 #if 1
-    matrix[0][0] = 1.0 - 2.0 * q.y * q.y - 2.0 * q.z * q.z;
-    matrix[1][0] = 2.0 * q.x * q.y + 2.0 * q.w * q.z;
-    matrix[2][0] = 2.0 * q.x * q.z - 2.0 * q.w * q.y;
+    matrix[0][0] = 1.0f - 2.0f * q.y * q.y - 2.0f * q.z * q.z;
+    matrix[1][0] = 2.0f * q.x * q.y + 2.0f * q.w * q.z;
+    matrix[2][0] = 2.0f * q.x * q.z - 2.0f * q.w * q.y;
 
     matrix[0][1] = 2.0f * q.x * q.y - 2.0f * q.w * q.z;
     matrix[1][1] = 1.0f - 2.0f * q.x * q.x - 2.0f * q.z * q.z;
@@ -554,7 +527,7 @@ void QuaternionMatrix(const Quaternion &q, matrix3x4_t &matrix)
     wy = q.w * y2;
     wz = q.w * z2;
 
-    matrix[0][0] = 1.0 - (yy + zz);
+    matrix[0][0] = 1.0f - (yy + zz);
     matrix[0][1] = xy - wz;
     matrix[0][2] = xz + wy;
     matrix[0][3] = 0.0f;
@@ -566,7 +539,7 @@ void QuaternionMatrix(const Quaternion &q, matrix3x4_t &matrix)
 
     matrix[2][0] = xz - wy;
     matrix[2][1] = yz + wx;
-    matrix[2][2] = 1.0 - (xx + yy);
+    matrix[2][2] = 1.0f - (xx + yy);
     matrix[2][3] = 0.0f;
 #endif
 }
@@ -575,15 +548,14 @@ void QuaternionSlerpNoAlign(const Quaternion &p, const Quaternion &q, float t, Q
 {
     Assert(s_bMathlibInitialized);
     float omega, cosom, sinom, sclp, sclq;
-    int i;
 
     // 0.0 returns p, 1.0 return q.
 
     cosom = p[0] * q[0] + p[1] * q[1] + p[2] * q[2] + p[3] * q[3];
 
-    if ((1.0f + cosom) > 0.000001f)
+    if (1.0f + cosom > 0.000001f)
     {
-        if ((1.0f - cosom) > 0.000001f)
+        if (1.0f - cosom > 0.000001f)
         {
             omega = acos(cosom);
             sinom = sin(omega);
@@ -596,10 +568,8 @@ void QuaternionSlerpNoAlign(const Quaternion &p, const Quaternion &q, float t, Q
             sclp = 1.0f - t;
             sclq = t;
         }
-        for (i = 0; i < 4; i++)
-        {
+        for (uint8 i = 0; i < 4; ++i)
             qt[i] = sclp * p[i] + sclq * q[i];
-        }
     }
     else
     {
@@ -609,21 +579,20 @@ void QuaternionSlerpNoAlign(const Quaternion &p, const Quaternion &q, float t, Q
         qt[1] = q[0];
         qt[2] = -q[3];
         qt[3] = q[2];
-        sclp  = sin((1.0f - t) * (0.5f * M_PI));
-        sclq  = sin(t * (0.5f * M_PI));
-        for (i = 0; i < 3; i++)
-        {
+        sclp  = sin((1.0f - t) * (0.5f * M_PIf));
+        sclq  = sin(t * (0.5f * M_PIf));
+        for (uint8 i = 0; i < 3; ++i)
             qt[i] = sclp * p[i] + sclq * qt[i];
-        }
     }
 
     Assert(qt.IsValid());
 }
 
-const studiohdr_t *virtualgroup_t::GetStudioHdr(void) const
+const studiohdr_t *virtualgroup_t::GetStudioHdr() const
 {
     return g_IMDLCache->GetStudioHdr((MDLHandle_t) (uintptr_t) cache & 0xffff);
 }
+
 int studiohdr_t::GetAutoplayList(unsigned short **pOut) const
 {
     return g_IMDLCache->GetAutoplayList((MDLHandle_t) (uintptr_t) virtualModel & 0xffff, pOut);

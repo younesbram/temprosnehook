@@ -498,7 +498,7 @@ void Draw()
         AddSideString(format("ItemDefinitionIndex: ", CE_INT(LOCAL_W, netvar.iItemDefinitionIndex)));
         AddSideString(format("Maxspeed: ", CE_FLOAT(LOCAL_E, netvar.m_flMaxspeed)));
         /*AddSideString(colors::white, "Weapon: %s [%i]",
-        RAW_ENT(g_pLocalPlayer->weapon())->GetClientClass()->GetName(),
+        RAW_ENT(LOCAL_W)->GetClientClass()->GetName(),
         LOCAL_W->m_iClassID());
         //AddSideString(colors::white, "flNextPrimaryAttack: %f",
         CE_FLOAT(LOCAL_W, netvar.flNextPrimaryAttack));

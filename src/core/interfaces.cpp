@@ -12,8 +12,6 @@
 #include <sstream>
 #include <steam/isteamclient.h>
 
-#define GAME_PTR_OFFSET 0x45
-
 // class ISteamFriends002;
 
 IVModelRender *g_IVModelRender                     = nullptr;
@@ -153,7 +151,7 @@ void CreateInterfaces()
     g_PredictionRandomSeed = *reinterpret_cast<int **>(sig + (uintptr_t) 1);
 
     uintptr_t g_pGameRules_sig = CSignature::GetClientSignature("55 89 E5 53 83 EC 14 8B 5D ? C7 44 24 ? ? ? ? ? 89 1C 24 E8 ? ? ? ? C7 03 ? ? ? ? C7 43");
-    rg_pGameRules              = *reinterpret_cast<CGameRules ***>(g_pGameRules_sig + GAME_PTR_OFFSET);
+    rg_pGameRules              = *reinterpret_cast<CGameRules ***>(g_pGameRules_sig + 0x45);
     g_IMaterialSystem          = BruteforceInterface<IMaterialSystemFixed>("VMaterialSystem", sharedobj::materialsystem());
     g_IMDLCache                = BruteforceInterface<IMDLCache>("MDLCache", sharedobj::datacache());
 

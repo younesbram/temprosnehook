@@ -4,7 +4,8 @@
 
 namespace setupbones_reconst
 {
-#define MAX_OVERLAYS 15
+constexpr uint8 MAX_OVERLAYS  = 15;
+constexpr uint16 m_pIK_offset = 0x568;
 
 void GetSkeleton(IClientEntity *ent, CStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], int boneMask)
 {
@@ -14,8 +15,7 @@ void GetSkeleton(IClientEntity *ent, CStudioHdr *pStudioHdr, Vector pos[], Quate
     if (!pStudioHdr->SequencesAvailable())
         return;
 
-    static uintptr_t m_pIK_offset = 0x568;
-    CIKContext **m_pIk            = (reinterpret_cast<CIKContext **>(reinterpret_cast<uint64_t>(ent) + (m_pIK_offset)));
+    auto **m_pIk = reinterpret_cast<CIKContext **>(reinterpret_cast<uint64_t>(ent) + m_pIK_offset);
 
     static uintptr_t m_AnimOverlay_offset       = 0x894;
     CUtlVector<C_AnimationLayer> &m_AnimOverlay = NET_VAR(ent, m_AnimOverlay_offset, CUtlVector<C_AnimationLayer>);
@@ -56,7 +56,7 @@ bool SetupBones(IClientEntity *ent, matrix3x4_t *pBoneToWorld, int boneMask)
     if (!pStudioHdr)
         return false;
 
-    if (pBoneToWorld == nullptr)
+    if (!pBoneToWorld)
         pBoneToWorld = new matrix3x4_t[sizeof(matrix3x4_t) * MAXSTUDIOBONES];
 
     int *entity_flags = (int *) ((uintptr_t) ent + 400);
@@ -67,17 +67,15 @@ bool SetupBones(IClientEntity *ent, matrix3x4_t *pBoneToWorld, int boneMask)
     Vector pos[MAXSTUDIOBONES];
     Quaternion q[MAXSTUDIOBONES];
 
-    static uintptr_t m_pIK_offset = 0x568;
-
     Vector adjOrigin = ent->GetAbsOrigin();
 
-    CIKContext **m_pIk = (reinterpret_cast<CIKContext **>(reinterpret_cast<uint64_t>(ent) + (m_pIK_offset)));
-    QAngle angles      = VectorToQAngle(re::C_BasePlayer::GetEyeAngles(ent));
+    auto **m_pIk  = reinterpret_cast<CIKContext **>(reinterpret_cast<uint64_t>(ent) + m_pIK_offset);
+    QAngle angles = VectorToQAngle(re::C_BasePlayer::GetEyeAngles(ent));
 
     // One function seems to have pitch as it will do weird stuff with the bones, so we just do this as a fix
     QAngle angles2 = angles;
-    angles2.x      = 0;
-    angles2.z      = 0;
+    angles2.x      = 0.0f;
+    angles2.z      = 0.0f;
 
     if (*m_pIk)
     {

@@ -194,10 +194,13 @@ std::optional<Vector> getClosestPayload(Vector source, int team)
     {
         if (CE_BAD(payload) || payload->m_iClassID() != CL_CLASS(CObjectCartDispenser))
             continue;
-        if (payload->m_vecOrigin().DistTo(source) < best_distance)
+
+        const auto payload_origin = payload->m_vecOrigin();
+        const auto dist_sq = payload_origin.DistToSqr(source);
+        if (dist_sq < best_distance)
         {
-            best_pos      = payload->m_vecOrigin();
-            best_distance = payload->m_vecOrigin().DistTo(source);
+            best_pos      = payload_origin;
+            best_distance = dist_sq;
         }
     }
     return best_pos;
@@ -440,10 +443,11 @@ std::optional<Vector> getClosestControlPoint(Vector source, int team)
         // They can cap
         if (cp.can_cap.at(team_idx))
         {
+            const auto dist_sq = (*cp.position).DistToSqr(source);
             // Is it closer?
-            if (cp.position && (*cp.position).DistTo(source) < best_distance)
+            if (cp.position && dist_sq < best_distance)
             {
-                best_distance = (*cp.position).DistTo(source);
+                best_distance = dist_sq;
                 best_cp       = cp.position;
             }
         }

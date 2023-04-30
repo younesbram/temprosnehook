@@ -639,15 +639,15 @@ static void cm()
 
             // If both the follow targets and the local players weapons are
             // not null or dormant
-            if (owner_weapon && CE_GOOD(g_pLocalPlayer->weapon()))
+            if (owner_weapon && CE_GOOD(LOCAL_W))
             {
 
                 // IsBaseCombatWeapon()
-                if (re::C_BaseCombatWeapon::IsBaseCombatWeapon(RAW_ENT(g_pLocalPlayer->weapon())) && re::C_BaseCombatWeapon::IsBaseCombatWeapon(owner_weapon))
+                if (re::C_BaseCombatWeapon::IsBaseCombatWeapon(RAW_ENT(LOCAL_W)) && re::C_BaseCombatWeapon::IsBaseCombatWeapon(owner_weapon))
                 {
 
                     // Get the players slot numbers and store in some vars
-                    int my_slot    = re::C_BaseCombatWeapon::GetSlot(RAW_ENT(g_pLocalPlayer->weapon()));
+                    int my_slot    = re::C_BaseCombatWeapon::GetSlot(RAW_ENT(LOCAL_W));
                     int owner_slot = re::C_BaseCombatWeapon::GetSlot(owner_weapon);
 
                     // If the local player is a medic and user settings

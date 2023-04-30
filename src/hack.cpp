@@ -11,12 +11,12 @@
 #include <dlfcn.h>
 #include <boost/stacktrace.hpp>
 #include <visual/SDLHooks.hpp>
+#include "x86gprintrin.h"
 #include "hack.hpp"
 #include "common.hpp"
 #if ENABLE_GUI
 #include "menu/GuiInterface.hpp"
 #endif
-#include <link.h>
 #include <pwd.h>
 
 #include "teamroundtimer.hpp"
@@ -89,23 +89,8 @@ void hack::ExecuteCommand(const std::string &command)
 }
 
 #if ENABLE_LOGGING
-
-std::string getFileName(std::string filePath)
-{
-    // Get last dot position
-    std::size_t dotPos = filePath.rfind('.');
-    std::size_t sepPos = filePath.rfind('/');
-
-    if (sepPos != std::string::npos)
-    {
-        return filePath.substr(sepPos + 1, filePath.size() - (dotPos != std::string::npos ? 1 : dotPos));
-    }
-    return filePath;
-}
-
 void critical_error_handler(int signum)
 {
-    namespace st = boost::stacktrace;
     ::signal(signum, SIG_DFL);
     passwd *pwd = getpwuid(getuid());
     std::ofstream out(strfmt("/tmp/cathook-%s-%d-segfault.log", pwd->pw_name, getpid()).get());
@@ -114,7 +99,7 @@ void critical_error_handler(int signum)
     if (!dladdr(reinterpret_cast<void *>(hack::ExecuteCommand), &info))
         return;
 
-    for (auto i : st::stacktrace())
+    for (auto i : boost::stacktrace::stacktrace())
     {
         Dl_info info2;
         if (dladdr(i.address(), &info2))
@@ -131,18 +116,11 @@ void critical_error_handler(int signum)
 
 static void InitRandom()
 {
-    int rand_seed;
-    FILE *rnd = fopen("/dev/urandom", "rb");
-    if (!rnd || fread(&rand_seed, sizeof(rand_seed), 1, rnd) < 1)
+    unsigned int seed;
+    do
     {
-        logging::Info("Warning!!! Failed read from /dev/urandom (%s). Randomness is going to be weak", strerror(errno));
-        timespec t{};
-        clock_gettime(CLOCK_MONOTONIC, &t);
-        rand_seed = t.tv_nsec ^ (t.tv_sec & getpid());
-    }
-    srand(rand_seed);
-    if (rnd)
-        fclose(rnd);
+    } while (!_rdseed32_step(&seed));
+    srand(seed);
 }
 
 void hack::Hook()
@@ -185,7 +163,7 @@ void hack::Hook()
     hooks::vstd.HookMethod(HOOK_ARGS(RandomInt));
     hooks::vstd.Apply();
 #if ENABLE_VISUALS
-    auto chat_hud = g_CHUD->FindElement("CHudChat");
+    CHudElement *chat_hud;
     while (!(chat_hud = g_CHUD->FindElement("CHudChat")))
         usleep(1000);
     hooks::chathud.Set(chat_hud);
@@ -276,7 +254,7 @@ free(logname);*/
         for (const auto &s : essential)
         {
             std::ifstream exists(paths::getDataPath("/" + s), std::ios::in);
-            if (not exists)
+            if (!exists)
             {
                 Error(("Missing essential file: " + s +
                        "/%s\nYou MUST run install-data script to finish "

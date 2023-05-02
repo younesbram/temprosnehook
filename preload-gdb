@@ -32,7 +32,7 @@ popd || exit
 sleep 1
 
 line=$(pgrep -u "$RUNUSER" hl2_linux)
-arr=($line)
+arr=("$line")
 
 if [ $# == 1 ]; then
   proc=$1

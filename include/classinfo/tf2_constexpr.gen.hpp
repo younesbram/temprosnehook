@@ -3,8 +3,7 @@
     CONSTEXPR HEADER FOR tf2
 */
 
-#ifndef tf2_CONSTEXPR_AUTOGEN_HPP
-#define tf2_CONSTEXPR_AUTOGEN_HPP
+#pragma once
 
 namespace client_classes_constexpr
 {
@@ -406,5 +405,3 @@ public:
     static constexpr int CWeaponAlyxGun                        = 0;
 };
 } // namespace client_classes_constexpr
-
-#endif /* tf2_CONSTEXPR_AUTOGEN_HPP */

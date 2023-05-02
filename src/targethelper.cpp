@@ -41,7 +41,7 @@ int GetScoreForEntity(CachedEntity *entity)
 
     int clazz      = CE_INT(entity, netvar.iClass);
     int health     = CE_INT(entity, netvar.iHealth);
-    float distance = (g_pLocalPlayer->v_Origin - entity->m_vecOrigin()).Length();
+    float distance = entity->m_flDistance();
     bool zoomed    = HasCondition<TFCond_Zoomed>(entity);
     bool pbullet   = HasCondition<TFCond_SmallBulletResist>(entity);
     bool special   = false;

@@ -579,8 +579,8 @@ void QuaternionSlerpNoAlign(const Quaternion &p, const Quaternion &q, float t, Q
         qt[1] = q[0];
         qt[2] = -q[3];
         qt[3] = q[2];
-        sclp  = sin((1.0f - t) * (0.5f * M_PIf));
-        sclq  = sin(t * (0.5f * M_PIf));
+        sclp  = sin((1.0f - t) * (0.5f * M_PI_F));
+        sclq  = sin(t * (0.5f * M_PI_F));
         for (uint8 i = 0; i < 3; ++i)
             qt[i] = sclp * p[i] + sclq * qt[i];
     }

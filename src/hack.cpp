@@ -11,7 +11,15 @@
 #include <dlfcn.h>
 #include <boost/stacktrace.hpp>
 #include <visual/SDLHooks.hpp>
+#ifndef __RDSEED__ // Used for InitRandom()
+#include <random>
+#include <fstream>
+#include <chrono>
+#include <sys/types.h>
+#include <unistd.h>
+#else
 #include "x86gprintrin.h"
+#endif
 #include "hack.hpp"
 #include "common.hpp"
 #if ENABLE_GUI
@@ -116,11 +124,28 @@ void critical_error_handler(int signum)
 
 static void InitRandom()
 {
+#ifdef __RDSEED__
     unsigned int seed;
     do
     {
     } while (!_rdseed32_step(&seed));
     srand(seed);
+#else
+    std::random_device rd;
+    unsigned int rand_seed = rd();
+
+    if (rd.entropy() == 0) // Check if the random device is not truly random
+    {
+        logging::Info("Warning! Failed to read from random_device. Randomness is going to be weak.");
+
+        auto now         = std::chrono::high_resolution_clock::now().time_since_epoch();
+        auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(now).count();
+        rand_seed        = static_cast<unsigned int>(nanoseconds ^ nanoseconds & getpid());
+    }
+
+    // Initialize random number generator
+    srand(rand_seed);
+#endif
 }
 
 void hack::Hook()
@@ -128,10 +153,8 @@ void hack::Hook()
     uintptr_t *clientMode;
     // Bad way to get clientmode.
     // FIXME [MP]?
-    while (!(clientMode = **(uintptr_t ***) ((uintptr_t) ((*(void ***) g_IBaseClient)[10]) + 1)))
-    {
+    while (!(clientMode = **(uintptr_t ***) ((uintptr_t) (*(void ***) g_IBaseClient)[10] + 1)))
         usleep(10000);
-    }
     hooks::clientmode.Set((void *) clientMode);
     hooks::clientmode.HookMethod(HOOK_ARGS(CreateMove));
 #if ENABLE_VISUALS
@@ -141,7 +164,7 @@ void hack::Hook()
     hooks::clientmode.HookMethod(HOOK_ARGS(LevelShutdown));
     hooks::clientmode.Apply();
 
-    hooks::clientmode4.Set((void *) (clientMode), 4);
+    hooks::clientmode4.Set((void *) clientMode, 4);
     hooks::clientmode4.HookMethod(HOOK_ARGS(FireGameEvent));
     hooks::clientmode4.Apply();
 

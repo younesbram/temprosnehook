@@ -6,6 +6,7 @@
  */
 
 #pragma once
+
 class CGameRules
 {
 public:
@@ -13,7 +14,7 @@ public:
     int roundmode;              // 68   | 4 bytes   | 72
     int m_bInWaitingForPlayers; // 72   | 4 bytes   | 76
     int winning_team;           // 76   | 4 bytes   | 80
-    char pad2[974];             // 100  | 974 bytes | 1054
+    char pad2[974];             // 80   | 974 bytes | 1054
     bool isPVEMode;             // 1054 | 1 byte    | 1055
     char pad3[15];              // 1055 | 15 bytes  | 1070
     int isUsingSpells;          // 1070 | 4 bytes   | 1074

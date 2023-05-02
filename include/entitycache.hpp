@@ -292,10 +292,7 @@ extern std::vector<CachedEntity *> player_cache;
 inline CachedEntity *Get(const u_int16_t &idx)
 {
     auto test = array.find(idx);
-    if (test == array.end())
-        return nullptr;
-    else
-        return &test->second;
+    return test != array.end() ? &test->second : nullptr;
 }
 __attribute__((hot)) void Update();
 void Invalidate();

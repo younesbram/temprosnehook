@@ -265,14 +265,13 @@ std::pair<CachedEntity *, float> getNearestPlayerDistance()
     float distance         = FLT_MAX;
     CachedEntity *best_ent = nullptr;
 
-    const auto local_origin = g_pLocalPlayer->v_Origin;
     for (const auto &ent : entity_cache::player_cache)
     {
         if (!ent->m_vecDormantOrigin() || !g_pPlayerResource->isAlive(ent->m_IDX) || !ent->m_bEnemy() || !player_tools::shouldTarget(ent))
             continue;
 
         const auto ent_origin = *ent->m_vecDormantOrigin();
-        const auto dist_sq    = local_origin.DistToSqr(ent_origin);
+        const auto dist_sq    = g_pLocalPlayer->v_Origin.DistToSqr(ent_origin);
 
         if (dist_sq >= SQR(distance))
             continue;

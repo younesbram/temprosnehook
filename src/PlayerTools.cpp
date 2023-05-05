@@ -43,7 +43,8 @@ bool shouldTarget(CachedEntity *entity)
         // Don't shoot players in truce
         if (isTruce())
             return false;
-        return shouldTargetSteamId(entity->player_info->friendsID);
+        if (entity->player_info)
+            return shouldTargetSteamId(entity->player_info->friendsID);
     }
     else if (entity->m_Type() == ENTITY_BUILDING)
         // Don't shoot buildings in truce
@@ -64,7 +65,7 @@ bool shouldAlwaysRenderEspSteamId(unsigned id)
 }
 bool shouldAlwaysRenderEsp(CachedEntity *entity)
 {
-    if (entity->m_Type() == ENTITY_PLAYER)
+    if (entity->m_Type() == ENTITY_PLAYER && entity->player_info)
         return shouldAlwaysRenderEspSteamId(entity->player_info->friendsID);
 
     return false;
@@ -85,9 +86,7 @@ std::optional<colors::rgba_t> forceEspColorSteamId(unsigned id)
 std::optional<colors::rgba_t> forceEspColor(CachedEntity *entity)
 {
     if (entity->m_Type() == ENTITY_PLAYER  && entity->player_info)
-    {
         return forceEspColorSteamId(entity->player_info->friendsID);
-    }
 
     return std::nullopt;
 }
@@ -147,7 +146,8 @@ static CatCommand mark_betrayal("pl_mark_betrayal", "Mark a steamid32 as betraya
 
 void onKilledBy(CachedEntity *entity)
 {
-    onKilledBy(entity->player_info->friendsID);
+    if (entity->player_info)
+        onKilledBy(entity->player_info->friendsID);
 }
 
 class PlayerToolsEventListener : public IGameEventListener2

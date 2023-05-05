@@ -81,7 +81,7 @@ static Timer lastJump{};
 static Timer crouch_timer{};                          // Mimic crouch
 static std::array<Timer, PLAYER_ARRAY_SIZE> afkTicks; // for how many ms the player hasn't been moving
 
-bool isIdle()
+bool IsIdle()
 {
     if (!enable || !autozoom_if_idle || !follow_target)
         return false;
@@ -338,7 +338,7 @@ static void cm()
                     if (!isValidTarget(entity))
                         continue;
                     // No enemy check, since steamid is very specific
-                    if (steamid != entity->player_info->friendsID) // steamid check
+                    if (entity->player_info && steamid != entity->player_info->friendsID) // steamid check
                         continue;
                     if (startFollow(entity, isNavBotCM))
                     {
@@ -372,7 +372,7 @@ static void cm()
                             continue;
                         if (entity->m_bEnemy())
                             continue;
-                        if (accountid != entity->player_info->friendsID)
+                        if (entity->player_info && accountid != entity->player_info->friendsID)
                             continue;
                         if (startFollow(entity, isNavBotCM))
                         {

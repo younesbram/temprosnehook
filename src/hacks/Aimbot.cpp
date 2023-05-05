@@ -63,7 +63,7 @@ static settings::Boolean auto_spin_up{ "aimbot.auto.spin-up", "false" };
 static settings::Boolean minigun_tapfire{ "aimbot.auto.tapfire", "false" };
 static settings::Boolean auto_zoom{ "aimbot.auto.zoom", "false" };
 static settings::Boolean auto_unzoom{ "aimbot.auto.unzoom", "false" };
-static settings::Int zoom_distance{ "aimbot.zoom.distance", "1250" };
+static settings::Float zoom_distance{ "aimbot.zoom.distance", "1250.0" };
 
 static settings::Boolean backtrackAimbot{ "aimbot.backtrack", "false" };
 static settings::Boolean backtrackLastTickOnly("aimbot.backtrack.only-last-tick", "true");
@@ -463,7 +463,7 @@ bool AllowNoScope(CachedEntity *target)
 
 void DoAutoZoom(bool target_found, CachedEntity *target)
 {
-    bool isIdle = !target_found && hacks::followbot::isIdle();
+    bool idle = hacks::followbot::IsIdle();
 
     // Keep track of our zoom time
     static Timer zoomTime{};
@@ -473,13 +473,13 @@ void DoAutoZoom(bool target_found, CachedEntity *target)
     {
         if (target_found)
             zoomTime.update();
-        if (isIdle || !zoomTime.check(3000))
+        if (idle || !zoomTime.check(3000))
             current_user_cmd->buttons |= IN_ATTACK2;
         return;
     }
 
     auto nearest = hacks::NavBot::getNearestPlayerDistance();
-    if (g_pLocalPlayer->holding_sniper_rifle && !AllowNoScope(target) && (target_found || nearest.second <= *zoom_distance || isIdle))
+    if (g_pLocalPlayer->holding_sniper_rifle && !AllowNoScope(target) && (target_found || nearest.second <= *zoom_distance || idle))
     {
         if (target_found)
             zoomTime.update();
@@ -574,6 +574,7 @@ static void CreateMove()
                     DoAutoshoot(target_last);
             }
         }
+        [[fallthrough]];
     default:
         break;
     }
@@ -639,12 +640,11 @@ bool ProjectileSpecialCases(CachedEntity *target_entity, int weapon_case)
             Aim(target_entity);
             return false;
         }
-        break;
+        [[fallthrough]];
     }
     default:
         return true;
     }
-    return true;
 }
 
 int tapfire_delay = 0;
@@ -1097,7 +1097,6 @@ bool IsTargetStateGood(CachedEntity *entity)
     return false;
 }
 
-#pragma GCC optimize("no-finite-math-only")
 // A function to aim at a specific entity
 bool Aim(CachedEntity *entity)
 {
@@ -1114,50 +1113,39 @@ bool Aim(CachedEntity *entity)
     if (projectileAimbotRequired) // unfortunately you have to check this twice, otherwise you'd have to run GetAimAtAngles far too early
     {
         const Vector &orig   = getShootPos(angles);
-        const bool grav_comp = (0.01f < cur_proj_grav);
+        const bool grav_comp = 0.01f < cur_proj_grav;
         if (grav_comp)
         {
             const QAngle &angl = VectorToQAngle(angles);
-            Vector end_targ;
-            if (entity->hitboxes.GetHitbox(cd.hitbox))
-                end_targ = entity->hitboxes.GetHitbox(cd.hitbox)->center;
-            else
-                end_targ = entity->m_vecOrigin();
-            Vector fwd;
-            AngleVectors2(angl, &fwd);
+            Vector end_targ    = is_it_good;
+            Vector fwd, right, up;
+            AngleVectors3(angl, &fwd, &right, &up);
+            // I have no clue why this is 200.0f; nowhere in the SDK is this explained.
+            // It appears to work though
+            Vector vel = 0.9f * (fwd * cur_proj_speed + up * 200.0f);
+            fwd.z      = 0.0f;
             fwd.NormalizeInPlace();
-            fwd *= cur_proj_speed;
-            Vector dist_between = (end_targ - orig) / fwd;
-            const float gravity = cur_proj_grav * g_ICvar->FindVar("sv_gravity")->GetFloat() * -1.0f;
-            float z_diff        = (end_targ.z - orig.z);
-            const float sol_1   = (fwd.z + FastSqrt(fwd.z * fwd.z + 2.0f * gravity * z_diff)) / (-1.0f * gravity);
-            if (std::isnan(sol_1))
-                dist_between.z = (fwd.z - FastSqrt(fwd.z * fwd.z + 2.0f * gravity * z_diff)) / (-1.0f * gravity);
-            else
-                dist_between.z = sol_1;
-            float maxTime = dist_between.Length();
-            if (!std::isnan(maxTime))
+            float alongvel = FastSqrt(SQR(vel.x) + SQR(vel.y));
+            fwd *= alongvel;
+            const float gravity  = cur_proj_grav * g_ICvar->FindVar("sv_gravity")->GetFloat() * -1.0f;
+            const float maxTime  = 2.5f;
+            const float timeStep = 0.01f;
+            Vector curr_pos      = orig;
+            trace_t ptr_trace;
+            Vector last_pos                 = orig;
+            const IClientEntity *rawest_ent = RAW_ENT(entity);
+            for (float t = 0.0f; t < maxTime; t += timeStep, last_pos = curr_pos)
             {
-                const float timeStep = maxTime * 0.1f;
-                Vector curr_pos      = orig;
-                trace_t ptr_trace;
-                Vector last_pos                 = orig;
-                const IClientEntity *rawest_ent = RAW_ENT(entity);
-                for (float t = 0.0f; t < maxTime; t += timeStep, last_pos = curr_pos)
-                {
-                    curr_pos.x = orig.x + fwd.x * t;
-                    curr_pos.y = orig.y + fwd.y * t;
-                    curr_pos.z = orig.z + fwd.z * t + 0.5f * gravity * t * t;
-                    if (!DidProjectileHit(last_pos, curr_pos, entity, ProjectileHitboxSize(LOCAL_W->m_iClassID()), true, &ptr_trace) || (IClientEntity *) ptr_trace.m_pEnt == rawest_ent)
-                        break;
-                }
-                if (!DidProjectileHit(ptr_trace.endpos, end_targ, entity, ProjectileHitboxSize(LOCAL_W->m_iClassID()), true, &ptr_trace))
-                    return false;
-
-                if (200.0f < curr_pos.DistTo(end_targ))
-                    return false;
+                curr_pos.x = orig.x + fwd.x * t;
+                curr_pos.y = orig.y + fwd.y * t;
+                curr_pos.z = orig.z + vel.z * t + 0.5f * gravity * SQR(t);
+                if (!DidProjectileHit(last_pos, curr_pos, entity, ProjectileHitboxSize(LOCAL_W->m_iClassID()), true, &ptr_trace) || (IClientEntity *) ptr_trace.m_pEnt == rawest_ent)
+                    break;
             }
-            else if (!DidProjectileHit(orig, is_it_good, entity, ProjectileHitboxSize(LOCAL_W->m_iClassID()), true))
+            if (!DidProjectileHit(end_targ, ptr_trace.endpos, entity, ProjectileHitboxSize(LOCAL_W->m_iClassID()), true, &ptr_trace))
+                return false;
+            Vector ent_check = entity->m_vecOrigin();
+            if (!DidProjectileHit(last_pos, ent_check, entity, ProjectileHitboxSize(LOCAL_W->m_iClassID()), false))
                 return false;
         }
         else if (!DidProjectileHit(orig, is_it_good, entity, ProjectileHitboxSize(LOCAL_W->m_iClassID()), grav_comp))
@@ -1191,7 +1179,6 @@ bool Aim(CachedEntity *entity)
     // Finish function
     return true;
 }
-#pragma GCC reset_options
 
 // A function to check whether player can autoshoot
 bool begancharge = false;

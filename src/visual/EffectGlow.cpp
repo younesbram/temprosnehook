@@ -237,6 +237,8 @@ rgba_t EffectGlow::GlowColor(IClientEntity *entity)
             return colors::Health_dimgreen(ent->m_iHealth(), ent->m_iMaxHealth());
         break;
     case ENTITY_PLAYER:
+        if (!ent->player_info)
+            break;
         if (health && playerlist::IsDefault(ent->player_info->friendsID))
             return colors::Health_dimgreen(ent->m_iHealth(), ent->m_iMaxHealth());
         else if (!playerlist::IsDefault(ent->player_info->friendsID))
@@ -276,7 +278,7 @@ bool EffectGlow::ShouldRenderGlow(IClientEntity *entity)
             return false;
         if (!disguised && IsPlayerDisguised(ent))
             return false;
-        if (!teammates && !ent->m_bEnemy() && playerlist::IsDefault(ent->player_info->friendsID))
+        if (!teammates && !ent->m_bEnemy() && ent->player_info && playerlist::IsDefault(ent->player_info->friendsID))
             return false;
         if (CE_BYTE(ent, netvar.iLifeState) != LIFE_ALIVE)
             return false;
@@ -285,9 +287,7 @@ bool EffectGlow::ShouldRenderGlow(IClientEntity *entity)
         if (!ent->m_bEnemy())
             return false;
         if (stickies && ent->m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile))
-        {
             return true;
-        }
         break;
     case ENTITY_GENERIC:
         const model_t *model = RAW_ENT(ent)->GetModel();

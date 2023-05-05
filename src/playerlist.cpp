@@ -144,7 +144,7 @@ bool IsDefault(unsigned steamid)
 #if ENABLE_VISUALS
     return data.state == k_EState::DEFAULT && !data.color.a;
 #endif
-    return data.state == k_EState ::DEFAULT;
+    return data.state == k_EState::DEFAULT;
 }
 
 bool IsFriend(unsigned steamid)
@@ -161,6 +161,7 @@ bool ChangeState(unsigned int steamid, k_EState state, bool force)
         data.state = state;
         return true;
     }
+
     switch (data.state)
     {
     case k_EState::FRIEND:
@@ -210,12 +211,11 @@ bool ChangeState(unsigned int steamid, k_EState state, bool force)
     case k_EState::ABUSE:
         return false;
     }
-    return true;
 }
 
 bool ChangeState(CachedEntity *entity, k_EState state, bool force)
 {
-    if (entity && entity->player_info->friendsID)
+    if (entity && entity->player_info && entity->player_info->friendsID)
         return ChangeState(entity->player_info->friendsID, state, force);
     return false;
 }
@@ -293,7 +293,7 @@ CatCommand pl_set_state("pl_set_state", "cat_pl_set_state [playername] [state] (
                             }
                             auto name = args.Arg(1);
                             int id    = -1;
-                            for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+                            for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
                             {
                                 player_info_s info{};
                                 if (!GetPlayerInfo(i, &info))

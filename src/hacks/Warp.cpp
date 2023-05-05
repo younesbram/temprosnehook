@@ -422,7 +422,7 @@ bool shouldWarp(bool check_amount)
          // Rapidfire and trying to attack?
          || shouldRapidfire()
          // Option is enabled, in melee range and target is visible to us
-         || *warp_melee && nearest.second < 175 && hacks::NavBot::isVisible)
+         || *warp_melee && nearest.second < 175.0f && hacks::NavBot::isVisible)
             // Do we have enough to warp?
             && (!check_amount || warp_amount) ||
         // Warp to dodge projectiles?

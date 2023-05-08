@@ -20,7 +20,7 @@ static boost::unordered_flat_map<int, int> previous_ammo;
 // Also fix heavy M2 causing bucket to fill faster, same for pyro
 DEFINE_HOOKED_METHOD(CalcIsAttackCriticalHelper_brokenweps, bool, IClientEntity *ent)
 {
-    if (CE_GOOD(LOCAL_E) && CE_GOOD(LOCAL_W) && ent && re::C_TFWeaponBase::GetOwnerViaInterface(ent) == LOCAL_E->InternalEntity() && !criticals::calling_crithelper)
+    if (CE_GOOD(LOCAL_E) && CE_GOOD(LOCAL_W) && ent && re::C_TFWeaponBase::GetOwnerViaInterface(ent) == RAW_ENT(LOCAL_E) && !criticals::calling_crithelper)
     {
         auto current_ammo = CE_INT(LOCAL_E, netvar.m_iAmmo + 4);
         if (previous_ammo[ent->entindex()] == current_ammo)
@@ -68,10 +68,11 @@ static InitRoutine minigun_check(
                     // Get the weapon
                     CachedEntity *weapon = ENTITY(HandleToIDX(hWeapons[i]));
                     // if weapon is what we are looking for, hook and move on
-                    if (CE_VALID(weapon) && (weapon->m_iClassID() == CL_CLASS(CTFMinigun) || weapon->m_iClassID() == CL_CLASS(CTFFlameThrower)) && !minigun_hook.IsHooked(weapon->InternalEntity()))
+                    auto weapon_internal_entity = RAW_ENT(weapon);
+                    if (CE_VALID(weapon) && (weapon->m_iClassID() == CL_CLASS(CTFMinigun) || weapon->m_iClassID() == CL_CLASS(CTFFlameThrower)) && !minigun_hook.IsHooked(weapon_internal_entity))
                     {
                         logging::Info("Found and hooked Minigun/Flamethrower!");
-                        minigun_hook.Set(weapon->InternalEntity());
+                        minigun_hook.Set(weapon_internal_entity);
                         minigun_hook.HookMethod(HOOK_ARGS(CalcIsAttackCriticalHelper_brokenweps));
                         minigun_hook.Apply();
                         break;

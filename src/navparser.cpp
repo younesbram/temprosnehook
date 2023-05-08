@@ -70,13 +70,14 @@ static bool IsPlayerPassableNavigation(Vector origin, Vector target, unsigned in
     Vector angles;
     VectorAngles(tr, angles);
 
-    Vector forward, right, up;
-    AngleVectors3(VectorToQAngle(angles), &forward, &right, &up);
+    Vector forward, right;
+    AngleVectors3(VectorToQAngle(angles), &forward, &right, nullptr);
     right.z = 0;
 
-    // We want to keep the same angle for these two bounding box traces
-    Vector relative_endpos = forward * tr.Length();
+    float tr_length        = tr.Length();
+    Vector relative_endpos = forward * tr_length;
 
+    // We want to keep the same angle for these two bounding box traces
     Vector left_ray_origin = origin - right * HALF_PLAYER_WIDTH;
     Vector left_ray_endpos = left_ray_origin + relative_endpos;
 
@@ -123,7 +124,7 @@ struct ConnectionInfo
 // Returns corrected "current_pos"
 Vector handleDropdown(Vector current_pos, Vector next_pos)
 {
-    Vector to_target = (next_pos - current_pos);
+    Vector to_target = next_pos - current_pos;
     // Only do it if we'd fall quite a bit
     if (-to_target.z > PLAYER_JUMP_HEIGHT)
     {
@@ -200,10 +201,12 @@ public:
         else
             state = NavState::Active;
     }
+
     float LeastCostEstimate(void *start, void *end) override
     {
         return reinterpret_cast<CNavArea *>(start)->m_center.DistTo(reinterpret_cast<CNavArea *>(end)->m_center);
     }
+
     void AdjacentCost(void *main, std::vector<micropather::StateCost> *adjacent) override
     {
         CNavArea &area = *reinterpret_cast<CNavArea *>(main);
@@ -278,9 +281,10 @@ public:
     {
         auto vec_corrected = vec;
         vec_corrected.z += PLAYER_JUMP_HEIGHT;
-        float ovBestDist = FLT_MAX, bestDist = FLT_MAX;
+        float overall_best_dist = FLT_MAX, best_dist = FLT_MAX;
         // If multiple candidates for LocalNav have been found, pick the closest
-        CNavArea *ovBestSquare = nullptr, *bestSquare = nullptr;
+        CNavArea *overall_best_square = nullptr, *best_square = nullptr;
+
         for (auto &i : navfile.m_areas)
         {
             // Marked bad, do not use if local origin
@@ -291,53 +295,57 @@ public:
                     continue;
             }
 
-            float dist = i.m_center.DistTo(vec);
-            if (dist < bestDist)
+            float dist = i.m_center.DistToSqr(vec);
+            if (dist < best_dist)
             {
-                bestDist   = dist;
-                bestSquare = &i;
+                best_dist   = dist;
+                best_square = &i;
             }
-            auto center_corrected = i.m_center;
-            center_corrected.z += PLAYER_JUMP_HEIGHT;
-            // Check if we are within x and y bounds of an area
-            if (ovBestDist < dist || !i.IsOverlapping(vec) || !IsVectorVisibleNavigation(vec_corrected, center_corrected))
+
+            if (overall_best_dist <= dist)
                 continue;
 
-            ovBestDist   = dist;
-            ovBestSquare = &i;
-        }
-        if (!ovBestSquare)
-            ovBestSquare = bestSquare;
+            auto center_corrected = i.m_center;
+            center_corrected.z += PLAYER_JUMP_HEIGHT;
 
-        return ovBestSquare;
+            // Check if we are within x and y bounds of an area
+            if (!i.IsOverlapping(vec) || !IsVectorVisibleNavigation(vec_corrected, center_corrected))
+                continue;
+
+            overall_best_dist   = dist;
+            overall_best_square = &i;
+
+            // Early return if the area is overlapping and visible
+            if (overall_best_dist == best_dist)
+                return overall_best_square;
+        }
+
+        return overall_best_square ? overall_best_square : best_square;
     }
 
     std::vector<void *> findPath(CNavArea *local, CNavArea *dest)
     {
-        using namespace std::chrono;
-
         if (state != NavState::Active)
             return {};
+
+        std::vector<void *> path;
+        float cost;
+
+        auto begin_pathing = std::chrono::high_resolution_clock::now();
+        int result         = pather.Solve(reinterpret_cast<void *>(local), reinterpret_cast<void *>(dest), &path, &cost);
+        auto timetaken     = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - begin_pathing).count();
 
         if (*log_pathing)
         {
             logging::Info("Start: (%f,%f,%f)", local->m_center.x, local->m_center.y, local->m_center.z);
             logging::Info("End: (%f,%f,%f)", dest->m_center.x, dest->m_center.y, dest->m_center.z);
+            logging::Info("Pathing: Pather result: %i. Time taken (NS): %lld", result, timetaken);
         }
 
-        std::vector<void *> pathNodes;
-        float cost;
-
-        time_point begin_pathing = high_resolution_clock::now();
-        int result               = pather.Solve(reinterpret_cast<void *>(local), reinterpret_cast<void *>(dest), &pathNodes, &cost);
-        long long timetaken      = duration_cast<nanoseconds>(high_resolution_clock::now() - begin_pathing).count();
-        if (*log_pathing)
-            logging::Info("Pathing: Pather result: %i. Time taken (NS): %lld", result, timetaken);
-        // Start and end are the same, return start node
         if (result == micropather::MicroPather::START_END_SAME)
             return { reinterpret_cast<void *>(local) };
 
-        return pathNodes;
+        return path;
     }
 
     void updateIgnores()

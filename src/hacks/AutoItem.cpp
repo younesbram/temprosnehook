@@ -80,9 +80,7 @@ void Lock()
         return;
     g_ISteamUserStats->RequestCurrentStats();
     for (int i = 0; i < g_IAchievementMgr->GetAchievementCount(); ++i)
-    {
         g_ISteamUserStats->ClearAchievement(g_IAchievementMgr->GetAchievementByIndex(i)->GetName());
-    }
     g_ISteamUserStats->StoreStats();
     g_ISteamUserStats->RequestCurrentStats();
 }
@@ -92,9 +90,7 @@ void Unlock()
     if (!checkAchMgr())
         return;
     for (int i = 0; i < g_IAchievementMgr->GetAchievementCount(); ++i)
-    {
         g_IAchievementMgr->AwardAchievement(g_IAchievementMgr->GetAchievementByIndex(i)->GetAchievementID());
-    }
 }
 
 void unlockSingle(int achID)
@@ -103,9 +99,7 @@ void unlockSingle(int achID)
         return;
     auto *ach = reinterpret_cast<IAchievement *>(g_IAchievementMgr->GetAchievementByID(achID));
     if (ach)
-    {
         g_IAchievementMgr->AwardAchievement(achID);
-    }
 }
 
 AchivementItem *isAchItem(int id)
@@ -374,9 +368,7 @@ CatCommand dump_achievement("achievement_dump", "Dump achievements to file (deve
                                 if (out.bad())
                                     return;
                                 for (int i = 0; i < g_IAchievementMgr->GetAchievementCount(); ++i)
-                                {
                                     out << '[' << i << "] " << g_IAchievementMgr->GetAchievementByIndex(i)->GetName() << ' ' << g_IAchievementMgr->GetAchievementByIndex(i)->GetAchievementID() << "\n";
-                                }
                                 out.close();
                             });
 

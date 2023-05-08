@@ -16,7 +16,7 @@ static void CreateMove()
 
     for (const auto &ent : entity_cache::player_cache)
     {
-        if (CE_BAD(ent) || ent->m_Type() != ENTITY_PLAYER)
+        if (RAW_ENT(ent)->IsDormant() || ent->m_Type() != ENTITY_PLAYER)
             continue;
 
         RemoveCondition<TFCond_Taunting>(ent);

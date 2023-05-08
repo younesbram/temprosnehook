@@ -49,7 +49,7 @@ static void FOVCheck()
         return;
     for (const auto &ent : entity_cache::player_cache)
     {
-        if (ent->InternalEntity()->IsDormant())
+        if (RAW_ENT(ent)->IsDormant())
             continue;
         if (!ent->m_bAlivePlayer() || !ent->m_bEnemy())
             continue;

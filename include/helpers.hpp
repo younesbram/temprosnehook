@@ -120,7 +120,7 @@ void fClampAngle(Vector &qaAng);
 inline Vector GetAimAtAngles(Vector origin, Vector target, CachedEntity *punch_correct = nullptr)
 {
     Vector angles, tr;
-    tr = (target - origin);
+    tr = target - origin;
     VectorAngles(tr, angles);
     // Apply punchangle correction
     if (punch_correct)
@@ -128,7 +128,7 @@ inline Vector GetAimAtAngles(Vector origin, Vector target, CachedEntity *punch_c
     fClampAngle(angles);
     return angles;
 }
-extern std::mutex trace_lock;
+
 bool IsEntityVisible(CachedEntity *entity, int hb);
 bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos, bool use_weapon_offset = false, unsigned int mask = MASK_SHOT_HULL, trace_t *trace = nullptr, bool hit = false);
 bool VisCheckEntFromEnt(CachedEntity *startEnt, CachedEntity *endEnt);
@@ -173,17 +173,11 @@ inline const char *teamname(int team)
     switch (team)
     {
     case 2:
-    {
         return "RED";
-    }
     case 3:
-    {
         return "BLU";
-    }
     default:
-    {
         return "SPEC";
-    }
     }
 }
 extern const std::string classes[10];

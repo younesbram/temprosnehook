@@ -80,7 +80,7 @@ void Update(CachedEntity *player)
                     if (IDX_GOOD(widx))
                     {
                         CachedEntity *weapon = ENTITY(widx);
-                        wp_name              = weapon->InternalEntity()->GetClientClass()->GetName();
+                        wp_name              = RAW_ENT(weapon)->GetClientClass()->GetName();
                         /*logging::Info("%d", weapon->m_IDX);
                         logging::Info("%s", );
                         IClientEntity* e_weapon = RAW_ENT(weapon);

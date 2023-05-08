@@ -204,7 +204,7 @@ Vector VischeckCorner(CachedEntity *player, CachedEntity *target, float maxdist,
 // return Two Corners that connect perfectly to ent and local player
 std::pair<Vector, Vector> VischeckWall(CachedEntity *player, CachedEntity *target, float maxdist, bool checkWalkable)
 {
-    int maxiterations = maxdist / 40;
+    int max_iterations = static_cast<int>(maxdist / 40.0f);
     Vector origin     = player->m_vecOrigin();
 
     // if we can see an entity, we don't need to run calculations
@@ -217,40 +217,40 @@ std::pair<Vector, Vector> VischeckWall(CachedEntity *player, CachedEntity *targe
 
     for (uint8 i = 0; i < 8; ++i) // for loop for all 4 directions
     {
-        // 40 * maxiterations = range in HU
-        for (int j = 0; j < maxiterations; ++j)
+        // 40 * max_iterations = range in HU
+        for (int j = 0; j < max_iterations; ++j)
         {
             Vector virtualOrigin = origin;
             // what direction to go in
             switch (i)
             {
             case 0:
-                virtualOrigin.x = virtualOrigin.x + 40 * (j + 1);
+                virtualOrigin.x += 40.0f * (j + 1.0f);
                 break;
             case 1:
-                virtualOrigin.x = virtualOrigin.x - 40 * (j + 1);
+                virtualOrigin.x -= 40.0f * (j + 1.0f);
                 break;
             case 2:
-                virtualOrigin.y = virtualOrigin.y + 40 * (j + 1);
+                virtualOrigin.y += 40.0f * (j + 1.0f);
                 break;
             case 3:
-                virtualOrigin.y = virtualOrigin.y - 40 * (j + 1);
+                virtualOrigin.y -= 40.0f * (j + 1.0f);
                 break;
             case 4:
-                virtualOrigin.x = virtualOrigin.x + 20 * (j + 1);
-                virtualOrigin.y = virtualOrigin.y + 20 * (j + 1);
+                virtualOrigin.x += 20.0f * (j + 1.0f);
+                virtualOrigin.y += 20.0f * (j + 1.0f);
                 break;
             case 5:
-                virtualOrigin.x = virtualOrigin.x - 20 * (j + 1);
-                virtualOrigin.y = virtualOrigin.y - 20 * (j + 1);
+                virtualOrigin.x -= 20.0f * (j + 1.0f);
+                virtualOrigin.y -= 20.0f * (j + 1.0f);
                 break;
             case 6:
-                virtualOrigin.x = virtualOrigin.x - 20 * (j + 1);
-                virtualOrigin.y = virtualOrigin.y + 20 * (j + 1);
+                virtualOrigin.x -= 20.0f * (j + 1.0f);
+                virtualOrigin.y += 20.0f * (j + 1.0f);
                 break;
             case 7:
-                virtualOrigin.x = virtualOrigin.x + 20 * (j + 1);
-                virtualOrigin.y = virtualOrigin.y - 20 * (j + 1);
+                virtualOrigin.x += 20.0f * (j + 1.0f);
+                virtualOrigin.y -= 20.0f * (j + 1.0f);
                 [[fallthrough]];
             default:
                 break;
@@ -260,40 +260,40 @@ std::pair<Vector, Vector> VischeckWall(CachedEntity *player, CachedEntity *targe
                 continue;
             for (uint8 i = 0; i < 8; ++i) // for loop for all 4 directions
             {
-                // 40 * maxiterations = range in HU
-                for (int j = 0; j < maxiterations; ++j)
+                // 40 * max_iterations = range in HU
+                for (int j = 0; j < max_iterations; ++j)
                 {
                     Vector virtualOrigin2 = target->m_vecOrigin();
                     // what direction to go in
                     switch (i)
                     {
                     case 0:
-                        virtualOrigin2.x = virtualOrigin2.x + 40 * (j + 1);
+                        virtualOrigin2.x += 40.0f * (j + 1.0f);
                         break;
                     case 1:
-                        virtualOrigin2.x = virtualOrigin2.x - 40 * (j + 1);
+                        virtualOrigin2.x -= 40.0f * (j + 1.0f);
                         break;
                     case 2:
-                        virtualOrigin2.y = virtualOrigin2.y + 40 * (j + 1);
+                        virtualOrigin2.y += 40.0f * (j + 1.0f);
                         break;
                     case 3:
-                        virtualOrigin2.y = virtualOrigin2.y - 40 * (j + 1);
+                        virtualOrigin2.y -= 40.0f * (j + 1.0f);
                         break;
                     case 4:
-                        virtualOrigin2.x = virtualOrigin2.x + 20 * (j + 1);
-                        virtualOrigin2.y = virtualOrigin2.y + 20 * (j + 1);
+                        virtualOrigin2.x += 20.0f * (j + 1.0f);
+                        virtualOrigin2.y += 20.0f * (j + 1.0f);
                         break;
                     case 5:
-                        virtualOrigin2.x = virtualOrigin2.x - 20 * (j + 1);
-                        virtualOrigin2.y = virtualOrigin2.y - 20 * (j + 1);
+                        virtualOrigin2.x -= 20.0f * (j + 1.0f);
+                        virtualOrigin2.y -= 20.0f * (j + 1.0f);
                         break;
                     case 6:
-                        virtualOrigin2.x = virtualOrigin2.x - 20 * (j + 1);
-                        virtualOrigin2.y = virtualOrigin2.y + 20 * (j + 1);
+                        virtualOrigin2.x -= 20.0f * (j + 1.0f);
+                        virtualOrigin2.y += 20.0f * (j + 1.0f);
                         break;
                     case 7:
-                        virtualOrigin2.x = virtualOrigin2.x + 20 * (j + 1);
-                        virtualOrigin2.y = virtualOrigin2.y - 20 * (j + 1);
+                        virtualOrigin2.x += 20.0f * (j + 1.0f);
+                        virtualOrigin2.y -= 20.0f * (j + 1.0f);
                         [[fallthrough]];
                     default:
                         break;
@@ -355,13 +355,13 @@ bool canReachVector(Vector loc, Vector dest)
     if (!dest.IsZero())
     {
         Vector dist       = dest - loc;
-        int maxiterations = floor(dest.DistTo(loc)) / 40;
-        for (int i = 0; i < maxiterations; ++i)
+        int max_iterations = static_cast<int>(floor(dest.DistTo(loc)) / 40.0f);
+        for (int i = 0; i < max_iterations; ++i)
         {
             // math to get the next vector 40.0f in the direction of dest
-            Vector vec = loc + dist / vectorMax(vectorAbs(dist)) * 40.0f * (i + 1);
+            Vector vec = loc + dist / vectorMax(vectorAbs(dist)) * 40.0f * (i + 1.0f);
 
-            if (DistanceToGround({ vec.x, vec.y, vec.z + 5 }) >= 40)
+            if (DistanceToGround({ vec.x, vec.y, vec.z + 5.0f }) >= 40.0f)
                 return false;
 
             for (uint8 j = 0; j < 4; ++j)
@@ -371,16 +371,16 @@ bool canReachVector(Vector loc, Vector dest)
                 switch (j)
                 {
                 case 0:
-                    directionalLoc.x = directionalLoc.x + 40;
+                    directionalLoc.x += 40.0f;
                     break;
                 case 1:
-                    directionalLoc.x = directionalLoc.x - 40;
+                    directionalLoc.x -= 40.0f;
                     break;
                 case 2:
-                    directionalLoc.y = directionalLoc.y + 40;
+                    directionalLoc.y += 40.0f;
                     break;
                 case 3:
-                    directionalLoc.y = directionalLoc.y - 40;
+                    directionalLoc.y -= 40.0f;
                     break;
                 }
                 trace_t trace;
@@ -402,10 +402,10 @@ bool canReachVector(Vector loc, Vector dest)
         // higher to avoid small false positives, player can jump 42 hu
         // according to
         // the tf2 wiki
-        if (DistanceToGround({ loc.x, loc.y, loc.z + 5 }) >= 40)
+        if (DistanceToGround({ loc.x, loc.y, loc.z + 5.0f }) >= 40.0f)
             return false;
 
-        // check if there is enough space arround the vector for a player to fit
+        // check if there is enough space around the vector for a player to fit
         // for loop for all 4 directions
         for (uint8 i = 0; i < 4; ++i)
         {
@@ -414,16 +414,16 @@ bool canReachVector(Vector loc, Vector dest)
             switch (i)
             {
             case 0:
-                directionalLoc.x = directionalLoc.x + 40;
+                directionalLoc.x += 40.0f;
                 break;
             case 1:
-                directionalLoc.x = directionalLoc.x - 40;
+                directionalLoc.x -= 40.0f;
                 break;
             case 2:
-                directionalLoc.y = directionalLoc.y + 40;
+                directionalLoc.y += 40.0f;
                 break;
             case 3:
-                directionalLoc.y = directionalLoc.y - 40;
+                directionalLoc.y -= 40.0f;
                 break;
             }
             trace_t trace;
@@ -465,12 +465,12 @@ std::string GetLevelName()
 
 std::pair<float, float> ComputeMovePrecise(const Vector &a, const Vector &b)
 {
-    Vector diff = (b - a);
-    if (diff.Length() == 0.0f)
-        return { 0, 0 };
+    Vector diff = b - a;
+    if (diff.IsZero())
+        return { 0.0f, 0.0f };
     const float x = diff.x;
     const float y = diff.y;
-    Vector vsilent(x, y, 0);
+    Vector vsilent(x, y, 0.0f);
     Vector ang;
     VectorAngles(vsilent, ang);
     float yaw = DEG2RAD(ang.y - current_user_cmd->viewangles.y);
@@ -482,12 +482,12 @@ std::pair<float, float> ComputeMovePrecise(const Vector &a, const Vector &b)
 
 Vector ComputeMove(const Vector &a, const Vector &b)
 {
-    Vector diff = (b - a);
-    if (diff.Length() == 0.0f)
+    Vector diff = b - a;
+    if (diff.IsZero())
         return Vector(0.0f);
     const float x = diff.x;
     const float y = diff.y;
-    Vector vsilent(x, y, 0);
+    Vector vsilent(x, y, 0.0f);
     Vector ang;
     VectorAngles(vsilent, ang);
     float yaw   = DEG2RAD(ang.y - current_user_cmd->viewangles.y);
@@ -610,9 +610,7 @@ void ReplaceSpecials(std::string &str)
             c += 5;
             // 2. Convert value to UTF-8
             if (val <= 0x7F)
-            {
                 str[i] = val;
-            }
             else if (val <= 0x7FF)
             {
                 str[i]     = 0xC0 | ((val >> 6) & 0x1F);
@@ -676,7 +674,7 @@ bool DidProjectileHit(Vector start_point, Vector end_point, CachedEntity *entity
         trace_obj = new trace_t;
     ray.Init(start_point, end_point, Vector(0, -projectile_size, -projectile_size), Vector(0, projectile_size, projectile_size));
     g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, trace_obj);
-    return ((IClientEntity *) trace_obj->m_pEnt == RAW_ENT(entity) || grav_comp && !trace_obj->DidHit());
+    return (IClientEntity *) trace_obj->m_pEnt == RAW_ENT(entity) || grav_comp && !trace_obj->DidHit();
 }
 
 // A function to find a weapon by WeaponID
@@ -838,27 +836,16 @@ void MatrixAngles(const matrix3x4_t &matrix, float *angles)
 
 void VectorAngles(Vector &forward, Vector &angles)
 {
-    float tmp, yaw, pitch;
-
     if (forward[1] == 0 && forward[0] == 0)
     {
-        yaw   = 0;
-        pitch = forward[2] >= 0 ? 270 : 90;
+        angles[0] = forward[2] >= 0 ? 270 : 90;
+        angles[1] = 0;
     }
     else
     {
-        yaw = atan2(forward[1], forward[0]) * 180 / PI;
-        if (yaw < 0)
-            yaw += 360;
-
-        tmp   = FastSqrt((SQR(forward[0]) + SQR(forward[1])));
-        pitch = atan2(-forward[2], tmp) * 180 / PI;
-        if (pitch < 0)
-            pitch += 360;
+        angles[1] = std::remainder(RAD2DEG(std::atan2(forward[1], forward[0])), 360.0f);
+        angles[0] = std::remainder(RAD2DEG(std::atan2(-forward[2], FastSqrt(SQR(forward[0]) + SQR(forward[1])))), 360.0f);
     }
-
-    angles[0] = pitch;
-    angles[1] = yaw;
     angles[2] = 0;
 }
 
@@ -879,15 +866,15 @@ void AngleVectors3(const QAngle &angles, Vector *forward, Vector *right, Vector 
 
     if (right)
     {
-        right->x = (-1 * sr * sp * cy + -1 * cr * -sy);
-        right->y = (-1 * sr * sp * sy + -1 * cr * cy);
-        right->z = -1 * sr * cp;
+        right->x = sr * sp * cy - cr * sy;
+        right->y = sr * sp * sy + cr * cy;
+        right->z = sr * cp;
     }
 
     if (up)
     {
-        up->x = (cr * sp * cy + -sr * -sy);
-        up->y = (cr * sp * sy + -sr * cy);
+        up->x = cr * sp * cy + sr * sy;
+        up->y = cr * sp * sy - sr * cy;
         up->z = cr * cp;
     }
 }
@@ -1042,7 +1029,7 @@ bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos, bool use_weapon_
         if (!*tcm || g_Settings.is_create_move)
             g_ITrace->TraceRay(ray, mask, &trace::filter_default, trace);
     }
-    return (((IClientEntity *) trace->m_pEnt) == RAW_ENT(entity) || (!hit && !trace->DidHit()));
+    return (IClientEntity *) trace->m_pEnt == RAW_ENT(entity) || !hit && !trace->DidHit();
 }
 
 // Get all the corners of a box. Taken from sauce engine.
@@ -1055,25 +1042,23 @@ void GenerateBoxVertices(const Vector &vOrigin, const QAngle &angles, const Vect
     Vector vecPos;
     for (uint8 i = 0; i < 8; ++i)
     {
-        vecPos[0] = (i & 0x1) ? vMaxs[0] : vMins[0];
-        vecPos[1] = (i & 0x2) ? vMaxs[1] : vMins[1];
-        vecPos[2] = (i & 0x4) ? vMaxs[2] : vMins[2];
+        vecPos[0] = i & 0x1 ? vMaxs[0] : vMins[0];
+        vecPos[1] = i & 0x2 ? vMaxs[1] : vMins[1];
+        vecPos[2] = i & 0x4 ? vMaxs[2] : vMins[2];
 
         VectorRotate(vecPos, fRotateMatrix, pVerts[i]);
         pVerts[i] += vOrigin;
     }
 }
 
-// For when you need to vis check something that isnt the local player
+// For when you need to vis check something that isn't the local player
 bool VisCheckEntFromEnt(CachedEntity *startEnt, CachedEntity *endEnt)
 {
-    // We setSelf as the starting ent as we dont want to hit it, we want the
-    // other ent
+    // We setSelf as the starting ent as we don't want to hit it, we want the other ent
     trace_t trace;
     trace::filter_default.SetSelf(RAW_ENT(startEnt));
 
-    // Setup the trace starting with the origin of the starting ent attemting to
-    // hit the origin of the end ent
+    // Set up the trace starting with the origin of the starting ent attempting to hit the origin of the end ent
     Ray_t ray;
     ray.Init(startEnt->m_vecOrigin(), endEnt->m_vecOrigin());
     {
@@ -1081,24 +1066,22 @@ bool VisCheckEntFromEnt(CachedEntity *startEnt, CachedEntity *endEnt)
         g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, &trace);
     }
     // Is the entity that we hit our target ent? if so, the vis check passes
-    if (trace.m_pEnt && (((IClientEntity *) trace.m_pEnt)) == RAW_ENT(endEnt))
+    if (trace.m_pEnt && (IClientEntity *) trace.m_pEnt == RAW_ENT(endEnt))
         return true;
 
     // Since we didn't hit our target ent, the vis check failed so return false
     return false;
 }
 
-// Use when you need to vis check something but its not the ent origin that you
+// Use when you need to vis check something, but it's not the ent origin that you
 // use, so we check from the vector to the ent, ignoring the first just in case
 bool VisCheckEntFromEntVector(Vector startVector, CachedEntity *startEnt, CachedEntity *endEnt)
 {
-    // We setSelf as the starting ent as we dont want to hit it, we want the
-    // other ent
+    // We setSelf as the starting ent as we don't want to hit it, we want the other ent
     trace_t trace;
     trace::filter_default.SetSelf(RAW_ENT(startEnt));
 
-    // Setup the trace starting with the origin of the starting ent attemting to
-    // hit the origin of the end ent
+    // Set up the trace starting with the origin of the starting ent attempting to hit the origin of the end ent
     Ray_t ray;
     ray.Init(startVector, endEnt->m_vecOrigin());
     {
@@ -1106,7 +1089,7 @@ bool VisCheckEntFromEntVector(Vector startVector, CachedEntity *startEnt, Cached
         g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, &trace);
     }
     // Is the entity that we hit our target ent? if so, the vis check passes
-    if (trace.m_pEnt && (((IClientEntity *) trace.m_pEnt)) == RAW_ENT(endEnt))
+    if (trace.m_pEnt && (IClientEntity *) trace.m_pEnt == RAW_ENT(endEnt))
         return true;
 
     // Since we didn't hit our target ent, the vis check failed so return false
@@ -1132,9 +1115,8 @@ void fClampAngle(Vector &qaAng)
 {
     qaAng[0] = fmod(qaAng[0] + 89.0f, 180.0f) - 89.0f;
     qaAng[1] = fmod(qaAng[1] + 180.0f, 360.0f) - 180.0f;
-    qaAng.z = 0.0f;
+    qaAng.z  = 0.0f;
 }
-
 
 bool IsProjectileCrit(CachedEntity *ent)
 {
@@ -1201,7 +1183,7 @@ weaponmode GetWeaponMode(CachedEntity *ent)
         // logging::Info("IDX_BAD: %i", weapon_idx);
         return weaponmode::weapon_invalid;
     }
-    weapon = (ENTITY(weapon_idx));
+    weapon = ENTITY(weapon_idx);
     if (CE_BAD(weapon))
         return weaponmode::weapon_invalid;
     int classid = weapon->m_iClassID();
@@ -1336,8 +1318,8 @@ bool GetProjectileData(CachedEntity *weapon, float &speed, float &gravity, float
             else
                 chargetime += TICKS_TO_TIME(1);
         }
-        rspeed = RemapValClamped(chargetime, 0.0f, 1.f, 1800, 2600);
-        rgrav  = RemapValClamped(chargetime, 0.0f, 1.f, 0.5, 0.1);
+        rspeed = RemapValClamped(chargetime, 0.0f, 1.0f, 1800.0f, 2600.0f);
+        rgrav  = RemapValClamped(chargetime, 0.0f, 1.0f, 0.5f, 0.1f);
         break;
     }
     case CL_CLASS(CTFBat_Giftwrap):
@@ -1429,8 +1411,8 @@ bool IsVectorVisibleNavigation(Vector origin, Vector target, unsigned int mask)
 
 void WhatIAmLookingAt(int *result_eindex, Vector *result_pos)
 {
-    static QAngle prev_angle   = QAngle(0, 0, 0);
-    static Vector prev_forward = Vector(0, 0, 0);
+    static QAngle prev_angle   = QAngle(0.0f, 0.0f, 0.0f);
+    static Vector prev_forward = Vector(0.0f, 0.0f, 0.0f);
 
     // Check if the player's view direction has changed since the last call to this function.
     QAngle angle;
@@ -1439,8 +1421,8 @@ void WhatIAmLookingAt(int *result_eindex, Vector *result_pos)
     prev_angle         = angle;
 
     // Compute the forward vector if the angle has changed or if it has not been computed before.
-    static Vector forward = Vector(0, 0, 0);
-    if (angle_changed || prev_forward == Vector(0, 0, 0))
+    static auto forward = Vector(0.0f);
+    if (angle_changed || prev_forward == Vector(0.0f))
     {
         float sp, sy, cp, cy;
         sincosf(DEG2RAD(angle[0]), &sp, &cp);
@@ -1453,7 +1435,7 @@ void WhatIAmLookingAt(int *result_eindex, Vector *result_pos)
 
     // Perform the raycast if the angle has changed or if the forward vector has not been computed before.
     static trace_t trace;
-    if (angle_changed || prev_forward == Vector(0, 0, 0))
+    if (angle_changed || prev_forward == Vector(0.0f))
     {
         Vector endpos = g_pLocalPlayer->v_Eye + forward * 8192.0f;
         Ray_t ray;
@@ -1476,7 +1458,7 @@ Vector GetForwardVector(Vector origin, Vector viewangles, float distance, Cached
     float sp, sy, cp, cy;
     QAngle angle = VectorToQAngle(viewangles);
     // Compensate for punch angle
-    if (punch_entity && *should_correct_punch)
+    if (*should_correct_punch && punch_entity)
         angle -= VectorToQAngle(CE_VECTOR(punch_entity, netvar.vecPunchAngle));
 
     sincosf(DEG2RAD(angle[1]), &sy, &cy);
@@ -1543,31 +1525,23 @@ bool IsPlayerResistantToCurrentWeapon(CachedEntity *player)
     case CL_CLASS(CTFParticleCannon):
     case CL_CLASS(CTFGrenadeLauncher):
     case CL_CLASS(CTFPipebombLauncher):
-        if (HasCondition<TFCond_UberBlastResist>(player))
-            return true;
-        break;
+        return HasCondition<TFCond_UberBlastResist>(player);
     case CL_CLASS(CTFCompoundBow):
     case CL_CLASS(CTFSyringeGun):
     case CL_CLASS(CTFCrossbow):
     case CL_CLASS(CTFShotgunBuildingRescue):
     case CL_CLASS(CTFDRGPomson):
     case CL_CLASS(CTFRaygun):
-        if (HasCondition<TFCond_UberBulletResist>(player))
-            return true;
-        break;
+        return HasCondition<TFCond_UberBulletResist>(player);
     case CL_CLASS(CTFWeaponFlameBall):
     case CL_CLASS(CTFFlareGun):
     case CL_CLASS(CTFFlareGun_Revenge):
     case CL_CLASS(CTFFlameRocket):
     case CL_CLASS(CTFFlameThrower):
-        if (HasCondition<TFCond_UberFireResist>(player))
-            return true;
-        break;
+        return HasCondition<TFCond_UberFireResist>(player);
     default:
-        if (g_pLocalPlayer->weapon_mode == weaponmode::weapon_hitscan && HasCondition<TFCond_UberBulletResist>(player))
-            return true;
+        return GetWeaponMode() == weaponmode::weapon_hitscan && HasCondition<TFCond_UberBulletResist>(player);
     }
-    return false;
 }
 
 Vector CalcAngle(Vector src, Vector dst)
@@ -1835,7 +1809,7 @@ Vector getShootPos(Vector angle)
         break;
     case CL_CLASS(CTFLunchBox):
         vecOffset = Vector(0.0f, 0.0f, -8.0f);
-        break;
+        [[fallthrough]];
     default:
         break;
     }
@@ -1847,7 +1821,7 @@ Vector getShootPos(Vector angle)
         // Game checks 2000 HU infront of eye for a hit
         static const float distance = 2000.0f;
 
-        Vector endpos = eye + (forward * distance);
+        Vector endpos = eye + forward * distance;
 
         trace_t tr;
         Ray_t ray;
@@ -1858,12 +1832,12 @@ Vector getShootPos(Vector angle)
             g_ITrace->TraceRay(ray, MASK_SOLID, &trace::filter_default, &tr);
 
         // Replicate game behaviour, only use the offset if our trace has a big enough fraction
-        if (tr.fraction <= 0.1)
+        if (tr.fraction <= 0.1f)
         {
             // Flipped viewmodels flip the y
             if (re::C_TFWeaponBase::IsViewModelFlipped(RAW_ENT(LOCAL_W)))
                 vecOffset->y *= -1.0f;
-            eye = eye + (forward * vecOffset->x) + (right * vecOffset->y) + (up * vecOffset->z);
+            eye = eye + forward * vecOffset->x + right * vecOffset->y + up * vecOffset->z;
             // They decided to do this weird stuff for the pomson instead of fixing their offset
             if (LOCAL_W->m_iClassID() == CL_CLASS(CTFDRGPomson))
                 eye.z -= 13.0f;
@@ -1997,6 +1971,7 @@ bool isTruce()
 {
     return is_truce_active;
 }
+
 void setTruce(bool status)
 {
     is_truce_active = status;

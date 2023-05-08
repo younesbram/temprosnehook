@@ -34,7 +34,7 @@ static InitRoutine init(
                         if (!ent->hitboxes.GetHitbox(0))
                             continue;
                         // Calculate draw pos
-                        auto c        = ent->InternalEntity()->GetCollideable();
+                        auto c        = RAW_ENT(ent)->GetCollideable();
                         auto draw_pos = ent->m_vecDormantOrigin();
                         if (!draw_pos)
                             continue;

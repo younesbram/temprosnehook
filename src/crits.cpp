@@ -1084,7 +1084,7 @@ void observedcritchance_nethook(const CRecvProxyData *data, void *pWeapon, void 
     *fl_observed_crit_chance     = data->m_Value.m_Float;
     if (CE_BAD(LOCAL_W) || !enabled)
         return;
-    if (pWeapon != LOCAL_W->InternalEntity())
+    if (pWeapon != RAW_ENT(LOCAL_W))
         return;
 
     float sent_chance = data->m_Value.m_Float;

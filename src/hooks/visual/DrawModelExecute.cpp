@@ -647,7 +647,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                     original_color.a = g_IVRenderView->GetBlend();
 
                     // Setup according to user settings using the ChamColors struct
-                    auto colors         = GetChamColors(LOCAL_E->InternalEntity(), false);
+                    auto colors         = GetChamColors(RAW_ENT(LOCAL_E), false);
                     colors.rgba_overlay = LOCAL_E->m_iTeam() == TEAM_RED ? *chams_overlay_color_red : LOCAL_E->m_iTeam() == TEAM_BLU ? *chams_overlay_color_blu : colors::white;
                     if (!arms_chams_team_color)
                     {
@@ -692,7 +692,7 @@ DEFINE_HOOKED_METHOD(DrawModelExecute, void, IVModelRender *this_, const DrawMod
                 g_IVRenderView->GetColorModulation(original_color);
                 original_color.a = g_IVRenderView->GetBlend();
 
-                auto colors           = GetChamColors(LOCAL_E->InternalEntity(), false);
+                auto colors           = GetChamColors(RAW_ENT(LOCAL_E), false);
                 IClientEntity *entity = g_IEntityList->GetClientEntity(info.entity_index);
 
                 // Setup according to user settings using the ChamColors struct

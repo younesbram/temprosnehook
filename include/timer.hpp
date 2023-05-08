@@ -5,23 +5,23 @@
  *      Author: nullifiedcat
  */
 
-#ifndef CH_TIMER_HPP
-#define CH_TIMER_HPP
+#pragma once
+
 #include <chrono>
 
 class Timer
 {
 public:
-    typedef std::chrono::system_clock clock;
-    std::chrono::time_point<clock> last{};
+    std::chrono::time_point<std::chrono::system_clock> last{};
 
-    inline Timer() = default;
+    constexpr Timer() noexcept = default;
 
-    inline bool check(unsigned ms) const
+    inline bool check(unsigned int ms) const noexcept
     {
-        return std::chrono::duration_cast<std::chrono::milliseconds>(clock::now() - last).count() >= ms;
+        return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - last).count() >= ms;
     }
-    inline bool test_and_set(unsigned ms)
+
+    bool test_and_set(unsigned int ms) noexcept
     {
         if (check(ms))
         {
@@ -30,9 +30,9 @@ public:
         }
         return false;
     }
-    inline void update()
+
+    inline void update() noexcept
     {
-        last = clock::now();
+        last = std::chrono::system_clock::now();
     }
 };
-#endif

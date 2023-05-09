@@ -860,7 +860,7 @@ void update()
                     logging::Info("Abandoning because there are %d local players "
                                   "in game, and abandon_if_ipc_bots_gte is %d.",
                                   count_ipc, int(abandon_if_ipc_bots_gte));
-                    tfmm::abandon();
+                    tfmm::Abandon();
                     return;
                 }
                 else
@@ -897,7 +897,7 @@ void update()
                 logging::Info("Abandoning because there are %d non-bots in "
                               "game, and abandon_if_humans_lte is %d.",
                               count_total - count_ipc, int(abandon_if_humans_lte));
-                tfmm::abandon();
+                tfmm::Abandon();
                 return;
             }
         }
@@ -908,7 +908,7 @@ void update()
                 logging::Info("Abandoning because there are %d total players "
                               "in game, and abandon_if_players_lte is %d.",
                               count_total, int(abandon_if_players_lte));
-                tfmm::abandon();
+                tfmm::Abandon();
                 return;
             }
         }

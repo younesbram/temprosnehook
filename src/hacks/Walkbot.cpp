@@ -1165,7 +1165,7 @@ static void cm()
                     if (leave_if_empty && nodes.empty() && quit_timer.test_and_set(5000))
                     {
                         logging::Info("No map file, abandon");
-                        tfmm::abandon();
+                        tfmm::Abandon();
                         return;
                     }
                 }

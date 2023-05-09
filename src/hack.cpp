@@ -143,7 +143,7 @@ static void InitRandom()
         rand_seed        = static_cast<unsigned int>(nanoseconds ^ nanoseconds & getpid());
     }
 
-    // Initialize random number generator
+    // Seed random number generator
     srand(rand_seed);
 #endif
 }

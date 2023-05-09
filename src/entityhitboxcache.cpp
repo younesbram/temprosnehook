@@ -150,7 +150,7 @@ matrix3x4_t *EntityHitboxCache::GetBones(int numbones)
 
 CachedHitbox *EntityHitboxCache::GetHitbox(int id)
 {
-    if ((m_CacheValidationFlags >> id) & 1)
+    if (m_CacheValidationFlags >> id & 1)
         return &m_CacheInternal[id];
     mstudiobbox_t *box;
 

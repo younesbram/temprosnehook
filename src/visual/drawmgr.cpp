@@ -24,7 +24,7 @@
 static settings::Boolean info_text{ "hack-info.enable", "true" };
 static settings::Boolean info_text_min{ "hack-info.minimal", "false" };
 
-void render_cheat_visuals()
+void RenderCheatVisuals()
 {
     {
         PROF_SECTION(BeginCheatVisuals)
@@ -63,12 +63,12 @@ void DrawCheatVisuals()
         PROF_SECTION(DRAW_info)
         std::string name_s, reason_s;
         PROF_SECTION(PT_info_text)
-        if (info_text)
+        if (*info_text)
         {
             auto color = colors::RainbowCurrent();
             color.a    = 1.0f;
             AddSideString("cathook by nullworks", color);
-            if (!info_text_min)
+            if (!*info_text_min)
             {
                 AddSideString(hack::GetVersion(), colors::gui); // GitHub commit and date
                 AddSideString(hack::GetType(), colors::gui);    // Compile type

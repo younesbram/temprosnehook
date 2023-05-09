@@ -145,7 +145,7 @@ std::string GetNamestealName(CSteamID steam_id)
 
     if ((*force_name).size() > 1)
     {
-        auto new_name = force_name.toString();
+        auto new_name = *force_name;
         ReplaceSpecials(new_name);
 
         return new_name;

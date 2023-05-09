@@ -21,6 +21,7 @@ bool re::CTFPartyClient::BInQueue(re::CTFPartyClient *this_)
 {
     return *(uint8_t *) ((uint8_t *) this_ + 69);
 }
+
 int re::CTFPartyClient::GetNumOnlineMembers()
 {
     typedef int (*GetNumOnlineMembers_t)(re::CTFPartyClient *);
@@ -29,6 +30,7 @@ int re::CTFPartyClient::GetNumOnlineMembers()
 
     return GetNumOnlineMembers_fn(this);
 }
+
 int re::CTFPartyClient::GetNumMembers()
 {
     typedef int (*GetNumMembers_t)(re::CTFPartyClient *);
@@ -37,6 +39,7 @@ int re::CTFPartyClient::GetNumMembers()
 
     return GetNumMembers_fn(this);
 }
+
 void re::CTFPartyClient::SendPartyChat(const char *message)
 {
     typedef void (*SendPartyChat_t)(re::CTFPartyClient *, const char *);
@@ -49,8 +52,7 @@ void re::CTFPartyClient::SendPartyChat(const char *message)
 bool re::CTFPartyClient::BCanQueueForStandby(re::CTFPartyClient *this_)
 {
     typedef bool (*BCanQueueForStandby_t)(re::CTFPartyClient *);
-    static uintptr_t addr              = CSignature::GetClientSignature("55 89 E5 53 83 EC 24 8B 5D 08 80 7B 46 00 75 40 8B 4B 38 85 C9 74 39 "
-                                                                                     "E8 ? ? ? ? 89 04 24 E8 ? ? ? ? 84 C0 75 28");
+    static uintptr_t addr              = CSignature::GetClientSignature("55 89 E5 53 83 EC 24 8B 5D 08 80 7B 46 00 75 40 8B 4B 38 85 C9 74 39 E8 ? ? ? ? 89 04 24 E8 ? ? ? ? 84 C0 75 28");
     static auto BCanQueueForStandby_fn = BCanQueueForStandby_t(addr);
 
     return BCanQueueForStandby_fn(this_);
@@ -68,13 +70,12 @@ re::ITFGroupMatchCriteria *re::CTFPartyClient::MutLocalGroupCriteria(re::CTFPart
 int re::CTFPartyClient::LoadSavedCasualCriteria()
 {
     typedef int (*LoadSavedCasualCriteria_t)(re::CTFPartyClient *);
-    static uintptr_t addr = CSignature::GetClientSignature("55 89 E5 8B 45 ? 5D 8B 80 ? ? ? ? C3 66 90 55 89 E5 "
-                                                           "8B 45 ? 5D 0F B6 80 ? ? ? ? C3 90 55 89 E5 56") -
-                            0x40;
+    static uintptr_t addr                  = CSignature::GetClientSignature("55 89 E5 8B 45 ? 5D 8B 80 ? ? ? ? C3 66 90 55 89 E5 8B 45 ? 5D 0F B6 80 ? ? ? ? C3 90 55 89 E5 56") - 0x40;
     static auto LoadSavedCasualCriteria_fn = LoadSavedCasualCriteria_t(addr);
 
     return LoadSavedCasualCriteria_fn(this);
 }
+
 void re::CTFPartyClient::RequestQueueForStandby()
 {
     typedef void (*RequestStandby_t)(re::CTFPartyClient *);
@@ -82,6 +83,7 @@ void re::CTFPartyClient::RequestQueueForStandby()
     static auto RequestStandby_fn = RequestStandby_t(addr);
     RequestStandby_fn(this);
 }
+
 char re::CTFPartyClient::RequestQueueForMatch(int type)
 {
     typedef char (*RequestQueueForMatch_t)(re::CTFPartyClient *, int);
@@ -90,6 +92,7 @@ char re::CTFPartyClient::RequestQueueForMatch(int type)
 
     return RequestQueueForMatch_fn(this, type);
 }
+
 bool re::CTFPartyClient::BInQueueForMatchGroup(int type)
 {
     typedef bool (*BInQueueForMatchGroup_t)(re::CTFPartyClient *, int);
@@ -98,10 +101,12 @@ bool re::CTFPartyClient::BInQueueForMatchGroup(int type)
 
     return BInQueueForMatchGroup_fn(this, type);
 }
+
 bool re::CTFPartyClient::BInQueueForStandby()
 {
     return *((unsigned char *) this + 84);
 }
+
 char re::CTFPartyClient::RequestLeaveForMatch(int type)
 {
     typedef char (*RequestLeaveForMatch_t)(re::CTFPartyClient *, int);
@@ -110,14 +115,15 @@ char re::CTFPartyClient::RequestLeaveForMatch(int type)
 
     return RequestLeaveForMatch_fn(this, type);
 }
+
 int re::CTFPartyClient::BInvitePlayerToParty(CSteamID steamid)
 {
     typedef int (*BInvitePlayerToParty_t)(re::CTFPartyClient *, CSteamID, bool);
-    static uintptr_t addr               = CSignature::GetClientSignature("55 89 E5 57 56 53 81 EC ? ? ? ? 8B 45 ? 8B 5D ? 8B 55 ? 89 85"
-                                                                                       "65 A1 ? ? ? ? 89 45 ? 31 C0 8B 45");
+    static uintptr_t addr               = CSignature::GetClientSignature("55 89 E5 57 56 53 81 EC ? ? ? ? 8B 45 ? 8B 5D ? 8B 55 ? 89 85 65 A1 ? ? ? ? 89 45 ? 31 C0 8B 45");
     static auto BInvitePlayerToParty_fn = BInvitePlayerToParty_t(addr);
     return BInvitePlayerToParty_fn(this, steamid, false);
 }
+
 int re::CTFPartyClient::BRequestJoinPlayer(CSteamID steamid)
 {
     typedef int (*BRequestJoinPlayer_t)(re::CTFPartyClient *, CSteamID, bool);
@@ -125,6 +131,7 @@ int re::CTFPartyClient::BRequestJoinPlayer(CSteamID steamid)
     static auto BRequestJoinPlayer_fn = BRequestJoinPlayer_t(addr);
     return BRequestJoinPlayer_fn(this, steamid, false);
 }
+
 int re::CTFPartyClient::PromotePlayerToLeader(CSteamID steamid)
 {
     typedef int (*PromotePlayerToLeader_t)(re::CTFPartyClient *, CSteamID);
@@ -133,13 +140,14 @@ int re::CTFPartyClient::PromotePlayerToLeader(CSteamID steamid)
 
     return PromotePlayerToLeader_fn(this, steamid);
 }
-std::vector<unsigned> re::CTFPartyClient::GetPartySteamIDs()
+
+std::vector<unsigned int> re::CTFPartyClient::GetPartySteamIDs()
 {
     typedef bool (*SteamIDOfSlot_t)(int slot, CSteamID *our);
     static uintptr_t addr        = CSignature::GetClientSignature("55 89 E5 56 53 31 DB 83 EC ? 8B 75 ? E8");
     static auto SteamIDOfSlot_fn = SteamIDOfSlot_t(addr);
-    std::vector<unsigned> party_members;
-    for (int i = 0; i < GetNumMembers(); i++)
+    std::vector<unsigned int> party_members;
+    for (int i = 0; i < GetNumMembers(); ++i)
     {
         CSteamID out;
         SteamIDOfSlot_fn(i, &out);
@@ -157,6 +165,7 @@ int re::CTFPartyClient::KickPlayer(CSteamID steamid)
 
     return KickPlayer_fn(this, steamid);
 }
+
 bool re::CTFPartyClient::GetCurrentPartyLeader(CSteamID &id)
 {
     uintptr_t party = *reinterpret_cast<uintptr_t *>(reinterpret_cast<uintptr_t>(this) + 0x18);
@@ -166,6 +175,7 @@ bool re::CTFPartyClient::GetCurrentPartyLeader(CSteamID &id)
     id = *reinterpret_cast<CSteamID *>(party + 0x1C);
     return true;
 }
+
 re::ITFMatchGroupDescription *re::GetMatchGroupDescription(int &idx)
 {
     typedef re::ITFMatchGroupDescription *(*GetMatchGroupDescription_t)(int &);

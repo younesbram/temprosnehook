@@ -13,7 +13,9 @@
 #include "drawmgr.hpp"
 #endif
 extern settings::Boolean die_if_vac;
-static Timer checkmmban{};
+#if !ENABLE_VISUALS
+static Timer check_mm_ban{};
+#endif
 namespace hooked_methods
 {
 DEFINE_HOOKED_METHOD(Paint, void, IEngineVGui *this_, PaintMode_t mode)
@@ -44,20 +46,16 @@ DEFINE_HOOKED_METHOD(Paint, void, IEngineVGui *this_, PaintMode_t mode)
         hitrate::Update();
 #if ENABLE_IPC
         static Timer nametimer{};
-        if (nametimer.test_and_set(1000 * 10))
-            if (ipc::peer)
-                ipc::StoreClientData();
+        if (nametimer.test_and_set(10000) && ipc::peer)
+            ipc::StoreClientData();
 
         static Timer ipc_timer{};
-        if (ipc_timer.test_and_set(1000))
+        if (ipc_timer.test_and_set(1000) && ipc::peer)
         {
-            if (ipc::peer)
-            {
-                if (ipc::peer->HasCommands())
-                    ipc::peer->ProcessCommands();
-                ipc::Heartbeat();
-                ipc::UpdateTemporaryData();
-            }
+            if (ipc::peer->HasCommands())
+                ipc::peer->ProcessCommands();
+            ipc::Heartbeat();
+            ipc::UpdateTemporaryData();
         }
 #endif
         if (!hack::command_stack().empty())
@@ -68,11 +66,8 @@ DEFINE_HOOKED_METHOD(Paint, void, IEngineVGui *this_, PaintMode_t mode)
             hack::command_stack().pop();
         }
 #if !ENABLE_VISUALS
-        if (*die_if_vac && checkmmban.test_and_set(1000))
-        {
-            if (tfmm::isMMBanned())
-                *(int *) 0 = 0;
-        }
+        if (*die_if_vac && check_mm_ban.test_and_set(1000) && tfmm::IsMMBanned())
+            *(int *) 0 = 0;
 #endif
 
 #if ENABLE_TEXTMODE_STDIN
@@ -86,7 +81,7 @@ DEFINE_HOOKED_METHOD(Paint, void, IEngineVGui *this_, PaintMode_t mode)
 #endif
         // MOVED BACK because glez and imgui flicker in painttraveerse
 #if ENABLE_IMGUI_DRAWING || ENABLE_GLEZ_DRAWING
-        render_cheat_visuals();
+        RenderCheatVisuals();
 #endif
         // Call all paint functions
         EC::run(EC::Paint);

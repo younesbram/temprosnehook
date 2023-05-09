@@ -83,7 +83,7 @@ int GetScoreForEntity(CachedEntity *entity)
 
         if (distance != 0)
         {
-            int distance_factor = 4096 / distance * 4;
+            int distance_factor = static_cast<int>(4096.0f / distance * 4.0f);
             total += distance_factor;
             if (health != 0)
             {
@@ -97,8 +97,8 @@ int GetScoreForEntity(CachedEntity *entity)
 
     if (total > 99)
         total = 99;
-    auto playerState = playerlist::AccessData(entity->player_info->friendsID).state;
-    if (playerState == playerlist::k_EState::ABUSE || playerState == playerlist::k_EState::PAZER || playerState == playerlist::k_EState::RAGE)
+    auto player_state = entity->player_info ? playerlist::AccessData(entity->player_info->friendsID).state : playerlist::k_EState::DEFAULT;
+    if (player_state == playerlist::k_EState::ABUSE || player_state == playerlist::k_EState::PAZER || player_state == playerlist::k_EState::RAGE)
         total = 999;
     if (!*hacks::aimbot::aim_sentrybuster && IsSentryBuster(entity))
         total = 0;

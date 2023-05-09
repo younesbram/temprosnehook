@@ -148,7 +148,7 @@ void dispatchUserMessage(bf_read &buffer, int type)
     {
         logging::Info("Vote passed");
         // if (was_local_player && requeue)
-        //    tfmm::startQueue();
+        //    tfmm::StartQueue();
         break;
     }
     case 48:

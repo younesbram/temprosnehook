@@ -10,8 +10,8 @@
 #include "timer.hpp"
 namespace hacks::autojoin
 {
-void updateSearch();
-void onShutdown();
+void UpdateSearch();
+void OnShutdown();
 #if !ENABLE_VISUALS
 extern Timer queue_time;
 #endif

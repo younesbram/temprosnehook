@@ -9,11 +9,11 @@
 
 namespace tfmm
 {
-void startQueue();
-void startQueueStandby();
-void leaveQueue();
-void disconnectAndAbandon();
-void abandon();
-bool isMMBanned();
-int getQueue();
+void StartQueue();
+void StartQueueStandby();
+void LeaveQueue();
+void DisconnectAndAbandon();
+void Abandon();
+bool IsMMBanned();
+int GetQueue();
 } // namespace tfmm

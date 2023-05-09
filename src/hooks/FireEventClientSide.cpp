@@ -27,7 +27,7 @@ static bool spam_blocked = true;
 
 DEFINE_HOOKED_METHOD(FireEventClientSide, bool, IGameEventManager2 *this_, IGameEvent *event)
 {
-    if (enable_antispam && strcmp(event->GetName(), "party_chat") == 0)
+    if (*enable_antispam && strcmp(event->GetName(), "party_chat") == 0)
     {
         // Increase total count
         spam_messages_since_reset++;
@@ -45,7 +45,7 @@ DEFINE_HOOKED_METHOD(FireEventClientSide, bool, IGameEventManager2 *this_, IGame
             if (spam_timer.test_and_set(10000))
             {
                 spam_messages_since_reset = 0;
-                // Need to readd 1 to the timer since the current message counts towards the next "epoch"
+                // Need to re-add 1 to the timer since the current message counts towards the next "epoch"
                 spam_messages_since_reset++;
                 spam_blocked = false;
             }
@@ -53,11 +53,11 @@ DEFINE_HOOKED_METHOD(FireEventClientSide, bool, IGameEventManager2 *this_, IGame
                 // Void messages to avoid crash
                 return true;
         }
-        // We havent reached the limit yet. Reset the limit if last reset is 5 seconds in the past
+        // We haven't reached the limit yet. Reset the limit if last reset is 5 seconds in the past
         else if (spam_timer.test_and_set(5000))
         {
             spam_messages_since_reset = 0;
-            // Need to readd 1 to the timer since the current message counts towards the next "epoch"
+            // Need to re-add 1 to the timer since the current message counts towards the next "epoch"
             spam_messages_since_reset++;
         }
     }

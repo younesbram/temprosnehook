@@ -467,7 +467,7 @@ Vector last_destination;
 bool isReady()
 {
     // F you Pipeline
-    return *enabled && map && map->state == NavState::Active && (*path_during_setup || GetLevelName() == "plr_pipeline" || g_pGameRules->roundmode > 3 && (g_pTeamRoundTimer->GetRoundState() != RT_STATE_SETUP || g_pLocalPlayer->team != TEAM_BLU));
+    return *enabled && map && map->state == NavState::Active && (*path_during_setup || GetLevelName() == "plr_pipeline" || g_pGameRules->m_iRoundState > 3 && (g_pTeamRoundTimer->GetRoundState() != RT_STATE_SETUP || g_pLocalPlayer->team != TEAM_BLU));
 }
 
 bool isPathing()

@@ -7,7 +7,7 @@ static settings::Boolean enabled("spellforce.enabled", "false");
 
 bool isEnabled()
 {
-    return *enabled && g_pGameRules->halloweenScenario != 0;
+    return *enabled && g_pGameRules->m_halloweenScenario != 0;
 }
 
 static settings::Int default_spell("spellforce.default_spell", "-1");
@@ -47,7 +47,7 @@ spelltypes getSpellMode()
     if (HasCondition<TFCond_HalloweenKart>(LOCAL_E))
         return BUMPER_CARS;
 
-    int scenario = g_pGameRules->halloweenScenario;
+    int scenario = g_pGameRules->m_halloweenScenario;
     switch (scenario)
     {
     case HALLOWEEN_SCENARIO_DOOMSDAY:
@@ -157,7 +157,7 @@ CachedEntity *getClosestSpell()
 
 static void CreateMoveLate()
 {
-    if (!isEnabled() || !g_pGameRules->isUsingSpells_fn())
+    if (!isEnabled() || !g_pGameRules->IsUsingSpells())
         return;
     int cmd;
 

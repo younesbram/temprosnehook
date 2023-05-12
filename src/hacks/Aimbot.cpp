@@ -137,23 +137,14 @@ inline float EffectiveTargetingRange()
         return 310.0f; // Pyros only have so much until their flames hit
     case CL_CLASS(CTFWeaponFlameBall):
         return 512.0f; // Dragons Fury is fast but short range
+    default:
+        return *max_range;
     }
-    return *max_range;
 }
 
 inline bool IsHitboxMedium(int hitbox)
 {
-    switch (hitbox)
-    {
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-        return true;
-    default:
-        return false;
-    }
+    return hitbox >= 1 && hitbox <= 5;
 }
 
 inline bool PlayerTeamCheck(CachedEntity *entity)
@@ -170,7 +161,8 @@ inline bool CarryingHeatmaker()
 // Am I holding the Machina ?
 inline bool CarryingMachina()
 {
-    return CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 526 || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 30665;
+    int item_definition_index = CE_INT(LOCAL_W, netvar.iItemDefinitionIndex);
+    return item_definition_index == 526 || item_definition_index == 30665;
 }
 
 // A function to find the best hitbox for a target
@@ -185,8 +177,6 @@ inline int BestHitbox(CachedEntity *target)
         return ClosestHitbox(target);
     case 2: // STATIC priority, return a user chosen hitbox
         return *hitbox;
-    default:
-        break;
     }
     // Hitbox machine :b:roke
     return -1;
@@ -229,7 +219,7 @@ inline void UpdateShouldBacktrack()
 
 inline bool ShouldBacktrack(CachedEntity *ent)
 {
-    if (!shouldbacktrack_cache || (ent && ent->m_Type() != ENTITY_PLAYER) || !backtrack::getGoodTicks(ent))
+    if (!shouldbacktrack_cache || ent && ent->m_Type() != ENTITY_PLAYER || !backtrack::getGoodTicks(ent))
         return false;
     return true;
 }

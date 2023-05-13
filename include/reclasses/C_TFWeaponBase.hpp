@@ -175,13 +175,10 @@ public:
                         // *(char *)(self + 2838) = 1;
                         return 1;
                     }
+                    else if (AreRandomCritsEnabled(self))
+                        return CalcIsAttackCriticalHelper(self);
                     else
-                    {
-                        if (AreRandomCritsEnabled(self))
-                            return CalcIsAttackCriticalHelper(self);
-                        else
-                            return CalcIsAttackCriticalHelperNoCrits(self);
-                    }
+                        return CalcIsAttackCriticalHelperNoCrits(self);
                 }
             }
         }

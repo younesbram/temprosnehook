@@ -255,8 +255,6 @@ template <typename... Args> std::string format(const Args &...args)
 }
 
 extern const char *powerups[POWERUP_COUNT];
-bool isTruce();
-void setTruce(bool status);
 int GetPlayerForUserID(int userID);
 
 inline bool GetPlayerInfo(int idx, player_info_s *info)

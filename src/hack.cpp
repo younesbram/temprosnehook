@@ -323,8 +323,10 @@ free(logname);*/
     logging::Info("Early Initializer stack done");
     sharedobj::LoadAllSharedObjects();
     CreateInterfaces();
+#if ENABLE_LOGGING
     CDumper dumper;
     dumper.SaveDump();
+#endif
     InitClassTable();
 
     BeginConVars();

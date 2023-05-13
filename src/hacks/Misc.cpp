@@ -900,7 +900,7 @@ static InitRoutine init(
         std::vector<unsigned char> patch1 = { 0xE8 };
         for (size_t i = 0; i < sizeof(uintptr_t); ++i)
             patch1.push_back(((unsigned char *) &relAddr1)[i]);
-        for (int i = patch1.size(); i < 6; i++)
+        for (unsigned int i = patch1.size(); i < 6; i++)
             patch1.push_back(0x90);
 
         // Construct BytePatch2
@@ -909,7 +909,7 @@ static InitRoutine init(
             patch2.push_back(((unsigned char *) &relAddr2)[i]);
         patch2.push_back(0x8B);
         patch2.push_back(0x00);
-        for (int i = patch2.size(); i < 27; ++i)
+        for (unsigned int i = patch2.size(); i < 27; ++i)
             patch2.push_back(0x90);
 
         patch_scoreboardcolor1 = std::make_unique<BytePatch>(addr1, patch1);
@@ -918,15 +918,6 @@ static InitRoutine init(
         // Patch!
         patch_scoreboardcolor1->Patch();
         patch_scoreboardcolor2->Patch();
-
-        EC::Register(
-            EC::LevelInit,
-            []()
-            {
-                // Remove truce status
-                setTruce(false);
-            },
-            "truce_reset");
     });
 } // namespace ScoreboardColoring
 

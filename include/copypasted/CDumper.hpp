@@ -1,5 +1,5 @@
 /*
- * CDumper.h
+ * CDumper.hpp
  *
  *  Created on: Oct 5, 2016
  *      Author: nullifiedcat
@@ -27,7 +27,7 @@ public:
         m_file.close();
     }
 
-    const std::string TypeToString(SendPropType type) const
+    static std::string TypeToString(SendPropType type)
     {
         switch (type)
         {
@@ -64,14 +64,10 @@ public:
     void DumpTable(RecvTable *pTable, int iLevel, int parent_offset = 0)
     {
         if (pTable == nullptr)
-        {
             return;
-        }
 
-        for (int j = 0; j < iLevel; j++)
-        {
+        for (int j = 0; j < iLevel; ++j)
             m_file << "  ";
-        }
 
         m_file << pTable->GetName() << "\n";
 
@@ -81,19 +77,13 @@ public:
         {
             RecvProp *pProp = pTable->GetProp(i);
             if (pProp == nullptr)
-            {
                 continue;
-            }
 
             if (isdigit(pProp->GetName()[0]))
-            {
                 continue;
-            }
 
             if (pProp->GetDataTable())
-            {
                 DumpTable(pProp->GetDataTable(), iLevel + 1, pProp->GetOffset());
-            }
 
             for (int j = 0; j < iLevel; j++)
                 m_file << "  ";
@@ -101,7 +91,7 @@ public:
             int offset        = pProp->GetOffset();
             SendPropType type = pProp->GetType();
 
-            m_file << pProp->GetName() << " : 0x" << std::hex << offset << " (0x" << (parent_offset + offset) << ") [" << TypeToString(type) << "]"
+            m_file << pProp->GetName() << " : 0x" << std::hex << offset << " (0x" << parent_offset + offset << ") [" << TypeToString(type) << "]"
                    << "\n";
         }
 

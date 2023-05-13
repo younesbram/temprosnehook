@@ -41,14 +41,14 @@ bool shouldTarget(CachedEntity *entity)
         if (HasCondition<TFCond_HalloweenGhostMode>(entity))
             return false;
         // Don't shoot players in truce
-        if (isTruce())
+        if (g_pGameRules->m_bTruceActive)
             return false;
         if (entity->player_info)
             return shouldTargetSteamId(entity->player_info->friendsID);
     }
     else if (entity->m_Type() == ENTITY_BUILDING)
         // Don't shoot buildings in truce
-        if (isTruce())
+        if (g_pGameRules->m_bTruceActive)
             return false;
 
     return true;
@@ -154,7 +154,6 @@ class PlayerToolsEventListener : public IGameEventListener2
 {
     void FireGameEvent(IGameEvent *event) override
     {
-
         int killer_id = GetPlayerForUserID(event->GetInt("attacker"));
         int victim_id = GetPlayerForUserID(event->GetInt("userid"));
 

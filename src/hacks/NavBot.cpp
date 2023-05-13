@@ -125,7 +125,7 @@ std::vector<CachedEntity *> getDispensers()
 
         // This fixes the fact that players can just place dispensers in unreachable locations
         auto local_nav = navparser::NavEngine::findClosestNavSquare(ent->m_vecOrigin());
-        if (local_nav->getNearestPoint(ent->m_vecOrigin().AsVector2D()).DistTo(ent->m_vecOrigin()) > 300.0f || local_nav->getNearestPoint(ent->m_vecOrigin().AsVector2D()).z - ent->m_vecOrigin().z > navparser::PLAYER_JUMP_HEIGHT)
+        if (local_nav->getNearestPoint(ent->m_vecOrigin().AsVector2D()).DistToSqr(ent->m_vecOrigin()) > SQR(300.0f) || local_nav->getNearestPoint(ent->m_vecOrigin().AsVector2D()).z - ent->m_vecOrigin().z > navparser::PLAYER_JUMP_HEIGHT)
             continue;
         entities.push_back(ent);
     }
@@ -1224,8 +1224,6 @@ enum capture_type
 static capture_type current_capturetype = no_capture;
 // Overwrite to return true for payload carts as an example
 static bool overwrite_capture = false;
-// Doomsday is a ctf + payload map which breaks capturing...
-static bool is_doomsday = false;
 
 std::optional<Vector> getCtfGoal(int our_team, int enemy_team)
 {
@@ -1266,10 +1264,10 @@ std::optional<Vector> getPayloadGoal(int our_team)
     current_capturetype = payload;
 
     // Adjust position, so it's not floating high up, provided the local player is close.
-    if (LOCAL_E->m_vecOrigin().DistTo(*position) <= 150.0f)
+    if (LOCAL_E->m_vecOrigin().DistToSqr(*position) <= SQR(150.0f))
         (*position).z = LOCAL_E->m_vecOrigin().z;
     // If close enough, don't move (mostly due to lifts)
-    if ((*position).DistTo(LOCAL_E->m_vecOrigin()) <= 50.0f)
+    if ((*position).DistToSqr(LOCAL_E->m_vecOrigin()) <= SQR(50.0f))
     {
         overwrite_capture = true;
         return std::nullopt;
@@ -1287,7 +1285,7 @@ std::optional<Vector> getControlPointGoal(int our_team)
 
     current_capturetype = controlpoints;
     // If close enough, don't move
-    if ((*position).DistTo(LOCAL_E->m_vecOrigin()) <= 50.0f)
+    if ((*position).DistToSqr(LOCAL_E->m_vecOrigin()) <= SQR(50.0f))
     {
         overwrite_capture = true;
         return std::nullopt;
@@ -1301,8 +1299,8 @@ bool captureObjectives()
 {
     static Timer capture_timer;
     static Vector previous_target(0.0f);
-    // Not active or on a doomsday map
-    if (!*capture_objectives || is_doomsday || !capture_timer.check(2000))
+
+    if (!*capture_objectives || g_pGameRules->m_bInWaitingForPlayers || g_pGameRules->m_bPlayingSpecialDeliveryMode || !capture_timer.check(2000))
         return false;
 
     // Priority too high, don't try
@@ -1372,7 +1370,7 @@ bool doRoam()
         target = getControlPointGoal(enemy_team);
     if (target)
     {
-        if ((*target).DistTo(g_pLocalPlayer->v_Origin) <= 250.0f)
+        if ((*target).DistToSqr(g_pLocalPlayer->v_Origin) <= SQR(250.0f))
         {
             navparser::NavEngine::cancelPath();
             return true;
@@ -1481,20 +1479,20 @@ static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &ne
         return (slots) *force_slot;
     switch (g_pLocalPlayer->clazz)
     {
-    /*case tf_scout:*/
+    case tf_scout:
     case tf_heavy:
         return primary;
-    /*case tf_medic:
+    case tf_medic:
         return secondary;
     case tf_spy:
     {
-        if (nearest.second > 200 && active_slot == primary)
+        if (nearest.second > 200.0f && active_slot == primary)
             return active_slot;
-        else if (nearest.second >= 250)
+        else if (nearest.second >= 250.0f)
             return primary;
         else
             return melee;
-    }*/
+    }
     case tf_sniper:
     {
         // Have a Huntsman, Always use primary
@@ -1510,27 +1508,27 @@ static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &ne
         else
             return primary;
     }
-    /*case tf_pyro:
+    case tf_pyro:
     {
-        if (nearest.second > 450 && active_slot == secondary)
+        if (nearest.second > 450.0f && active_slot == secondary)
             return active_slot;
-        else if (nearest.second <= 550)
+        else if (nearest.second <= 550.0f)
             return primary;
         else
             return secondary;
     }
     case tf_soldier:
     {
-        if (nearest.second <= 200)
+        if (nearest.second <= 200.0f)
             return secondary;
-        else if (nearest.second <= 300)
+        else if (nearest.second <= 300.0f)
             return active_slot;
         else
             return primary;
     }
-    case tf_engineer:
+    /*case tf_engineer:
     {
-        if (((CE_GOOD(mySentry) && mySentry->m_flDistance() <= 300) || (CE_GOOD(myDispenser) && myDispenser->m_flDistance() <= 500)) || (current_building_spot.IsValid() && current_building_spot.DistTo(g_pLocalPlayer->v_Origin) <= 500.0f))
+        if (((CE_GOOD(mySentry) && mySentry->m_flDistance() <= 300) || (CE_GOOD(myDispenser) && myDispenser->m_flDistance() <= 500)) || (current_building_spot.IsValid() && current_building_spot.DistToSqr(g_pLocalPlayer->v_Origin) <= SQR(500.0f)))
         {
             if (active_slot >= melee && navparser::NavEngine::current_priority != prio_melee)
                 return active_slot;
@@ -1544,9 +1542,9 @@ static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &ne
     }*/
     default:
     {
-        if (nearest.second <= 400)
+        if (nearest.second <= 400.0f)
             return secondary;
-        else if (nearest.second <= 500)
+        else if (nearest.second <= 500.0f)
             return active_slot;
         else
             return primary;
@@ -1578,7 +1576,6 @@ static void CreateMove()
         return;
     if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E))
         return;
-
     refreshSniperSpots();
     /*refreshLocalBuildings();
     refreshBuildingSpots();*/
@@ -1590,7 +1587,7 @@ static void CreateMove()
         // Update the distance config
         switch (g_pLocalPlayer->clazz)
         {
-        /*case tf_scout:*/
+        case tf_scout:
         case tf_heavy:
             selected_config = CONFIG_SHORT_RANGE;
             break;
@@ -1615,33 +1612,33 @@ static void CreateMove()
     if (escapeDanger())
         return;
     // Second priority should be getting health
-    else if (getHealth())
+    if (getHealth())
         return;
     // If we aren't getting health, get ammo
-    else if (getAmmo())
+    if (getAmmo())
         return;
     // Try to run engineer logic
-    /*else if (runEngineerLogic())
+    /*if (runEngineerLogic())
         return;*/
-    else if (meleeAttack(slot, nearest))
+    if (meleeAttack(slot, nearest))
         return;
     // Try to capture objectives
-    else if (captureObjectives())
+    if (captureObjectives())
         return;
     // Try to snipe sentries
-    else if (snipeSentries())
+    if (snipeSentries())
         return;
     // Try to hide if reloading
-    else if (runReload())
+    if (runReload())
         return;
     // Try to stalk enemies
-    else if (stayNear())
+    if (stayNear())
         return;
     // Try to get health with a lower priority
-    else if (getHealth(true))
+    if (getHealth(true))
         return;
     // We have nothing else to do, roam
-    else if (doRoam())
+    if (doRoam())
         return;
 }
 
@@ -1650,14 +1647,8 @@ void LevelInit()
     // Make it run asap
     refresh_sniperspots_timer.last -= std::chrono::seconds(60);
     sniper_spots.clear();
-    is_doomsday = false;
-
-    // Doomsday sucks
-    // TODO: add proper doomsday implementation
-    auto map_name = std::string(g_IEngine->GetLevelName());
-    if (g_IEngine->GetLevelName() && map_name.find("sd_doomsday") != std::string::npos)
-        is_doomsday = true;
 }
+
 #if ENABLE_VISUALS
 void Draw()
 {
@@ -1691,11 +1682,11 @@ void Draw()
 static InitRoutine init(
     []()
     {
-        EC::Register(EC::CreateMove, CreateMove, "navbot_cm");
-        EC::Register(EC::CreateMoveWarp, CreateMove, "navbot_cm");
-        EC::Register(EC::LevelInit, LevelInit, "navbot_levelinit");
+        EC::Register(EC::CreateMove, CreateMove, "CM_NavBot");
+        EC::Register(EC::CreateMoveWarp, CreateMove, "CMW_NavBot");
+        EC::Register(EC::LevelInit, LevelInit, "INIT_NavBot");
 #if ENABLE_VISUALS
-        EC::Register(EC::Draw, Draw, "navbot_draw");
+        EC::Register(EC::Draw, Draw, "DRAW_NavBot");
 #endif
         LevelInit();
     });

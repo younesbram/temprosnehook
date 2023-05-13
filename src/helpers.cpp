@@ -1965,14 +1965,3 @@ bool HookNetvar(std::vector<std::string> path, ProxyFnHook &hook, RecvVarProxyFn
     }
     return false;
 }
-
-static bool is_truce_active = false;
-bool isTruce()
-{
-    return is_truce_active;
-}
-
-void setTruce(bool status)
-{
-    is_truce_active = status;
-}

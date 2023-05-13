@@ -704,6 +704,9 @@ bool ShouldAim()
     // Check if using action slot item
     if (g_pLocalPlayer->using_action_slot_item)
         return false;
+    // Our team lost, so we can't hurt the enemy team
+    if (g_pGameRules->m_iRoundState == 5 && g_pGameRules->m_iWinningTeam != g_pLocalPlayer->team)
+        return false;
     // Using a forbidden weapon?
     if (!LOCAL_W || LOCAL_W->m_iClassID() == CL_CLASS(CTFKnife) || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 237 || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 265)
         return false;
@@ -713,6 +716,7 @@ bool ShouldAim()
     // Deadringer out?
     if (CE_BYTE(LOCAL_E, netvar.m_bFeignDeathReady) != 0)
         return false;
+    // Holding a sapper?
     if (g_pLocalPlayer->holding_sapper)
         return false;
     // Is bonked?
@@ -724,6 +728,7 @@ bool ShouldAim()
     // Is cloaked?
     if (IsPlayerInvisible(LOCAL_E))
         return false;
+    // Using the minigun and we have no ammo?
     if (LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun) && CE_INT(LOCAL_E, netvar.m_iAmmo + 4) == 0)
         return false;
 #if ENABLE_VISUALS
@@ -983,7 +988,7 @@ bool IsTargetStateGood(CachedEntity *entity)
                 if (IsEntityVectorVisible(entity, entity->hitboxes.GetHitbox(cd.hitbox)->center, true, MASK_SHOT_HULL, &first_tracer, true))
                     return true;
                 const uint8 max_box = entity->hitboxes.GetNumHitboxes();
-                u_int8_t i = 0;
+                u_int8_t i          = 0;
                 while (i < max_box) // Prevents returning empty at all costs. Loops through every hitbox
                 {
                     if (i == cd.hitbox)
@@ -1413,7 +1418,7 @@ int ClosestHitbox(CachedEntity *target)
 {
     // FIXME this will break multithreading if it will be ever implemented. When
     // implementing it, these should be made non-static
-    int closest = -1;
+    int closest       = -1;
     float closest_fov = 256.0f, fov = 0.0f;
 
     for (int i = 0; i < target->hitboxes.GetNumHitboxes(); ++i)

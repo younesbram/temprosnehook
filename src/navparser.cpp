@@ -44,7 +44,6 @@ static settings::Int stuck_expire_time{ "nav.anti-stuck.expire-time", "10" };
 // How long we should blacklist the node after being stuck for too long?
 static settings::Int stuck_blacklist_time{ "nav.anti-stuck.blacklist-time", "120" };
 static settings::Int sticky_ignore_time{ "nav.ignore.sticky-time", "15" };
-static settings::Boolean path_during_setup{ "nav.path-during-setup", "false" };
 
 // Cast a Ray and return if it hit
 static bool CastRay(Vector origin, Vector endpos, unsigned mask, ITraceFilter *filter)
@@ -466,8 +465,18 @@ Vector last_destination;
 
 bool isReady()
 {
-    // F you Pipeline
-    return *enabled && map && map->state == NavState::Active && (*path_during_setup || GetLevelName() == "plr_pipeline" || g_pGameRules->m_iRoundState > 3 && (g_pTeamRoundTimer->GetRoundState() != RT_STATE_SETUP || g_pLocalPlayer->team != TEAM_BLU));
+    if (!g_IEngine->IsInGame())
+        return false;
+
+    std::string level_name = GetLevelName();
+
+    bool game_ready             = *enabled && map && map->state == NavState::Active;
+    bool level_ready            = level_name == "plr_pipeline" || g_pGameRules->m_iRoundState > 3;
+    bool in_setup               = g_pGameRules->m_bInSetup && g_pLocalPlayer->team == TEAM_BLU;
+    // FIXME: If we're on a control point map, and blue is the attacking team, then the gates are closed, so we shouldn't path
+    bool in_waiting_for_players = g_pGameRules->m_bInWaitingForPlayers && (level_name.starts_with("pl_") || level_name.starts_with("cp_")) && g_pLocalPlayer->team == TEAM_BLU;
+
+    return game_ready && level_ready && !in_setup && !in_waiting_for_players;
 }
 
 bool isPathing()
@@ -731,7 +740,7 @@ void vischeckPath()
         return;
 
     // Iterate all the crumbs
-    for (int i = 0; i < (int) crumbs.size() - 1; i++)
+    for (unsigned int i = 0; i < crumbs.size() - 1; ++i)
     {
         auto current_crumb  = crumbs[i];
         auto next_crumb     = crumbs[i + 1];
@@ -822,7 +831,7 @@ void updateStuckTime()
         // We are stuck for too long, blastlist node for a while and repath
         if (map->connection_stuck_time[key].time_stuck > TIME_TO_TICKS(*stuck_detect_time))
         {
-            map->vischeck_cache[key].expire_tick    = *path_during_setup ? TICKCOUNT_TIMESTAMP(30) : TICKCOUNT_TIMESTAMP(*stuck_blacklist_time);
+            map->vischeck_cache[key].expire_tick    = TICKCOUNT_TIMESTAMP(*stuck_blacklist_time);
             map->vischeck_cache[key].vischeck_state = false;
             if (*log_pathing)
                 logging::Info("Blackisted connection %d->%d", key.first->m_id, key.second->m_id);
@@ -835,15 +844,16 @@ static void CreateMove()
 {
     if (!isReady())
         return;
+
     if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
     {
         cancelPath();
         return;
     }
-    round_states round_state = g_pTeamRoundTimer->GetRoundState();
-    // Still in setup time, if on fitting team, then do not path yet
-    // F you Pipeline
-    if (round_state == RT_STATE_SETUP && GetLevelName() != "plr_pipeline" && g_pLocalPlayer->team == TEAM_BLU && !*path_during_setup)
+
+    // Still in setup or waiting for players. If on fitting team, do not path yet
+    std::string level_name = GetLevelName();
+    if (g_pLocalPlayer->team == TEAM_BLU && (g_pGameRules->m_bInSetup && level_name != "plr_pipeline" || g_pGameRules->m_bInWaitingForPlayers && (level_name.starts_with("pl_") || level_name.starts_with("cp_"))))
     {
         if (navparser::NavEngine::isPathing())
             navparser::NavEngine::cancelPath();

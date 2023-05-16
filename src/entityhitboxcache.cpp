@@ -17,7 +17,7 @@ void EntityHitboxCache::Init()
     studiohdr_t *shdr;
     mstudiohitboxset_t *set;
     m_bInit    = true;
-    parent_ref = &(entity_cache::array[hit_idx]);
+    parent_ref = &entity_cache::array[hit_idx];
     if (CE_BAD(parent_ref))
         return;
     model = (model_t *) RAW_ENT(parent_ref)->GetModel();
@@ -52,8 +52,8 @@ bool EntityHitboxCache::VisibilityCheck(int id)
         return false;
     if (!m_bSuccess)
         return false;
-    if ((m_VisCheckValidationFlags >> id) & 1)
-        return (m_VisCheck >> id) & 1;
+    if (m_VisCheckValidationFlags >> id & 1)
+        return m_VisCheck >> id & 1;
     // TODO corners
     hitbox = GetHitbox(id);
     if (!hitbox)
@@ -82,13 +82,13 @@ void EntityHitboxCache::UpdateBones()
     // I do not have to find all of these signatures and dig through ida
     struct BoneCache;
 
-    typedef BoneCache *(*GetBoneCache_t)(unsigned);
-    typedef void (*BoneCacheUpdateBones_t)(BoneCache *, matrix3x4_t *bones, unsigned, float time);
-    static auto hitbox_bone_cache_handle_offset = *(unsigned *) (CSignature::GetClientSignature("8B 86 ? ? ? ? 89 04 24 E8 ? ? ? ? 85 C0 89 C3 74 48") + 2);
+    typedef BoneCache *(*GetBoneCache_t)(unsigned int);
+    typedef void (*BoneCacheUpdateBones_t)(BoneCache *, matrix3x4_t *bones, unsigned int, float time);
+    static auto hitbox_bone_cache_handle_offset = *(unsigned int *) (CSignature::GetClientSignature("8B 86 ? ? ? ? 89 04 24 E8 ? ? ? ? 85 C0 89 C3 74 48") + 2);
     static auto studio_get_bone_cache           = (GetBoneCache_t) CSignature::GetClientSignature("55 89 E5 56 53 BB ? ? ? ? 83 EC 50 C7 45 D8");
     static auto bone_cache_update_bones         = (BoneCacheUpdateBones_t) CSignature::GetClientSignature("55 89 E5 57 31 FF 56 53 83 EC 1C 8B 5D 08 0F B7 53 10");
 
-    auto hitbox_bone_cache_handle = CE_VAR(parent_ref, hitbox_bone_cache_handle_offset, unsigned);
+    auto hitbox_bone_cache_handle = CE_VAR(parent_ref, hitbox_bone_cache_handle_offset, unsigned int);
     if (hitbox_bone_cache_handle)
     {
         BoneCache *bone_cache = studio_get_bone_cache(hitbox_bone_cache_handle);

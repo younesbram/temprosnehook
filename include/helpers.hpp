@@ -21,7 +21,7 @@ void SetCVarInterface(ICvar *iface);
 
 constexpr float PI    = 3.14159265358979323846f;
 constexpr float RADPI = 57.295779513082f;
-// #define DEG2RAD(x) ((float)(x) * (float)(PI / 180.0f))
+#define DEG2RAD(x) ((float) (x) * (float) (PI / 180.0f))
 
 #include <enums.hpp>
 #include <conditions.hpp>
@@ -68,8 +68,7 @@ std::vector<ConCommand *> &RegisteredCommandsList();
 void BeginConVars();
 void EndConVars();
 
-// Calling source engine functions would get me more accurate result at cost of
-// speed, so idk.
+// Calling source engine functions would get me more accurate result at cost of speed, so idk.
 // TODO?
 
 bool IsPlayerInvulnerable(CachedEntity *player);
@@ -223,9 +222,9 @@ bool IsEntityVisiblePenetration(CachedEntity *entity, int hb);
 float RandFloatRange(float min, float max);
 int UniformRandomInt(int min, int max);
 
-Vector CalcAngle(Vector src, Vector dst);
-void MakeVector(Vector ang, Vector &out);
-float GetFov(Vector ang, Vector src, Vector dst);
+Vector CalcAngle(const Vector &src, const Vector &dst);
+void MakeVector(const Vector &angle, Vector &vector);
+float GetFov(const Vector &angle, const Vector &src, const Vector &dst);
 
 void ReplaceString(std::string &input, const std::string &what, const std::string &with_what);
 void ReplaceSpecials(std::string &input);

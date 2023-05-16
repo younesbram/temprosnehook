@@ -205,7 +205,7 @@ Vector VischeckCorner(CachedEntity *player, CachedEntity *target, float maxdist,
 std::pair<Vector, Vector> VischeckWall(CachedEntity *player, CachedEntity *target, float maxdist, bool checkWalkable)
 {
     int max_iterations = static_cast<int>(maxdist / 40.0f);
-    Vector origin     = player->m_vecOrigin();
+    Vector origin      = player->m_vecOrigin();
 
     // if we can see an entity, we don't need to run calculations
     if (VisCheckEntFromEnt(player, target))
@@ -354,7 +354,7 @@ bool canReachVector(Vector loc, Vector dest)
 {
     if (!dest.IsZero())
     {
-        Vector dist       = dest - loc;
+        Vector dist        = dest - loc;
         int max_iterations = static_cast<int>(floor(dest.DistTo(loc)) / 40.0f);
         for (int i = 0; i < max_iterations; ++i)
         {
@@ -1113,9 +1113,9 @@ bool IsBuildingVisible(CachedEntity *ent)
 
 void fClampAngle(Vector &qaAng)
 {
-    qaAng[0] = fmod(qaAng[0] + 89.0f, 180.0f) - 89.0f;
-    qaAng[1] = fmod(qaAng[1] + 180.0f, 360.0f) - 180.0f;
-    qaAng.z  = 0.0f;
+    qaAng.x = fmod(qaAng[0] + 89.0f, 180.0f) - 89.0f;
+    qaAng.y = fmod(qaAng[1] + 180.0f, 360.0f) - 180.0f;
+    qaAng.z = 0.0f;
 }
 
 bool IsProjectileCrit(CachedEntity *ent)
@@ -1544,49 +1544,49 @@ bool IsPlayerResistantToCurrentWeapon(CachedEntity *player)
     }
 }
 
-Vector CalcAngle(Vector src, Vector dst)
+Vector CalcAngle(const Vector &src, const Vector &dst)
 {
-    Vector AimAngles, delta;
-    float hyp2;
-    delta       = src - dst;
-    hyp2        = SQR(delta.x) + SQR(delta.y);
-    AimAngles.x = atanf(delta.z / FastSqrt(hyp2)) * RADPI;
-    AimAngles.y = atan2f(delta.y, delta.x) * RADPI;
-    AimAngles.z = 0.0f;
-    if (delta.x < 0.0f)
-        AimAngles.y += 180.0f;
-    return AimAngles;
+    Vector delta  = src - dst;
+    float hyp_sqr = delta.LengthSqr();
+    Vector aim_angles;
+
+    aim_angles.x = atanf(delta.z / FastSqrt(hyp_sqr)) * RADPI;
+    aim_angles.y = atan2f(delta.y, delta.x) * RADPI;
+    aim_angles.z = 0.0f;
+
+    if (delta.x >= 0.0f)
+        aim_angles.y += 180.0f;
+
+    return aim_angles;
 }
 
-void MakeVector(Vector angle, Vector &vector)
+void MakeVector(const Vector &angle, Vector &vector)
 {
-    float pitch, yaw, tmp;
-    pitch     = angle[0] * PI / 180;
-    yaw       = angle[1] * PI / 180;
-    tmp       = cos(pitch);
-    vector[0] = -tmp * -cos(yaw);
-    vector[1] = sin(yaw) * tmp;
-    vector[2] = -sin(pitch);
+    float pitch = DEG2RAD(angle.x);
+    float yaw   = DEG2RAD(angle.y);
+    float tmp   = cos(pitch);
+
+    vector.x = tmp * cos(yaw);
+    vector.y = sin(yaw) * tmp;
+    vector.z = -sin(pitch);
 }
 
-float GetFov(Vector angle, Vector src, Vector dst)
+float GetFov(const Vector &angle, const Vector &src, const Vector &dst)
 {
     Vector ang, aim;
-    float mag, u_dot_v;
     ang = CalcAngle(src, dst);
 
     MakeVector(angle, aim);
     MakeVector(ang, ang);
 
-    mag     = hypot(aim.x, aim.y, aim.z);
-    u_dot_v = aim.Dot(ang);
+    float mag_sqr = aim.LengthSqr();
+    float u_dot_v = aim.Dot(ang);
 
-    // Congratulations! you managed to go out of domain. That means you are directly on the target
-    // And floating point imprecision breaks this function making it return NAN, so we "fix" it via this.
-    if (u_dot_v / SQR(mag) > 1.0f)
+    // Avoid out of domain error
+    if (u_dot_v >= mag_sqr)
         return 0;
 
-    return RAD2DEG(acos(u_dot_v * (1.0f / SQR(mag))));
+    return RAD2DEG(acos(u_dot_v / mag_sqr));
 }
 
 bool CanHeadshot()

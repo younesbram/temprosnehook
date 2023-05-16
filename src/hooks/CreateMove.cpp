@@ -222,15 +222,6 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
     if (current_user_cmd && current_user_cmd->command_number)
         last_cmd_number = current_user_cmd->command_number;
 
-    /**bSendPackets = true;
-    if (hacks::lagexploit::ExploitActive()) {
-        *bSendPackets = ((current_user_cmd->command_number % 4) == 0);
-        //logging::Info("%d", *bSendPackets);
-    }*/
-
-    // logging::Info("canpacket: %i", ch->CanPacket());
-    // if (!cmd) return ret;
-
     time_replaced = false;
     curtime_old   = g_GlobalVars->curtime;
 
@@ -403,7 +394,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
         else
         {
             auto ratio      = std::clamp(cl_interp_ratio->GetFloat(), sv_client_min_interp_ratio->GetFloat(), sv_client_max_interp_ratio->GetFloat());
-            auto lerptime   = (std::max)(cl_interp->GetFloat(), (ratio / ((sv_maxupdaterate) ? sv_maxupdaterate->GetFloat() : cl_updaterate->GetFloat())));
+            auto lerptime   = std::max(cl_interp->GetFloat(), ratio / (sv_maxupdaterate ? sv_maxupdaterate->GetFloat() : cl_updaterate->GetFloat()));
             cmd->tick_count = TIME_TO_TICKS(CE_FLOAT(LOCAL_E, netvar.m_flSimulationTime) + lerptime);
         }
     }

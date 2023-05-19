@@ -412,7 +412,7 @@ void WriteCmd(IInput *input, CUserCmd *cmd, int sequence_nr)
 // This gets called before the other CreateMove, but since we run original first in here all the stuff gets called after normal CreateMove is done
 DEFINE_HOOKED_METHOD(CreateMoveInput, void, IInput *this_, int sequence_nr, float input_sample_time, bool arg3)
 {
-    bSendPackets = reinterpret_cast<bool *>((uintptr_t) __builtin_frame_address(1) - 8);
+    bSendPackets = reinterpret_cast<bool *>(reinterpret_cast<uintptr_t>(__builtin_frame_address(1)) - 8);
     // Call original function, includes Normal CreateMove
     original::CreateMoveInput(this_, sequence_nr, input_sample_time, arg3);
 
@@ -442,12 +442,10 @@ DEFINE_HOOKED_METHOD(CreateMoveInput, void, IInput *this_, int sequence_nr, floa
     // Run EC
     EC::run(EC::CreateMoveLate);
 
-    if (CE_GOOD(LOCAL_E))
-    {
-        // Restore prediction
-        if (engine_prediction::original_origin.IsValid())
-            engine_prediction::FinishEnginePrediction(RAW_ENT(LOCAL_E), current_late_user_cmd);
-    }
+    // Restore prediction
+    if (CE_GOOD(LOCAL_E) && engine_prediction::original_origin.IsValid())
+        engine_prediction::FinishEnginePrediction(RAW_ENT(LOCAL_E), current_late_user_cmd);
+
     // Write the usercmd
     WriteCmd(this_, current_late_user_cmd, sequence_nr);
 }

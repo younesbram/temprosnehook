@@ -61,15 +61,17 @@ static InitRoutine minigun_check(
                 if (!hWeapons)
                     return;
                 // Go through the handle array and search for the item
-                for (int i = 0; hWeapons[i]; i++)
+                for (int i = 0; hWeapons[i]; ++i)
                 {
                     if (IDX_BAD(HandleToIDX(hWeapons[i])))
                         continue;
                     // Get the weapon
                     CachedEntity *weapon = ENTITY(HandleToIDX(hWeapons[i]));
+                    if (CE_BAD(weapon))
+                        continue;
                     // if weapon is what we are looking for, hook and move on
                     auto weapon_internal_entity = RAW_ENT(weapon);
-                    if (CE_VALID(weapon) && (weapon->m_iClassID() == CL_CLASS(CTFMinigun) || weapon->m_iClassID() == CL_CLASS(CTFFlameThrower)) && !minigun_hook.IsHooked(weapon_internal_entity))
+                    if ((weapon->m_iClassID() == CL_CLASS(CTFMinigun) || weapon->m_iClassID() == CL_CLASS(CTFFlameThrower)) && !minigun_hook.IsHooked(weapon_internal_entity))
                     {
                         logging::Info("Found and hooked Minigun/Flamethrower!");
                         minigun_hook.Set(weapon_internal_entity);

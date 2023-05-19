@@ -2,7 +2,7 @@
 
 #include <entitycache.hpp>
 
-// Tf2 flag types
+// TF2 flag types
 enum ETFFlagType
 {
     TF_FLAGTYPE_CTF = 0,

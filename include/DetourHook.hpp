@@ -30,8 +30,8 @@ public:
     {
         original_address   = original;
         hook_fn            = hook_func;
-        uintptr_t rel_addr = ((uintptr_t) hook_func - ((uintptr_t) original_address)) - 5;
-        patch.reset(new BytePatch(original, { 0xE9, foffset(rel_addr, 0), foffset(rel_addr, 1), foffset(rel_addr, 2), foffset(rel_addr, 3) }));
+        uintptr_t rel_addr = reinterpret_cast<uintptr_t>(hook_func) - original_address - 5;
+        patch = std::make_unique<BytePatch>(original, std::vector<unsigned char> { 0xE9, foffset(rel_addr, 0), foffset(rel_addr, 1), foffset(rel_addr, 2), foffset(rel_addr, 3) });
         InitBytepatch();
     }
 
@@ -59,7 +59,7 @@ public:
         {
             // Unpatch
             (*patch).Shutdown();
-            return (void *) original_address;
+            return reinterpret_cast<void *>(original_address);
         }
         // No patch, no func.
         return nullptr;

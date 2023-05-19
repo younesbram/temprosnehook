@@ -7,14 +7,6 @@ namespace flagcontroller
 std::array<flag_info, 2> flags;
 bool is_ctf = true;
 
-// Check if a flag is good or not
-bool isGoodFlag(CachedEntity *flag)
-{
-    if (CE_INVALID(flag) || flag->m_iClassID() != CL_CLASS(CCaptureFlag))
-        return false;
-    return true;
-}
-
 void Update()
 {
     // Not ctf, no need to update
@@ -22,9 +14,9 @@ void Update()
         return;
     // Find flags if missing
     if (!flags[0].ent || !flags[1].ent)
+    {
         for (const auto &ent : entity_cache::valid_ents)
         {
-            // We cannot identify a bad entity as a flag due to the unreliability of it
             if (ent->m_iClassID() != CL_CLASS(CCaptureFlag))
                 continue;
 
@@ -34,6 +26,8 @@ void Update()
             else if (ent != flags[0].ent)
                 flags[1].ent = ent;
         }
+    }
+
     // Update flag data
     for (auto &flag : flags)
     {
@@ -41,15 +35,8 @@ void Update()
         if (!flag.ent)
             continue;
 
-        // Bad Flag, reset
-        if (!isGoodFlag(flag.ent))
-        {
-            flag = flag_info();
-            continue;
-        }
-
-        // Cannot use "bad" flag, but it is still potentially valid
-        if (CE_BAD(flag.ent))
+        // Cannot use dormant flag, but it is still potentially valid
+        if (RAW_ENT(flag.ent)->IsDormant())
             continue;
 
         int flag_type = CE_INT(flag.ent, netvar.m_nFlagType);
@@ -76,7 +63,7 @@ void Update()
 
 void LevelInit()
 {
-    // Resez everything
+    // Reset everything
     for (auto &flag : flags)
         flag = flag_info();
     is_ctf = true;
@@ -86,10 +73,8 @@ void LevelInit()
 flag_info getFlag(int team)
 {
     for (auto &flag : flags)
-    {
         if (flag.team == team)
             return flag;
-    }
     // None found
     return {};
 }
@@ -103,10 +88,7 @@ Vector getPosition(CachedEntity *flag)
 std::optional<Vector> getPosition(int team)
 {
     auto flag = getFlag(team);
-    if (isGoodFlag(flag.ent))
-        return getPosition(flag.ent);
-    // No good flag
-    return std::nullopt;
+    return getPosition(flag.ent);
 }
 
 // Get the person carrying the flag
@@ -127,10 +109,7 @@ CachedEntity *getCarrier(CachedEntity *flag)
 CachedEntity *getCarrier(int team)
 {
     auto flag = getFlag(team);
-    // Only use good flags
-    if (isGoodFlag(flag.ent))
-        return getCarrier(flag.ent);
-    return nullptr;
+    return getCarrier(flag.ent);
 }
 
 // Get the status of the flag (Home, being carried, dropped)
@@ -142,11 +121,7 @@ ETFFlagStatus getStatus(CachedEntity *flag)
 ETFFlagStatus getStatus(int team)
 {
     auto flag = getFlag(team);
-    // Only use good flags
-    if (isGoodFlag(flag.ent))
-        return getStatus(flag.ent);
-    // Mark as home if nothing is found
-    return TF_FLAGINFO_HOME;
+    return getStatus(flag.ent);
 }
 } // namespace flagcontroller
 
@@ -177,6 +152,7 @@ void Update()
         }
     }
 }
+
 std::optional<Vector> getClosestPayload(Vector source, int team)
 {
     // Invalid team
@@ -265,7 +241,7 @@ bool TeamCanCapPoint(int index, int team)
 
 int GetPreviousPointForPoint(int index, int team, int previndex)
 {
-    int iIntIndex = previndex + (index * MAX_PREVIOUS_POINTS) + (team * MAX_CONTROL_POINTS * MAX_PREVIOUS_POINTS);
+    int iIntIndex = previndex + index * MAX_PREVIOUS_POINTS + team * MAX_CONTROL_POINTS * MAX_PREVIOUS_POINTS;
     return (&CE_INT(objective_resource, netvar.m_iPreviousPoints))[iIntIndex];
 }
 
@@ -388,6 +364,7 @@ void UpdateControlPoints()
     }
 
     if (capstatus_update.test_and_set(1000))
+    {
         for (int i = 0; i < num_cp; i++)
         {
             auto &data = controlpoint_data[i];
@@ -395,6 +372,7 @@ void UpdateControlPoints()
             data.can_cap.at(0) = isPointUseable(i, TEAM_RED);
             data.can_cap.at(1) = isPointUseable(i, TEAM_BLU);
         }
+    }
 }
 
 // Get the closest controlpoint to cap

@@ -7,6 +7,11 @@ namespace flagcontroller
 std::array<flag_info, 2> flags;
 bool is_ctf = true;
 
+bool IsFlagGood(CachedEntity *flag)
+{
+    return CE_VALID(flag) && flag->m_iClassID() == CL_CLASS(CCaptureFlag);
+}
+
 void Update()
 {
     // Not ctf, no need to update
@@ -34,6 +39,13 @@ void Update()
         // Not inited
         if (!flag.ent)
             continue;
+
+        // Bad Flag, reset
+        if (!IsFlagGood(flag.ent))
+        {
+            flag = flag_info();
+            continue;
+        }
 
         // Cannot use dormant flag, but it is still potentially valid
         if (RAW_ENT(flag.ent)->IsDormant())
@@ -88,7 +100,10 @@ Vector getPosition(CachedEntity *flag)
 std::optional<Vector> getPosition(int team)
 {
     auto flag = getFlag(team);
-    return getPosition(flag.ent);
+    if (IsFlagGood(flag.ent))
+        return getPosition(flag.ent);
+    // No good flag
+    return std::nullopt;
 }
 
 // Get the person carrying the flag
@@ -109,7 +124,10 @@ CachedEntity *getCarrier(CachedEntity *flag)
 CachedEntity *getCarrier(int team)
 {
     auto flag = getFlag(team);
-    return getCarrier(flag.ent);
+    // Only use good flags
+    if (IsFlagGood(flag.ent))
+        return getCarrier(flag.ent);
+    return nullptr;
 }
 
 // Get the status of the flag (Home, being carried, dropped)
@@ -121,7 +139,11 @@ ETFFlagStatus getStatus(CachedEntity *flag)
 ETFFlagStatus getStatus(int team)
 {
     auto flag = getFlag(team);
-    return getStatus(flag.ent);
+    // Only use good flags
+    if (IsFlagGood(flag.ent))
+        return getStatus(flag.ent);
+    // Mark as home if nothing is found
+    return TF_FLAGINFO_HOME;
 }
 } // namespace flagcontroller
 

@@ -49,8 +49,8 @@ CatCommand connect("ipc_connect", "Connect to IPC server",
                            logging::Info("peer count: %i", peer->memory->peer_count);
                            logging::Info("magic number: 0x%08x", peer->memory->global_data.magic_number);
                            logging::Info("magic number offset: 0x%08x", (uintptr_t) &peer->memory->global_data.magic_number - (uintptr_t) peer->memory);
-                           peer->SetCommandHandler(commands::execute_client_cmd, [](const cat_ipc::Command &command, const void *payload) { hack::command_stack().emplace(static_cast<const char *>(payload)); });
-                           peer->SetCommandHandler(commands::execute_client_cmd_long, [](const cat_ipc::Command &command, const void *payload) { hack::command_stack().emplace(static_cast<const char *>(payload)); });
+                           peer->SetCommandHandler(commands::execute_client_cmd, [](cat_ipc::command_s &command, void *payload) { hack::command_stack().emplace((const char *) &command.cmd_data); });
+                           peer->SetCommandHandler(commands::execute_client_cmd_long, [](cat_ipc::command_s &command, void *payload) { hack::command_stack().emplace((const char *) payload); });
                            user_data_s &data = peer->memory->peer_user_data[peer->client_id];
 
                            // Preserve accumulated data
@@ -71,7 +71,6 @@ CatCommand connect("ipc_connect", "Connect to IPC server",
                            peer = nullptr;
                        }
                    });
-
 CatCommand connect_ghost("ipc_connect_ghost", "Connect to ipc but do not actually receive any commands",
                          []()
                          {
@@ -96,14 +95,12 @@ CatCommand connect_ghost("ipc_connect_ghost", "Connect to ipc but do not actuall
                                  peer = nullptr;
                              }
                          });
-
 CatCommand disconnect("ipc_disconnect", "Disconnect from IPC server",
                       []()
                       {
                           delete peer;
                           peer = nullptr;
                       });
-
 CatCommand exec("ipc_exec", "Execute command (first argument = bot ID)",
                 [](const CCommand &args)
                 {
@@ -114,7 +111,7 @@ CatCommand exec("ipc_exec", "Execute command (first argument = bot ID)",
                         logging::Info("Target id is NaN!");
                         return;
                     }
-                    if (target_id > 253)
+                    if (target_id > 255)
                     {
                         logging::Info("Invalid target id: %u", target_id);
                         return;
@@ -138,7 +135,6 @@ CatCommand exec("ipc_exec", "Execute command (first argument = bot ID)",
                         peer->SendMessage(command.c_str(), target_id, ipc::commands::execute_client_cmd, nullptr, 0);
                     }
                 });
-
 CatCommand exec_all("ipc_exec_all", "Execute command (on every peer)",
                     [](const CCommand &args)
                     {
@@ -260,7 +256,7 @@ CatCommand debug_get_ingame_ipc("ipc_debug_dump_server", "Show other bots on ser
                                     }
                                     int count = 0;
                                     std::vector<unsigned> botlist{};
-                                    for (unsigned i = 0; i < cat_ipc::max_peers; ++i)
+                                    for (unsigned i = 0; i < cat_ipc::max_peers; i++)
                                     {
                                         if (!ipc::peer->memory->peer_data[i].free)
                                         {

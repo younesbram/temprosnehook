@@ -116,20 +116,33 @@ char re::CTFPartyClient::RequestLeaveForMatch(int type)
     return RequestLeaveForMatch_fn(this, type);
 }
 
+// This function is the first function called inside the BRequestJoinPlayer function
 int re::CTFPartyClient::BInvitePlayerToParty(CSteamID steamid)
 {
     typedef int (*BInvitePlayerToParty_t)(re::CTFPartyClient *, CSteamID, bool);
-    static uintptr_t addr               = CSignature::GetClientSignature("55 89 E5 57 56 53 81 EC ? ? ? ? 8B 45 ? 8B 5D ? 8B 55 ? 89 85 65 A1 ? ? ? ? 89 45 ? 31 C0 8B 45");
+    static uintptr_t addr               = CSignature::GetClientSignature("55 89 E5 57 56 53 83 EC 1C 8B 5D ? 8B 75 ? 8B 7D ? 89 1C 24 89 74 24 ? 89 7C 24 ? E8 ? ? ? ? 84 C0");
     static auto BInvitePlayerToParty_fn = BInvitePlayerToParty_t(addr);
     return BInvitePlayerToParty_fn(this, steamid, false);
 }
 
+// Find function by searching for this string:
+// "[PartyClient] Sending request to join %s party (current party %llu)"
 int re::CTFPartyClient::BRequestJoinPlayer(CSteamID steamid)
 {
     typedef int (*BRequestJoinPlayer_t)(re::CTFPartyClient *, CSteamID, bool);
     static uintptr_t addr             = CSignature::GetClientSignature("55 89 E5 57 56 53 81 EC ? ? ? ? 8B 45 14 8B 55 ? 89 45 ? 8B");
     static auto BRequestJoinPlayer_fn = BRequestJoinPlayer_t(addr);
     return BRequestJoinPlayer_fn(this, steamid, false);
+}
+
+// Find function by searching for this string:
+// "[PartyClient] CTFPartyClient::CancelOutgoingJoinRequestOrIncomingInvite for %s"
+int re::CTFPartyClient::CancelOutgoingJoinRequestOrIncomingInvite(CSteamID steamid)
+{
+    typedef int (*CancelOutgoingJoinRequestOrIncomingInvite_t)(re::CTFPartyClient *, CSteamID);
+    static uintptr_t addr                                    = CSignature::GetClientSignature("55 89 E5 57 56 8D 45 ? 53 81 EC 9C 00 00 00 8B 7D");
+    static auto CancelOutgoingJoinRequestOrIncomingInvite_fn = CancelOutgoingJoinRequestOrIncomingInvite_t(addr);
+    return CancelOutgoingJoinRequestOrIncomingInvite_fn(this, steamid);
 }
 
 int re::CTFPartyClient::PromotePlayerToLeader(CSteamID steamid)

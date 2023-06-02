@@ -25,6 +25,7 @@ public:
     char RequestLeaveForMatch(int type);
     int BInvitePlayerToParty(CSteamID steamid);
     int BRequestJoinPlayer(CSteamID steamid);
+    int CancelOutgoingJoinRequestOrIncomingInvite(CSteamID steamid);
     static bool BInQueue(CTFPartyClient *this_);
     int GetNumOnlineMembers();
     int GetNumMembers();

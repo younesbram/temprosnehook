@@ -1,6 +1,4 @@
-cmake_minimum_required(VERSION 3.20.4)
-
-set(NativePrecompiledHeaders 1)
+cmake_minimum_required(VERSION 3.21.0)
 
 # Ensure that only 32 bit libraries are used.
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/Toolchain-cross-m32.cmake")
@@ -19,7 +17,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
-set(Force_CXX_23B 0 CACHE BOOL "Force 23B as the CXX Standard, useful for disrepancies in compiler and IDE")
+set(Force_CXX_23B 0 CACHE BOOL "Force 23B as the CXX Standard, useful for discrepancies in compiler and IDE")
 
 project(cathook VERSION 0.0.1)
 if (NOT Force_CXX_23B)

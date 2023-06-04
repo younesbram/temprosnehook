@@ -40,8 +40,9 @@ bool UnassignedClass()
 static Timer autoteam_timer{};
 static Timer startqueue_timer{};
 #if !ENABLE_VISUALS
-Timer queue_time{};
+static Timer queue_timer{};
 #endif
+
 void UpdateSearch()
 {
     if (!*auto_queue && !*auto_requeue || g_IEngine->IsInGame())
@@ -87,7 +88,7 @@ void UpdateSearch()
     }
     startqueue_timer.test_and_set(5000);
 #if !ENABLE_VISUALS
-    if (queue_time.test_and_set(1200000))
+    if (queue_timer.test_and_set(600000))
         g_IEngine->ClientCmd_Unrestricted("quit"); // lol
 #endif
 }

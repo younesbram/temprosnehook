@@ -48,7 +48,7 @@ void UpdateSearch()
     if (!*auto_queue && !*auto_requeue || g_IEngine->IsInGame())
     {
 #if !ENABLE_VISUALS
-        queue_time.update();
+        queue_timer.update();
 #endif
         return;
     }
@@ -66,7 +66,7 @@ void UpdateSearch()
     if (current_user_cmd && gc && gc->BConnectedToMatchServer(false) && gc->BHaveLiveMatch())
     {
 #if !ENABLE_VISUALS
-        queue_time.update();
+        queue_timer.update();
 #endif
         tfmm::LeaveQueue();
     }

@@ -287,7 +287,7 @@ bool ShouldRenderChams(IClientEntity *entity)
             return false;
         if (!teammates && !ent->m_bEnemy() && playerlist::IsDefault(ent->player_info->friendsID))
             return false;
-        if (CE_BYTE(ent, netvar.iLifeState))
+        if (ent->m_bAlivePlayer())
             return false;
         return true;
     case ENTITY_PROJECTILE:

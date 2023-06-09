@@ -118,7 +118,7 @@ inline std::optional<rgba_t> getColor(CachedEntity *ent)
 
 void draw()
 {
-    if (!enabled || CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
+    if (!enabled || CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive)
         return;
     // Loop all players
     if (*buildings)

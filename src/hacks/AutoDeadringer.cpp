@@ -37,16 +37,16 @@ int NearbyEntities()
 
 static void CreateMove()
 {
-    if (!enable)
+    if (!*enable)
         return;
-    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
+    if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive || CE_BAD(LOCAL_W))
         return;
     if (g_pLocalPlayer->clazz != tf_spy)
         return;
     if (HasCondition<TFCond_Cloaked>(LOCAL_E) || HasCondition<TFCond_CloakFlicker>(LOCAL_E))
         return;
     bool shouldm2 = true;
-    if (CE_INT(LOCAL_E, netvar.iHealth) < (int) trigger_health && NearbyEntities() > 1 && !CE_BYTE(LOCAL_E, netvar.m_bFeignDeathReady))
+    if (g_pLocalPlayer->health < *trigger_health && NearbyEntities() > 1 && !CE_BYTE(LOCAL_E, netvar.m_bFeignDeathReady))
         current_user_cmd->buttons |= IN_ATTACK2;
     else
         shouldm2 = false;

@@ -665,10 +665,10 @@ void smart_crouch()
 CatCommand print_ammo("debug_print_ammo", "debug",
                       []()
                       {
-                          if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
+                          if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive || CE_BAD(LOCAL_W))
                               return;
                           logging::Info("Current slot: %d", re::C_BaseCombatWeapon::GetSlot(RAW_ENT(LOCAL_W)));
-                          for (int i = 0; i < 10; ++i)
+                          for (uint8_t i = 0; i < 10; ++i)
                               logging::Info("Ammo Table %d: %d", i, CE_INT(LOCAL_E, netvar.m_iAmmo + i * 4));
                       });
 
@@ -758,7 +758,7 @@ void update()
     if (CE_BAD(LOCAL_E))
         return;
 
-    if (LOCAL_E->m_bAlivePlayer())
+    if (g_pLocalPlayer->alive)
     {
         unstuck.update();
         unstucks = 0;
@@ -931,7 +931,7 @@ static void draw()
 {
     if (!catbotmode || !anti_motd)
         return;
-    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
+    if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive)
         return;
     AddCenterString(health, colors::green);
     AddCenterString(ammo, colors::yellow);

@@ -16,7 +16,7 @@ static void CreateMove()
     if (!g_pGameRules->m_bPlayingMannVsMachine)
         return;
 
-    if (auto_revive && !LOCAL_E->m_bAlivePlayer() && revive_timer.test_and_set(1000))
+    if (auto_revive && !g_pLocalPlayer->alive && revive_timer.test_and_set(1000))
     {
         auto *kv = new KeyValues("MVM_Revive_Response");
         kv->SetInt("accepted", 1);

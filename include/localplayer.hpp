@@ -1,5 +1,5 @@
 /*
- * localplayer.h
+ * localplayer.hpp
  *
  *  Created on: Oct 15, 2016
  *      Author: nullifiedcat
@@ -33,7 +33,7 @@ public:
     int team;
     int health;
     int flags;
-    char life_state;
+    bool alive;
     int clazz;
     bool bZoomed;
     bool bRevving;

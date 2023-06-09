@@ -133,7 +133,7 @@ CachedEntity *getClosestSpell()
     float best_dist   = FLT_MAX;
     bool is_dormant   = false;
 
-    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
+    if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive)
         return ent;
     for (auto &spell : entity_cache::valid_ents)
     {

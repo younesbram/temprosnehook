@@ -225,7 +225,7 @@ static void SandwichAim()
 {
     if (!*sandwichaim_enabled)
         return;
-    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
+    if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive || CE_BAD(LOCAL_W))
         return;
     if (sandwichaim_aimkey)
     {
@@ -281,7 +281,7 @@ static void ChargeAimbot()
     if (charge_key && !charge_key.isKeyDown())
         return;
 #endif
-    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
+    if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive || CE_BAD(LOCAL_W))
         return;
     if (!HasCondition<TFCond_Charging>(LOCAL_E))
         return;

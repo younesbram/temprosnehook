@@ -240,7 +240,7 @@ void Draw()
         if (*fov > 0.0f && *fov < 180)
         {
             // Don't show ring while player is dead
-            if (CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
+            if (CE_GOOD(LOCAL_E) && g_pLocalPlayer->alive)
             {
                 rgba_t color = colors::gui;
                 color.a      = float(fovcircle_opacity);
@@ -249,7 +249,7 @@ void Draw()
                 g_IEngine->GetScreenSize(width, height);
 
                 // Math
-                float mon_fov  = (float(width) / float(height) / (4.0f / 3.0f));
+                float mon_fov  = float(width) / float(height) / (4.0f / 3.0f);
                 float fov_real = RAD2DEG(2 * atanf(mon_fov * tanf(DEG2RAD(draw::fov / 2))));
                 float radius   = tan(DEG2RAD(float(fov)) / 2) / tan(DEG2RAD(fov_real) / 2) * (width);
 

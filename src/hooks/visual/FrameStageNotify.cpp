@@ -192,7 +192,7 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
     std::optional<Vector> backup_punch;
     if (isHackActive() && !g_Settings.bInvalid && stage == FRAME_RENDER_START)
     {
-        if (no_shake && CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
+        if (no_shake && CE_GOOD(LOCAL_E) && g_pLocalPlayer->alive)
         {
             backup_punch                                       = NET_VECTOR(RAW_ENT(LOCAL_E), netvar.vecPunchAngle);
             NET_VECTOR(RAW_ENT(LOCAL_E), netvar.vecPunchAngle) = { 0.0f, 0.0f, 0.0f };

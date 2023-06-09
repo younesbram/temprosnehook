@@ -32,7 +32,7 @@ void Draw()
     CachedEntity *closest_spy;
     float closest_spy_distance, distance;
     int spy_count;
-    if (g_pLocalPlayer->life_state)
+    if (g_pLocalPlayer->alive)
         return;
     closest_spy          = nullptr;
     closest_spy_distance = 0.0f;

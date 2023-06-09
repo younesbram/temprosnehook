@@ -89,7 +89,7 @@ InitRoutine init(
             EC::CreateMove,
             []()
             {
-                if (prev_slot != -1 && CE_GOOD(LOCAL_E) && CE_GOOD(LOCAL_W) && LOCAL_E->m_bAlivePlayer() && taunt_t.test_and_set(100))
+                if (prev_slot != -1 && CE_GOOD(LOCAL_E) && CE_GOOD(LOCAL_W) && g_pLocalPlayer->alive && taunt_t.test_and_set(100))
                 {
                     if (in_taunt)
                     {

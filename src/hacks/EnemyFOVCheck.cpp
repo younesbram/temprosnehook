@@ -45,7 +45,7 @@ static void FOVCheck()
         return;
     if (CE_BAD(LOCAL_E))
         return;
-    if (!LOCAL_E->m_bAlivePlayer())
+    if (!g_pLocalPlayer->alive)
         return;
     for (const auto &ent : entity_cache::player_cache)
     {

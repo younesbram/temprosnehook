@@ -742,7 +742,10 @@ static void followCrumbs()
         {
             static Vector next{ crumbs[0].vec.x, crumbs[0].vec.y, g_pLocalPlayer->v_Eye.z };
             static bool looked_at_point = true;
-            static int aim_speed = 20;
+            static Timer choose_new_point;
+
+            static int wait_time = 20;
+            static int aim_speed = 15;
 
             if (looked_at_point && choose_new_point.test_and_set(wait_time))
             {

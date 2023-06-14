@@ -19,6 +19,7 @@
 #include "CNavFile.h"
 #include "teamroundtimer.hpp"
 #include "Aimbot.hpp"
+#include "MiscAimbot.hpp"
 #include "navparser.hpp"
 #if ENABLE_VISUALS
 #include "drawing.hpp"
@@ -703,7 +704,7 @@ static void followCrumbs()
             ticks_since_jump++;
 
             // Update jump timer now since we are back on ground
-            if (crouch && g_pLocalPlayer->flags & FL_ONGROUND && ticks_since_jump > 3)
+            if (crouch && CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND && ticks_since_jump > 3)
             {
                 // Reset
                 crouch = false;
@@ -721,15 +722,16 @@ static void followCrumbs()
     }*/
 
     // Look at path
-    if (*look && !hacks::aimbot::IsAiming())
+    if (look && !hacks::aimbot::IsAiming())
     {
         Vector next{ crumbs[0].vec.x, crumbs[0].vec.y, g_pLocalPlayer->v_Eye.z };
         next = GetAimAtAngles(g_pLocalPlayer->v_Eye, next);
-
+        static int aim_speed = 15;
+         // Slow aim to smoothen
+        hacks::misc_aimbot::DoSlowAim(next, aim_speed);
         current_user_cmd->viewangles = next;
     }
-
-    WalkTo(current_vec);
+    WalkTo(crumbs[0].vec);
 }
 
 static Timer vischeck_timer{};
@@ -845,7 +847,7 @@ static void CreateMove()
     if (!isReady())
         return;
 
-    if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive)
+    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
     {
         cancelPath();
         return;
@@ -957,7 +959,7 @@ void Draw()
 {
     if (!isReady() || !*draw)
         return;
-    if (*draw_debug_areas && CE_GOOD(LOCAL_E) && g_pLocalPlayer->alive)
+    if (*draw_debug_areas && CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
     {
         auto area = map->findClosestNavSquare(g_pLocalPlayer->v_Origin);
         auto edge = area->getNearestPoint(g_pLocalPlayer->v_Origin.AsVector2D());

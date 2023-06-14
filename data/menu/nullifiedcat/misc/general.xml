@@ -46,6 +46,11 @@
             <AutoVariable width="fill" target="misc.force-halloween" label="Force halloween"/>
             <AutoVariable width="fill" target="killstreak.enable" label="Killstreak counter"
                           tooltip="Adds a client-sided killstreak counter to your weapons."/>
+                          <AutoVariable width="fill" target="mvmtools.instant-revive" label="MVM Instant revive"/>
+            <AutoVariable width="fill" target="mvmtools.auto-f4" label="MvM Auto Ready"
+                          tooltip="Automatically sets ready state when in a MvM game."/>
+        </List>
+    </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Spy alert" x="382">
         <List width="200">
             <AutoVariable width="fill" target="spy-alert.enable" label="Enable"

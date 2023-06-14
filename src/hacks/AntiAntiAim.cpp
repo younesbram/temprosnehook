@@ -8,19 +8,20 @@
 
 namespace hacks::anti_anti_aim
 {
-static settings::Boolean enable{ "anti-anti-aim.enable", "false" };
+static settings::Boolean enable{ "anti-anti-aim.enable", "true" };
 static settings::Boolean debug{ "anti-anti-aim.debug.enable", "false" };
 
-boost::unordered_flat_map<unsigned, brutedata> resolver_map;
+std::unordered_map<unsigned, brutedata> resolver_map;
 std::array<CachedEntity *, 32> sniperdot_array;
 
 static inline void modifyAngles()
 {
-    for (const auto &player : entity_cache::player_cache)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
     {
-        if (CE_BAD(player) || !player->m_bAlivePlayer() || !player->m_bEnemy() || !player->player_info->friendsID)
+        auto player = ENTITY(i);
+        if (CE_BAD(player) || !player->m_bAlivePlayer() || !player->m_bEnemy() || !player->player_info.friendsID)
             continue;
-        auto &data  = resolver_map[player->player_info->friendsID];
+        auto &data  = resolver_map[player->player_info.friendsID];
         auto &angle = CE_VECTOR(player, netvar.m_angEyeAngles);
         angle.x     = data.new_angle.x;
         angle.y     = data.new_angle.y;
@@ -29,12 +30,13 @@ static inline void modifyAngles()
 static inline void CreateMove()
 {
     // Empty the array
-    sniperdot_array.fill(nullptr);
+    sniperdot_array.fill(0);
     // Find sniper dots
-    for (auto &dot_ent : entity_cache::valid_ents)
+    for (int i = g_IEngine->GetMaxClients() + 1; i <= HIGHEST_ENTITY; i++)
     {
+        CachedEntity *dot_ent = ENTITY(i);
         // Not a sniper dot
-        if (dot_ent->m_iClassID() != CL_CLASS(CSniperDot))
+        if (CE_BAD(dot_ent) || dot_ent->m_iClassID() != CL_CLASS(CSniperDot))
             continue;
         // Get the player it belongs to
         auto ent_idx = HandleToIDX(CE_INT(dot_ent, netvar.m_hOwnerEntity));
@@ -52,11 +54,13 @@ void frameStageNotify(ClientFrameStage_t stage)
     if (!enable || !g_IEngine->IsInGame())
         return;
     if (stage == FRAME_NET_UPDATE_POSTDATAUPDATE_START)
+    {
         modifyAngles();
+    }
 #endif
 }
 
-static std::array<float, 5> yaw_resolves{ 0.0f, 180.0f, 65.0f, -65.0f, -180.0f };
+static std::array<float, 8> yaw_resolves{ 0.0f, 180.0f, 65.0f, 90.0f, -180.0f, 260.0f, 80.0f, 20.0f };
 
 static float resolveAngleYaw(float angle, brutedata &brute)
 {
@@ -69,7 +73,7 @@ static float resolveAngleYaw(float angle, brutedata &brute)
 
     // Yaw Resolving
     // Find out which angle we should try
-    int entry = (int) std::floor((brute.brutenum / 2.0f)) % yaw_resolves.size();
+    int entry = (int) std::floor((brute.brutenum / 5.0f)) % yaw_resolves.size();
     angle += yaw_resolves[entry];
 
     while (angle > 180)
@@ -108,13 +112,13 @@ static float resolveAnglePitch(float angle, brutedata &brute, CachedEntity *ent)
     // No sniper dot/not using a sniperrifle.
     if (sniper_dot == nullptr)
     {
-        if (brute.brutenum % 2)
+        if (brute.brutenum % 3)
         {
             // Pitch resolver
-            if (angle >= 90)
-                angle = -89;
-            if (angle <= -90)
-                angle = 89;
+            if (angle >= 180)
+                angle = -180;
+            if (angle <= -360)
+                angle = -50;
         }
     }
     // Sniper dot found, use it.
@@ -138,9 +142,9 @@ static float resolveAnglePitch(float angle, brutedata &brute, CachedEntity *ent)
 void increaseBruteNum(int idx)
 {
     auto ent = ENTITY(idx);
-    if (CE_BAD(ent) || !ent->player_info->friendsID)
+    if (CE_BAD(ent) || !ent->player_info.friendsID)
         return;
-    auto &data = hacks::anti_anti_aim::resolver_map[ent->player_info->friendsID];
+    auto &data = hacks::anti_anti_aim::resolver_map[ent->player_info.friendsID];
     if (data.hits_in_a_row >= 4)
         data.hits_in_a_row = 2;
     else if (data.hits_in_a_row >= 2)
@@ -161,8 +165,8 @@ void increaseBruteNum(int idx)
 
 static void pitchHook(const CRecvProxyData *pData, void *pStruct, void *pOut)
 {
-    float flPitch     = pData->m_Value.m_Float;
-    auto *flPitch_out = (float *) pOut;
+    float flPitch      = pData->m_Value.m_Float;
+    float *flPitch_out = (float *) pOut;
 
     if (!enable)
     {
@@ -173,13 +177,13 @@ static void pitchHook(const CRecvProxyData *pData, void *pStruct, void *pOut)
     auto client_ent   = (IClientEntity *) (pStruct);
     CachedEntity *ent = ENTITY(client_ent->entindex());
     if (CE_GOOD(ent))
-        *flPitch_out = resolveAnglePitch(flPitch, resolver_map[ent->player_info->friendsID], ent);
+        *flPitch_out = resolveAnglePitch(flPitch, resolver_map[ent->player_info.friendsID], ent);
 }
 
 static void yawHook(const CRecvProxyData *pData, void *pStruct, void *pOut)
 {
-    float flYaw     = pData->m_Value.m_Float;
-    auto *flYaw_out = (float *) pOut;
+    float flYaw      = pData->m_Value.m_Float;
+    float *flYaw_out = (float *) pOut;
 
     if (!enable)
     {
@@ -190,7 +194,7 @@ static void yawHook(const CRecvProxyData *pData, void *pStruct, void *pOut)
     auto client_ent   = (IClientEntity *) (pStruct);
     CachedEntity *ent = ENTITY(client_ent->entindex());
     if (CE_GOOD(ent))
-        *flYaw_out = resolveAngleYaw(flYaw, resolver_map[ent->player_info->friendsID]);
+        *flYaw_out = resolveAngleYaw(flYaw, resolver_map[ent->player_info.friendsID]);
 }
 
 // *_ptr points to what we need to modify while *_ProxyFn holds the old value
@@ -208,16 +212,16 @@ static void hook()
         // "DT_TFPlayer", "tfnonlocaldata"
         if (!strcmp(pszName, "DT_TFPlayer"))
         {
-            for (int i = 0; i < pClass->m_pRecvTable->m_nProps; ++i)
+            for (int i = 0; i < pClass->m_pRecvTable->m_nProps; i++)
             {
-                auto *pProp1 = (RecvPropRedef *) &(pClass->m_pRecvTable->m_pProps[i]);
+                RecvPropRedef *pProp1 = (RecvPropRedef *) &(pClass->m_pRecvTable->m_pProps[i]);
                 if (!pProp1)
                     continue;
                 const char *pszName2 = pProp1->m_pVarName;
                 if (!strcmp(pszName2, "tfnonlocaldata"))
                     for (int j = 0; j < pProp1->m_pDataTable->m_nProps; j++)
                     {
-                        auto *pProp2 = (RecvPropRedef *) &(pProp1->m_pDataTable->m_pProps[j]);
+                        RecvPropRedef *pProp2 = (RecvPropRedef *) &(pProp1->m_pDataTable->m_pProps[j]);
                         if (!pProp2)
                             continue;
                         const char *name = pProp2->m_pVarName;

@@ -513,16 +513,16 @@ static void CreateMove()
     projectile_mode          = false;
     projectileAimbotRequired = false;
     bool should_zoom         = *auto_zoom;
-    switch(GetWeaponMode)
+    switch (GetWeaponMode)
     {
         case weapon_hitscan:
         {
             if(should_backtrack)
                 UpdateShouldBacktrack();
-            if(Aim(target_entity))
+            if(Aim(target_last))
             {
                     int weapon_case = LOCAL_W->m_iClassID();
-                    doAutoZoom(true, target_last);
+                    DoAutoZoom(true, target_last);
                     /* very much simple ""fix"" for the aimbot death stare */
                     if (g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed && CE_GOOD(LOCAL_W) && re::C_BaseCombatWeapon::GetSlot(RAW_ENT(LOCAL_W)) + 1 != 3)
                         Aim(target_last);
@@ -540,7 +540,7 @@ static void CreateMove()
         {
             if(should_backtrack)
                 updateShouldBacktrack();
-            if(Aim(target_entity))
+            if(Aim(target_last))
             {
                 if (antiaim::isEnabled())
                 {
@@ -548,12 +548,12 @@ static void CreateMove()
                     if (g_pLocalPlayer->weapon_melee_damage_tick)
                     {
                         *bSendPackets = false;
-                        Aim(target_entity);
+                        Aim(target_last);
                     }
                 }
                 else
                 {
-                    Aim(target_entity);
+                    Aim(target_last);
                     DoAutoshoot();
                 }
             }

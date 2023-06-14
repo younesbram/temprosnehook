@@ -513,7 +513,7 @@ static void CreateMove()
     projectile_mode          = false;
     projectileAimbotRequired = false;
     bool should_zoom         = *auto_zoom;
-    switch (GetWeaponMode)
+    switch (weapon_mode)
     {
         case weapon_hitscan:
         {
@@ -529,9 +529,9 @@ static void CreateMove()
                     else if (!g_pLocalPlayer->holding_sniper_rifle)
                         Aim(target_last);
 
-                    if(!hitscanSpecialCases(target_last, weapon_case))
+                    if(!HitscanSpecialCases(target_last, weapon_case))
                         DoAutoshoot();
-                    else if (hitscanSpecialCases(target_last, weapon_case) && (CE_INT(LOCAL_W, netvar.m_iClip1) == 0))
+                    else if (HitscanSpecialCases(target_last, weapon_case) && (CE_INT(LOCAL_W, netvar.m_iClip1) == 0))
                         DoAutoshoot();
             }
         break;
@@ -539,7 +539,7 @@ static void CreateMove()
         case weapon_melee:
         {
             if(should_backtrack)
-                updateShouldBacktrack();
+                UpdateShouldBacktrack();
             if(Aim(target_last))
             {
                 if (antiaim::isEnabled())

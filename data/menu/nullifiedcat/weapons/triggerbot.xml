@@ -1,43 +1,4 @@
 <Tab name="Triggerbot" padding="4 4 4 4">
-    <Box padding="12 6 6 6" width="content" height="content" name="Auto reflect">
-        <List width="202">
-            <AutoVariable width="fill" target="autoreflect.enable" label="Enable auto reflect"/>
-            <AutoVariable width="fill" target="autoreflect.button" label="Reflect button"/>
-            <AutoVariable width="fill" target="autoreflect.idle-only" label="Only reflect when able"
-                          tooltip="Don't try to reflect when using primary fire."/>
-            <AutoVariable width="fill" target="autoreflect.teammate" label="Teammate projectiles"
-                          tooltip="Attempt to reflect teammate projectiles."/>
-            <AutoVariable width="fill" target="autoreflect.teammatesfire" label="Teammates"
-                          tooltip="Auto extinguish teammates."/>
-            <AutoVariable width="fill" target="autoreflect.dodgeball" label="Dodgeball mode"
-                          tooltip="Disables vischeck."/>
-            <AutoVariable width="fill" target="autoreflect.legit" label="Legit mode"
-                          tooltip="Don't move the mouse to reflect. Spectator safe."/>
-        </List>
-        <Box padding="12 6 6 6" name="Targets" width="content" height="content" y="110">
-            <Box padding="12 6 6 6" name="Big" width="content" height="content">
-                <List width="95">
-                    <AutoVariable width="fill" target="autoreflect.rockets" label="Rockets"/>
-                    <AutoVariable width="fill" target="autoreflect.pipes" label="Pipes"/>
-                    <AutoVariable width="fill" target="autoreflect.stickies" label="Stickies"/>
-                    <AutoVariable width="fill" target="autoreflect.sentryrockets" label="Sentry rockets"/>
-                </List>
-            </Box>
-            <Box padding="12 6 6 6" name="Small" width="content" height="content" x="105">
-                <List width="85">
-                    <AutoVariable width="fill" target="autoreflect.flares" label="Flares"/>
-                    <AutoVariable width="fill" target="autoreflect.arrows" label="Arrows"/>
-                    <AutoVariable width="fill" target="autoreflect.jars" label="Jars"/>
-                    <AutoVariable width="fill" target="autoreflect.healingbolts" label="Healing bolts"
-                                  tooltip="Crusader's Crossbow healing bolts."/>
-                    <AutoVariable width="fill" target="autoreflect.cleavers" label="Cleavers"
-                                  tooltip="The Scout's Flying Guillotine."/>
-                </List>
-            </Box>
-            <AutoVariable width="196" y="95" target="autoreflect.default" label="Default"
-                          tooltip="If a projectile is not known, should autoreflect still try to reflect it?"/>
-        </Box>
-    </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Auto backstab" y="250">
         <List width="214">
             <AutoVariable width="fill" target="autobackstab.enabled" label="Enable auto backstab"/>
@@ -102,33 +63,6 @@
             <AutoVariable width="fill" target="auto-detonator.enable" label="Enable auto Detonator"
                           tooltip="Auto explode Detonator flares."/>
             <AutoVariable width="fill" target="auto-detonator.ignore-cloaked" label="Ignore cloaked"/>
-        </List>
-    </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Auto sticky" x="410" y="50">
-        <List width="165">
-            <AutoVariable width="fill" target="autosticky.enable" label="Enable auto sticky"
-                          tooltip="Auto detonate stickies."/>
-            <AutoVariable width="fill" target="autosticky.buildings" label="Detonate on buildings"/>
-            <LabeledObject width="fill" label="Legit mode"
-                           tooltip="Rage: No changes to make the autosticky appear more legit. Semi-legit: Require a line of sight to the Sticky and ignores invisible spies. Legit: same as semi-legit but also require a line of sight to the enemy.">
-                <Select target="autosticky.legit-mode">
-                    <Option name="Rage" value="0"/>
-                    <Option name="Semi-legit" value="1"/>
-                    <Option name="Legit" value="2"/>
-                </Select>
-            </LabeledObject>
-            <AutoVariable width="fill" target="autosticky.dontblowmeup" label="Don't blow me up"
-                          tooltip="Don't detonate if you would recieve damage."/>
-            <AutoVariable width="fill" target="autosticky.min-dist" label="Min distance"
-                          tooltip="Stickies will be auto-detonated if enemies are within this distance (measured in Hammer units)."
-                          min="0" max="130" step="5"/>
-        </List>
-    </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Auto Dead Ringer" x="410" y="150">
-        <List width="165">
-            <AutoVariable width="fill" target="auto-deadringer.enable" label="Enable auto Dead Ringer"
-                          tooltip="Auto activate the Dead Ringer if equipped."/>
-            <AutoVariable width="fill" target="auto-deadringer.health" label="Trigger at health"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Anti-backstab" x="410" y="200">

@@ -515,51 +515,26 @@ static void CreateMove()
     bool should_zoom         = *auto_zoom;
     switch (weapon_mode)
     {
-        case weapon_hitscan:
+    case weapon_hitscan:
+        if (should_backtrack)
+            UpdateShouldBacktrack();
+        target_last = RetrieveBestTarget(aimkey_status);
+        if (target_last)
         {
-            if(should_backtrack)
-                UpdateShouldBacktrack();
-            if(Aim(target_last))
-            {
-                    int weapon_case = LOCAL_W->m_iClassID();
-                    DoAutoZoom(true, target_last);
-                    /* very much simple ""fix"" for the aimbot death stare */
-                    if (g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed && CE_GOOD(LOCAL_W) && re::C_BaseCombatWeapon::GetSlot(RAW_ENT(LOCAL_W)) + 1 != 3)
-                        Aim(target_last);
-                    else if (!g_pLocalPlayer->holding_sniper_rifle)
-                        Aim(target_last);
-
-                    if(!HitscanSpecialCases(target_last, weapon_case))
-                        DoAutoshoot();
-                    else if (HitscanSpecialCases(target_last, weapon_case) && (CE_INT(LOCAL_W, netvar.m_iClip1) == 0))
-                        DoAutoshoot();
-            }
+            if (should_zoom)
+                DoAutoZoom(true, target_last);
+            int weapon_case = LOCAL_W->m_iClassID();
+            if (!HitscanSpecialCases(target_last, weapon_case))
+                DoAutoshoot(target_last);
+        }
         break;
-        }
-        case weapon_melee:
-        {
-            if(should_backtrack)
-                UpdateShouldBacktrack();
-            if(Aim(target_last))
-            {
-                if (antiaim::isEnabled())
-                {
-                    DoAutoshoot();
-                    if (g_pLocalPlayer->weapon_melee_damage_tick)
-                    {
-                        *bSendPackets = false;
-                        Aim(target_last);
-                    }
-                }
-                else
-                {
-                    Aim(target_last);
-                    DoAutoshoot();
-                }
-            }
-            break;
-        }
-
+    case weapon_melee:
+        if (should_backtrack)
+            UpdateShouldBacktrack();
+        target_last = RetrieveBestTarget(aimkey_status);
+        if (target_last)
+            DoAutoshoot(target_last);
+        break;
     case weapon_projectile:
     case weapon_throwable:
         if (*projectile_aimbot)

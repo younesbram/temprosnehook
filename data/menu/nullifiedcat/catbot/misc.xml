@@ -48,8 +48,6 @@
                           tooltip="Second hat/cosmetic to equip, see cathook.club/wiki/How-to-Autoitem"/>
             <AutoVariable width="fill" target="auto-item.hats.3" label="Hat 3"
                           tooltip="Third hat/cosmetic to equip, see cathook.club/wiki/How-to-Autoitem"/>
-        </List>
-    </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Autoload" x="330">
         <List width="150">
             <AutoVariable width="fill" target="cat-bot.autoload.enable" label="Enable autoload"/>

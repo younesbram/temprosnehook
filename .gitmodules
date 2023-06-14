@@ -21,4 +21,4 @@
 	url = https://github.com/nullworks/source-sdk-2013-headers.git
 [submodule "external/boost-cmake"]
 	path = external/boost-cmake
-	url = https://github.com/RosneBurgerworks/boost-cmake
+	url = https://github.com/STEVE4GIT/boost-cmake

@@ -526,6 +526,10 @@ static void CreateMove()
             int weapon_case = LOCAL_W->m_iClassID();
             if (!HitscanSpecialCases(target_last, weapon_case))
                 DoAutoshoot(target_last);
+                    if (g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed && CE_GOOD(LOCAL_W) && re::C_BaseCombatWeapon::GetSlot(RAW_ENT(LOCAL_W)) + 1 != 3)
+                        Aim(target_last);
+                    else if (!g_pLocalPlayer->holding_sniper_rifle)
+                        Aim(target_last);
         }
         break;
     case weapon_melee:

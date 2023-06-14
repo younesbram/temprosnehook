@@ -91,7 +91,7 @@ if (EnableVisuals)
         target_link_libraries(cathook ${FREETYPE_LIBRARIES})
     endif()
 endif()
-
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/external")
 find_package(Git REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(Boost 1.81.0 EXACT)

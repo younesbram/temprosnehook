@@ -33,46 +33,6 @@ DEFINE_HOOKED_METHOD(Shutdown, void, INetChannel *this_, const char *reason)
     }
 #if ENABLE_IPC
     ipc::UpdateServerAddress(true);
-#endif
-    if (isHackActive() && (*custom_disconnect_reason).length() > 3 && strstr(reason, "user"))
-        original::Shutdown(this_, (*custom_disconnect_reason).c_str());
-    else
-        original::Shutdown(this_, reason);
-    if (*auto_abandon && !ignoredc)
-        tfmm::DisconnectAndAbandon();
-    ignoredc = false;
-    hacks::autojoin::OnShutdown();
-    std::string message = reason;
-    votelogger::onShutdown(message);
-    if (*random_name && randomnames_file.TryLoad("names.txt"))
-    {
-        std::random_device rd;
-        std::mt19937 mt(rd());
-        std::uniform_int_distribution<unsigned int> dist(0, randomnames_file.lines.size());
-        name_forced = randomnames_file.lines.at(dist(mt));
-    }
-    else
-        name_forced = "";
 }
 
-static InitRoutine init(
-    []()
-    {
-        random_name.installChangeCallback(
-            [](settings::VariableBase<bool> &, bool after)
-            {
-                if (after)
-                {
-                    if (randomnames_file.TryLoad("names.txt"))
-                    {
-                        std::random_device rd;
-                        std::mt19937 mt(rd());
-                        std::uniform_int_distribution<unsigned int> dist(0, randomnames_file.lines.size());
-                        name_forced = randomnames_file.lines.at(dist(mt));
-                    }
-                }
-                else
-                    name_forced = "";
-            });
-    });
 } // namespace hooked_methods

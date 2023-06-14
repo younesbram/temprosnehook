@@ -31,7 +31,6 @@
 namespace navparser
 {
 static settings::Boolean enabled("nav.enabled", "false");
-static settings::Boolean walk_while_setup{ "navbot.blu-walk-while-setup", "true" };
 static settings::Boolean draw("nav.draw", "false");
 static settings::Boolean look{ "nav.look-at-path", "false" };
 static settings::Boolean draw_debug_areas("nav.draw.debug-areas", "false");
@@ -476,6 +475,7 @@ bool isReady()
     bool level_ready            = level_name == "plr_pipeline" || g_pGameRules->m_iRoundState > 3;
     bool in_setup               = g_pGameRules->m_bInSetup && g_pLocalPlayer->team == TEAM_BLU;
     // FIXME: If we're on a control point map, and blue is the attacking team, then the gates are closed, so we shouldn't path
+    bool in_waiting_for_players = g_pGameRules->m_bInWaitingForPlayers && (level_name.starts_with("pl_") || level_name.starts_with("cp_")) && g_pLocalPlayer->team == TEAM_BLU;
 
     return game_ready && level_ready && !in_setup && !in_waiting_for_players;
 }
@@ -876,7 +876,7 @@ void updateStuckTime()
         // We are stuck for too long, blastlist node for a while and repath
         if (map->connection_stuck_time[key].time_stuck > TIME_TO_TICKS(*stuck_detect_time))
         {
-                map->vischeck_cache[key].expire_tick = walk_while_setup ? TICKCOUNT_TIMESTAMP(30) : TICKCOUNT_TIMESTAMP(*stuck_blacklist_time);
+            map->vischeck_cache[key].expire_tick    = TICKCOUNT_TIMESTAMP(*stuck_blacklist_time);
             map->vischeck_cache[key].vischeck_state = false;
             if (*log_pathing)
                 logging::Info("Blackisted connection %d->%d", key.first->m_id, key.second->m_id);

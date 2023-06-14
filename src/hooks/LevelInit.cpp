@@ -56,4 +56,5 @@ DEFINE_HOOKED_METHOD(LevelInit, void, void *this_, const char *name)
 #if ENABLE_IPC
     if (ipc::peer)
         ipc::peer->memory->peer_user_data[ipc::peer->client_id].ts_connected = time(nullptr);
+} 
 } // namespace hooked_methods

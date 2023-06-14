@@ -31,8 +31,6 @@ DEFINE_HOOKED_METHOD(Shutdown, void, INetChannel *this_, const char *reason)
         *(int *) nullptr = 0;
         exit(1);
     }
-#if ENABLE_IPC
-    ipc::UpdateServerAddress(true);
 }
 
 } // namespace hooked_methods

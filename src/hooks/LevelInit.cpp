@@ -53,8 +53,5 @@ DEFINE_HOOKED_METHOD(LevelInit, void, void *this_, const char *name)
     chat_stack::Reset();
     original::LevelInit(this_, name);
     EC::run(EC::LevelInit);
-#if ENABLE_IPC
-    if (ipc::peer)
-        ipc::peer->memory->peer_user_data[ipc::peer->client_id].ts_connected = time(nullptr);
 } 
 } // namespace hooked_methods

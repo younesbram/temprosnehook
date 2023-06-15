@@ -12,7 +12,6 @@
 #if ENABLE_VISUALS
 
 #include "ESP.hpp"
-#include "SkinChanger.hpp"
 
 #endif
 #include "Aimbot.hpp"

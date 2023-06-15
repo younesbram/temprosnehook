@@ -207,9 +207,9 @@ void MoveToTick(BacktrackData data)
 
     typedef BoneCache *(*GetBoneCache_t)(unsigned);
     typedef void (*BoneCacheUpdateBones_t)(BoneCache *, matrix3x4_t * bones, unsigned, float time);
-    static auto hitbox_bone_cache_handle_offset = *(unsigned *) (CSignature.GetClientSignature("8B 86 ? ? ? ? 89 04 24 E8 ? ? ? ? 85 C0 89 C3 74 48") + 2);
-    static auto studio_get_bone_cache           = (GetBoneCache_t) CSignature.GetClientSignature("55 89 E5 56 53 BB ? ? ? ? 83 EC 50 C7 45 D8");
-    static auto bone_cache_update_bones         = (BoneCacheUpdateBones_t) CSignature.GetClientSignature("55 89 E5 57 31 FF 56 53 83 EC 1C 8B 5D 08 0F B7 53 10");
+    static auto hitbox_bone_cache_handle_offset = *(unsigned *) (CSignature::GetClientSignature("8B 86 ? ? ? ? 89 04 24 E8 ? ? ? ? 85 C0 89 C3 74 48") + 2);
+    static auto studio_get_bone_cache           = (GetBoneCache_t) CSignature::GetClientSignature("55 89 E5 56 53 BB ? ? ? ? 83 EC 50 C7 45 D8");
+    static auto bone_cache_update_bones         = (BoneCacheUpdateBones_t) CSignature::GetClientSignature("55 89 E5 57 31 FF 56 53 83 EC 1C 8B 5D 08 0F B7 53 10");
 
     auto hitbox_bone_cache_handle = CE_VAR(target, hitbox_bone_cache_handle_offset, unsigned);
     if (hitbox_bone_cache_handle)
@@ -227,7 +227,7 @@ void MoveToTick(BacktrackData data)
     uintptr_t collisionprop = (uintptr_t) RAW_ENT(target) + netvar.m_Collision;
 
     typedef void (*UpdateParition_t)(uintptr_t prop);
-    static auto sig_update                     = CSignature.GetClientSignature("55 89 E5 57 56 53 83 EC 3C 8B 5D ? 8B 43 ? 8B 90");
+    static auto sig_update                     = CSignature::GetClientSignature("55 89 E5 57 56 53 83 EC 3C 8B 5D ? 8B 43 ? 8B 90");
     static UpdateParition_t UpdatePartition_fn = (UpdateParition_t) sig_update;
 
     // Mark for update

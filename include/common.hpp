@@ -18,7 +18,7 @@
 #include <fstream>
 #include <unordered_map>
 #include <algorithm>
-
+#include "core/macros.hpp"
 #include <unistd.h>
 #include <link.h>
 #include <sys/sysinfo.h>

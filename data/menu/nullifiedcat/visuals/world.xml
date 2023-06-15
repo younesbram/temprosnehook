@@ -55,15 +55,7 @@
             <AutoVariable width="fill" target="visual.night-mode.skybox-color" label="Nightmode color (skybox)"/>
             <LabeledObject width="fill" label="Ragdoll override">
                 <Select target="visual.ragdoll-mode">
-                    <Option name="Auto" value="0"/>
-                    <Option name="Gib" value="1"/>
-                    <Option name="Burning" value="2"/>
-                    <Option name="Electrocuted" value="3"/>
-                    <Option name="Ash" value="4"/>
-                    <Option name="Gold" value="5"/>
-                    <Option name="Ice" value="6"/>
-                </Select>
-            </LabeledObject>
+                 <Option name="Auto" value="0"/>
             <AutoVariable width="fill" target="visual.ragdoll-only-local" label="Only override local player kills"/>
             <LabeledObject width="fill" label="Skybox override">
                 <Select target="misc.skybox-override">

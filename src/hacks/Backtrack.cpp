@@ -1,6 +1,5 @@
 #include "common.hpp"
 #include "Backtrack.hpp"
-#include "AntiCheatBypass.hpp"
 
 namespace hacks::backtrack
 {
@@ -72,7 +71,7 @@ std::vector<std::vector<BacktrackData>> bt_data;
 // Update our sequences
 void updateDatagram()
 {
-    auto *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
+    INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
     if (ch)
     {
         int m_nInSequenceNr = ch->m_nInSequenceNr;
@@ -90,7 +89,7 @@ void updateDatagram()
 // Latency to add for backtrack
 float getLatency()
 {
-    auto *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
+    INetChannel *ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
     // Track what actual latency we have
     float real_latency = 0.0f;
 
@@ -107,9 +106,6 @@ float getLatency()
 bool isTickInRange(int tickcount)
 {
     int delta_tickcount = abs(tickcount - current_user_cmd->tick_count + TIME_TO_TICKS(getLatency() / 1000.0f));
-    if (!hacks::antianticheat::enabled)
-        return TICKS_TO_TIME(delta_tickcount) <= 0.2f - TICKS_TO_TIME(2);
-    else
         return delta_tickcount <= TICKS_TO_TIME(1);
 }
 
@@ -121,8 +117,6 @@ bool isEnabled()
     CachedEntity *wep = LOCAL_W;
     if (CE_BAD(wep))
     {
-        if (hacks::antianticheat::enabled)
-            return true;
         return false;
     }
     int slot = re::C_BaseCombatWeapon::GetSlot(RAW_ENT(wep));
@@ -192,13 +186,14 @@ void MoveToTick(BacktrackData data)
     // Need to reconstruct a bunch of data
     target->hitboxes.InvalidateCache();
 
-    // Mark all the hitboxes as valid, so we don't recalc them and use the old data
+    // Mark all the hitboxes as valid so we don't recalc them and use the old data
     // We already have
     target->hitboxes.m_CacheInternal.resize(data.hitboxes.size());
-    // Sets bits 1-18 (Or array indicies 0-17 if this was an array)
-    target->hitboxes.m_CacheValidationFlags |= 262143ULL;
-    for (unsigned i = hitbox_t::head; i <= foot_R; ++i)
-        target->hitboxes.m_CacheInternal.at(i) = data.hitboxes.at(i);
+    for (int i = hitbox_t::head; i <= foot_R; i++)
+    {
+        target->hitboxes.m_CacheValidationFlags[i] = true;
+        target->hitboxes.m_CacheInternal.at(i)     = data.hitboxes.at(i);
+    }
 
     // Sync animation properly
     CE_FLOAT(target, netvar.m_flSimulationTime) = data.simtime;
@@ -212,9 +207,9 @@ void MoveToTick(BacktrackData data)
 
     typedef BoneCache *(*GetBoneCache_t)(unsigned);
     typedef void (*BoneCacheUpdateBones_t)(BoneCache *, matrix3x4_t * bones, unsigned, float time);
-    static auto hitbox_bone_cache_handle_offset = *(unsigned *) (CSignature::GetClientSignature("8B 86 ? ? ? ? 89 04 24 E8 ? ? ? ? 85 C0 89 C3 74 48") + 2);
-    static auto studio_get_bone_cache           = (GetBoneCache_t) CSignature::GetClientSignature("55 89 E5 56 53 BB ? ? ? ? 83 EC 50 C7 45 D8");
-    static auto bone_cache_update_bones         = (BoneCacheUpdateBones_t) CSignature::GetClientSignature("55 89 E5 57 31 FF 56 53 83 EC 1C 8B 5D 08 0F B7 53 10");
+    static auto hitbox_bone_cache_handle_offset = *(unsigned *) (gSignatures.GetClientSignature("8B 86 ? ? ? ? 89 04 24 E8 ? ? ? ? 85 C0 89 C3 74 48") + 2);
+    static auto studio_get_bone_cache           = (GetBoneCache_t) gSignatures.GetClientSignature("55 89 E5 56 53 BB ? ? ? ? 83 EC 50 C7 45 D8");
+    static auto bone_cache_update_bones         = (BoneCacheUpdateBones_t) gSignatures.GetClientSignature("55 89 E5 57 31 FF 56 53 83 EC 1C 8B 5D 08 0F B7 53 10");
 
     auto hitbox_bone_cache_handle = CE_VAR(target, hitbox_bone_cache_handle_offset, unsigned);
     if (hitbox_bone_cache_handle)
@@ -232,8 +227,8 @@ void MoveToTick(BacktrackData data)
     uintptr_t collisionprop = (uintptr_t) RAW_ENT(target) + netvar.m_Collision;
 
     typedef void (*UpdateParition_t)(uintptr_t prop);
-    static auto sig_update         = CSignature::GetClientSignature("55 89 E5 57 56 53 83 EC 3C 8B 5D ? 8B 43 ? 8B 90");
-    static auto UpdatePartition_fn = (UpdateParition_t) sig_update;
+    static auto sig_update                     = gSignatures.GetClientSignature("55 89 E5 57 56 53 83 EC 3C 8B 5D ? 8B 43 ? 8B 90");
+    static UpdateParition_t UpdatePartition_fn = (UpdateParition_t) sig_update;
 
     // Mark for update
     int *entity_flags = (int *) ((uintptr_t) RAW_ENT(target) + 400);
@@ -255,10 +250,8 @@ void RestoreEntity(int entidx)
     set_data = std::nullopt;
 }
 
-static void CreateMoveEarly()
+void CreateMoveEarly()
 {
-    if (hacks::antianticheat::enabled && *latency > 200.0f)
-        latency = 200.0f;
     draw_positions.clear();
     isBacktrackEnabled = isEnabled();
     if (!isBacktrackEnabled)
@@ -267,7 +260,6 @@ static void CreateMoveEarly()
         bt_data.clear();
         return;
     }
-
     if (CE_GOOD(LOCAL_E))
         updateDatagram();
     else
@@ -278,9 +270,10 @@ static void CreateMoveEarly()
     if ((int) bt_data.size() != g_IEngine->GetMaxClients())
         bt_data.resize(g_IEngine->GetMaxClients());
 
-    for (const auto &ent: entity_cache::player_cache)
+    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
     {
-        int index = ent->m_IDX - 1;
+        CachedEntity *ent = ENTITY(i);
+        int index         = i - 1;
 
         auto &ent_data = bt_data[index];
 
@@ -290,7 +283,7 @@ static void CreateMoveEarly()
             continue;
         }
         BacktrackData data{};
-        data.entidx      = ent->m_IDX;
+        data.entidx      = i;
         data.m_vecAngles = ent->m_vecAngle();
         data.m_vecOrigin = ent->m_vecOrigin();
         data.tickcount   = current_user_cmd->tick_count;
@@ -304,7 +297,7 @@ static void CreateMoveEarly()
         // Copy bones (for chams/glow)
         data.bones = ent->hitboxes.bones;
 
-        for (int i = head; i <= foot_R; ++i)
+        for (int i = head; i <= foot_R; i++)
             data.hitboxes.at(i) = *ent->hitboxes.GetHitbox(i);
 
         ent_data.insert(ent_data.begin(), data);
@@ -326,7 +319,7 @@ static void CreateMoveEarly()
     }
 }
 
-static void CreateMoveLate()
+void CreateMoveLate()
 {
     if (!isBacktrackEnabled)
         return;
@@ -334,14 +327,14 @@ static void CreateMoveLate()
     red_position = std::nullopt;
 
     // Bad player
-    if (CE_BAD(LOCAL_E) || HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E) || !g_pLocalPlayer->alive)
+    if (CE_BAD(LOCAL_E) || HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
         return;
 
     // No data set yet, try to get nearest to cursor
     if (!set_data && !g_pLocalPlayer->bUseSilentAngles)
     {
         float cursor_distance = FLT_MAX;
-        for (const auto &ent_data : bt_data)
+        for (auto &ent_data : bt_data)
         {
             for (auto &tick_data : ent_data)
             {

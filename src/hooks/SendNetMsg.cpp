@@ -7,6 +7,7 @@
 #include <settings/Int.hpp>
 #include "AntiAim.hpp"
 #include "HookedMethods.hpp"
+#include "nullnexus.hpp"
 #include "Warp.hpp"
 #include "nospread.hpp"
 #include "AntiCheatBypass.hpp"
@@ -211,7 +212,26 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, boo
         if (!say_idx || !say_team_idx)
         {
             offset    = say_idx ? 26 : 21;
-            
+
+#if ENABLE_NULLNEXUS
+            // Only allow !! and !!! if crypto_chat is on
+            if (crypt_chat)
+            {
+                std::string msg(str.substr(offset));
+                msg = msg.substr(0, msg.length() - 2);
+                if (msg.find("!!!") == 0 || msg.find("!!") == 0)
+                {
+                    int sub_val = 2;
+                    if (msg.find("!!!") == 0)
+                        sub_val = 3;
+                    // Message is sent over Nullnexus.
+                    std::string substrmsg(msg.substr(sub_val));
+                    nullnexus::sendmsg(substrmsg);
+                    // Do not send message over normal chat.
+                    return false;
+                }
+            }
+#endif
             if (*newlines_msg > 0)
             {
                 // TODO move out? update in a value change callback?

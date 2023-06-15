@@ -12,6 +12,7 @@
 #include "CatBot.hpp"
 #include "ChatCommands.hpp"
 #include <iomanip>
+#include "nullnexus.hpp"
 #include "votelogger.hpp"
 #include "nospread.hpp"
 

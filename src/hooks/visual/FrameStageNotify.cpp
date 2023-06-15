@@ -186,6 +186,8 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
         hacks::anti_anti_aim::frameStageNotify(stage);
     }
     {
+        PROF_SECTION(FSN_skinchanger)
+        hacks::skinchanger::FrameStageNotify(stage);
     }
     std::optional<Vector> backup_punch;
     if (isHackActive() && !g_Settings.bInvalid && stage == FRAME_RENDER_START)

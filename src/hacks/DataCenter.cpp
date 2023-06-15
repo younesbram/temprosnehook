@@ -29,6 +29,7 @@ static settings::Boolean enable_north_america{ "dc.toggle-north-america", "false
 static settings::Boolean enable_south_america{ "dc.toggle-south-america", "false" };
 static settings::Boolean enable_asia{ "dc.toggle-asia", "false" };
 static settings::Boolean enable_oceania{ "dc.toggle-oceania", "false" };
+static settings::Boolean enable_africa{ "dc.toggle-africa", "false" };
 
 typedef std::array<char, 5> CidStr_t;
 
@@ -243,6 +244,7 @@ static void Init()
     enable_south_america.installChangeCallback([](settings::VariableBase<bool> &, bool after) { manageRegions(south_america_datacenters, after); });
     enable_asia.installChangeCallback([](settings::VariableBase<bool> &, bool after) { manageRegions(asia_datacenters, after); });
     enable_oceania.installChangeCallback([](settings::VariableBase<bool> &, bool after) { manageRegions(oceana_datacenters, after); });
+    enable_africa.installChangeCallback([](settings::VariableBase<bool> &, bool after) { manageRegions(africa_datacenters, after); });
 }
 
 static InitRoutine init(Init);

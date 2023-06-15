@@ -191,7 +191,7 @@ void MoveToTick(BacktrackData data)
     target->hitboxes.m_CacheInternal.resize(data.hitboxes.size());
     for (int i = hitbox_t::head; i <= foot_R; i++)
     {
-        target->hitboxes.m_CacheValidationFlags(i) = true;
+        target->hitboxes.m_CacheValidationFlags[i] = true;
         target->hitboxes.m_CacheInternal.at(i)     = data.hitboxes.at(i);
     }
 

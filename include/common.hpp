@@ -29,7 +29,6 @@
 
 #include "timer.hpp"
 
-#include "core/macros.hpp"
 #include "Constants.hpp"
 #if ENABLE_VISUALS
 #include <visual/colors.hpp>

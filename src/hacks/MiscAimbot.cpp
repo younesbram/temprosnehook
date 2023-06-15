@@ -184,7 +184,7 @@ static InitRoutine init(
         EC::Register(EC::CreateMove, CreateMove, "cm_miscaimbot", EC::average);
         EC::Register(EC::CreateMoveWarp, CreateMove, "cmw_miscaimbot", EC::average);
 
-        static auto signature = CSignature.GetClientSignature("55 89 E5 53 83 EC 14 E8 ? ? ? ? 85 C0 74 ? 8D 98 ? ? ? ? C7 44 24 ? 11 00 00 00");
+        static auto signature = CSignature::GetClientSignature("55 89 E5 53 83 EC 14 E8 ? ? ? ? 85 C0 74 ? 8D 98 ? ? ? ? C7 44 24 ? 11 00 00 00");
 
         CAM_CapYaw_detour.Init(signature, (void *) CAM_CapYaw_Hook);
         EC::Register(

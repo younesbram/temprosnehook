@@ -53,5 +53,22 @@ DEFINE_HOOKED_METHOD(LevelInit, void, void *this_, const char *name)
     chat_stack::Reset();
     original::LevelInit(this_, name);
     EC::run(EC::LevelInit);
-} 
+#if ENABLE_IPC
+    if (ipc::peer)
+        ipc::peer->memory->peer_user_data[ipc::peer->client_id].ts_connected = time(nullptr);
+#endif
+    if (*random_name)
+    {
+        static TextFile file;
+        if (file.TryLoad("names.txt"))
+        {
+            std::random_device rd;
+            std::mt19937 mt(rd());
+            std::uniform_int_distribution<unsigned int> dist(0, file.lines.size());
+            name_forced = file.lines.at(dist(mt));
+        }
+    }
+    else
+        name_forced = "";
+}
 } // namespace hooked_methods

@@ -36,8 +36,7 @@ target_sources(cathook PRIVATE ${files})
 
 add_subdirectory(ac)
 if (EnableVisuals)
-    set(files "${CMAKE_CURRENT_LIST_DIR}/DominateMark.cpp"
-            "${CMAKE_CURRENT_LIST_DIR}/ESP.cpp"
+    set(files "${CMAKE_CURRENT_LIST_DIR}/ESP.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/HeadESP.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/KillfeedColor.cpp"
             "${CMAKE_CURRENT_LIST_DIR}/Radar.cpp"

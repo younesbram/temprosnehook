@@ -19,6 +19,22 @@ void SendNetMsg(INetMessage &msg);
 }
 namespace hooked_methods
 {
+std::vector<KeyValues *> Iterate(KeyValues *event, int depth)
+{
+    std::vector<KeyValues *> peer_list = { event };
+    for (int i = 0; i < depth; i++)
+    {
+        for (auto ev : peer_list)
+            for (KeyValues *dat2 = ev; dat2 != NULL; dat2 = dat2->m_pPeer)
+                if (std::find(peer_list.begin(), peer_list.end(), dat2) == peer_list.end())
+                    peer_list.push_back(dat2);
+        for (auto ev : peer_list)
+            for (KeyValues *dat2 = ev; dat2 != NULL; dat2 = dat2->m_pSub)
+                if (std::find(peer_list.begin(), peer_list.end(), dat2) == peer_list.end())
+                    peer_list.push_back(dat2);
+    }
+    return peer_list;
+}
 
 void ParseKeyValue(KeyValues *event)
 {

@@ -129,8 +129,6 @@
             <AutoVariable width="fill" target="chat.log-events.death" label="Log death events"/>
             <AutoVariable width="fill" target="chat.log-events.spawn" label="Log (re)spawn events"/>
             <AutoVariable width="fill" target="chat.log-events.changeclass" label="Log class change events"/>
-            <AutoVariable width="fill" target="chat.identify" label="Identify" tooltip="Identify Cathook users."/>
-            <AutoVariable width="fill" target="chat.identify.answer" label="Counter identify"/>
         </List>
     </Box>
     <Box name="Votelogger" width="content" height="content" padding="12 6 6 6" x="170" y="140">

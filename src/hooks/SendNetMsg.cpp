@@ -13,11 +13,6 @@
 
 static settings::Int newlines_msg{ "chat.prefix-newlines", "0" };
 static settings::Boolean log_sent{ "debug.log-sent-chat", "false" };
-static settings::Boolean answerIdentify{ "chat.identify.answer", "true" };
-static Timer identify_timer{};
-constexpr int CAT_IDENTIFY   = 0xCA7;
-constexpr int CAT_REPLY      = 0xCA8;
-constexpr float AUTH_MESSAGE = 1234567.0f;
 
 namespace hacks::catbot
 {
@@ -25,41 +20,6 @@ void SendNetMsg(INetMessage &msg);
 }
 namespace hooked_methods
 {
-
-static bool send_achievement_reply{};
-static Timer send_achievement_reply_timer{};
-
-// Welcome back Achievement based identify.
-void sendAchievementKv(int value)
-{
-    auto *kv = new KeyValues("AchievementEarned");
-    kv->SetInt("achievementID", value);
-    g_IEngine->ServerCmdKeyValues(kv);
-}
-
-void sendIdentifyMessage(bool reply)
-{
-    reply ? sendAchievementKv(CAT_REPLY) : sendAchievementKv(CAT_IDENTIFY);
-}
-
-settings::Boolean identify{ "chat.identify", "true" };
-
-std::vector<KeyValues *> Iterate(KeyValues *event, int depth)
-{
-    std::vector<KeyValues *> peer_list = { event };
-    for (int i = 0; i < depth; i++)
-    {
-        for (auto ev : peer_list)
-            for (KeyValues *dat2 = ev; dat2 != nullptr; dat2 = dat2->m_pPeer)
-                if (std::find(peer_list.begin(), peer_list.end(), dat2) == peer_list.end())
-                    peer_list.push_back(dat2);
-        for (auto ev : peer_list)
-            for (KeyValues *dat2 = ev; dat2 != nullptr; dat2 = dat2->m_pSub)
-                if (std::find(peer_list.begin(), peer_list.end(), dat2) == peer_list.end())
-                    peer_list.push_back(dat2);
-    }
-    return peer_list;
-}
 
 void ParseKeyValue(KeyValues *event)
 {
@@ -128,61 +88,6 @@ void ParseKeyValue(KeyValues *event)
         }
     }
 }
-
-void ProcessAchievement(IGameEvent *ach)
-{
-    int player_idx  = ach->GetInt("player", 0xDEAD);
-    int achievement = ach->GetInt("achievement", 0xDEAD);
-    if (player_idx != 0xDEAD && (achievement == CAT_IDENTIFY || achievement == CAT_REPLY))
-    {
-        // Always reply and set on CA7 and only set on CA8
-        bool reply = achievement == CAT_IDENTIFY;
-        player_info_s info{};
-        if (!g_IEngine->GetPlayerInfo(player_idx, &info))
-            return;
-        if (reply && *answerIdentify && player_idx != g_pLocalPlayer->entity_idx)
-        {
-            send_achievement_reply_timer.update();
-            send_achievement_reply = true;
-        }
-        if (playerlist::ChangeState(info.friendsID, playerlist::k_EState::CAT))
-            PrintChat("Detected \x07%06X%s\x01 as a Cathook user", 0xe1ad01, info.name);
-    }
-}
-
-class AchievementListener : public IGameEventListener2
-{
-    void FireGameEvent(IGameEvent *event) override
-    {
-        ProcessAchievement(event);
-    }
-};
-static CatCommand send_identify("debug_send_identify", "debug", []() { sendIdentifyMessage(false); });
-
-static AchievementListener event_listener{};
-
-static InitRoutine run_identify(
-    []()
-    {
-        EC::Register(
-            EC::CreateMove,
-            []()
-            {
-                if (send_achievement_reply && send_achievement_reply_timer.check(10000))
-                {
-                    sendIdentifyMessage(true);
-                    send_achievement_reply = false;
-                }
-                // It is safe to send every 15ish seconds, small packet
-                if (!*identify || CE_BAD(LOCAL_E) || !identify_timer.test_and_set(15000))
-                    return;
-                sendIdentifyMessage(false);
-            },
-            "sendnetmsg_createmove");
-        g_IEventManager2->AddListener(&event_listener, "achievement_earned", false);
-        EC::Register(
-            EC::Shutdown, []() { g_IEventManager2->RemoveListener(&event_listener); }, "shutdown_event");
-    });
 
 DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, bool force_reliable, bool voice)
 {

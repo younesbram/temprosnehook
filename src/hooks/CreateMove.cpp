@@ -254,8 +254,6 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
     if (firstcm)
     {
         DelayTimer.update();
-        if (identify)
-            sendIdentifyMessage(false);
         EC::run(EC::FirstCM);
         firstcm = false;
     }

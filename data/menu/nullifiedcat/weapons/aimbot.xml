@@ -188,24 +188,6 @@
             </LabeledObject>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Sandvich aimbot" x="340" y="230">
-        <List width="150">
-            <AutoVariable width="fill" target="sandwichaim.enable" label="Enable"/>
-            <AutoVariable width="fill" target="sandwichaim.aimkey" label="Aim key"/>
-            <LabeledObject width="fill" label="Aim key mode">
-                <Select target="sandwichaim.aimkey-mode">
-                    <Option name="Disable" value="0"/>
-                    <Option name="Pressed" value="1"/>
-                    <Option name="Not pressed" value="2"/>
-                </Select>
-            </LabeledObject>
-        </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Shield aimbot" x="340" y="295">
-        <List width="150">
-            <AutoVariable width="fill" target="chargeaim.enable" label="Enable"
-                          tooltip="Makes your demoman charge automatically go towards the enemy. Only active when key is held, and does not trigger the charge itself."/>
-            <AutoVariable width="fill" target="chargeaim.key" label="Aim key"/>
-        </List>
     </Box>
 </Tab>

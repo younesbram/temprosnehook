@@ -1551,6 +1551,23 @@ static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &ne
     }
 }
 
+static void updateSlot(std::pair<CachedEntity *, float> &nearest)
+{
+    static Timer slot_timer{};
+    if (CE_GOOD(LOCAL_E) && !HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E) && CE_GOOD(LOCAL_W) && g_pLocalPlayer->alive)
+    {
+        IClientEntity *weapon = RAW_ENT(LOCAL_W);
+        if (re::C_BaseCombatWeapon::IsBaseCombatWeapon(weapon))
+        {
+            slot        = re::C_BaseCombatWeapon::GetSlot(weapon) + 1;
+            int newslot = getBestSlot(static_cast<slots>(slot), nearest);
+            if (slot != newslot)
+                g_IEngine->ClientCmd_Unrestricted(format("slot", newslot).c_str());
+        }
+    }
+}
+
+
 static void CreateMove()
 {
     if (!*enabled || !navparser::NavEngine::isReady())

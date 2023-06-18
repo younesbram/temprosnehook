@@ -14,6 +14,13 @@
                     <Option name="Menu on" value="3"/>
                 </Select>
             </LabeledObject>
+            <AutoVariable width="fill" target="visual.snowflakes" label="Enable snowflakes"/>
+            <AutoVariable width="fill" target="visual.snowflakes.fall-speed.min" label="Minimum fall speed"/>
+            <AutoVariable width="fill" target="visual.snowflakes.fall-speed.max" label="Maximum fall speed"/>
+            <AutoVariable width="fill" target="visual.snowflakes.sideways-speed.min" label="Minimum sidemove speed"/>
+            <AutoVariable width="fill" target="visual.snowflakes.sideways-speed.max" label="Maximum sidemove speed"/>
+            <AutoVariable width="fill" target="visual.font_size.esp" label="Main font size"/>
+            <AutoVariable width="fill" target="visual.font_size.center_size" label="Center string font size"/>
     <Box padding="12 6 6 6" width="content" height="content" name="Team colors" x="185">
         <List width="150">
             <AutoVariable width="fill" target="colors.team-red" label="Red"/>

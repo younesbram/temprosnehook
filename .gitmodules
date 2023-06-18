@@ -6,7 +6,7 @@
 	url = https://github.com/Loser911/libxoverlay
 [submodule "simple-ipc"]
 	path = external/simple-ipc
-	url = https://github.com/Loser911/simple-ipc
+	url = https://github.com/nullworks/simple-ipc
 [submodule "external/MicroPather"]
 	path = external/MicroPather
 	url = https://github.com/nullworks/MicroPather

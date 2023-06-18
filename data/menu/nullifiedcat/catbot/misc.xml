@@ -24,8 +24,6 @@
             <AutoVariable width="fill" target="autoparty.message-kicks" label="Log to chat"
                           tooltip="Log kick notifications to party chat."/>
             <AutoVariable width="fill" target="autoparty.debug" label="Log locks/unlocks"/>
-        </List>
-    </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Auto item" x="165">
         <List width="150">
             <AutoVariable width="fill" target="auto-item.enable" label="Enable auto item"

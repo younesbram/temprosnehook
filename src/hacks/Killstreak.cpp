@@ -75,7 +75,7 @@ void on_kill(IGameEvent *event)
         return;
     if (killer_id == victim_id)
         return;
-    if (CE_BAD(LOCAL_E) || CE_BAD(LOCAL_W) || !LOCAL_E->m_bAlivePlayer())
+    if (CE_BAD(LOCAL_E) || CE_BAD(LOCAL_W) || !g_pLocalPlayer->alive)
         return;
 
     killstreak++;

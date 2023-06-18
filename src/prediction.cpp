@@ -137,7 +137,7 @@ void applyStrafePrediction(Vector &pos, StrafePredictionData &data, float predic
 // Check if this target is eligible for strafe prediction and return an object containing info if it is
 std::optional<StrafePredictionData> initializeStrafePrediction(CachedEntity *ent)
 {
-    if (g_pLocalPlayer->weapon_mode == weapon_projectile && ent->m_Type() == ENTITY_PLAYER && ent->m_IDX > 0 && ent->m_IDX <= g_GlobalVars->maxClients && !(CE_INT(ent, netvar.iFlags) & FL_ONGROUND))
+    if (GetWeaponMode() == weapon_projectile && ent->m_Type() == ENTITY_PLAYER && ent->m_IDX > 0 && ent->m_IDX <= g_GlobalVars->maxClients && !(CE_INT(ent, netvar.iFlags) & FL_ONGROUND))
     {
         auto &buffer = previous_positions.at(ent->m_IDX - 1);
         if (buffer.full())

@@ -102,7 +102,7 @@ static int last_buttons{ 0 };
 
 static void updateAntiAfk()
 {
-    if (current_user_cmd->buttons != last_buttons || g_pLocalPlayer->life_state)
+    if (current_user_cmd->buttons != last_buttons || g_pLocalPlayer->alive)
     {
         anti_afk_timer.update();
         last_buttons = current_user_cmd->buttons;
@@ -241,14 +241,14 @@ static void CreateMove()
     if (*anti_afk)
         updateAntiAfk();
 
-    if (*auto_jump && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
+    if (*auto_jump && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->alive)
     {
         static int ticks_last_jump = 0;
 
         if (UniformRandomInt(0, 99) > *auto_jump_chance)
             return;
 
-        bool ground = CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND;
+        bool ground = g_pLocalPlayer->flags & FL_ONGROUND;
         bool jump   = current_user_cmd->buttons & IN_JUMP;
 
         if (!ground && jump && ticks_last_jump++ >= 9)
@@ -259,14 +259,14 @@ static void CreateMove()
     }
 
     // Automatically strafes in the air
-    if (*auto_strafe && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
+    if (*auto_strafe && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->alive)
     {
         auto movetype = (unsigned) CE_VAR(LOCAL_E, 0x194, unsigned char);
 
         if (movetype == MoveType_t::MOVETYPE_NOCLIP || movetype == MoveType_t::MOVETYPE_LADDER)
             return;
 
-        auto flags              = CE_INT(LOCAL_E, netvar.iFlags);
+        auto flags              = g_pLocalPlayer->flags;
         static bool was_jumping = false;
         bool is_jumping         = current_user_cmd->buttons & IN_JUMP;
 
@@ -328,9 +328,9 @@ static void CreateMove()
         }
     }
 
-    if (*accurate_movement && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
+    if (*accurate_movement && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->alive)
     {
-        if (!(CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND))
+        if (!(g_pLocalPlayer->flags & FL_ONGROUND))
             return;
 
         if (current_user_cmd->buttons & (IN_MOVELEFT | IN_MOVERIGHT | IN_FORWARD | IN_BACK))
@@ -360,7 +360,7 @@ static void CreateMove()
         current_user_cmd->viewangles.x = (current_user_cmd->buttons & IN_BACK) ? 91.0f : (current_user_cmd->buttons & IN_FORWARD) ? 0.0f : 90.0f;
 
     // Infinite lunchbox
-    if (*infinite_lunchbox && infinite_lunchbox_key.isKeyDown() && LOCAL_E->m_bAlivePlayer())
+    if (*infinite_lunchbox && infinite_lunchbox_key.isKeyDown() && g_pLocalPlayer->alive)
     {
         int weapon_id = HandleToIDX(CE_INT(LOCAL_E, netvar.hActiveWeapon));
         if (weapon_id == CL_CLASS(CTFLunchBox))

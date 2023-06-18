@@ -126,7 +126,7 @@ namespace hooked_methods
 void speedHack(CUserCmd *cmd)
 {
     float speed;
-    if (cmd->buttons & IN_DUCK && (CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND) && !(cmd->buttons & IN_ATTACK) && !HasCondition<TFCond_Charging>(LOCAL_E))
+    if (cmd->buttons & IN_DUCK && (g_pLocalPlayer->flags & FL_ONGROUND) && !(cmd->buttons & IN_ATTACK) && !HasCondition<TFCond_Charging>(LOCAL_E))
     {
         speed                     = Vector{ cmd->forwardmove, cmd->sidemove, 0.0f }.Length();
         static float prevspeedang = 0.0f;
@@ -261,7 +261,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
 
     if (CE_GOOD(LOCAL_E))
     {
-        if (!g_pLocalPlayer->life_state && CE_GOOD(LOCAL_W))
+        if (!g_pLocalPlayer->alive && CE_GOOD(LOCAL_W))
         {
             // Walkbot can leave game.
             if (!g_IEngine->IsInGame())
@@ -277,7 +277,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
                 {
                     // Do not fakelag when trying to attack
                     bool do_fakelag = true;
-                    switch (g_pLocalPlayer->weapon_mode)
+                    switch (GetWeaponMode())
                     {
                     case weapon_melee:
                     {
@@ -295,12 +295,12 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
                         break;
                     }
 
-                    if (fakelag_midair && CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND)
+                    if (fakelag_midair && g_pLocalPlayer->flags & FL_ONGROUND)
                         do_fakelag = false;
 
                     if (do_fakelag)
                     {
-                        int fakelag_amnt = (*fakelag_amount > 1) ? *fakelag_amount : 1;
+                        int fakelag_amnt = *fakelag_amount > 1 ? *fakelag_amount : 1;
                         *bSendPackets    = fakelag_amnt == fakelag_queue;
                         if (*bSendPackets)
                             g_pLocalPlayer->isFakeAngleCM = true;
@@ -324,7 +324,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
         PROF_SECTION(CM_WRAPPER)
         EC::run(EC::CreateMove_NoEnginePred);
 
-        if (engine_pred && g_pLocalPlayer->weapon_mode == weapon_projectile)
+        if (engine_pred && GetWeaponMode() == weapon_projectile)
         {
             engine_prediction::RunEnginePrediction(RAW_ENT(LOCAL_E), current_user_cmd);
             g_pLocalPlayer->UpdateEye();

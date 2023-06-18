@@ -280,7 +280,7 @@ bool EffectGlow::ShouldRenderGlow(IClientEntity *entity)
             return false;
         if (!teammates && !ent->m_bEnemy() && ent->player_info && playerlist::IsDefault(ent->player_info->friendsID))
             return false;
-        if (CE_BYTE(ent, netvar.iLifeState) != LIFE_ALIVE)
+        if (!ent->m_bAlivePlayer())
             return false;
         return true;
     case ENTITY_PROJECTILE:

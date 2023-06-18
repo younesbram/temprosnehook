@@ -54,23 +54,17 @@ DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
     if (spectator_target)
     {
         CachedEntity *spec = ENTITY(spectator_target);
-        if (CE_GOOD(spec) && !CE_BYTE(spec, netvar.iLifeState))
+        if (CE_GOOD(spec) && !spec->m_bAlivePlayer())
         {
             setup->origin = spec->m_vecOrigin() + CE_VECTOR(spec, netvar.vViewOffset);
             // why not spectate yourself
             if (spec == LOCAL_E)
-            {
                 setup->angles = CE_VAR(spec, netvar.m_angEyeAnglesLocal, QAngle);
-            }
             else
-            {
                 setup->angles = CE_VAR(spec, netvar.m_angEyeAngles, QAngle);
-            }
         }
         if (g_IInputSystem->IsButtonDown(ButtonCode_t::KEY_SPACE))
-        {
             spectator_target = 0;
-        }
     }
 
     if (freecam && current_user_cmd)

@@ -14,7 +14,6 @@ Free open-source GNU/Linux training software for the game **Team Fortress 2**. D
 - [Getting started](#getting-started)
     - [Dependencies](#dependencies)
     - [Downloading](#downloading)
-    - [Compiling from source](#compiling-from-source)
     - [Loading / Injecting into game process](#loading--injecting-into-game-process)
 - [FAQ](#faq)
     - [How do I open the menu?](#how-do-i-open-the-menu)

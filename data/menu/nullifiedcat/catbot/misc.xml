@@ -1,4 +1,4 @@
-<Tab name="Misc" padding="6 6 6 6">
+<Tab name="Misc" padding="4 4 4 4">
     <Box name="Auto Party" width="content" height="content" padding="12 6 6 6">
         <List width="150">
             <AutoVariable width="fill" target="autoparty.enable" label="Enable auto party"/>

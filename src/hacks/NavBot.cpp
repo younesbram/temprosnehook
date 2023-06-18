@@ -1589,7 +1589,6 @@ static void CreateMove()
     auto nearest = getNearestPlayerDistance();
 
     updateSlot(nearest);
-    autoJump(nearest);
     updateEnemyBlacklist(slot);
 
     // Try to escape danger first of all

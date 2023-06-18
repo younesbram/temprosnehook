@@ -37,18 +37,6 @@ Open a terminal window and enter the following command:
 
 The `cathook` folder should have been created successfully, containing all source files.
 
-### Compiling from source
-
-When you have obtained a copy of the source code, the next step is opening it with your IDE of choice.
-
-Then change all `-march=native -mtune=native` arguments inside [CMakeLists.txt](https://github.com/explowz/cathook/blob/master/CMakeLists.txt) to `-march=<your cpu-type> -mtune=<your cpu-type>`. This should result in more performant code, optimized for your CPU. The list of valid options can be found [here](https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html).
-
-And simply run the following command while inside the source folder:
-
-    ./update
-
-If everything went right you should receive a binary file named `libcathook.so`.
-
 ### Loading / Injecting into game process
 
 Run the following command while inside the source folder:

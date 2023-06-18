@@ -80,7 +80,7 @@ CachedEntity *ClosestSpy()
                 isheavy = true;
             ispyro = true;
         }
-        if (ent->m_iTeam() == g_pLocalPlayer->team)
+        if (CE_INT(ent, netvar.iTeamNum) == g_pLocalPlayer->team)
             continue;
         if (IsPlayerInvisible(ent))
             continue;

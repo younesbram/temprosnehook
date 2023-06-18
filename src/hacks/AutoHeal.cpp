@@ -512,8 +512,8 @@ int HealingPriority(int idx)
         return !HasCondition<TFCond_Ubercharged>(ent);
 
     int priority        = 0;
-    int health          = ent->m_iHealth();
-    int maxhealth       = ent->m_iMaxHealth();
+    int health          = CE_INT(ent, netvar.iHealth);
+    int maxhealth       = g_pPlayerResource->GetMaxHealth(ent);
     int maxbuffedhealth = maxhealth * 1.5;
     int maxoverheal     = maxbuffedhealth - maxhealth;
     int overheal        = maxoverheal - (maxbuffedhealth - health);

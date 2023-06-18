@@ -107,7 +107,7 @@ void DrawEntity(int x, int y, CachedEntity *ent)
         if (hide_invis && IsPlayerInvisible(ent))
             return;
         const int &clazz = CE_INT(ent, netvar.iClass);
-        const int &team  = ent->m_iTeam();
+        const int &team  = CE_INT(ent, netvar.iTeamNum);
         idx              = team - 2;
         if (idx < 0 || idx > 1)
             return;
@@ -145,7 +145,7 @@ void DrawEntity(int x, int y, CachedEntity *ent)
             if (!ent->m_vecDormantOrigin())
                 return;
             const auto &wtr = WorldToRadar(ent->m_vecDormantOrigin()->x, ent->m_vecDormantOrigin()->y);
-            tx_teams[ent->m_iTeam() - 2].draw(x + wtr.first, y + wtr.second, *icon_size * 1.5f, *icon_size * 1.5f, colors::white);
+            tx_teams[CE_INT(ent, netvar.iTeamNum) - 2].draw(x + wtr.first, y + wtr.second, *icon_size * 1.5f, *icon_size * 1.5f, colors::white);
             switch (ent->m_iClassID())
             {
             case CL_CLASS(CObjectDispenser):

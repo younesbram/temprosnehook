@@ -498,7 +498,7 @@ static void CreateMove()
 
     if (*specmode != 0)
         SpectatorUpdate();
-    if (!enable || !LOCAL_E || !g_pLocalPlayer->alive || !aimkey_status || !ShouldAim())
+    if (!enable || !LOCAL_E || !LOCAL_E->m_bAlivePlayer() || !aimkey_status || !ShouldAim())
     {
         target_last = nullptr;
         return;
@@ -687,7 +687,10 @@ bool MouseMoving()
     if (previous_x != current_x || previous_y != current_y)
         stop_moving_time = SERVER_TIME + 0.5;
 
-    return SERVER_TIME <= stop_moving_time;
+    if (SERVER_TIME <= stop_moving_time)
+        return true;
+    else
+        return false;
 }
 #endif
 
@@ -800,7 +803,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
 
     float target_highest_score, score = 0.0f;
     CachedEntity *target_highest_ent                       = nullptr;
-    target_highest_score                                   = -256.0f;
+    target_highest_score                                   = -256;
     std::optional<hacks::backtrack::BacktrackData> bt_tick = std::nullopt;
     for (const auto &ent : entity_cache::valid_ents)
     {
@@ -912,7 +915,7 @@ bool IsTargetStateGood(CachedEntity *entity)
             return false;
         // Distance
         float targeting_range = EffectiveTargetingRange();
-        if (entity->m_flDistance() - 40.0f > targeting_range && tickcount > last_target_ignore_timer) // m_flDistance includes the collision box. You have to subtract it (Should be the same for every model)
+        if (entity->m_flDistance() - 40 > targeting_range && tickcount > last_target_ignore_timer) // m_flDistance includes the collision box. You have to subtract it (Should be the same for every model)
             return false;
 
         // Rage only check
@@ -1539,7 +1542,7 @@ static void DrawText()
         if (fov > 0.0f && fov < 180.0f)
         {
             // Don't show ring while player is dead
-            if (CE_GOOD(LOCAL_E) && g_pLocalPlayer->alive)
+            if (CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
             {
                 rgba_t color = colors::gui;
                 color.a      = *fovcircle_opacity;

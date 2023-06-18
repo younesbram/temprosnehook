@@ -80,10 +80,13 @@ bool PlayerPassesQuery(Query query, int idx)
     if (!RAW_ENT(player))
         return false;
     int teammate = !player->m_bEnemy();
-    bool alive   = !player->m_bAlivePlayer();
-    int clazzBit = 1 << (CE_INT(player, netvar.iClass) - 1);
-    if (static_cast<int>(query.flags_class) && !(clazzBit & static_cast<int>(query.flags_class)))
-        return false;
+    bool alive   = !CE_BYTE(player, netvar.iLifeState);
+    int clazzBit = (1 << (CE_INT(player, netvar.iClass) - 1));
+    if (static_cast<int>(query.flags_class))
+    {
+        if (!(clazzBit & static_cast<int>(query.flags_class)))
+            return false;
+    }
     if (query.flags & (static_cast<int>(QueryFlags::TEAMMATES) | static_cast<int>(QueryFlags::ENEMIES)))
     {
         if (!teammate && !(query.flags & static_cast<int>(QueryFlags::ENEMIES)))

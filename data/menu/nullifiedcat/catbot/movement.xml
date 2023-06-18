@@ -63,8 +63,6 @@
                     <Option name="PDA2" value="5"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="navbot.autojump.enabled" label="Enable autojump"/>
-            <AutoVariable width="fill" target="navbot.autojump.trigger-distance" label="Jump distance"/>
             <AutoVariable width="fill" target="navbot.snipe-sentries" label="Try to target sentries"/>
             <AutoVariable width="fill" target="navbot.snipe-sentries.shortrange" label="Scout/Pyro sentry mode"
                           tooltip="Try to target sentries as scout/pyro aswell. Usually not recommended."/>

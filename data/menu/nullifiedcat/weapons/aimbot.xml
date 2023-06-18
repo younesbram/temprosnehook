@@ -157,8 +157,6 @@
             <AutoVariable width="fill" target="aimbot.spectator.slow" label="Spectated slow"
                           tooltip="Controls how quickly the aimbot moves your crosshair while in spectated mode."
                           min="0" max="30"/>
-        </List>
-    </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Backtracking" x="340" y="85">
         <List width="150">
             <AutoVariable width="fill" target="backtrack.enabled" label="Enable backtracking"

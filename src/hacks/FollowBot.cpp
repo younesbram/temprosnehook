@@ -27,7 +27,6 @@ static settings::Boolean mimic_slot{ "follow-bot.mimic-slot", "false" };
 static settings::Boolean always_medigun{ "follow-bot.always-medigun", "false" };
 static settings::Boolean sync_taunt{ "follow-bot.taunt-sync", "false" };
 static settings::Boolean change{ "follow-bot.change-roaming-target", "false" };
-static settings::Boolean autojump{ "follow-bot.jump-if-stuck", "true" };
 static settings::Boolean afk{ "follow-bot.switch-afk", "true" };
 static settings::Int afktime{ "follow-bot.afk-time", "15000" };
 static settings::Boolean corneractivate{ "follow-bot.corners", "true" };
@@ -605,8 +604,6 @@ static void cm()
     if (dist_to_target > *follow_distance)
 #endif
     {
-        // Check for jump
-        if (autojump && lastJump.check(1000) && (idle_time.check(2000) || DistanceToGround({ breadcrumbs[0].x, breadcrumbs[0].y, breadcrumbs[0].z + 5 }) > 47))
         {
             current_user_cmd->buttons |= IN_JUMP;
             lastJump.update();

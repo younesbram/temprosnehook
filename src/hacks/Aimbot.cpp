@@ -48,7 +48,6 @@ static settings::Boolean only_can_shoot{ "aimbot.can-shoot-only", "true" };
 
 static settings::Boolean extrapolate{ "aimbot.extrapolate", "false" };
 static settings::Int normal_slow_aim{ "aimbot.slow", "0" };
-static settings::Int miss_chance{ "aimbot.miss-chance", "0" };
 
 static settings::Boolean projectile_aimbot{ "aimbot.projectile.enable", "true" };
 static settings::Float proj_gravity{ "aimbot.projectile.gravity", "0" };
@@ -72,7 +71,6 @@ static bool force_backtrack_aimbot = false;
 static settings::Boolean target_hazards{ "aimbot.target.hazards", "true" };
 static settings::Float max_range{ "aimbot.target.max-range", "4096" };
 static settings::Boolean ignore_vaccinator{ "aimbot.target.ignore-vaccinator", "true" };
-static settings::Boolean ignore_deadringer{ "aimbot.target.ignore-deadringer", "true" };
 settings::Boolean aim_sentrybuster{ "aimbot.target.sentrybuster", "false" };
 settings::Boolean ignore_cloak{ "aimbot.target.ignore-cloaked-spies", "true" };
 static settings::Boolean buildings_sentry{ "aimbot.target.sentry", "true" };
@@ -955,21 +953,6 @@ bool IsTargetStateGood(CachedEntity *entity)
             if (!(health <= hsdmg || health <= cdmg || !g_pLocalPlayer->bZoomed || maxCharge && health > maxhs))
                 return false;
         }
-
-        // Some global checks
-
-        // cloaked/deadringed players
-        if (*ignore_cloak || *ignore_deadringer)
-        {
-            if (IsPlayerInvisible(entity))
-            {
-                // Item id for deadringer is 59 as of time of creation
-                if (*ignore_deadringer && HasWeapon(entity, 59))
-                    return false;
-                if (*ignore_cloak && !HasCondition<TFCond_OnFire>(entity) && !HasCondition<TFCond_CloakFlicker>(entity))
-                    return false;
-            }
-        }
         // Vaccinator
         if (*ignore_vaccinator && IsPlayerResistantToCurrentWeapon(entity))
             return false;
@@ -1087,9 +1070,6 @@ bool IsTargetStateGood(CachedEntity *entity)
 // A function to aim at a specific entity
 bool Aim(CachedEntity *entity)
 {
-    if (*miss_chance > 0 && UniformRandomInt(0, 99) < *miss_chance)
-        return true;
-
     // Get angles from eye to target
     Vector is_it_good = PredictEntity(entity);
     if (!projectileAimbotRequired && !IsEntityVectorVisible(entity, is_it_good, true, MASK_SHOT_HULL, nullptr, true))

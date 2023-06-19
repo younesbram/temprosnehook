@@ -150,7 +150,7 @@ inline bool CarryingMachina()
     return item_definition_index == 526 || item_definition_index == 30665;
 }
 
-// A function to find the best hitbox for a target
+// this sucks ass 
 inline int BestHitbox(CachedEntity *target)
 {
     // Switch based upon the hitbox mode set by the user

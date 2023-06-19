@@ -28,8 +28,6 @@
             <AutoVariable width="fill" target="aimbot.extrapolate" label="Extrapolate"/>
             <AutoVariable width="fill" target="aimbot.zoomed-only" label="Zoomed only"
                           tooltip="If applicable, the aimbot will only shoot if you are scoped in."/>
-            <AutoVariable width="fill" target="aimbot.assistance.only" label="Assistance only"
-                          tooltip="Aimbot will only activate if your mouse has moved in the last half second."/>
             <AutoVariable width="fill" target="aimbot.target.ignore-non-rage" label="Rage only"
                           tooltip="Only target players set to RAGE."/>
         </List>
@@ -111,10 +109,7 @@
             <AutoVariable width="fill" target="aimbot.target.sentry" label="Aim sentry"/>
             <AutoVariable width="fill" target="aimbot.target.other-buildings" label="Aim other buildings"/>
             <AutoVariable width="fill" target="aimbot.target.stickybomb" label="Aim stickies"/>
-            <AutoVariable width="fill" target="aimbot.target.sentrybuster" label="Aim sentry buster"/>
             <AutoVariable width="fill" target="aimbot.target.npcs" label="Aim NPC"/>
-            <AutoVariable width="fill" target="aimbot.target.ignore-deadringer" label="Ignore deadringer"/>
-            <AutoVariable width="fill" target="aimbot.target.ignore-cloaked-spies" label="Ignore cloaked"/>
             <AutoVariable width="fill" target="player-tools.ignore.taunting" label="Ignore taunting"/>
             <AutoVariable width="fill" target="aimbot.target.ignore-vaccinator" label="Ignore vacc ubercharge"/>
 

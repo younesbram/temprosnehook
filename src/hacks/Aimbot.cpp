@@ -38,7 +38,6 @@ static settings::Boolean wait_for_charge{ "aimbot.wait-for-charge", "false" };
 static settings::Boolean silent{ "aimbot.silent", "true" };
 static settings::Boolean target_lock{ "aimbot.lock-target", "false" };
 #if ENABLE_VISUALS
-static settings::Boolean assistance_only{ "aimbot.assistance.only", "false" };
 static settings::Boolean fov_draw{ "aimbot.fov-circle.enable", "0" };
 static settings::Float fovcircle_opacity{ "aimbot.fov-circle.opacity", "0.7" };
 #endif
@@ -72,9 +71,6 @@ static bool force_backtrack_aimbot = false;
 static settings::Boolean target_hazards{ "aimbot.target.hazards", "true" };
 static settings::Float max_range{ "aimbot.target.max-range", "4096" };
 static settings::Boolean ignore_vaccinator{ "aimbot.target.ignore-vaccinator", "true" };
-static settings::Boolean ignore_deadringer{ "aimbot.target.ignore-deadringer", "true" };
-settings::Boolean aim_sentrybuster{ "aimbot.target.sentrybuster", "false" };
-settings::Boolean ignore_cloak{ "aimbot.target.ignore-cloaked-spies", "true" };
 static settings::Boolean buildings_sentry{ "aimbot.target.sentry", "true" };
 static settings::Boolean buildings_other{ "aimbot.target.other-buildings", "true" };
 static settings::Boolean npcs{ "aimbot.target.npcs", "true" };
@@ -728,11 +724,6 @@ bool ShouldAim()
     // Using the minigun and we have no ammo?
     if (LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun) && CE_INT(LOCAL_E, netvar.m_iAmmo + 4) == 0)
         return false;
-#if ENABLE_VISUALS
-    if (*assistance_only && !MouseMoving())
-        return false;
-#endif
-    return true;
 }
 
 // Function to find a suitable target
@@ -958,18 +949,6 @@ bool IsTargetStateGood(CachedEntity *entity)
 
         // Some global checks
 
-        // cloaked/deadringed players
-        if (*ignore_cloak || *ignore_deadringer)
-        {
-            if (IsPlayerInvisible(entity))
-            {
-                // Item id for deadringer is 59 as of time of creation
-                if (*ignore_deadringer && HasWeapon(entity, 59))
-                    return false;
-                if (*ignore_cloak && !HasCondition<TFCond_OnFire>(entity) && !HasCondition<TFCond_CloakFlicker>(entity))
-                    return false;
-            }
-        }
         // Vaccinator
         if (*ignore_vaccinator && IsPlayerResistantToCurrentWeapon(entity))
             return false;

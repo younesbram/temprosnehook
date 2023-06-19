@@ -24,7 +24,6 @@ static settings::Float delay{ "trigger.delay", "0" };
 static settings::Button trigger_key{ "trigger.key.button", "<null>" };
 static settings::Int trigger_key_mode{ "trigger.key.mode", "1" };
 // FIXME move these into targeting
-static settings::Boolean ignore_cloak{ "trigger.target.ignore-cloaked-spies", "true" };
 static settings::Boolean ignore_vaccinator{ "trigger.target.ignore-vaccinator", "true" };
 static settings::Boolean buildings_sentry{ "trigger.target.buildings-sentry", "true" };
 static settings::Boolean buildings_other{ "trigger.target.buildings-other", "true" };
@@ -239,9 +238,6 @@ bool IsTargetStateGood(CachedEntity *entity, std::optional<backtrack::BacktrackD
         }
         // Don't target invulnerable players, ex: uber, bonk
         if (IsPlayerInvulnerable(entity))
-            return false;
-        // If settings allow, don't target cloaked players
-        if (ignore_cloak && IsPlayerInvisible(entity))
             return false;
         // If settings allow, don't target vaccinated players
         if (ignore_vaccinator && IsPlayerResistantToCurrentWeapon(entity))

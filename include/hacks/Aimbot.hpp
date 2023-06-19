@@ -13,9 +13,6 @@ class ConVar;
 class IClientEntity;
 
 namespace hacks::aimbot
-{
-extern settings::Boolean aim_sentrybuster;
-extern settings::Boolean ignore_cloak;
 extern unsigned last_target_ignore_timer;
 
 // Functions used to calculate aimbot data, and if already calculated use it

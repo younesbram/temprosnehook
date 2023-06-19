@@ -28,10 +28,6 @@
             <AutoVariable width="fill" target="aimbot.extrapolate" label="Extrapolate"/>
             <AutoVariable width="fill" target="aimbot.zoomed-only" label="Zoomed only"
                           tooltip="If applicable, the aimbot will only shoot if you are scoped in."/>
-            <AutoVariable width="fill" target="aimbot.target.ignore-non-rage" label="Rage only"
-                          tooltip="Only target players set to RAGE."/>
-        </List>
-    </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Projectile aimbot" y="240">
         <List width="150">
             <AutoVariable width="fill" target="aimbot.projectile.enable" label="Enable projectile aimbot"/>
@@ -131,8 +127,6 @@
                           tooltip="Distance to the nearest enemy in HMU for which the bot will always zoom"/>
             <AutoVariable width="fill" target="aimbot.auto.unzoom" label="Auto unzoom"
                           tooltip="Intelligently unzoom if applicable to current weapon type."/>
-        </List>
-    </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Spectated mode" x="340">
         <List width="150">
             <LabeledObject width="fill" label="Spectator mode"
@@ -143,13 +137,6 @@
                     <Option name="Any" value="2"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="aimbot.spectator.enable" label="Aimbot enable"
-                          tooltip="Should the aimbot be enabled based on the above?"/>
-            <AutoVariable width="fill" target="aimbot.spectator.fov" label="Spectated FOV"
-                          tooltip="FOV for the aimbot when in spectated mode."/>
-            <AutoVariable width="fill" target="aimbot.spectator.slow" label="Spectated slow"
-                          tooltip="Controls how quickly the aimbot moves your crosshair while in spectated mode."
-                          min="0" max="30"/>
     <Box padding="12 6 6 6" width="content" height="content" name="Backtracking" x="340" y="85">
         <List width="150">
             <AutoVariable width="fill" target="backtrack.enabled" label="Enable backtracking"

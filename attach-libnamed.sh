@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# Thank you LWSS
-# https://github.com/LWSS/Fuzion/commit/a53b6c634cde0ed47b08dd587ba40a3806adf3fe
-
 [[ ! -z "$SUDO_USER" ]] && RUNUSER="$SUDO_USER" || RUNUSER="$LOGNAME"
 RUNCMD="sudo -u $RUNUSER"
 

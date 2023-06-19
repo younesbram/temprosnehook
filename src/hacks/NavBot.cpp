@@ -27,7 +27,9 @@ static settings::Boolean escape_danger("navbot.escape-danger", "true");
 static settings::Boolean escape_danger_ctf_cap("navbot.escape-danger.ctf-cap", "false");
 static settings::Boolean enable_slight_danger_when_capping("navbot.escape-danger.slight-danger.capping", "false");
 static settings::Boolean run_to_reload("navbot.run-to-reload", "false");
-static settings::Int force_slot("navbot.force-slot", "1");
+static settings::Boolean autojump("navbot.autojump.enabled", "false");
+static settings::Int force_slot("navbot.force-slot", "0");
+static settings::Float jump_distance("navbot.autojump.trigger-distance", "300");
 static settings::Int blacklist_delay("navbot.proximity-blacklist.delay", "500");
 static settings::Boolean blacklist_dormat("navbot.proximity-blacklist.dormant", "false");
 static settings::Int blacklist_delay_dormat("navbot.proximity-blacklist.delay-dormant", "1000");
@@ -1458,6 +1460,18 @@ bool escapeDanger()
 
 static int slot = primary;
 
+static void autoJump(std::pair<CachedEntity *, float> &nearest)
+{
+    if (!*autojump)
+        return;
+    static Timer last_jump{};
+    if (!last_jump.test_and_set(200) || CE_BAD(nearest.first))
+        return;
+
+    if (nearest.second <= *jump_distance)
+        current_user_cmd->buttons |= IN_JUMP | IN_DUCK;
+}
+
 static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &nearest)
 {
     if (*force_slot)
@@ -1589,6 +1603,7 @@ static void CreateMove()
     auto nearest = getNearestPlayerDistance();
 
     updateSlot(nearest);
+    autoJump(nearest);
     updateEnemyBlacklist(slot);
 
     // Try to escape danger first of all

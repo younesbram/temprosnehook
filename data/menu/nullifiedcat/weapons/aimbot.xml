@@ -28,6 +28,12 @@
             <AutoVariable width="fill" target="aimbot.extrapolate" label="Extrapolate"/>
             <AutoVariable width="fill" target="aimbot.zoomed-only" label="Zoomed only"
                           tooltip="If applicable, the aimbot will only shoot if you are scoped in."/>
+            <AutoVariable width="fill" target="aimbot.assistance.only" label="Assistance only"
+                          tooltip="Aimbot will only activate if your mouse has moved in the last half second."/>
+            <AutoVariable width="fill" target="aimbot.target.ignore-non-rage" label="Rage only"
+                          tooltip="Only target players set to RAGE."/>
+        </List>
+    </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Projectile aimbot" y="240">
         <List width="150">
             <AutoVariable width="fill" target="aimbot.projectile.enable" label="Enable projectile aimbot"/>
@@ -105,7 +111,10 @@
             <AutoVariable width="fill" target="aimbot.target.sentry" label="Aim sentry"/>
             <AutoVariable width="fill" target="aimbot.target.other-buildings" label="Aim other buildings"/>
             <AutoVariable width="fill" target="aimbot.target.stickybomb" label="Aim stickies"/>
+            <AutoVariable width="fill" target="aimbot.target.sentrybuster" label="Aim sentry buster"/>
             <AutoVariable width="fill" target="aimbot.target.npcs" label="Aim NPC"/>
+            <AutoVariable width="fill" target="aimbot.target.ignore-deadringer" label="Ignore deadringer"/>
+            <AutoVariable width="fill" target="aimbot.target.ignore-cloaked-spies" label="Ignore cloaked"/>
             <AutoVariable width="fill" target="player-tools.ignore.taunting" label="Ignore taunting"/>
             <AutoVariable width="fill" target="aimbot.target.ignore-vaccinator" label="Ignore vacc ubercharge"/>
 
@@ -127,6 +136,25 @@
                           tooltip="Distance to the nearest enemy in HMU for which the bot will always zoom"/>
             <AutoVariable width="fill" target="aimbot.auto.unzoom" label="Auto unzoom"
                           tooltip="Intelligently unzoom if applicable to current weapon type."/>
+        </List>
+    </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Spectated mode" x="340">
+        <List width="150">
+            <LabeledObject width="fill" label="Spectator mode"
+                           tooltip="Never: the settings below will never override main aimbot settings. Firstperson: enable below settings if at least one person is spectating you in first person. Spectated: enable below settings if you are being spectated at all.">
+                <Select target="aimbot.spectator-mode">
+                    <Option name="Off" value="0"/>
+                    <Option name="Firstperson" value="1"/>
+                    <Option name="Any" value="2"/>
+                </Select>
+            </LabeledObject>
+            <AutoVariable width="fill" target="aimbot.spectator.enable" label="Aimbot enable"
+                          tooltip="Should the aimbot be enabled based on the above?"/>
+            <AutoVariable width="fill" target="aimbot.spectator.fov" label="Spectated FOV"
+                          tooltip="FOV for the aimbot when in spectated mode."/>
+            <AutoVariable width="fill" target="aimbot.spectator.slow" label="Spectated slow"
+                          tooltip="Controls how quickly the aimbot moves your crosshair while in spectated mode."
+                          min="0" max="30"/>
     <Box padding="12 6 6 6" width="content" height="content" name="Backtracking" x="340" y="85">
         <List width="150">
             <AutoVariable width="fill" target="backtrack.enabled" label="Enable backtracking"

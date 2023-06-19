@@ -19,16 +19,20 @@ static settings::Int max_dist{ "esp.range", "4096" };
 static settings::Int box_esp{ "esp.box.mode", "2" };
 static settings::Int box_corner_size_height{ "esp.box.corner-size.height", "10" };
 static settings::Int box_corner_size_width{ "esp.box.corner-size.width", "10" };
+static settings::Boolean box_3d_player{ "esp.box.player-3d", "false" };
+static settings::Boolean box_3d_building{ "esp.box.building-3d", "false" };
 
 static settings::Boolean draw_bones{ "esp.bones", "false" };
 static settings::Float bones_thickness{ "esp.bones.thickness", "0.5" };
 static settings::Boolean bones_color{ "esp.bones.color", "false" };
 
 static settings::Int healthbar{ "esp.health-bar", "3" };
+static settings::Int sightlines{ "esp.sightlines", "0" };
 static settings::Int esp_text_position{ "esp.text-position", "0" };
 static settings::Int esp_expand{ "esp.expand", "0" };
 static settings::Boolean vischeck{ "esp.vischeck", "true" };
 static settings::Boolean hide_invis{ "esp.hide-invis", "false" };
+static settings::Boolean legit{ "esp.legit", "false" };
 
 static settings::Boolean local_esp{ "esp.show.local", "true" };
 static settings::Boolean buildings{ "esp.show.buildings", "true" };
@@ -38,6 +42,7 @@ static settings::Boolean npc{ "esp.show.npc", "true" };
 
 static settings::Boolean show_weapon{ "esp.info.weapon", "false" };
 static settings::Boolean show_distance{ "esp.info.distance", "true" };
+static settings::Boolean show_buster_radius{ "esp.info.buster-radius", "true" };
 static settings::Boolean show_health{ "esp.info.health", "true" };
 static settings::Boolean show_name{ "esp.info.name", "true" };
 static settings::Boolean show_class{ "esp.info.class", "true" };
@@ -49,7 +54,10 @@ static settings::Boolean item_esp{ "esp.item.enable", "true" };
 static settings::Boolean item_ammo_packs{ "esp.item.ammo", "false" };
 static settings::Boolean item_health_packs{ "esp.item.health", "true" };
 // static settings::Boolean item_powerups{ "esp.item.powerup", "true" };
+static settings::Boolean item_money{ "esp.item.money", "true" };
 static settings::Boolean item_spellbooks{ "esp.item.spellbook", "true" };
+static settings::Boolean item_explosive{ "esp.item.explosive", "true" };
+static settings::Boolean item_crumpkin{ "esp.item.crumpkin", "true" };
 static settings::Boolean item_gargoyle{ "esp.item.gargoyle", "true" };
 static settings::Boolean item_objectives{ "esp.item.objectives", "false" };
 
@@ -107,7 +115,17 @@ inline void RepaintEnt(CachedEntity *ent, float distance)
         color.r *= 0.5f;
         color.g *= 0.5f;
         color.b *= 0.5f;
-    
+    }
+    // If show distance, add string here
+    if (show_distance)
+        AddEntityString(ent, format(int(distance / 64 * 1.22f), 'm'));
+    if (show_buster_radius && IsSentryBuster(ent))
+    {
+        // range check with a bit extra just to be safe
+        if (distance < 310)
+            AddEntityString(ent, "DANGER ZONE!", colors::FromRGBA8(255.0f, 0.0f, 0.0f, 255.0f));
+        else
+            AddEntityString(ent, "SAFE ZONE", colors::FromRGBA8(0.0f, 255.0f, 0.0f, 255.0f));
     }
     SetEntityColor(ent, color);
 }
@@ -372,6 +390,94 @@ static void CreateMove()
     std::sort(entities_need_repaint.begin(), entities_need_repaint.end(), [](std::pair<CachedEntity *, float> &a, std::pair<CachedEntity *, float> &b) { return a.second > b.second; });
 }
 
+void _FASTCALL Sightlines(CachedEntity *ent, rgba_t &fg)
+{
+    if (((int) sightlines == 2 || ((int) sightlines == 1 && CE_INT(ent, netvar.iClass) == tf_sniper)) && CE_GOOD(ent) && ent->hitboxes.GetHitbox(0))
+    {
+        PROF_SECTION(PT_esp_sightlines)
+
+        // Get players angle and head position
+        Vector &eye_angles = NET_VECTOR(RAW_ENT(ent), netvar.m_angEyeAngles);
+        Vector eye_position;
+        eye_position = ent->hitboxes.GetHitbox(0)->center;
+
+        // Main ray tracing area
+        float sy         = sinf(DEG2RAD(eye_angles.y)); // yaw
+        float cy         = cosf(DEG2RAD(eye_angles.y));
+        float sp         = sinf(DEG2RAD(eye_angles.x)); // pitch
+        float cp         = cosf(DEG2RAD(eye_angles.x));
+        Vector forward_t = Vector(cp * cy, cp * sy, -sp);
+        // We don't want the sightlines endpoint to go behind us because the
+        // world to screen check will fail, but keep it at most 4096
+        Vector forward = forward_t * 4096.0F + eye_position;
+        Ray_t ray;
+        ray.Init(eye_position, forward);
+        trace_t trace;
+        g_ITrace->TraceRay(ray, MASK_SOLID, &trace::filter_no_player, &trace);
+
+        // Screen vectors
+        Vector scn1, scn2;
+
+        // Status vars
+        bool found_scn2 = true;
+
+        // Get end point on screen
+        if (!draw::WorldToScreen(trace.endpos, scn2))
+        {
+            // Set status
+            found_scn2 = false;
+            // Get the end distance from the trace
+            float end_distance = trace.endpos.DistTo(eye_position);
+
+            // Loop and look back until we have a vector on screen
+            for (int i = 1; i < 500; ++i)
+            {
+                // Subtract 40 multiplyed by the tick from the end distance
+                // and use that as our length to check
+                Vector end_vector = forward_t * (end_distance - (10 * i)) + eye_position;
+                if (end_vector.DistTo(eye_position) < 1)
+                    break;
+                if (draw::WorldToScreen(end_vector, scn2))
+                {
+                    found_scn2 = true;
+                    break;
+                }
+            }
+        }
+
+        if (found_scn2)
+        {
+            // Set status
+            bool found_scn1 = true;
+
+            // If we don't have a vector on screen, attempt to find one
+            if (!draw::WorldToScreen(eye_position, scn1))
+            {
+                // Set status
+                found_scn1 = false;
+
+                // Loop and look back until we have a vector on screen
+                for (int i = 1; i < 500; ++i)
+                {
+                    // Multiply starting distance by 15, multiplied by the loop tick
+                    Vector start_vector = forward_t * (10 * i) + eye_position;
+                    // We don't want it to go too far
+                    if (start_vector.DistTo(trace.endpos) < 1)
+                        break;
+                    // Check if we have a vector on screen, if we do then we set our status
+                    if (draw::WorldToScreen(start_vector, scn1))
+                    {
+                        found_scn1 = true;
+                        break;
+                    }
+                }
+            }
+            // We have both vectors, draw
+            if (found_scn1)
+                draw::Line(scn1.x, scn1.y, scn2.x - scn1.x, scn2.y - scn1.y, fg, 0.5f);
+        }
+    }
+}
 
 void _FASTCALL Healthbar(EntityType &type, int &classid, rgba_t &fg, ESPData &ent_data, CachedEntity *ent)
 {
@@ -539,6 +645,11 @@ void _FASTCALL BoxEsp(EntityType &type, bool &transparent, rgba_t &fg, CachedEnt
             fg.g *= 0.75f;
             fg.b *= 0.75f;
         }
+        if (!box_3d_player && box_esp)
+            DrawBox(ent, fg);
+        else if (box_3d_player)
+            Draw3DBox(ent, fg);
+        break;
     case ENTITY_BUILDING:
         if (ent->m_iTeam() == g_pLocalPlayer->team && !team_buildings)
             break;
@@ -592,6 +703,11 @@ void _FASTCALL BoxEsp(EntityType &type, bool &transparent, rgba_t &fg, CachedEnt
             if (visible)
                 draw::Triangle(screen[0].x, screen[0].y, screen[1].x, screen[1].y, screen[2].x, screen[2].y, fg);
         }
+        if (!box_3d_building && box_esp)
+            DrawBox(ent, fg);
+        else if (box_3d_building)
+            Draw3DBox(ent, fg);
+        break;
     }
 }
 
@@ -717,6 +833,10 @@ void ProcessEntityPT()
         if (!position)
             continue;
 
+        // Sightline esp
+        if (sightlines && type == ENTITY_PLAYER)
+            Sightlines(ent, fg);
+
         static Vector screen;
         if (!draw::EntityCenterToScreen(ent, screen))
             continue;
@@ -728,7 +848,7 @@ void ProcessEntityPT()
         bool transparent = vischeck && ent_data.transparent;
 
         // Box esp
-        if (box_esp)
+        if (box_esp || box_3d_player || box_3d_building)
             BoxEsp(type, transparent, fg, ent);
 
         if (draw_bones)
@@ -772,6 +892,10 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
         return;
 
     {
+        // We don't actually care about this vector at all. It just exists so WorldToScreen can function normally
+        static Vector origin_screen;
+        if (!sightlines && ent->m_Type() != ENTITY_PLAYER && !draw::WorldToScreen(*origin, origin_screen))
+            return;
     }
 
     auto distance = ent->m_flDistance();
@@ -867,6 +991,15 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             player_info_s info{};
             if (!GetPlayerInfo(ent->m_IDX, &info))
                 return;
+
+            // Legit mode handling
+            if (legit && ent->m_bEnemy() && playerlist::IsDefault(info.friendsID))
+            {
+                if (IsPlayerInvisible(ent))
+                    return; // Invis check
+                if (vischeck && !ent->IsVisible())
+                    return;
+            }
 
             // Powerup handling
             if (powerup_esp)
@@ -1076,6 +1209,15 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                         AddEntityString(ent, gargoyle_str, colors::FromRGBA8(199, 21, 133, 255));
                     return;
                 }
+                // Explosive/Environmental hazard esp
+                else if (item_explosive && (classid == CL_CLASS(CTFPumpkinBomb) || Hash::IsHazard(szName)))
+                {
+                    if (classid == CL_CLASS(CTFPumpkinBomb))
+                        AddEntityString(ent, pumpkinbomb_str, colors::FromRGBA8(255, 162, 0, 255));
+                    else
+                        AddEntityString(ent, explosive_str, colors::FromRGBA8(255, 162, 0, 255));
+                    return;
+                }
                 if (item_objectives && (classid == CL_CLASS(CCaptureFlag) || (Hash::IsFlag(szName) || Hash::IsBombCart(szName) || Hash::IsBombCartRed(szName))))
                 {
                     rgba_t color = ent->m_iTeam() == TEAM_BLU ? colors::blu : (ent->m_iTeam() == TEAM_RED ? colors::red : colors::white);
@@ -1112,7 +1254,13 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                     else
                         AddEntityString(ent, spell_str, colors::green);
                 }
+                // Crumpkin esp https://wiki.teamfortress.com/wiki/Halloween_pumpkin
+                else if (item_crumpkin && Hash::IsCrumpkin(szName))
+                    AddEntityString(ent, crumpkin_str, colors::FromRGBA8(253, 203, 88, 255));
             }
+            // MVM Money esp
+            if (item_money && classid == CL_CLASS(CCurrencyPack) && !CE_BYTE(ent, netvar.bDistributed))
+                AddEntityString(ent, mvm_money_str);
         }
     }
 }

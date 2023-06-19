@@ -38,6 +38,7 @@ static settings::Boolean wait_for_charge{ "aimbot.wait-for-charge", "false" };
 static settings::Boolean silent{ "aimbot.silent", "true" };
 static settings::Boolean target_lock{ "aimbot.lock-target", "false" };
 #if ENABLE_VISUALS
+static settings::Boolean assistance_only{ "aimbot.assistance.only", "false" };
 static settings::Boolean fov_draw{ "aimbot.fov-circle.enable", "0" };
 static settings::Float fovcircle_opacity{ "aimbot.fov-circle.opacity", "0.7" };
 #endif
@@ -71,11 +72,25 @@ static bool force_backtrack_aimbot = false;
 static settings::Boolean target_hazards{ "aimbot.target.hazards", "true" };
 static settings::Float max_range{ "aimbot.target.max-range", "4096" };
 static settings::Boolean ignore_vaccinator{ "aimbot.target.ignore-vaccinator", "true" };
+static settings::Boolean ignore_deadringer{ "aimbot.target.ignore-deadringer", "true" };
+settings::Boolean aim_sentrybuster{ "aimbot.target.sentrybuster", "false" };
+settings::Boolean ignore_cloak{ "aimbot.target.ignore-cloaked-spies", "true" };
 static settings::Boolean buildings_sentry{ "aimbot.target.sentry", "true" };
 static settings::Boolean buildings_other{ "aimbot.target.other-buildings", "true" };
 static settings::Boolean npcs{ "aimbot.target.npcs", "true" };
 static settings::Boolean stickybot{ "aimbot.target.stickybomb", "false" };
+static settings::Boolean rageonly{ "aimbot.target.ignore-non-rage", "false" };
 static settings::Int teammates{ "aimbot.target.teammates", "0" };
+
+/*
+ * 0 Always on
+ * 1 Disable if being spectated in first person
+ * 2 Disable if being spectated
+ */
+static settings::Int specmode("aimbot.spectator-mode", "0");
+static settings::Boolean specenable("aimbot.spectator.enable", "false");
+static settings::Float specfov("aimbot.spectator.fov", "0");
+static settings::Int specslow("aimbot.spectator.slow", "0");
 
 settings::Boolean engine_projpred{ "aimbot.debug.engine-pp", "true" };
 
@@ -150,7 +165,7 @@ inline bool CarryingMachina()
     return item_definition_index == 526 || item_definition_index == 30665;
 }
 
-// this sucks ass 
+// A function to find the best hitbox for a target
 inline int BestHitbox(CachedEntity *target)
 {
     // Switch based upon the hitbox mode set by the user
@@ -207,6 +222,35 @@ inline bool ShouldBacktrack(CachedEntity *ent)
     if (!shouldbacktrack_cache || ent && ent->m_Type() != ENTITY_PLAYER || !backtrack::getGoodTicks(ent))
         return false;
     return true;
+}
+
+void SpectatorUpdate()
+{
+    switch (*specmode)
+    {
+    // Always on
+    default:
+    case 0:
+        break;
+    // Disable if being spectated in first person
+    case 1:
+        if (g_pLocalPlayer->spectator_state == g_pLocalPlayer->FIRSTPERSON)
+        {
+            enable   = *specenable;
+            slow_aim = *specslow;
+            fov      = *specfov;
+        }
+        break;
+    // Disable if being spectated
+    case 2:
+        if (g_pLocalPlayer->spectator_state == g_pLocalPlayer->ANY)
+        {
+            enable   = *specenable;
+            slow_aim = *specslow;
+            fov      = *specfov;
+        }
+        break;
+    }
 }
 
 #define GET_MIDDLE(c1, c2) ((corners[c1] + corners[c2]) / 2.0f)
@@ -452,6 +496,8 @@ static void CreateMove()
 
     bool aimkey_status = UpdateAimkey();
 
+    if (*specmode != 0)
+        SpectatorUpdate();
     if (!enable || !LOCAL_E || !g_pLocalPlayer->alive || !aimkey_status || !ShouldAim())
     {
         target_last = nullptr;
@@ -682,6 +728,11 @@ bool ShouldAim()
     // Using the minigun and we have no ammo?
     if (LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun) && CE_INT(LOCAL_E, netvar.m_iAmmo + 4) == 0)
         return false;
+#if ENABLE_VISUALS
+    if (*assistance_only && !MouseMoving())
+        return false;
+#endif
+    return true;
 }
 
 // Function to find a suitable target
@@ -864,6 +915,10 @@ bool IsTargetStateGood(CachedEntity *entity)
         if (entity->m_flDistance() - 40.0f > targeting_range && tickcount > last_target_ignore_timer) // m_flDistance includes the collision box. You have to subtract it (Should be the same for every model)
             return false;
 
+        // Rage only check
+        if (*rageonly && playerlist::AccessData(entity->player_info->friendsID).state != playerlist::k_EState::RAGE)
+            return false;
+
         // Wait for charge
         if (*wait_for_charge && g_pLocalPlayer->holding_sniper_rifle)
         {
@@ -903,6 +958,18 @@ bool IsTargetStateGood(CachedEntity *entity)
 
         // Some global checks
 
+        // cloaked/deadringed players
+        if (*ignore_cloak || *ignore_deadringer)
+        {
+            if (IsPlayerInvisible(entity))
+            {
+                // Item id for deadringer is 59 as of time of creation
+                if (*ignore_deadringer && HasWeapon(entity, 59))
+                    return false;
+                if (*ignore_cloak && !HasCondition<TFCond_OnFire>(entity) && !HasCondition<TFCond_CloakFlicker>(entity))
+                    return false;
+            }
+        }
         // Vaccinator
         if (*ignore_vaccinator && IsPlayerResistantToCurrentWeapon(entity))
             return false;

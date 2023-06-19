@@ -127,16 +127,6 @@
                           tooltip="Distance to the nearest enemy in HMU for which the bot will always zoom"/>
             <AutoVariable width="fill" target="aimbot.auto.unzoom" label="Auto unzoom"
                           tooltip="Intelligently unzoom if applicable to current weapon type."/>
-    <Box padding="12 6 6 6" width="content" height="content" name="Spectated mode" x="340">
-        <List width="150">
-            <LabeledObject width="fill" label="Spectator mode"
-                           tooltip="Never: the settings below will never override main aimbot settings. Firstperson: enable below settings if at least one person is spectating you in first person. Spectated: enable below settings if you are being spectated at all.">
-                <Select target="aimbot.spectator-mode">
-                    <Option name="Off" value="0"/>
-                    <Option name="Firstperson" value="1"/>
-                    <Option name="Any" value="2"/>
-                </Select>
-            </LabeledObject>
     <Box padding="12 6 6 6" width="content" height="content" name="Backtracking" x="340" y="85">
         <List width="150">
             <AutoVariable width="fill" target="backtrack.enabled" label="Enable backtracking"

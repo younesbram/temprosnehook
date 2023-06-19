@@ -54,9 +54,7 @@ static settings::Boolean item_esp{ "esp.item.enable", "true" };
 static settings::Boolean item_ammo_packs{ "esp.item.ammo", "false" };
 static settings::Boolean item_health_packs{ "esp.item.health", "true" };
 // static settings::Boolean item_powerups{ "esp.item.powerup", "true" };
-static settings::Boolean item_money{ "esp.item.money", "true" };
 static settings::Boolean item_spellbooks{ "esp.item.spellbook", "true" };
-static settings::Boolean item_explosive{ "esp.item.explosive", "true" };
 static settings::Boolean item_crumpkin{ "esp.item.crumpkin", "true" };
 static settings::Boolean item_gargoyle{ "esp.item.gargoyle", "true" };
 static settings::Boolean item_objectives{ "esp.item.objectives", "false" };
@@ -992,15 +990,6 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             if (!GetPlayerInfo(ent->m_IDX, &info))
                 return;
 
-            // Legit mode handling
-            if (legit && ent->m_bEnemy() && playerlist::IsDefault(info.friendsID))
-            {
-                if (IsPlayerInvisible(ent))
-                    return; // Invis check
-                if (vischeck && !ent->IsVisible())
-                    return;
-            }
-
             // Powerup handling
             if (powerup_esp)
             {
@@ -1209,15 +1198,6 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                         AddEntityString(ent, gargoyle_str, colors::FromRGBA8(199, 21, 133, 255));
                     return;
                 }
-                // Explosive/Environmental hazard esp
-                else if (item_explosive && (classid == CL_CLASS(CTFPumpkinBomb) || Hash::IsHazard(szName)))
-                {
-                    if (classid == CL_CLASS(CTFPumpkinBomb))
-                        AddEntityString(ent, pumpkinbomb_str, colors::FromRGBA8(255, 162, 0, 255));
-                    else
-                        AddEntityString(ent, explosive_str, colors::FromRGBA8(255, 162, 0, 255));
-                    return;
-                }
                 if (item_objectives && (classid == CL_CLASS(CCaptureFlag) || (Hash::IsFlag(szName) || Hash::IsBombCart(szName) || Hash::IsBombCartRed(szName))))
                 {
                     rgba_t color = ent->m_iTeam() == TEAM_BLU ? colors::blu : (ent->m_iTeam() == TEAM_RED ? colors::red : colors::white);
@@ -1258,9 +1238,6 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 else if (item_crumpkin && Hash::IsCrumpkin(szName))
                     AddEntityString(ent, crumpkin_str, colors::FromRGBA8(253, 203, 88, 255));
             }
-            // MVM Money esp
-            if (item_money && classid == CL_CLASS(CCurrencyPack) && !CE_BYTE(ent, netvar.bDistributed))
-                AddEntityString(ent, mvm_money_str);
         }
     }
 }

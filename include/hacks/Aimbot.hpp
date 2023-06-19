@@ -13,6 +13,7 @@ class ConVar;
 class IClientEntity;
 
 namespace hacks::aimbot
+{
 extern unsigned last_target_ignore_timer;
 
 // Functions used to calculate aimbot data, and if already calculated use it

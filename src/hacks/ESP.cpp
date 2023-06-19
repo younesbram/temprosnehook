@@ -19,8 +19,6 @@ static settings::Int max_dist{ "esp.range", "4096" };
 static settings::Int box_esp{ "esp.box.mode", "2" };
 static settings::Int box_corner_size_height{ "esp.box.corner-size.height", "10" };
 static settings::Int box_corner_size_width{ "esp.box.corner-size.width", "10" };
-static settings::Boolean box_3d_player{ "esp.box.player-3d", "false" };
-static settings::Boolean box_3d_building{ "esp.box.building-3d", "false" };
 
 static settings::Boolean draw_bones{ "esp.bones", "false" };
 static settings::Float bones_thickness{ "esp.bones.thickness", "0.5" };
@@ -32,7 +30,6 @@ static settings::Int esp_text_position{ "esp.text-position", "0" };
 static settings::Int esp_expand{ "esp.expand", "0" };
 static settings::Boolean vischeck{ "esp.vischeck", "true" };
 static settings::Boolean hide_invis{ "esp.hide-invis", "false" };
-static settings::Boolean legit{ "esp.legit", "false" };
 
 static settings::Boolean local_esp{ "esp.show.local", "true" };
 static settings::Boolean buildings{ "esp.show.buildings", "true" };
@@ -643,11 +640,6 @@ void _FASTCALL BoxEsp(EntityType &type, bool &transparent, rgba_t &fg, CachedEnt
             fg.g *= 0.75f;
             fg.b *= 0.75f;
         }
-        if (!box_3d_player && box_esp)
-            DrawBox(ent, fg);
-        else if (box_3d_player)
-            Draw3DBox(ent, fg);
-        break;
     case ENTITY_BUILDING:
         if (ent->m_iTeam() == g_pLocalPlayer->team && !team_buildings)
             break;
@@ -701,11 +693,6 @@ void _FASTCALL BoxEsp(EntityType &type, bool &transparent, rgba_t &fg, CachedEnt
             if (visible)
                 draw::Triangle(screen[0].x, screen[0].y, screen[1].x, screen[1].y, screen[2].x, screen[2].y, fg);
         }
-        if (!box_3d_building && box_esp)
-            DrawBox(ent, fg);
-        else if (box_3d_building)
-            Draw3DBox(ent, fg);
-        break;
     }
 }
 
@@ -846,7 +833,7 @@ void ProcessEntityPT()
         bool transparent = vischeck && ent_data.transparent;
 
         // Box esp
-        if (box_esp || box_3d_player || box_3d_building)
+        if (box_esp)
             BoxEsp(type, transparent, fg, ent);
 
         if (draw_bones)

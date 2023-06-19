@@ -42,9 +42,6 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="ESP settings" x="165" y="50">
         <List width="150">
-            <AutoVariable width="fill" target="esp.box.player-3d" label="3D players"
-                          tooltip="Overrides setting for 'Box mode'."/>
-            <AutoVariable width="fill" target="esp.box.building-3d" label="3D buildings"/>
             <AutoVariable width="fill" target="esp.box.corner-size" label="Corner size"/>
             <AutoVariable width="fill" target="esp.bones" label="Bone ESP"/>
             <AutoVariable width="fill" target="esp.bones.thickness" label="Bone thickness" min="0.1" max="5"

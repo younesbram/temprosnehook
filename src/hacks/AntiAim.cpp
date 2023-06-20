@@ -55,7 +55,7 @@ bool aaaa_key_pressed  = false;
 
 float GetAAAAPitch()
 {
-    switch ((int) aaaa_mode)
+    switch (*aaaa_mode)
     {
     case 0:
         return aaaa_stage ? -271 : -89;
@@ -64,21 +64,16 @@ float GetAAAAPitch()
     case 2:
         return aaaa_stage ? -180 : 180;
     default:
-        break;
+        return 0;
     }
-    return 0;
 }
 
 float GetAAAATimerLength()
 {
     if (aaaa_interval)
-    {
         return (float) aaaa_interval;
-    }
     else
-    {
         return RandFloatRange((float) aaaa_interval_random_low, (float) aaaa_interval_random_high);
-    }
 }
 
 void NextAAAA()
@@ -212,7 +207,7 @@ void SetSafeSpace(int safespace)
 /* checks if action slot is being used */
 void SendNetMessage(INetMessage &msg)
 {
-    if (!enable)
+    if (!*enable)
         return;
 
     if(!((KeyValues *) (((unsigned *) &msg)[4])))
@@ -236,26 +231,23 @@ bool ShouldAA(CUserCmd *cmd)
         return false;
     int classid = LOCAL_W->m_iClassID();
     auto mode   = GetWeaponMode();
-    if ((cmd->buttons & IN_ATTACK) && (classid == CL_CLASS(CTFCompoundBow) || mode == weapon_melee)) && CanShoot()
+    if (!(classid == CL_CLASS(CTFCompoundBow) || mode == weapon_melee) && CanShoot() && (cmd->buttons & IN_ATTACK))
     {
         return false;
     }
-    if ((cmd->buttons & IN_ATTACK2) && classid == CL_CLASS(CTFLunchBox))
+    if (classid == CL_CLASS(CTFLunchBox) && (cmd->buttons & IN_ATTACK2))
         return false;
-    if ((cmd->buttons & IN_ATTACK) && classid == CL_CLASS(CTFGrapplingHook) && !g_pLocalPlayer->bAttackLastTick)
+    if (classid == CL_CLASS(CTFGrapplingHook) && !g_pLocalPlayer->bAttackLastTick && (cmd->buttons & IN_ATTACK))
     {
         SetSafeSpace(2);
-    }
+
     switch (mode)
     {
     case weapon_projectile:
         if (classid == CL_CLASS(CTFCompoundBow))
         {
-            if (!(cmd->buttons & IN_ATTACK))
-            {
-                if (g_pLocalPlayer->bAttackLastTick)
-                    SetSafeSpace(4);
-            }
+            if (!(cmd->buttons & IN_ATTACK) && g_pLocalPlayer->bAttackLastTick)
+                SetSafeSpace(4);
             break;
         }
         [[fallthrough]];
@@ -325,9 +317,9 @@ bool findEdge(float edgeOrigYaw)
     // If the distance is too far, then set the distance to max so the angle
     // isnt used
     if (edgeLeftDist >= 260)
-        edgeLeftDist = 999999999;
+        edgeLeftDist = 999999999.0f;
     if (edgeRightDist >= 260)
-        edgeRightDist = 999999999;
+        edgeRightDist = 999999999.0f;
 
     // If none of the vectors found a wall, then dont edge
     if (edgeLeftDist == edgeRightDist)
@@ -338,7 +330,7 @@ bool findEdge(float edgeOrigYaw)
     {
         edgeToEdgeOn = 1;
         // Correction for pitches to keep the head behind walls with real Up or Jitter
-        if ((((int) pitch_real == 2) || ((int) pitch_real == 4)) && !g_pLocalPlayer->isFakeAngleCM)
+        if ((*pitch_real == 2 || *pitch_real == 4) && !g_pLocalPlayer->isFakeAngleCM)
             edgeToEdgeOn = 2;
         return true;
     }
@@ -346,7 +338,7 @@ bool findEdge(float edgeOrigYaw)
     {
         edgeToEdgeOn = 2;
         // Same as above
-       if ((((int) pitch_real == 2) || ((int) pitch_real == 4)) && !g_pLocalPlayer->isFakeAngleCM)
+        if ((((int) pitch_real == 2) || ((int) pitch_real == 4)) && !g_pLocalPlayer->isFakeAngleCM)
             edgeToEdgeOn = 1;
         return true;
     }
@@ -361,34 +353,33 @@ float useEdge(float edgeViewAngle)
     if (((edgeViewAngle < -135) || (edgeViewAngle > 135)) && edgeTest == true)
     {
         if (edgeToEdgeOn == 1)
-            edgeYaw = (float) -90;
+            edgeYaw = -90;
         if (edgeToEdgeOn == 2)
-            edgeYaw = (float) 90;
+            edgeYaw = 90;
         edgeTest = false;
     }
     if ((edgeViewAngle >= -135) && (edgeViewAngle < -45) && edgeTest == true)
     {
         if (edgeToEdgeOn == 1)
-            edgeYaw = (float) 0;
+            edgeYaw = 0;
         if (edgeToEdgeOn == 2)
-            edgeYaw = (float) 179;
+            edgeYaw = 179;
         edgeTest = false;
     }
     if ((edgeViewAngle >= -45) && (edgeViewAngle < 45) && edgeTest == true)
     {
         if (edgeToEdgeOn == 1)
-            edgeYaw = (float) 90;
+            edgeYaw = 90;
         if (edgeToEdgeOn == 2)
-            edgeYaw = (float) -90;
+            edgeYaw = -90;
         edgeTest = false;
     }
-    if ((edgeViewAngle <= 135) && (edgeViewAngle >= 45) && edgeTest == true)
+    if ((edgeViewAngle <= 135) && (edgeViewAngle >= 45) && edgeTest)
     {
         if (edgeToEdgeOn == 1)
-            edgeYaw = (float) 179;
+            edgeYaw = 179;
         if (edgeToEdgeOn == 2)
             edgeYaw = (float) 0;
-        edgeTest = false;
     }
     // return with the angle choosen
     return edgeYaw;
@@ -396,12 +387,12 @@ float useEdge(float edgeViewAngle)
 static float randyaw = 0.0f;
 void ProcessUserCmd(CUserCmd *cmd)
 {
-	// Not running
+    // Not running
     if (!enable)
         return;
     if (!ShouldAA(cmd))
         return;
-    if (!pitch_fake && !pitch_real && !yaw_fake && !yaw_real)
+    if (!*pitch_fake && !*pitch_real && !*yaw_fake && !*yaw_real)
         return;
     
     static bool keepmode = true;
@@ -410,7 +401,7 @@ void ProcessUserCmd(CUserCmd *cmd)
     float &y             = cmd->viewangles.y;
     static bool flip     = false;
     bool clamp           = !no_clamping;
-    bool yaw_mode		 = true;
+    bool yaw_mode        = true;
 
     static int ticksUntilSwap = 0;
     static bool swap          = true;
@@ -424,49 +415,49 @@ void ProcessUserCmd(CUserCmd *cmd)
     
     // Yaw logic
     if (g_pLocalPlayer->isFakeAngleCM)
-		yaw_mode = false;
-	
-	switch ((int) (yaw_mode ? yaw_real : yaw_fake))
-	{
-	case 1: // Custom
-		y = (float) (yaw_mode ? yaw_real_static : yaw_fake_static);
-		break;
-	case 2: // Custom Offset
-		y += (float) (yaw_mode ? yaw_real_static : yaw_fake_static);
-		break;
-	case 3: // Left
-		y -= 90.0f;
-		break;
-	case 4: // Right
-		y += 90.0f;
-		break;
-	case 5: // Back
-		y += 180.0f;
-		break;
-	case 6: // Spin
-		cur_yaw[yaw_mode] += yaw_mode ? (float) spin : -((float) spin);
-		while (cur_yaw[yaw_mode] > 180.0f)
-			cur_yaw[yaw_mode] += -360.0f;
-		while (cur_yaw[yaw_mode] < -180.0f)
-			cur_yaw[yaw_mode] += 360.0f;
-		y = cur_yaw[yaw_mode];
-		break;
-	case 7: // Edge
-		// Attempt to find an edge and if found, rotate around it
-		if (findEdge(y))
-			y = useEdge(y);
-		break;
-	case 8: // Sideways
-		if (!yaw_mode)
-			swap = !swap;
-		y += swap ? 90.0f : -90.0f;
-		break;
-	case 9: // Heck
-		FuckYaw(y);
-		clamp = false;
-		break;
-	case 10: // Omega
-		if (!yaw_mode)
+        yaw_mode = false;
+
+    switch ((int) (yaw_mode ? yaw_real : yaw_fake))
+    {
+    case 1: // Custom
+        y = (float) (yaw_mode ? yaw_real_static : yaw_fake_static);
+        break;
+    case 2: // Custom Offset
+        y += (float) (yaw_mode ? yaw_real_static : yaw_fake_static);
+        break;
+    case 3: // Left
+        y -= 90.0f;
+        break;
+    case 4: // Right
+        y += 90.0f;
+        break;
+    case 5: // Back
+        y += 180.0f;
+        break;
+    case 6: // Spin
+        cur_yaw[yaw_mode] += yaw_mode ? (float) spin : -((float) spin);
+        while (cur_yaw[yaw_mode] > 180.0f)
+            cur_yaw[yaw_mode] += -360.0f;
+        while (cur_yaw[yaw_mode] < -180.0f)
+            cur_yaw[yaw_mode] += 360.0f;
+        y = cur_yaw[yaw_mode];
+        break;
+    case 7: // Edge
+        // Attempt to find an edge and if found, rotate around it
+        if (findEdge(y))
+            y = useEdge(y);
+        break;
+    case 8: // Sideways
+        if (!yaw_mode)
+            swap = !swap;
+        y += swap ? 90.0f : -90.0f;
+        break;
+    case 9: // Heck
+        FuckYaw(y);
+        clamp = false;
+        break;
+    case 10: // Omega
+        if (!yaw_mode)
         {
             randyaw += RandFloatRange(-30.0f, 30.0f);
             y = randyaw;
@@ -486,10 +477,10 @@ void ProcessUserCmd(CUserCmd *cmd)
 	}
     
     // Pitch logic
-    switch (int(pitch_real))
+    switch (*pitch_real)
     {
     case 1: // Custom
-        p = float(pitch_static);
+        p = *pitch_static;
         break;
     case 2: // Up
         p = -89.0f;
@@ -515,7 +506,7 @@ void ProcessUserCmd(CUserCmd *cmd)
     }
     
     // Fake is done afterwards so that they can be applied on top of the real angles set above
-    switch (int(pitch_fake))
+    switch (*pitch_fake)
     {
     case 1: // Up
         p -= 360.0f;
@@ -534,9 +525,9 @@ void ProcessUserCmd(CUserCmd *cmd)
     flip = !flip;
     if (clamp)
         fClampAngle(cmd->viewangles);
-    if (roll)
-        cmd->viewangles.z = float(roll);
-    if (aaaa_enable)
+    if (*roll)
+        cmd->viewangles.z = *roll;
+    if (*aaaa_enable)
     {
         UpdateAAAAKey();
         UpdateAAAATimer();

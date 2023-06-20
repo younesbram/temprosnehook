@@ -15,7 +15,7 @@ void angle_data_s::push(const Vector &angle)
 {
     if (!angle.x && !angle.y)
         return;
-    good                = strue;
+    good                = true;
     angles[angle_index] = angle;
     if (++angle_index >= count)
         angle_index = 0;

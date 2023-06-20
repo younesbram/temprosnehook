@@ -10,13 +10,14 @@
 #include <hacks/AntiAim.hpp>
 
 #include "common.hpp"
+
 namespace hacks::antiaim
 {
 bool force_fakelag = false;
 float used_yaw     = 0.0f;
-static settings::Boolean enable{ "antiaim.enable", "0" };
+static settings::Boolean enable{ "antiaim.enable", "false" };
 
-static settings::Boolean no_clamping{ "antiaim.no-clamp", "0" };
+static settings::Boolean no_clamping{ "antiaim.no-clamp", "false" };
 static settings::Float roll{ "antiaim.roll", "0" };
 static settings::Float spin{ "antiaim.spin-speed", "10" };
 
@@ -29,7 +30,7 @@ static settings::Float yaw_fake_static{ "antiaim.yaw.fake.static", "0" };
 static settings::Int yaw_real{ "antiaim.yaw.real", "0" };
 static settings::Float yaw_real_static{ "antiaim.yaw.real.static", "0" };
 
-static settings::Boolean aaaa_enable{ "antiaim.aaaa.enable", "0" };
+static settings::Boolean aaaa_enable{ "antiaim.aaaa.enable", "false" };
 static settings::Float aaaa_interval{ "antiaim.aaaa.interval.seconds", "0" };
 static settings::Float aaaa_interval_random_high{ "antiaim.aaaa.interval.random-high", "10" };
 static settings::Float aaaa_interval_random_low{ "antiaim.aaaa.interval.random-low", "2" };
@@ -69,13 +70,9 @@ float GetAAAAPitch()
 float GetAAAATimerLength()
 {
     if (aaaa_interval)
-    {
         return (float) aaaa_interval;
-    }
     else
-    {
         return RandFloatRange((float) aaaa_interval_random_low, (float) aaaa_interval_random_high);
-    }
 }
 
 void NextAAAA()
@@ -306,7 +303,7 @@ float edgeDistance(float edgeRayYaw)
     // trace::g_pFilterNoPlayer to only focus on the enviroment
     g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_no_player, &trace);
     // Pythagorean theorem to calculate distance
-    float edgeDistance = (sqrt(pow(trace.startpos.x - trace.endpos.x, 2) + pow(trace.startpos.y - trace.endpos.y, 2)));
+    float edgeDistance = FastSqrt(pow(trace.startpos.x - trace.endpos.x, 2) + pow(trace.startpos.y - trace.endpos.y, 2));
     return edgeDistance;
 }
 
@@ -354,7 +351,7 @@ float useEdge(float edgeViewAngle)
     // Var to be disabled when an angle is chosen to prevent the others from
     // conflicting
     bool edgeTest = true;
-   if ((edgeViewAngle < -135) || (edgeViewAngle > 135))
+    if ((edgeViewAngle < -135) || (edgeViewAngle > 135))
     {
         if (edgeToEdgeOn == 1)
             edgeYaw = (float) -90;
@@ -362,7 +359,7 @@ float useEdge(float edgeViewAngle)
             edgeYaw = (float) 90;
         edgeTest = false;
     }
-    if ((edgeViewAngle >= -135) && (edgeViewAngle < -45) && edgeTest == true)
+    if ((edgeViewAngle >= -135) && (edgeViewAngle < -45) && edgeTest)
     {
         if (edgeToEdgeOn == 1)
             edgeYaw = (float) 0;
@@ -370,7 +367,7 @@ float useEdge(float edgeViewAngle)
             edgeYaw = (float) 179;
         edgeTest = false;
     }
-    if ((edgeViewAngle >= -45) && (edgeViewAngle < 45) && edgeTest == true)
+    if ((edgeViewAngle >= -45) && (edgeViewAngle < 45) && edgeTest)
     {
         if (edgeToEdgeOn == 1)
             edgeYaw = (float) 90;
@@ -378,7 +375,7 @@ float useEdge(float edgeViewAngle)
             edgeYaw = (float) -90;
         edgeTest = false;
     }
-    if ((edgeViewAngle <= 135) && (edgeViewAngle >= 45) && edgeTest == true)
+    if ((edgeViewAngle <= 135) && (edgeViewAngle >= 45) && edgeTest)
     {
         if (edgeToEdgeOn == 1)
             edgeYaw = (float) 179;
@@ -388,6 +385,7 @@ float useEdge(float edgeViewAngle)
     // return with the angle choosen
     return edgeYaw;
 }
+
 static float randyaw = 0.0f;
 void ProcessUserCmd(CUserCmd *cmd)
 {
@@ -547,5 +545,5 @@ bool isEnabled()
     return *enable;
 }
 
-static InitRoutine fakelag_check([]() { yaw_fake.installChangeCallback([](settings::VariableBase<int> &, int after) { force_fakelag = after > 0 ? true : false; }); });
+static InitRoutine fakelag_check([]() { yaw_fake.installChangeCallback([](settings::VariableBase<int> &, int after) { force_fakelag = after > 0; }); });
 } // namespace hacks::antiaim

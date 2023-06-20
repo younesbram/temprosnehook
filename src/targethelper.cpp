@@ -40,7 +40,7 @@ int GetScoreForEntity(CachedEntity *entity)
     }
 
     int clazz      = CE_INT(entity, netvar.iClass);
-    int health     = entity->m_iHealth();
+    int health     = CE_INT(entity, netvar.iHealth);
     float distance = entity->m_flDistance();
     bool zoomed    = HasCondition<TFCond_Zoomed>(entity);
     bool pbullet   = HasCondition<TFCond_SmallBulletResist>(entity);

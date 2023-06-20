@@ -54,7 +54,7 @@ void frameStageNotify()
     if (enable)
     {
         // Add thirdperson
-        if (!g_pLocalPlayer->alive)
+        if (!g_pLocalPlayer->life_state)
             CE_INT(LOCAL_E, netvar.nForceTauntCam) = 1;
         was_enabled = true;
     }

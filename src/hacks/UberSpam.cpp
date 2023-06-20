@@ -57,7 +57,7 @@ int ChargePercentLineIndex(float chargef)
 
 static void CreateMove()
 {
-    if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive || CE_BAD(LOCAL_W))
+    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
         return;
     if (!GetSource())
         return;

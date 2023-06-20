@@ -54,7 +54,7 @@ static InitRoutine minigun_check(
             EC::CreateMove,
             []()
             {
-                if (CE_BAD(LOCAL_E) || HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E) || !g_pLocalPlayer->alive || !minigun_check_timer.test_and_set(1000))
+                if (CE_BAD(LOCAL_E) || HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || !minigun_check_timer.test_and_set(1000))
                     return;
                 // Grab the handle and store it into the var
                 int *hWeapons = &CE_INT(LOCAL_E, netvar.hMyWeapons);

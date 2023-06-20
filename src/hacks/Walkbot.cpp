@@ -865,7 +865,7 @@ void UpdateSlot()
 {
     if (!slot_timer.test_and_set(1000))
         return;
-    if (CE_GOOD(LOCAL_E) && CE_GOOD(LOCAL_W) && !g_pLocalPlayer->alive)
+    if (CE_GOOD(LOCAL_E) && CE_GOOD(LOCAL_W) && !g_pLocalPlayer->life_state)
     {
         IClientEntity *weapon = RAW_ENT(LOCAL_W);
         // IsBaseCombatWeapon()
@@ -1134,7 +1134,7 @@ Timer map_check{};
 int erasedelay = 0;
 static void cm()
 {
-    if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive || CE_BAD(LOCAL_W))
+    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
         return;
     if (state::state == WB_DISABLED)
         return;

@@ -651,7 +651,7 @@ void _FASTCALL BoxEsp(EntityType &type, bool &transparent, rgba_t &fg, CachedEnt
             Draw3DBox(ent, fg);
         break;
     case ENTITY_BUILDING:
-        if (ent->m_iTeam() == g_pLocalPlayer->team && !team_buildings)
+        if (CE_INT(ent, netvar.iTeamNum) == g_pLocalPlayer->team && !team_buildings)
             break;
         if (!fg)
             fg = colors::EntityF(ent);

@@ -87,7 +87,7 @@ static void CreateMove()
         RandomFloat();
 
     // Projectile/Huntsman check
-    if (GetWeaponMode() != weapon_projectile && LOCAL_W->m_iClassID() != CL_CLASS(CTFCompoundBow))
+    if (g_pLocalPlayer->weapon_mode != weapon_projectile && LOCAL_W->m_iClassID() != CL_CLASS(CTFCompoundBow))
         return;
 
     // Beggars check
@@ -213,7 +213,7 @@ bool IsPerfectShot(IClientEntity *weapon, float provided_time = 0.0 /*used for o
 // Applies nospread
 void ApplySpreadCorrection(Vector &angles, int seed, float spread)
 {
-    if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive || CE_BAD(LOCAL_W))
+    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
         return;
     IClientEntity *weapon = RAW_ENT(LOCAL_W);
 
@@ -612,7 +612,7 @@ void CL_SendMove_hook()
     {
         static Timer s_NextCheck;
         // we use it as 1 sec delay
-        if (s_NextCheck.check(1000) && new_packets == 1 && (no_spread_synced != SYNCED || !g_pLocalPlayer->alive) && !waiting_perf_data)
+        if (s_NextCheck.check(1000) && new_packets == 1 && (no_spread_synced != SYNCED || !LOCAL_E->m_bAlivePlayer()) && !waiting_perf_data)
         {
             s_NextCheck.update();
             // request playerperf once again here, and this time we don't care if it will be sent with clc_move
@@ -622,7 +622,7 @@ void CL_SendMove_hook()
             should_update_time = true;
 
             // Incase we are dead sync too, unless we already are doing so
-            if (!g_pLocalPlayer->alive && no_spread_synced != CORRECTING)
+            if (!LOCAL_E->m_bAlivePlayer() && no_spread_synced != CORRECTING)
             {
                 // Backup data
                 last_sync_delta_time = float_time_delta;
@@ -656,7 +656,7 @@ void CL_SendMove_hook()
     RecheckIfresync_needed(asumed_real_time);
 
     // If we're dead just return original
-    if (!g_pLocalPlayer->alive)
+    if (!LOCAL_E->m_bAlivePlayer())
     {
         auto original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
         original();
@@ -681,7 +681,7 @@ void CL_SendMove_hook()
     }
 
     // Bad weapon
-    if ((GetWeaponMode() != weapon_hitscan && LOCAL_W->m_iClassID() != CL_CLASS(CTFCompoundBow)))
+    if ((g_pLocalPlayer->weapon_mode != weapon_hitscan && LOCAL_W->m_iClassID() != CL_CLASS(CTFCompoundBow)))
     {
         auto original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
         original();
@@ -890,7 +890,7 @@ static InitRoutine init_bulletnospread(
             EC::Draw,
             []()
             {
-                if (bullet && (draw || draw_mantissa) && CE_GOOD(LOCAL_E) && g_pLocalPlayer->alive)
+                if (bullet && (draw || draw_mantissa) && CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
                 {
                     std::string draw_string;
                     rgba_t draw_color = colors::white;

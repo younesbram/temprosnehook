@@ -1558,7 +1558,7 @@ static void CreateMove()
 {
     if (!*enabled || !navparser::NavEngine::isReady())
         return;
-    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E))
+    if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive || HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E))
         return;
     refreshSniperSpots();
     /*refreshLocalBuildings();

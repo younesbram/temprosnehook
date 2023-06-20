@@ -28,6 +28,10 @@ static settings::Boolean escape_danger_ctf_cap("navbot.escape-danger.ctf-cap", "
 static settings::Boolean enable_slight_danger_when_capping("navbot.escape-danger.slight-danger.capping", "false");
 static settings::Boolean run_to_reload("navbot.run-to-reload", "false");
 static settings::Int force_slot("navbot.force-slot", "1");
+static settings::Boolean autojump("navbot.autojump.enabled", "false");
+static settings::Boolean primary_only("navbot.primary-only", "true");
+static settings::Int force_slot("navbot.force-slot", "1");
+static settings::Float jump_distance("navbot.autojump.trigger-distance", "300");
 static settings::Int blacklist_delay("navbot.proximity-blacklist.delay", "500");
 static settings::Boolean blacklist_dormat("navbot.proximity-blacklist.dormant", "false");
 static settings::Int blacklist_delay_dormat("navbot.proximity-blacklist.delay-dormant", "1000");
@@ -1540,6 +1544,8 @@ static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &ne
 static void updateSlot(std::pair<CachedEntity *, float> &nearest)
 {
     static Timer slot_timer{};
+    if (!*force_slot && !*primary_only || !slot_timer.test_and_set(300))
+        return;
     if (CE_GOOD(LOCAL_E) && !HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E) && CE_GOOD(LOCAL_W) && g_pLocalPlayer->alive)
     {
         IClientEntity *weapon = RAW_ENT(LOCAL_W);
@@ -1552,7 +1558,6 @@ static void updateSlot(std::pair<CachedEntity *, float> &nearest)
         }
     }
 }
-
 
 static void CreateMove()
 {

@@ -30,7 +30,6 @@ static settings::Boolean run_to_reload("navbot.run-to-reload", "false");
 static settings::Int force_slot("navbot.force-slot", "1");
 static settings::Boolean autojump("navbot.autojump.enabled", "false");
 static settings::Boolean primary_only("navbot.primary-only", "true");
-static settings::Int force_slot("navbot.force-slot", "1");
 static settings::Float jump_distance("navbot.autojump.trigger-distance", "300");
 static settings::Int blacklist_delay("navbot.proximity-blacklist.delay", "500");
 static settings::Boolean blacklist_dormat("navbot.proximity-blacklist.dormant", "false");

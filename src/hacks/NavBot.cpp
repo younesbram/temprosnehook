@@ -1154,7 +1154,7 @@ static bool buildBuilding(int building)
     if (!CE_INT(LOCAL_E, netvar.m_iAmmo + 12))
         return getAmmo(true);
 
-    if (ent->m_flDistance() <= 100.0f && g_pLocalPlayer->weapon_mode == weapon_melee)
+    if (ent->m_flDistance() <= 100.0f && GetWeaponMode() == weapon_melee)
     {
         AimAt(g_pLocalPlayer->v_Eye, GetBuildingPosition(ent), current_user_cmd);
         current_user_cmd->buttons |= IN_ATTACK;

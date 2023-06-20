@@ -163,7 +163,7 @@ float getFireDelay()
 
 bool canInstaZoom()
 {
-    return in_rapidfire_zoom || (g_pLocalPlayer->holding_sniper_rifle && CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND && current_user_cmd->buttons & IN_ATTACK2 && !HasCondition<TFCond_Zoomed>(LOCAL_E) && CE_FLOAT(LOCAL_W, netvar.flNextSecondaryAttack) <= SERVER_TIME);
+    return in_rapidfire_zoom || (g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->flags & FL_ONGROUND && current_user_cmd->buttons & IN_ATTACK2 && !HasCondition<TFCond_Zoomed>(LOCAL_E) && CE_FLOAT(LOCAL_W, netvar.flNextSecondaryAttack) <= SERVER_TIME);
 }
 
 // This is needed in order to make zoom/unzoom smooth even with insta zoom
@@ -202,7 +202,7 @@ bool shouldRapidfire()
         return false;
 
     // Dead player
-    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
+    if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive || CE_BAD(LOCAL_W))
         return false;
 
     // Weapon specific ignores, knives, Thermal Thruster, Huntsman, Mediguns, and the grappling hook
@@ -210,7 +210,8 @@ bool shouldRapidfire()
         return false;
 
     // Ignore throwables/consumables/etc
-    if (g_pLocalPlayer->weapon_mode == weapon_throwable || g_pLocalPlayer->weapon_mode == weapon_consumable || g_pLocalPlayer->weapon_mode == weapon_pda)
+    auto weapon_mode = GetWeaponMode();
+    if (weapon_mode == weapon_throwable || weapon_mode == weapon_consumable || weapon_mode == weapon_pda)
         return false;
 
     // Unrevved minigun cannot rapidfire
@@ -276,15 +277,16 @@ bool shouldRapidfire()
     case 0: // Always on
         return buttons_pressed;
     case 1: // Disable on projectile
-        if (g_pLocalPlayer->weapon_mode == weapon_projectile)
+        if (GetWeaponMode() == weapon_projectile)
             return false;
         break;
     case 2: // Disable on melee
-        if (g_pLocalPlayer->weapon_mode == weapon_melee)
+        if (GetWeaponMode() == weapon_melee)
             return false;
         break;
     case 3: // Disable on projectile and melee
-        if (g_pLocalPlayer->weapon_mode == weapon_projectile || g_pLocalPlayer->weapon_mode == weapon_melee)
+        auto weapon_mode = GetWeaponMode();
+        if (weapon_mode == weapon_projectile || weapon_mode == weapon_melee)
             return false;
         break;
     }
@@ -339,7 +341,7 @@ void dodgeProj(CachedEntity *proj_ptr)
 
 static void dodgeProj_cm()
 {
-    if (!LOCAL_E->m_bAlivePlayer() || proj_map.empty() || !dodge_projectile)
+    if (!g_pLocalPlayer->alive || proj_map.empty() || !dodge_projectile)
         return;
     Vector player_pos  = RAW_ENT(LOCAL_E)->GetAbsOrigin();
     const int max_size = proj_map.size();
@@ -568,7 +570,7 @@ int approximateTicksForDist(float distance, float initial_speed, int max_ticks)
 {
     bool is_skullcutter = false;
     bool has_booties    = false;
-    if (CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer() && CE_GOOD(LOCAL_W))
+    if (CE_GOOD(LOCAL_E) && g_pLocalPlayer->alive && CE_GOOD(LOCAL_W))
     {
         // We have a skullcutter, mark as such
         if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 172)
@@ -779,7 +781,7 @@ void warpLogic()
 {
     if (!enabled)
         return;
-    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
+    if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive || CE_BAD(LOCAL_W))
         return;
 
     // Handle minigun in rapidfire
@@ -806,7 +808,7 @@ void warpLogic()
 
         if (!charge_in_jump)
         {
-            if (CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND)
+            if (g_pLocalPlayer->flags & FL_ONGROUND)
                 ground_ticks++;
             else
                 ground_ticks = 0;
@@ -814,7 +816,7 @@ void warpLogic()
 
         bool button_block = (current_user_cmd->buttons & (IN_ATTACK | IN_ATTACK2));
         // Charge on minigun even with m2 held
-        if (LOCAL_E->m_bAlivePlayer() && CE_GOOD(LOCAL_W) && LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun))
+        if (g_pLocalPlayer->alive && CE_GOOD(LOCAL_W) && LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun))
             button_block = current_user_cmd->buttons & IN_ATTACK;
 
         // Bunch of checks, if they all pass we are standing still
@@ -1001,7 +1003,7 @@ void warpLogic()
             velocity::EstimateAbsVelocity(RAW_ENT(LOCAL_E), vel);
 
             // if we move more than 1.0 HU/s and buttons are pressed, and we are grounded, go to move towards statement...
-            if (CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND && !vel.IsZero(1.0f) && current_user_cmd->buttons & (IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT))
+            if (g_pLocalPlayer->flags & FL_ONGROUND && !vel.IsZero(1.0f) && current_user_cmd->buttons & (IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT))
                 current_peek_state = MOVE_TOWARDS;
             // ...else don't warp
             else
@@ -1150,7 +1152,7 @@ void Draw()
         return;
     if (CE_BAD(LOCAL_E))
         return;
-    if (!LOCAL_E->m_bAlivePlayer())
+    if (!g_pLocalPlayer->alive)
         return;
 
     if (draw)
@@ -1219,7 +1221,7 @@ public:
         CachedEntity *att = ENTITY(attacker_idx);
 
         // Don't run if we (the victim) are invalid
-        if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
+        if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive)
             return;
         // Ignore projectile damage for now
         if (CE_VALID(att) && att->m_bAlivePlayer() && GetWeaponMode(att) == weapon_projectile)

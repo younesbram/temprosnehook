@@ -1746,7 +1746,7 @@ void PrintChat(const char *fmt, ...)
 Vector getShootPos(Vector angle)
 {
     Vector eye = g_pLocalPlayer->v_Eye;
-    if (g_pLocalPlayer->weapon_mode != weapon_projectile || CE_BAD(LOCAL_W))
+    if (GetWeaponMode() != weapon_projectile || CE_BAD(LOCAL_W))
         return eye;
 
     Vector forward, right, up;
@@ -1763,7 +1763,7 @@ Vector getShootPos(Vector angle)
         vecOffset = Vector(23.5f, 12.0f, -3.0f);
         if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 513) // The Original
             vecOffset->y = 0.0f;
-        if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) != 513 && CE_INT(LOCAL_E, netvar.iFlags) & FL_DUCKING)
+        if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) != 513 && g_pLocalPlayer->flags & FL_DUCKING)
             vecOffset->z = 8.0f;
         break;
     case CL_CLASS(CTFParticleCannon): // Cow Mangler 5000
@@ -1778,7 +1778,7 @@ Vector getShootPos(Vector angle)
         {
         case CL_CLASS(CTFParticleCannon): // Cow Mangler 5000
         case CL_CLASS(CTFRaygun):         // Righteous Bison
-            if (CE_INT(LOCAL_E, netvar.iFlags) & FL_DUCKING)
+            if (g_pLocalPlayer->flags & FL_DUCKING)
                 vecOffset->z = 8.0f;
             break;
         case CL_CLASS(CTFCompoundBow):

@@ -3,8 +3,6 @@
         <List width="150">
             <AutoVariable width="fill" target="esp.enable" label="Enable ESP"
                           tooltip="Enable extrasensory perception. This shows important information about game entities."/>
-            <AutoVariable width="fill" target="esp.legit" label="Legit mode"
-                          tooltip="Dont show ESP of enemies behind walls"/>
             <AutoVariable width="fill" target="esp.range" label="Max range"/>
             <AutoVariable width="fill" target="lightesp.enable" label="Enable light ESP"
                           tooltip="Show a red and green dot on the heads of enemies."/>

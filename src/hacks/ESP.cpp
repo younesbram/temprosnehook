@@ -992,15 +992,6 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             if (!GetPlayerInfo(ent->m_IDX, &info))
                 return;
 
-            // Legit mode handling
-            if (legit && ent->m_bEnemy() && playerlist::IsDefault(info.friendsID))
-            {
-                if (IsPlayerInvisible(ent))
-                    return; // Invis check
-                if (vischeck && !ent->IsVisible())
-                    return;
-            }
-
             // Powerup handling
             if (powerup_esp)
             {

@@ -134,23 +134,6 @@
                           tooltip="Intelligently unzoom if applicable to current weapon type."/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Spectated mode" x="340">
-        <List width="150">
-            <LabeledObject width="fill" label="Spectator mode"
-                           tooltip="Never: the settings below will never override main aimbot settings. Firstperson: enable below settings if at least one person is spectating you in first person. Spectated: enable below settings if you are being spectated at all.">
-                <Select target="aimbot.spectator-mode">
-                    <Option name="Off" value="0"/>
-                    <Option name="Firstperson" value="1"/>
-                    <Option name="Any" value="2"/>
-                </Select>
-            </LabeledObject>
-            <AutoVariable width="fill" target="aimbot.spectator.enable" label="Aimbot enable"
-                          tooltip="Should the aimbot be enabled based on the above?"/>
-            <AutoVariable width="fill" target="aimbot.spectator.fov" label="Spectated FOV"
-                          tooltip="FOV for the aimbot when in spectated mode."/>
-            <AutoVariable width="fill" target="aimbot.spectator.slow" label="Spectated slow"
-                          tooltip="Controls how quickly the aimbot moves your crosshair while in spectated mode."
-                          min="0" max="30"/>
     <Box padding="12 6 6 6" width="content" height="content" name="Backtracking" x="340" y="85">
         <List width="150">
             <AutoVariable width="fill" target="backtrack.enabled" label="Enable backtracking"
@@ -179,7 +162,5 @@
                 </Select>
             </LabeledObject>
         </List>
-    </Box>
-    </Box>
     </Box>
 </Tab>

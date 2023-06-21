@@ -12,4 +12,3 @@ add_subdirectory(settings)
 if (EnableVisuals)
     add_subdirectory(visual)
 endif()
-

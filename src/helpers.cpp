@@ -49,7 +49,7 @@ void BeginConVars()
                                      "hud_fastswitch 1\n"
                                      "tf_medigun_autoheal 1\n"
                                      "cat_fixvac\n"
-                                     "fps_max 20\n"
+                                     "fps_max 30\n"
                                      "cat_ipc_connect";
 
         cfg_autoexec_textmode.close();

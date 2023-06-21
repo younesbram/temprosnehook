@@ -15,21 +15,9 @@ extern bool angleCheck(CachedEntity *from, CachedEntity *to, std::optional<Vecto
 }
 namespace hacks::antibackstab
 {
-static settings::Boolean enable{ "antibackstab.enable", "false" };
+static settings::Boolean enable{ "antibackstab.enable", "true" };
 static settings::Float distance{ "antibackstab.distance", "200" };
-static settings::Boolean sayno{ "antibackstab.nope", "false" };
 bool noaa = false;
-
-void SayNope()
-{
-    static float last_say = 0.0f;
-    if (g_GlobalVars->curtime < last_say)
-        last_say = 0.0f;
-    if (g_GlobalVars->curtime - last_say < 1.5f)
-        return;
-    hack::ExecuteCommand("voicemenu 0 7");
-    last_say = g_GlobalVars->curtime;
-}
 
 float GetAngle(CachedEntity *spy)
 {
@@ -118,8 +106,6 @@ static void CreateMove()
         if (couldbebackstabbed || CE_INT(spy, netvar.iClass) == tf_class::tf_heavy)
             current_user_cmd->viewangles.x = 150.0f;
         g_pLocalPlayer->bUseSilentAngles = true;
-        if (sayno)
-            SayNope();
         *bSendPackets = true;
     }
     else

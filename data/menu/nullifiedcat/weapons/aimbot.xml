@@ -104,8 +104,6 @@
             <AutoVariable width="fill" target="aimbot.lock-target" label="Preserve target"
                           tooltip="Lock onto a target until they die or leave your FOV."/>
             <AutoVariable width="fill" target="aimbot.target.sentry" label="Aim sentry"/>
-            <AutoVariable width="fill" target="aimbot.target.other-buildings" label="Aim other buildings"/>
-            <AutoVariable width="fill" target="aimbot.target.stickybomb" label="Aim stickies"/>
             <AutoVariable width="fill" target="aimbot.target.npcs" label="Aim NPC"/>
             <AutoVariable width="fill" target="player-tools.ignore.taunting" label="Ignore taunting"/>
             <AutoVariable width="fill" target="aimbot.target.ignore-vaccinator" label="Ignore vacc ubercharge"/>

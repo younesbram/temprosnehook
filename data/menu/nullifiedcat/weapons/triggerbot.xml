@@ -62,8 +62,6 @@
             <AutoVariable width="fill" target="antibackstab.angle" label="Detection angle"/>
             <AutoVariable width="fill" target="antibackstab.distance" label="Detection distance"/>
             <AutoVariable width="fill" target="antibackstab.silent" label="Silent"/>
-            <AutoVariable width="fill" target="antibackstab.nope" label="Nope!"
-                          tooltip="Have your character say 'no'."/>
         </List>
     </Box>
 </Tab>

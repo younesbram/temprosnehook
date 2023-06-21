@@ -69,9 +69,7 @@ static bool force_backtrack_aimbot = false;
 static settings::Float max_range{ "aimbot.target.max-range", "4096" };
 static settings::Boolean ignore_vaccinator{ "aimbot.target.ignore-vaccinator", "true" };
 static settings::Boolean buildings_sentry{ "aimbot.target.sentry", "true" };
-static settings::Boolean buildings_other{ "aimbot.target.other-buildings", "true" };
 static settings::Boolean npcs{ "aimbot.target.npcs", "true" };
-static settings::Boolean stickybot{ "aimbot.target.stickybomb", "false" };
 static settings::Int teammates{ "aimbot.target.teammates", "0" };
 
 /*
@@ -998,9 +996,6 @@ bool IsTargetStateGood(CachedEntity *entity)
     if (entity->m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile))
     {
         // Enabled
-        if (!*stickybot)
-            return false;
-
         // Teammates, Even with friendly fire enabled, stickies can NOT be destroyed
         if (!entity->m_bEnemy())
             return false;

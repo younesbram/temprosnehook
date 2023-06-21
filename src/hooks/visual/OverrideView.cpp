@@ -7,7 +7,6 @@
 #include <settings/Float.hpp>
 #include "HookedMethods.hpp"
 
-static settings::Float override_fov{ "visual.fov", "0" };
 static settings::Float freecam_speed{ "visual.freecam-speed", "800.0f" };
 static settings::Button freecam{ "visual.freecam-button", "<none>" };
 static settings::Button zoom_key{ "visual.zoom-key", "<null>" };
@@ -23,33 +22,6 @@ namespace hooked_methods
 DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
 {
     original::OverrideView(this_, setup);
-
-    if (!isHackActive() || g_Settings.bInvalid || CE_BAD(LOCAL_E))
-        return;
-
-    bool zoomed = setup->fov < CE_INT(LOCAL_E, netvar.iDefaultFOV) || g_pLocalPlayer->bZoomed;
-    if (*no_zoom && zoomed)
-    {
-        auto fov   = g_ICvar->FindVar("fov_desired");
-        setup->fov = override_fov ? *override_fov : fov->GetInt();
-    }
-    else if (override_fov && !zoomed)
-    {
-        setup->fov = *override_fov;
-    }
-    if (zoom_key && zoom_key.isKeyDown())
-    {
-        auto default_fov               = g_ICvar->FindVar("default_fov");
-        float sens_factor              = (*zoom_fov / setup->fov) * (setup->fov / default_fov->GetFloat());
-        setup->fov                     = *zoom_fov;
-        g_CHUD->GetSensitivityFactor() = sens_factor;
-        zoomed_last_tick               = true;
-    }
-    else if (zoomed_last_tick)
-    {
-        g_CHUD->GetSensitivityFactor() = 0.0f;
-        zoomed_last_tick               = false;
-    }
 
     if (spectator_target)
     {

@@ -27,6 +27,8 @@
                           tooltip="If applicable, the aimbot will only shoot if you are scoped in."/>
             <AutoVariable width="fill" target="aimbot.assistance.only" label="Assistance only"
                           tooltip="Aimbot will only activate if your mouse has moved in the last half second."/>
+        </List>
+    </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Projectile aimbot" y="240">
         <List width="150">
             <AutoVariable width="fill" target="aimbot.projectile.enable" label="Enable projectile aimbot"/>

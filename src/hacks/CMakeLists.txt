@@ -29,4 +29,3 @@ set(files "${CMAKE_CURRENT_LIST_DIR}/AutoJoin.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Walkbot.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Warp.cpp")
 target_sources(cathook PRIVATE ${files})
-endif()

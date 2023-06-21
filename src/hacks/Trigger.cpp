@@ -26,7 +26,6 @@ static settings::Int trigger_key_mode{ "trigger.key.mode", "1" };
 // FIXME move these into targeting
 static settings::Boolean ignore_vaccinator{ "trigger.target.ignore-vaccinator", "true" };
 static settings::Boolean buildings_sentry{ "trigger.target.buildings-sentry", "true" };
-static settings::Boolean buildings_other{ "trigger.target.buildings-other", "true" };
 static settings::Boolean stickybot{ "trigger.target.stickybombs", "false" };
 static settings::Boolean teammates{ "trigger.target.teammates", "false" };
 static settings::Float max_range{ "trigger.target.max-range", "4096" };
@@ -283,14 +282,14 @@ bool IsTargetStateGood(CachedEntity *entity, std::optional<backtrack::BacktrackD
     else if (entity->m_Type() == ENTITY_BUILDING)
     {
         // Check if building aimbot is enabled
-        if (!(buildings_other || buildings_sentry))
+        if (!( buildings_sentry))
             return false;
         // Check if enemy building
         if (!entity->m_bEnemy())
             return false;
 
         // If needed, Check if building type is allowed
-        if (!(buildings_other && buildings_sentry))
+        if  (buildings_sentry)
         {
             // Check if target is a sentrygun
             if (entity->m_iClassID() == CL_CLASS(CObjectSentrygun))
@@ -301,10 +300,6 @@ bool IsTargetStateGood(CachedEntity *entity, std::optional<backtrack::BacktrackD
             }
             else
             {
-                // If target is not a sentry, check if other buildings are
-                // allowed
-                if (!buildings_other)
-                    return false;
             }
         }
 

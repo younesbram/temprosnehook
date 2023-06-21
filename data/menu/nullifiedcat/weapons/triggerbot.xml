@@ -52,7 +52,6 @@
                 <AutoVariable width="fill" target="trigger.target.stickybombs" label="Stickybombs"
                               tooltip="Fire upon stickybombs."/>
                 <AutoVariable width="fill" target="trigger.target.buildings-sentry" label="Sentry guns"/>
-                <AutoVariable width="fill" target="trigger.target.buildings-other" label="Other buildings"/>
                 <AutoVariable width="fill" target="trigger.target.ignore-vaccinator" label="Ignore Vaccinator"/>
             </List>
         </Box>

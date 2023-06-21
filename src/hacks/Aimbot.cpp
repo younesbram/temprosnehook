@@ -68,12 +68,10 @@ static bool force_backtrack_aimbot = false;
 
 static settings::Float max_range{ "aimbot.target.max-range", "4096" };
 static settings::Boolean ignore_vaccinator{ "aimbot.target.ignore-vaccinator", "true" };
-settings::Boolean aim_sentrybuster{ "aimbot.target.sentrybuster", "false" };
 static settings::Boolean buildings_sentry{ "aimbot.target.sentry", "true" };
 static settings::Boolean buildings_other{ "aimbot.target.other-buildings", "true" };
 static settings::Boolean npcs{ "aimbot.target.npcs", "true" };
 static settings::Boolean stickybot{ "aimbot.target.stickybomb", "false" };
-static settings::Boolean rageonly{ "aimbot.target.ignore-non-rage", "false" };
 static settings::Int teammates{ "aimbot.target.teammates", "0" };
 
 /*
@@ -880,10 +878,6 @@ bool IsTargetStateGood(CachedEntity *entity)
         if (entity->m_flDistance() - 40.0f > targeting_range && tickcount > last_target_ignore_timer) // m_flDistance includes the collision box. You have to subtract it (Should be the same for every model)
             return false;
 
-        // Rage only check
-        if (*rageonly && playerlist::AccessData(entity->player_info->friendsID).state != playerlist::k_EState::RAGE)
-            return false;
-
         // Wait for charge
         if (*wait_for_charge && g_pLocalPlayer->holding_sniper_rifle)
         {
@@ -962,7 +956,7 @@ bool IsTargetStateGood(CachedEntity *entity)
     case (ENTITY_BUILDING):
     {
         // Enabled check
-        if (!*buildings_other && !*buildings_sentry)
+        if (!*buildings_sentry)
             return false;
 
         // Teammate's buildings can never be damaged
@@ -974,7 +968,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         if (targeting_range > 0.0f && entity->m_flDistance() - 40.0f > targeting_range && tickcount > last_target_ignore_timer)
             return false;
 
-        if (!*buildings_sentry && entity->m_iClassID() == CL_CLASS(CObjectSentrygun) || !*buildings_other)
+        if (!*buildings_sentry && entity->m_iClassID() == CL_CLASS(CObjectSentrygun))
             return false;
 
         return true;

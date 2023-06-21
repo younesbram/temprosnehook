@@ -81,7 +81,7 @@ DEFINE_HOOKED_METHOD(Paint, void, IEngineVGui *this_, PaintMode_t mode)
 #if !ENABLE_VISUALS
         if (*die_if_vac && checkmmban.test_and_set(1000))
         {
-            if (tfmm::isMMBanned())
+            if (tfmm::IsMMBanned())
                 *(int *) 0 = 0;
         }
 #endif

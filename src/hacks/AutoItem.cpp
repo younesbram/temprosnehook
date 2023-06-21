@@ -19,11 +19,11 @@
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <utility>
 #include "common.hpp"
 
 namespace hacks::autoitem
 {
+
 static settings::Boolean enable{ "auto-item.enable", "false" };
 static settings::Int interval{ "auto-item.time", "30000" };
 
@@ -45,9 +45,11 @@ static settings::Boolean debug{ "auto-item.debug", "false" };
     if (*debug)    \
     logging::Info("AutoItem.cpp: " __VA_ARGS__)
 
+#if ENABLE_TEXTMODE
+static settings::Boolean autoNoisemaker{ "misc.auto-noisemaker", "true" };
+#else
 static settings::Boolean autoNoisemaker{ "misc.auto-noisemaker", "false" };
-
-static const int unequip_id = -1;
+#endif
 
 // 536 is Birthday noisemaker
 // 673 is Christmas noisemaker
@@ -55,12 +57,12 @@ static int noisemaker_id = 536;
 
 struct AchivementItem
 {
-    int achievement_id{};
+    int achievement_id;
     std::string name;
 };
 
 // A map that allows us to map item ids to achievement names and achievement ids
-static boost::unordered_flat_map<int /*item_id*/, AchivementItem> ach_items;
+static std::unordered_map<int /*item_id*/, AchivementItem> ach_items;
 static std::array<std::vector<std::string>, 3> craft_groups;
 
 bool checkAchMgr()
@@ -79,8 +81,10 @@ void Lock()
     if (!checkAchMgr())
         return;
     g_ISteamUserStats->RequestCurrentStats();
-    for (int i = 0; i < g_IAchievementMgr->GetAchievementCount(); ++i)
+    for (int i = 0; i < g_IAchievementMgr->GetAchievementCount(); i++)
+    {
         g_ISteamUserStats->ClearAchievement(g_IAchievementMgr->GetAchievementByIndex(i)->GetName());
+    }
     g_ISteamUserStats->StoreStats();
     g_ISteamUserStats->RequestCurrentStats();
 }
@@ -89,8 +93,10 @@ void Unlock()
 {
     if (!checkAchMgr())
         return;
-    for (int i = 0; i < g_IAchievementMgr->GetAchievementCount(); ++i)
+    for (int i = 0; i < g_IAchievementMgr->GetAchievementCount(); i++)
+    {
         g_IAchievementMgr->AwardAchievement(g_IAchievementMgr->GetAchievementByIndex(i)->GetAchievementID());
+    }
 }
 
 void unlockSingle(int achID)
@@ -99,7 +105,9 @@ void unlockSingle(int achID)
         return;
     auto *ach = reinterpret_cast<IAchievement *>(g_IAchievementMgr->GetAchievementByID(achID));
     if (ach)
+    {
         g_IAchievementMgr->AwardAchievement(achID);
+    }
 }
 
 AchivementItem *isAchItem(int id)
@@ -324,7 +332,7 @@ void getAndEquipWeapon(std::string str, int clazz, int slot)
 }
 
 static Timer t{};
-static void CreateMove()
+void CreateMove()
 {
     if (!enable || CE_BAD(LOCAL_E) || !t.test_and_set(*interval))
         return;
@@ -353,9 +361,9 @@ static void CreateMove()
             offset = (offset + 1) % 3;
         }
         if (autoNoisemaker && inv->GetFirstItemOfItemDef(noisemaker_id))
+        {
             equipItem(clazz, 9, noisemaker_id, false, false);
-        else // Unequip the noisemaker if we're not using it
-            equipItem(clazz, 9, unequip_id, false, false);
+        }
     }
 }
 
@@ -367,8 +375,10 @@ CatCommand dump_achievement("achievement_dump", "Dump achievements to file (deve
                                 std::ofstream out("/tmp/cathook_achievements.txt", std::ios::out);
                                 if (out.bad())
                                     return;
-                                for (int i = 0; i < g_IAchievementMgr->GetAchievementCount(); ++i)
+                                for (int i = 0; i < g_IAchievementMgr->GetAchievementCount(); i++)
+                                {
                                     out << '[' << i << "] " << g_IAchievementMgr->GetAchievementByIndex(i)->GetName() << ' ' << g_IAchievementMgr->GetAchievementByIndex(i)->GetAchievementID() << "\n";
+                                }
                                 out.close();
                             });
 
@@ -412,7 +422,7 @@ CatCommand lock_single("achievement_lock_single", "Locks single achievement by I
 
                            int index = -1;
                            if (ach)
-                               for (int i = 0; i < g_IAchievementMgr->GetAchievementCount(); ++i)
+                               for (int i = 0; i < g_IAchievementMgr->GetAchievementCount(); i++)
                                {
                                    auto ach2 = g_IAchievementMgr->GetAchievementByIndex(i);
                                    if (ach2->GetAchievementID() == id)
@@ -456,9 +466,9 @@ void rvarCallback(std::string after, int idx)
 static InitRoutine init(
     []()
     {
-        primary.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { rvarCallback(std::move(after), 0); });
-        secondary.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { rvarCallback(std::move(after), 1); });
-        melee.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { rvarCallback(std::move(after), 2); });
+        primary.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { rvarCallback(after, 0); });
+        secondary.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { rvarCallback(after, 1); });
+        melee.installChangeCallback([](settings::VariableBase<std::string> &, std::string after) { rvarCallback(after, 2); });
 
         EC::Register(EC::CreateMove, CreateMove, "autoitem_cm");
 

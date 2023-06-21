@@ -14,7 +14,7 @@ namespace player_tools
 static settings::Int betrayal_limit{ "player-tools.betrayal-limit", "2" };
 static settings::Boolean betrayal_sync{ "player-tools.betrayal-ipc-sync", "true" };
 
-static settings::Boolean taunting{ "player-tools.ignore.taunting", "true" };
+static settings::Boolean taunting{ "player-tools.ignore.taunting", "false" };
 static settings::Boolean ignoreCathook{ "player-tools.ignore.cathook", "true" };
 
 static boost::unordered_flat_map<unsigned, unsigned> betrayal_list{};

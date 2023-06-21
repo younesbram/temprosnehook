@@ -26,8 +26,8 @@ along with Cathook. If not, see <https://www.gnu.org/licenses/>.
 #include "Aimbot.hpp"
 
 /* World visual rvars */
-static settings::Boolean no_arms{ "remove.arms", "false" };
-static settings::Boolean no_hats{ "remove.hats", "false" };
+static settings::Boolean no_arms{ "remove.arms", "true" };
+static settings::Boolean no_hats{ "remove.hats", "true" };
 static settings::Boolean blend_zoom{ "zoom.blend", "false" };
 
 static settings::Boolean enable{ "chams.enable", "false" };

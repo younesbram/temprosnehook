@@ -75,7 +75,7 @@ void DrawSpectatorStrings()
 #if ENABLE_TEXTMODE
 static settings::Boolean fix_cyoaanim{ "remove.contracker", "true" };
 #else
-static settings::Boolean fix_cyoaanim{ "remove.contracker", "false" };
+static settings::Boolean fix_cyoaanim{ "remove.contracker", "true" };
 #endif
 
 #if !ENFORCE_STREAM_SAFETY && ENABLE_VISUALS

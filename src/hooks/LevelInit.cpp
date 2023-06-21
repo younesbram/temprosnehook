@@ -13,7 +13,6 @@
 #include <random>
 
 static settings::Boolean halloween_mode{ "misc.force-halloween", "false" };
-static settings::Int skybox_changer{ "misc.skybox-override", "0" };
 extern settings::Boolean random_name;
 extern settings::String force_name;
 extern std::string name_forced;
@@ -31,16 +30,6 @@ DEFINE_HOOKED_METHOD(LevelInit, void, void *this_, const char *name)
 #if ENABLE_GUI
     gui::onLevelLoad();
 #endif
-    if (skybox_changer)
-    {
-        typedef bool (*LoadNamedSkys_Fn)(const char *);
-        uintptr_t addr            = CSignature::GetEngineSignature("55 89 E5 57 31 FF 56 8D B5 ? ? ? ? 53 81 EC 6C 01 00 00");
-        static auto LoadNamedSkys = LoadNamedSkys_Fn(addr);
-        bool succ;
-        logging::Info("Going to load the skybox");
-        succ = LoadNamedSkys(skynum[(int) skybox_changer]);
-        logging::Info("Loaded Skybox: %s", succ ? "true" : "false");
-    }
     ConVar *holiday = g_ICvar->FindVar("tf_forced_holiday");
     if (halloween_mode)
         holiday->SetValue(2);

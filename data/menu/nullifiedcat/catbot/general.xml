@@ -23,7 +23,6 @@
                           tooltip="Automatically join a team."/>
         </List>
     </Box>
-    </Box>
     <Box name="Utilities" width="content" height="content" padding="12 6 6 6" x="215">
         <List width="200">
             <AutoVariable width="fill" target="cat-bot.enable" label="Enable utilities"/>

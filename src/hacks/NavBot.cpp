@@ -3,7 +3,7 @@
 #include "HookTools.hpp"
 #include "interfaces.hpp"
 #include "navparser.hpp"
-#include "playerresource.h"
+#include "playerresource.hpp"
 #include "localplayer.hpp"
 #include "sdk.hpp"
 #include "entitycache.hpp"

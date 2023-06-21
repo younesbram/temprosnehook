@@ -26,8 +26,7 @@ static settings::Boolean normal_enable{ "aimbot.enable", "false" };
 static settings::Button aimkey{ "aimbot.aimkey.button", "<null>" };
 static settings::Int aimkey_mode{ "aimbot.aimkey.mode", "1" };
 static settings::Boolean autoshoot{ "aimbot.autoshoot", "true" };
-static settings::Boolean autoreload{ "aimbot.autoshoot.activate-heatmaker", "false" };
-static settings::Boolean autoshoot_disguised{ "aimbot.autoshoot-disguised", "true" };
+static settings::Boolean autoreload{ "aimbot.autoshoot.activate-heatmaker", "true" };
 static settings::Boolean multipoint{ "aimbot.multipoint", "0" };
 static settings::Int vischeck_hitboxes{ "aimbot.vischeck-hitboxes", "0" };
 static settings::Int hitbox_mode{ "aimbot.hitbox-mode", "0" };
@@ -46,7 +45,6 @@ static settings::Int hitbox{ "aimbot.hitbox", "0" };
 static settings::Boolean zoomed_only{ "aimbot.zoomed-only", "true" };
 static settings::Boolean only_can_shoot{ "aimbot.can-shoot-only", "true" };
 
-static settings::Boolean extrapolate{ "aimbot.extrapolate", "false" };
 static settings::Int normal_slow_aim{ "aimbot.slow", "0" };
 
 static settings::Boolean projectile_aimbot{ "aimbot.projectile.enable", "true" };
@@ -68,11 +66,9 @@ static settings::Boolean backtrack_aimbot{ "aimbot.backtrack", "false" };
 static settings::Boolean backtrack_last_tick_only("aimbot.backtrack.only-last-tick", "true");
 static bool force_backtrack_aimbot = false;
 
-static settings::Boolean target_hazards{ "aimbot.target.hazards", "true" };
 static settings::Float max_range{ "aimbot.target.max-range", "4096" };
 static settings::Boolean ignore_vaccinator{ "aimbot.target.ignore-vaccinator", "true" };
 settings::Boolean aim_sentrybuster{ "aimbot.target.sentrybuster", "false" };
-settings::Boolean ignore_cloak{ "aimbot.target.ignore-cloaked-spies", "true" };
 static settings::Boolean buildings_sentry{ "aimbot.target.sentry", "true" };
 static settings::Boolean buildings_other{ "aimbot.target.other-buildings", "true" };
 static settings::Boolean npcs{ "aimbot.target.npcs", "true" };
@@ -767,35 +763,6 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
     // No last_target found, reset the timer.
     last_target_ignore_timer = 0;
 
-    // Do not attempt to target pumpkins with melee
-    if (*target_hazards && GetWeaponMode() != weapon_melee)
-    {
-        for (const auto &hazard_entity : entity_cache::valid_ents)
-        {
-            const model_t *model = RAW_ENT(hazard_entity)->GetModel();
-            if (model)
-            {
-                const auto szName = g_IModelInfo->GetModelName(model);
-                if (Hash::IsHazard(szName))
-                {
-                    for (const auto &ent : entity_cache::valid_ents)
-                    {
-                        const auto hazard_origin = hazard_entity->m_vecOrigin();
-                        if (IsTargetStateGood(ent) && IsVectorVisible(hazard_origin, ent->m_vecOrigin(), true))
-                        {
-                            const float dist_hazard_to_enemy        = hazard_origin.DistTo(ent->m_vecOrigin());
-                            const float dist_hazard_to_local_player = hazard_entity->m_flDistance();
-                            const float damage_to_enemy             = 150.0f - 0.25f * dist_hazard_to_enemy;
-                            // Hazards cannot deal more than 75 damage
-                            if (damage_to_enemy >= 75.0f && dist_hazard_to_local_player > 350.0f && Aim(hazard_entity))
-                                return hazard_entity;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     float target_highest_score, score = 0.0f;
     CachedEntity *target_highest_ent                       = nullptr;
     target_highest_score                                   = -256.0f;
@@ -1155,8 +1122,6 @@ void DoAutoshoot(CachedEntity *target_entity)
     // Enable check
     if (!*autoshoot)
         return;
-    if (!*autoshoot_disguised && IsPlayerDisguised(LOCAL_E))
-        return;
     // Handle Huntsman/Loose cannon
     if (LOCAL_W->m_iClassID() == CL_CLASS(CTFCompoundBow) || LOCAL_W->m_iClassID() == CL_CLASS(CTFCannon))
     {
@@ -1254,11 +1219,6 @@ Vector PredictEntity(CachedEntity *entity)
         }
         else
         {
-            // If using extrapolation, then predict a vector
-            if (*extrapolate)
-                result = SimpleLatencyPrediction(entity, cd.hitbox);
-            // else just grab strait from the hitbox
-            else
             {
                 // Allow multipoint logic to run
                 if (!*multipoint)

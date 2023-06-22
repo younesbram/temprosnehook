@@ -416,8 +416,6 @@ void hack::Shutdown()
     {
         logging::Info("Running shutdown handlers");
         EC::run(EC::Shutdown);
-#if ENABLE_VISUALS
-        g_pScreenSpaceEffects->DisableScreenSpaceEffect("_cathook_glow");
 #if EXTERNAL_DRAWING
         xoverlay_destroy();
 #endif

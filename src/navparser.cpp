@@ -474,6 +474,8 @@ bool isReady()
     bool game_ready             = *enabled && map && map->state == NavState::Active;
     bool level_ready            = level_name == "plr_pipeline" || g_pGameRules->m_iRoundState > 3;
     bool in_setup               = g_pGameRules->m_bInSetup && g_pLocalPlayer->team == TEAM_BLU;
+    // FIXME: If we're on a control point map, and blue is the attacking team, then the gates are closed, so we shouldn't path
+    bool in_waiting_for_players = g_pGameRules->m_bInWaitingForPlayers && (level_name.starts_with("pl_") || level_name.starts_with("cp_")) && g_pLocalPlayer->team == TEAM_BLU;
 
     return game_ready && level_ready && !in_setup && !in_waiting_for_players;
 }
@@ -893,7 +895,7 @@ static void CreateMove()
         cancelPath();
         return;
     }
-
+    
     std::string level_name = GetLevelName();
 
     if (*vischeck_runtime)

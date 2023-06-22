@@ -123,11 +123,6 @@ inline float EffectiveTargetingRange()
         return static_cast<float>(re::C_TFWeaponBaseMelee::GetSwingRange(RAW_ENT(LOCAL_W)));
     switch (LOCAL_W->m_iClassID())
     {
-    case CL_CLASS(CTFFlameThrower):
-        return 310.0f; // Pyros only have so much until their flames hit
-    case CL_CLASS(CTFWeaponFlameBall):
-        return 512.0f; // Dragons Fury is fast but short range
-    default:
         return *max_range;
     }
 }
@@ -700,15 +695,11 @@ bool ShouldAim()
     // Carrying A building?
     if (CE_BYTE(LOCAL_E, netvar.m_bCarryingObject) != 0)
         return false;
-    // Deadringer out?
-    if (CE_BYTE(LOCAL_E, netvar.m_bFeignDeathReady) != 0)
-        return false;
-    // Holding a sapper?
-    if (g_pLocalPlayer->holding_sapper)
-        return false;
     // Is bonked?
     if (HasCondition<TFCond_Bonked>(LOCAL_E))
         return false;
+    if (GetWeaponMode() == weapon_hitscan || GetWeaponMode() == weapon_melee);
+    return false
     // Is taunting?
     if (HasCondition<TFCond_Taunting>(LOCAL_E))
         return false;

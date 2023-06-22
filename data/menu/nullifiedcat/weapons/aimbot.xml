@@ -126,7 +126,7 @@
                           tooltip="Intelligently unzoom if applicable to current weapon type."/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Backtracking" x="340" y="85">
+    <Box padding="12 6 6 6" width="content" height="content" name="Backtracking" x="340">
         <List width="150">
             <AutoVariable width="fill" target="backtrack.enabled" label="Enable backtracking"
                           tooltip="Allow hitting enemies where they were in the past."/>

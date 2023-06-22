@@ -215,7 +215,7 @@ bool getAmmo(bool force = false)
         }
         else
             was_force = false;
-        auto ammopacks  = getEntities(false);
+        auto ammopacks  = getEntities({ ITEM_AMMO_SMALL, ITEM_AMMO_MEDIUM, ITEM_AMMO_LARGE });
         auto dispensers = getDispensers();
 
         auto total_ents = ammopacks;
@@ -227,15 +227,13 @@ bool getAmmo(bool force = false)
             total_ents.insert(total_ents.end(), dispensers.begin(), dispensers.end());
             std::sort(total_ents.begin(), total_ents.end(), [](CachedEntity *a, CachedEntity *b) { return a->m_flDistance() < b->m_flDistance(); });
         }
-        for (const auto ammopack : total_ents)
-        {
+        for (auto ammopack : total_ents)
             // If we succeeed, don't try to path to other packs
             if (navparser::NavEngine::navTo(ammopack->m_vecOrigin(), ammo, true, ammopack->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) > 200.0f * 200.0f))
             {
                 was_force = force;
                 return true;
             }
-        }
         ammo_cooldown.update();
     }
     else if (navparser::NavEngine::current_priority == ammo && !was_force)

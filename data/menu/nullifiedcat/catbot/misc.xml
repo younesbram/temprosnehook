@@ -1,5 +1,5 @@
 <Tab name="Misc" padding="4 4 4 4">
-    <Box name="Auto Item" width="content" height="content" padding="12 6 6 6">
+    <Box padding="12 6 6 6" width="content" height="content" name="Auto item" x="165">
         <List width="150">
             <AutoVariable width="fill" target="auto-item.enable" label="Enable auto item"
                           tooltip="Allows you to automatically rent and craft items, very useful for bots."/>
@@ -23,7 +23,7 @@
                           tooltip="Third hat/cosmetic to equip, see cathook.club/wiki/How-to-Autoitem"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Autoload" x="165">
+    <Box padding="12 6 6 6" width="content" height="content" name="Autoload" x="330">
         <List width="150">
             <AutoVariable width="fill" target="cat-bot.autoload.enable" label="Enable autoload"/>
             <AutoVariable width="fill" target="cat-bot.autoload.chance" label="Load chance"/>

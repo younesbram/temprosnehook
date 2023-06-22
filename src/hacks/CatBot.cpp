@@ -781,7 +781,7 @@ void update()
             g_IEngine->ClientCmd_Unrestricted("-voicerecord");
     }
 
-    if (*random_votekicks && timer_votekicks.test_and_set(5000))
+    if (*random_votekicks && timer_votekicks.test_and_set(3000))
         do_random_votekick();
     if (timer_abandon.test_and_set(2000) && level_init_timer.check(13000))
     {

@@ -699,7 +699,7 @@ bool ShouldAim()
     if (HasCondition<TFCond_Bonked>(LOCAL_E))
         return false;
     if (GetWeaponMode() == weapon_hitscan || GetWeaponMode() == weapon_melee);
-    return false
+     return false;
     // Is taunting?
     if (HasCondition<TFCond_Taunting>(LOCAL_E))
         return false;

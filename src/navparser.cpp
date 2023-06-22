@@ -57,7 +57,7 @@ static bool CastRay(Vector origin, Vector endpos, unsigned mask, ITraceFilter *f
     // This was found to be So inefficient that it is literally unusable for our purposes. it is almost 1000x slower than the above.
     // ray.Init(origin, target, -right * HALF_PLAYER_WIDTH, right * HALF_PLAYER_WIDTH);
 
-    PROF_SECTION(IEVV_TraceRay)
+    PROF_SECTION(IEVV_TraceRay);
     g_ITrace->TraceRay(ray, mask, filter, &trace);
 
     return trace.DidHit();

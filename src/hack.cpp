@@ -419,7 +419,6 @@ void hack::Shutdown()
 #if EXTERNAL_DRAWING
         xoverlay_destroy();
 #endif
-#endif
     }
     logging::Info("Releasing VMT hooks..");
     hooks::ReleaseAllHooks();

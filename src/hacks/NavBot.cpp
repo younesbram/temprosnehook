@@ -137,17 +137,17 @@ std::vector<CachedEntity *> getDispensers()
 }
 
 // Get entities of given itemtypes (Used for health/ammo)
-// Use true for health packs, use false for ammo packs
-std::vector<CachedEntity *> getEntities(bool find_health)
+std::vector<CachedEntity *> getEntities(const std::vector<k_EItemType> &itemtypes)
 {
     std::vector<CachedEntity *> entities;
-    for (const auto &ent : entity_cache::valid_ents)
+    for (int i = g_IEngine->GetMaxClients() + 1; i < MAX_ENTITIES; i++)
     {
-        const model_t *model = RAW_ENT(ent)->GetModel();
-        if (model)
+        CachedEntity *ent = ENTITY(i);
+        if (CE_BAD(ent))
+            continue;
+        for (auto &itemtype : itemtypes)
         {
-            const auto szName = g_IModelInfo->GetModelName(model);
-            if (find_health && Hash::IsHealth(szName) || !find_health && Hash::IsAmmo(szName))
+            if (ent->m_ItemType() == itemtype)
             {
                 entities.push_back(ent);
                 break;

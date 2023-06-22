@@ -27,17 +27,14 @@ static settings::Boolean escape_danger("navbot.escape-danger", "true");
 static settings::Boolean escape_danger_ctf_cap("navbot.escape-danger.ctf-cap", "false");
 static settings::Boolean enable_slight_danger_when_capping("navbot.escape-danger.slight-danger.capping", "false");
 static settings::Boolean run_to_reload("navbot.run-to-reload", "false");
-static settings::Boolean autojump("navbot.autojump.enabled", "false");
-static settings::Boolean primary_only("navbot.primary-only", "false");
 static settings::Int force_slot("navbot.force-slot", "1");
-static settings::Float jump_distance("navbot.autojump.trigger-distance", "300");
 static settings::Int blacklist_delay("navbot.proximity-blacklist.delay", "500");
 static settings::Boolean blacklist_dormat("navbot.proximity-blacklist.dormant", "false");
 static settings::Int blacklist_delay_dormat("navbot.proximity-blacklist.delay-dormant", "1000");
 static settings::Int blacklist_slightdanger_limit("navbot.proximity-blacklist.slight-danger.amount", "2");
 // static settings::Boolean engie_mode("navbot.engineer-mode", "true");
 #if ENABLE_VISUALS
-static settings::Boolean draw_danger("navbot.draw-danger", "false");
+static settings::Boolean draw_danger("navbot.draw-danger", "false");    
 #endif
 
 // Allow for custom danger configs, mainly for debugging purposes
@@ -1461,18 +1458,6 @@ bool escapeDanger()
 
 static int slot = primary;
 
-static void autoJump(std::pair<CachedEntity *, float> &nearest)
-{
-    if (!*autojump)
-        return;
-    static Timer last_jump{};
-    if (!last_jump.test_and_set(200) || CE_BAD(nearest.first))
-        return;
-
-    if (nearest.second <= *jump_distance)
-        current_user_cmd->buttons |= IN_JUMP | IN_DUCK;
-}
-
 static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &nearest)
 {
     if (*force_slot)
@@ -1555,8 +1540,6 @@ static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &ne
 static void updateSlot(std::pair<CachedEntity *, float> &nearest)
 {
     static Timer slot_timer{};
-    if (!*force_slot && !*primary_only || !slot_timer.test_and_set(300))
-        return;
     if (CE_GOOD(LOCAL_E) && !HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E) && CE_GOOD(LOCAL_W) && g_pLocalPlayer->alive)
     {
         IClientEntity *weapon = RAW_ENT(LOCAL_W);
@@ -1569,6 +1552,7 @@ static void updateSlot(std::pair<CachedEntity *, float> &nearest)
         }
     }
 }
+
 
 static void CreateMove()
 {
@@ -1605,7 +1589,6 @@ static void CreateMove()
     auto nearest = getNearestPlayerDistance();
 
     updateSlot(nearest);
-    autoJump(nearest);
     updateEnemyBlacklist(slot);
 
     // Try to escape danger first of all

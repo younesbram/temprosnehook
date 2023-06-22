@@ -137,17 +137,17 @@ std::vector<CachedEntity *> getDispensers()
 }
 
 // Get entities of given itemtypes (Used for health/ammo)
-std::vector<CachedEntity *> getEntities(const std::vector<k_EItemType> &itemtypes)
+// Use true for health packs, use false for ammo packs
+std::vector<CachedEntity *> getEntities(bool find_health)
 {
     std::vector<CachedEntity *> entities;
-    for (int i = g_IEngine->GetMaxClients() + 1; i < MAX_ENTITIES; i++)
+    for (const auto &ent : entity_cache::valid_ents)
     {
-        CachedEntity *ent = ENTITY(i);
-        if (CE_BAD(ent))
-            continue;
-        for (auto &itemtype : itemtypes)
+        const model_t *model = RAW_ENT(ent)->GetModel();
+        if (model)
         {
-            if (ent->m_ItemType() == itemtype)
+            const auto szName = g_IModelInfo->GetModelName(model);
+            if (find_health && Hash::IsHealth(szName) || !find_health && Hash::IsAmmo(szName))
             {
                 entities.push_back(ent);
                 break;
@@ -215,7 +215,7 @@ bool getAmmo(bool force = false)
         }
         else
             was_force = false;
-        auto ammopacks  = getEntities({ ITEM_AMMO_SMALL, ITEM_AMMO_MEDIUM, ITEM_AMMO_LARGE });
+        auto ammopacks  = getEntities(false);
         auto dispensers = getDispensers();
 
         auto total_ents = ammopacks;
@@ -227,13 +227,15 @@ bool getAmmo(bool force = false)
             total_ents.insert(total_ents.end(), dispensers.begin(), dispensers.end());
             std::sort(total_ents.begin(), total_ents.end(), [](CachedEntity *a, CachedEntity *b) { return a->m_flDistance() < b->m_flDistance(); });
         }
-        for (auto ammopack : total_ents)
+        for (const auto ammopack : total_ents)
+        {
             // If we succeeed, don't try to path to other packs
             if (navparser::NavEngine::navTo(ammopack->m_vecOrigin(), ammo, true, ammopack->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) > 200.0f * 200.0f))
             {
                 was_force = force;
                 return true;
             }
+        }
         ammo_cooldown.update();
     }
     else if (navparser::NavEngine::current_priority == ammo && !was_force)

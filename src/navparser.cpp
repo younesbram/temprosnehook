@@ -764,7 +764,7 @@ static void followCrumbs()
                     choose_new_point.update();
                 looked_at_point = true;
                 wait_time       = 20 + UniformRandomInt(0, 2);
-                aim_speed       = 11 + UniformRandomInt(0, 2); // it was smooth at 13
+                aim_speed       = 13 + UniformRandomInt(0, 2); // it was smooth at 13
             }
 
             Vector next_slow = next;

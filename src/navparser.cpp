@@ -895,16 +895,7 @@ static void CreateMove()
         cancelPath();
         return;
     }
-
-    // Still in setup or waiting for players. If on fitting team, do not path yet
-    std::string level_name = GetLevelName();
-    if (g_pLocalPlayer->team == TEAM_BLU && (g_pGameRules->m_bInSetup && level_name != "plr_pipeline" || g_pGameRules->m_bInWaitingForPlayers && (level_name.starts_with("pl_") || level_name.starts_with("cp_"))))
-    {
-        if (navparser::NavEngine::isPathing())
-            navparser::NavEngine::cancelPath();
-        return;
-    }
-
+    
     if (*vischeck_runtime)
         vischeckPath();
     checkBlacklist();

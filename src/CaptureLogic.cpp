@@ -1,15 +1,18 @@
 #include "CaptureLogic.hpp"
-#include <utility>
 #include "common.hpp"
 
 namespace flagcontroller
 {
+
 std::array<flag_info, 2> flags;
 bool is_ctf = true;
 
-bool IsFlagGood(CachedEntity *flag)
+// Check if a flag is good or not
+bool isGoodFlag(CachedEntity *flag)
 {
-    return CE_VALID(flag) && flag->m_iClassID() == CL_CLASS(CCaptureFlag);
+    if (CE_INVALID(flag) || flag->m_iClassID() != CL_CLASS(CCaptureFlag))
+        return false;
+    return true;
 }
 
 void Update()
@@ -19,10 +22,11 @@ void Update()
         return;
     // Find flags if missing
     if (!flags[0].ent || !flags[1].ent)
-    {
-        for (const auto &ent : entity_cache::valid_ents)
+        for (int i = g_IEngine->GetMaxClients() + 1; i < MAX_ENTITIES; i++)
         {
-            if (ent->m_iClassID() != CL_CLASS(CCaptureFlag))
+            CachedEntity *ent = ENTITY(i);
+            // We cannot identify a bad entity as a flag due to the unreliability of it
+            if (CE_BAD(ent) || ent->m_iClassID() != CL_CLASS(CCaptureFlag))
                 continue;
 
             // Store flags
@@ -31,8 +35,6 @@ void Update()
             else if (ent != flags[0].ent)
                 flags[1].ent = ent;
         }
-    }
-
     // Update flag data
     for (auto &flag : flags)
     {
@@ -41,14 +43,14 @@ void Update()
             continue;
 
         // Bad Flag, reset
-        if (!IsFlagGood(flag.ent))
+        if (!isGoodFlag(flag.ent))
         {
             flag = flag_info();
             continue;
         }
 
-        // Cannot use dormant flag, but it is still potentially valid
-        if (RAW_ENT(flag.ent)->IsDormant())
+        // Cannot use "bad" flag, but it is still potentially valid
+        if (CE_BAD(flag.ent))
             continue;
 
         int flag_type = CE_INT(flag.ent, netvar.m_nFlagType);
@@ -75,7 +77,7 @@ void Update()
 
 void LevelInit()
 {
-    // Reset everything
+    // Resez everything
     for (auto &flag : flags)
         flag = flag_info();
     is_ctf = true;
@@ -85,10 +87,12 @@ void LevelInit()
 flag_info getFlag(int team)
 {
     for (auto &flag : flags)
+    {
         if (flag.team == team)
             return flag;
+    }
     // None found
-    return {};
+    return flag_info();
 }
 
 // Get the Position of a flag on a specific team
@@ -100,7 +104,7 @@ Vector getPosition(CachedEntity *flag)
 std::optional<Vector> getPosition(int team)
 {
     auto flag = getFlag(team);
-    if (IsFlagGood(flag.ent))
+    if (isGoodFlag(flag.ent))
         return getPosition(flag.ent);
     // No good flag
     return std::nullopt;
@@ -125,7 +129,7 @@ CachedEntity *getCarrier(int team)
 {
     auto flag = getFlag(team);
     // Only use good flags
-    if (IsFlagGood(flag.ent))
+    if (isGoodFlag(flag.ent))
         return getCarrier(flag.ent);
     return nullptr;
 }
@@ -140,7 +144,7 @@ ETFFlagStatus getStatus(int team)
 {
     auto flag = getFlag(team);
     // Only use good flags
-    if (IsFlagGood(flag.ent))
+    if (isGoodFlag(flag.ent))
         return getStatus(flag.ent);
     // Mark as home if nothing is found
     return TF_FLAGINFO_HOME;
@@ -149,7 +153,8 @@ ETFFlagStatus getStatus(int team)
 
 namespace plcontroller
 {
-// Valid_ents that controls all the payloads for each team. Red team is first, then comes blue team.
+
+// Array that controls all the payloads for each team. Red team is first, then comes blue team.
 static std::array<std::vector<CachedEntity *>, 2> payloads;
 static Timer update_payloads{};
 
@@ -162,10 +167,11 @@ void Update()
         for (auto &entry : payloads)
             entry.clear();
 
-        for (const auto &ent : entity_cache::valid_ents)
+        for (int i = g_IEngine->GetMaxClients() + 1; i < MAX_ENTITIES; i++)
         {
+            CachedEntity *ent = ENTITY(i);
             // Not the object we need or invalid (team)
-            if (ent->m_iClassID() != CL_CLASS(CObjectCartDispenser) || ent->m_iTeam() < TEAM_RED || ent->m_iTeam() > TEAM_BLU)
+            if (CE_BAD(ent) || ent->m_iClassID() != CL_CLASS(CObjectCartDispenser) || ent->m_iTeam() < TEAM_RED || ent->m_iTeam() > TEAM_BLU)
                 continue;
             int team = ent->m_iTeam();
 
@@ -174,7 +180,6 @@ void Update()
         }
     }
 }
-
 std::optional<Vector> getClosestPayload(Vector source, int team)
 {
     // Invalid team
@@ -188,17 +193,14 @@ std::optional<Vector> getClosestPayload(Vector source, int team)
     std::optional<Vector> best_pos;
 
     // Find best payload
-    for (auto &payload : entry)
+    for (auto payload : entry)
     {
         if (CE_BAD(payload) || payload->m_iClassID() != CL_CLASS(CObjectCartDispenser))
             continue;
-
-        const auto payload_origin = payload->m_vecOrigin();
-        const auto dist_sq = payload_origin.DistToSqr(source);
-        if (dist_sq < best_distance)
+        if (payload->m_vecOrigin().DistTo(source) < best_distance)
         {
-            best_pos      = payload_origin;
-            best_distance = dist_sq;
+            best_pos      = payload->m_vecOrigin();
+            best_distance = payload->m_vecOrigin().DistTo(source);
         }
     }
     return best_pos;
@@ -213,14 +215,15 @@ void LevelInit()
 
 namespace cpcontroller
 {
-std::array<cp_info, MAX_CONTROL_POINTS + 1> controlpoint_data;
+
+std::array<cp_info, MAX_CONTROL_POINTS> controlpoint_data;
 CachedEntity *objective_resource = nullptr;
 
 struct point_ignore
 {
     std::string mapname;
     int point_idx;
-    point_ignore(std::string str, int idx) : mapname{ std::move(str) }, point_idx{ idx } {};
+    point_ignore(std::string str, int idx) : mapname{ str }, point_idx{ idx } {};
 };
 
 // TODO: Find a way to fix these edge-cases.
@@ -238,9 +241,10 @@ void UpdateObjectiveResource()
     if (CE_GOOD(objective_resource) && objective_resource->m_iClassID() == CL_CLASS(CTFObjectiveResource))
         return;
     // Find ObjectiveResource and gamerules
-    for (const auto &ent : entity_cache::valid_ents)
+    for (int i = g_IEngine->GetMaxClients() + 1; i < MAX_ENTITIES; i++)
     {
-        if (ent->m_iClassID() != CL_CLASS(CTFObjectiveResource))
+        CachedEntity *ent = ENTITY(i);
+        if (CE_BAD(ent) || ent->m_iClassID() != CL_CLASS(CTFObjectiveResource))
             continue;
         // Found it
         objective_resource = ent;
@@ -263,7 +267,7 @@ bool TeamCanCapPoint(int index, int team)
 
 int GetPreviousPointForPoint(int index, int team, int previndex)
 {
-    int iIntIndex = previndex + index * MAX_PREVIOUS_POINTS + team * MAX_CONTROL_POINTS * MAX_PREVIOUS_POINTS;
+    int iIntIndex = previndex + (index * MAX_PREVIOUS_POINTS) + (team * MAX_CONTROL_POINTS * MAX_PREVIOUS_POINTS);
     return (&CE_INT(objective_resource, netvar.m_iPreviousPoints))[iIntIndex];
 }
 
@@ -374,11 +378,11 @@ void UpdateControlPoints()
     // Clear the invalid controlpoints
     if (num_cp <= MAX_CONTROL_POINTS)
         for (int i = num_cp; i < MAX_CONTROL_POINTS; i++)
-            controlpoint_data[i] = cp_info();
+            controlpoint_data.at(i) = cp_info();
 
     for (int i = 0; i < num_cp; i++)
     {
-        auto &data    = controlpoint_data[i];
+        auto &data    = controlpoint_data.at(i);
         data.cp_index = i;
 
         // Update position (m_vCPPositions[index])
@@ -386,15 +390,13 @@ void UpdateControlPoints()
     }
 
     if (capstatus_update.test_and_set(1000))
-    {
         for (int i = 0; i < num_cp; i++)
         {
-            auto &data = controlpoint_data[i];
+            auto &data = controlpoint_data.at(i);
             // Check accessibility for both teams, requires alot of checks
             data.can_cap.at(0) = isPointUseable(i, TEAM_RED);
             data.can_cap.at(1) = isPointUseable(i, TEAM_BLU);
         }
-    }
 }
 
 // Get the closest controlpoint to cap
@@ -428,7 +430,7 @@ std::optional<Vector> getClosestControlPoint(Vector source, int team)
     for (auto &ignore : ignore_points)
     {
         // Try to find map name in bad point array
-        if (levelname.find(ignore.mapname) != std::string::npos)
+        if (levelname.find(ignore.mapname) != levelname.npos)
             ignore_index = ignore.point_idx;
     }
 
@@ -443,11 +445,10 @@ std::optional<Vector> getClosestControlPoint(Vector source, int team)
         // They can cap
         if (cp.can_cap.at(team_idx))
         {
-            const auto dist_sq = (*cp.position).DistToSqr(source);
             // Is it closer?
-            if (cp.position && dist_sq < best_distance)
+            if (cp.position && (*cp.position).DistTo(source) < best_distance)
             {
-                best_distance = dist_sq;
+                best_distance = (*cp.position).DistTo(source);
                 best_cp       = cp.position;
             }
         }
@@ -471,7 +472,7 @@ void Update()
 } // namespace cpcontroller
 
 // Main handlers
-static void CreateMove()
+void CreateMove()
 {
     flagcontroller::Update();
     plcontroller::Update();

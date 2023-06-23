@@ -700,12 +700,6 @@ bool ShouldAim()
     // Carrying A building?
     if (CE_BYTE(LOCAL_E, netvar.m_bCarryingObject) != 0)
         return false;
-    // Deadringer out?
-    if (CE_BYTE(LOCAL_E, netvar.m_bFeignDeathReady) != 0)
-        return false;
-    // Holding a sapper?
-    if (g_pLocalPlayer->holding_sapper)
-        return false;
     // Is bonked?
     if (HasCondition<TFCond_Bonked>(LOCAL_E))
         return false;

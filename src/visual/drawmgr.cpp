@@ -24,7 +24,7 @@
 
 static settings::Boolean info_text{ "hack-info.enable", "true" };
 static settings::Boolean info_text_min{ "hack-info.minimal", "false" };
-static settings::Rgba info_background_color{"hack-info.background", "ff00e6b3"};
+static settings::Rgba info_background_color{"hack-info.background", "000000b3"};
 static settings::Rgba info_foreground_color{"hack-info.foreground", "ffffff"};
 static settings::Int info_x{"hack-info.x", "10"};
 static settings::Int info_y{"hack-info.y", "10"};

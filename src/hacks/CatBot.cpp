@@ -789,120 +789,40 @@ void update()
         ipc_list.clear();
         int count_total = 0;
 
-        for (const auto &ent : entity_cache::player_cache)
+        for (int i = 1; i <= g_IEngine->GetMaxClients(); ++i)
         {
-            if (g_IEngine->GetLocalPlayer() == ent->m_IDX)
-                continue;
-
-            if (g_IEntityList->GetClientEntity(ent->m_IDX))
+            if (g_IEntityList->GetClientEntity(i))
                 ++count_total;
             else
                 continue;
 
             player_info_s info{};
-            if (!GetPlayerInfo(ent->m_IDX, &info))
+            if (!GetPlayerInfo(i, &info))
                 continue;
             if (playerlist::AccessData(info.friendsID).state == playerlist::k_EState::CAT)
                 --count_total;
 
-            if (playerlist::AccessData(info.friendsID).state == playerlist::k_EState::IPC || playerlist::AccessData(info.friendsID).state == playerlist::k_EState::TEXTMODE)
+            if (playerlist::AccessData(info.friendsID).state == playerlist::k_EState::IPC)
             {
                 ipc_list.push_back(info.friendsID);
                 ++count_ipc;
             }
-        }
-
-        if (*abandon_if_ipc_bots_gte)
-        {
-            if (count_ipc >= *abandon_if_ipc_bots_gte)
+            /* Check this so we don't spam logs */
+            re::CTFGCClientSystem *gc = re::CTFGCClientSystem::GTFGCClientSystem();
+            re::CTFPartyClient *pc    = re::CTFPartyClient::GTFPartyClient();
+            if (requeue_if_humans_lte && gc && gc->BConnectedToMatchServer(true) && gc->BHaveLiveMatch())
             {
-                // Store local IPC Id and assign to the quit_id variable for later comparisions
-                unsigned local_ipcid = ipc::peer->client_id;
-                unsigned quit_id     = local_ipcid;
-
-                // Iterate all the players marked as bot
-                for (auto &id : ipc_list)
+                if (pc && !(pc->BInQueueForMatchGroup(tfmm::getQueue()) || pc->BInQueueForStandby()))
                 {
-                    // We already know we shouldn't quit, so just break out of the loop
-                    if (quit_id < local_ipcid)
-                        break;
-
-                    // Reduce code size
-                    auto &peer_mem = ipc::peer->memory;
-
-                    // Iterate all ipc peers
-                    for (unsigned i = 0; i < cat_ipc::max_peers; ++i)
+                    if (count_total - count_total <= int(requeue_if_humans_lte))
                     {
-                        // If that ipc peer is alive and in has the steamid of that player
-                        if (!peer_mem->peer_data[i].free && peer_mem->peer_user_data[i].friendid == id)
-                        {
-                            // Check against blacklist
-                            if (std::find(ipc_blacklist.begin(), ipc_blacklist.end(), i) != ipc_blacklist.end())
-                                continue;
-
-                            // Found someone with a lower ipc id
-                            if (i < local_ipcid)
-                            {
-                                quit_id = i;
-                                break;
-                            }
-                        }
+                        tfmm::startQueue();
+                        logging::Info("Requeuing because there are %d non-bots in "
+                                        "game, and requeue_if_humans_lte is %d.",
+                                        count_total - count_ipc, int(requeue_if_humans_lte));
+                        return;
                     }
                 }
-                // Only quit if you are the player with the lowest ipc id
-                if (quit_id == local_ipcid)
-                {
-                    // Clear blacklist related stuff
-                    waiting_for_quit_bool = false;
-                    ipc_blacklist.clear();
-
-                    logging::Info("Abandoning because there are %d local players in game, and abandon_if_ipc_bots_gte is %d.", count_ipc, *abandon_if_ipc_bots_gte);
-                    tfmm::Abandon();
-                    return;
-                }
-                else
-                {
-                    if (!waiting_for_quit_bool)
-                    {
-                        // Waiting for that ipc id to quit, we use this timer in order to blacklist
-                        // ipc peers which refuse to quit for some reason
-                        waiting_for_quit_bool = true;
-                        waiting_for_quit_timer.update();
-                    }
-                    else
-                    {
-                        // IPC peer isn't leaving, blacklist for now
-                        if (waiting_for_quit_timer.test_and_set(10000))
-                        {
-                            ipc_blacklist.push_back(quit_id);
-                            waiting_for_quit_bool = false;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                // Reset Bool because no reason to quit
-                waiting_for_quit_bool = false;
-                ipc_blacklist.clear();
-            }
-        }
-        if (*abandon_if_humans_lte)
-        {
-            if (count_total - count_ipc <=  *abandon_if_humans_lte)
-            {
-                logging::Info("Abandoning because there are %d non-bots in game, and abandon_if_humans_lte is %d.", count_total - count_ipc, *abandon_if_humans_lte);
-                tfmm::Abandon();
-                return;
-            }
-        }
-        if (*abandon_if_players_lte)
-        {
-            if (count_total <= *abandon_if_players_lte)
-            {
-                logging::Info("Abandoning because there are %d total players in game, and abandon_if_players_lte is %d.", count_total, *abandon_if_players_lte);
-                tfmm::Abandon();
-                return;
             }
         }
     }

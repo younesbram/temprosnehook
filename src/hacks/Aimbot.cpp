@@ -512,9 +512,9 @@ static void CreateMove()
         if (target_last)
         /*deathstare fix*/
         if (g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed && CE_GOOD(LOCAL_W) && re::C_BaseCombatWeapon::GetSlot(RAW_ENT(LOCAL_W)) + 1 != 3)
-            Aim(target_entity);
+            Aim(target_last);
         else if (!g_pLocalPlayer->holding_sniper_rifle)
-            Aim(target_entity);
+            Aim(target_last);
         {
             if (should_zoom)
                 DoAutoZoom(true, target_last);

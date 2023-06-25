@@ -73,11 +73,11 @@ void DrawCheatVisuals()
             auto color = colors::RainbowCurrent();
             std::string hack_info_text;
             if(!info_text_min) {
-                hack_info_text = "Rosnehook Indev " + hack::GetVersion() + " " + hack::GetType() + 
+                hack_info_text = "Rosnehook InDev | " + hack::GetVersion() + " | " + hack::GetType() + 
                 "\nPress '" + open_gui_button.toString() + "' to open the HUD.";
             }
             else {
-                hack_info_text = "Rosnehook " + hack::GetVersion() + " " + hack::GetType();
+                hack_info_text = "Rosnehook | " + hack::GetVersion() + " | " + hack::GetType();
             }
             float w, h;
             fonts::center_screen->stringSize(hack_info_text, &w, &h); // Scale these to size of string

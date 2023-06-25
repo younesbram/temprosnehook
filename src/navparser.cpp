@@ -758,7 +758,7 @@ static void followCrumbs()
             }
 
             // Pick a new point, we're looking at our current one closely enough
-            if ((current_user_cmd->viewangles - next).IsZero(10.0f))
+            if ((current_user_cmd->viewangles - next).IsZero(5.0f))
             {
                 if (!looked_at_point)
                     choose_new_point.update();
@@ -773,7 +773,6 @@ static void followCrumbs()
             current_user_cmd->viewangles = next_slow;
         }
     }
-
     WalkTo(crumbs[0].vec);
 }
 

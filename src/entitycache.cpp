@@ -82,7 +82,7 @@ void Update()
 
     // pre-allocate memory
     valid_ents.reserve(max);
-    player_cache.reserve(g_IEngine->GetMaxClients());
+    player_cache.reserve(g_GlobalVars->maxClients);
 
     if (previous_max == max && previous_ent == current_ents)
     {

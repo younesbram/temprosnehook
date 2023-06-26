@@ -18,7 +18,7 @@
 #include <fstream>
 #include <unordered_map>
 #include <algorithm>
-#include "core/macros.hpp"
+
 #include <unistd.h>
 #include <link.h>
 #include <sys/sysinfo.h>
@@ -29,6 +29,7 @@
 
 #include "timer.hpp"
 
+#include "core/macros.hpp"
 #include "Constants.hpp"
 #if ENABLE_VISUALS
 #include <visual/colors.hpp>

@@ -21,7 +21,6 @@
 #include "AntiBackstab.hpp"
 #include "FollowBot.hpp"
 #include "Trigger.hpp"
-#include "UberSpam.hpp"
 #include "Spam.hpp"
 #include "NavBot.hpp"
 #include "FollowBot.hpp"

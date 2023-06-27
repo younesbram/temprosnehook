@@ -1105,53 +1105,10 @@ void DoAutoshoot(CachedEntity *target_entity)
     // Enable check
     if (!*autoshoot)
         return;
-    // Handle Huntsman/Loose cannon
-    if (LOCAL_W->m_iClassID() == CL_CLASS(CTFCompoundBow) || LOCAL_W->m_iClassID() == CL_CLASS(CTFCannon))
-    {
-        if (!*only_can_shoot && !began_charge)
-        {
-            current_user_cmd->buttons |= IN_ATTACK;
-            began_charge = true;
-            return;
-        }
-        began_charge = false;
-        current_user_cmd->buttons &= ~IN_ATTACK;
-        hacks::antiaim::SetSafeSpace(5);
-        return;
-    }
-    else
-        began_charge = false;
-
-    if (LOCAL_W->m_iClassID() == CL_CLASS(CTFPipebombLauncher))
-    {
-        float chargebegin = CE_FLOAT(LOCAL_W, netvar.flChargeBeginTime);
-        float chargetime  = g_GlobalVars->curtime - chargebegin;
-
-        // Release Sticky if > chargetime, 3.85 is the max second chargetime,
-        // but we also need to consider the release time supplied by the user
-        if (chargetime >= 3.85f * *sticky_autoshoot != 0 && began_sticky > 3)
-        {
-            current_user_cmd->buttons &= ~IN_ATTACK;
-            hacks::antiaim::SetSafeSpace(5);
-            began_sticky = 0;
-        }
-        // Else just keep charging
-        else
-        {
-            current_user_cmd->buttons |= IN_ATTACK;
-            began_sticky++;
-        }
-        return;
-    }
-    else
-        began_sticky = 0;
     bool attack = true;
 
     // Rifle check
     if (g_pLocalPlayer->holding_sniper_rifle && *zoomed_only && !CanHeadshot() && !AllowNoScope(target_entity))
-        attack = false;
-    // Ambassador check
-    else if (*wait_for_charge && IsAmbassador(LOCAL_W) && !AmbassadorCanHeadshot())
         attack = false;
     // Autoshoot breaks with Slow aimbot, so use a workaround to detect when it can
     else if (slow_aim != 0 && !slow_can_shoot)
@@ -1299,37 +1256,6 @@ int AutoHitbox(CachedEntity *target)
 
         return hitbox_t::head;
     }
-    // Hunstman
-    else if (ci == CL_CLASS(CTFCompoundBow))
-    {
-        float begincharge = CE_FLOAT(LOCAL_W, netvar.flChargeBeginTime);
-        float charge      = g_GlobalVars->curtime - begincharge;
-        auto damage       = std::floor(50.0f + 70.0f * fminf(1.0f, charge));
-        if (damage >= target_health)
-            return hitbox_t::spine_1;
-        else
-            return hitbox_t::head;
-    }
-    // Ambassador
-    else if (IsAmbassador(LOCAL_W))
-    {
-
-        // 18 health is a good number to use as that's the usual minimum
-        // damage it can do with a bodyshot, but damage could
-        // potentially be higher
-
-        if (target_health <= 18.0f || IsPlayerCritBoosted(LOCAL_E) || target->m_flDistance() > 1200.0f)
-            return hitbox_t::spine_1;
-        else if (AmbassadorCanHeadshot())
-            return hitbox_t::head;
-    }
-    // Rockets and stickies should aim at the foot if the target is on the ground
-    else if (ci == CL_CLASS(CTFPipebombLauncher) || ci == CL_CLASS(CTFRocketLauncher) || ci == CL_CLASS(CTFParticleCannon) || ci == CL_CLASS(CTFRocketLauncher_AirStrike) || ci == CL_CLASS(CTFRocketLauncher_Mortar) || ci == CL_CLASS(CTFRocketLauncher_DirectHit))
-    {
-        bool ground = CE_INT(target, netvar.iFlags) & 1 << 0;
-        if (ground)
-            preferred = NotVisibleHitbox(target, hitbox_t::foot_L); // Only time it is worth the penalty
-    }
     return preferred;
 }
 
@@ -1410,19 +1336,6 @@ bool UpdateAimkey()
         default:
             break;
         }
-        // Huntsman and Loose Cannon need special logic since we aim upon m1 being released
-        if (!*autoshoot && CE_GOOD(LOCAL_W) && (LOCAL_W->m_iClassID() == CL_CLASS(CTFCompoundBow) || LOCAL_W->m_iClassID() == CL_CLASS(CTFCannon)))
-        {
-            if (!allow_aimkey && last_allow_aimkey)
-            {
-                allow_aimkey      = true;
-                last_allow_aimkey = false;
-            }
-            else
-                last_allow_aimkey = allow_aimkey;
-        }
-        else
-            last_allow_aimkey = allow_aimkey;
         pressed_last_tick = key_down;
     }
     // Return whether the aimkey allows aiming

@@ -30,7 +30,7 @@
             <AutoVariable width="fill" target="cat-bot.abandon-if.bots-gte" label="Abandon if bots Gte"/>
             <AutoVariable width="fill" target="cat-bot.abandon-if.ipc-bots-gte" label="Abandon if IPC bots Gte"/>
             <AutoVariable width="fill" target="cat-bot.abandon-if.humans-lte" label="Abandon if humans Lte"/>
-            <AutoVariable width="fill" target="cat-bot.abandon-if.players-lte" label="Abandon if players Lte"/>
+            <AutoVariable width="fill" target="cat-bot.requeue-if.players-lte" label="Requeue if players Lte"/>
             <AutoVariable width="fill" target="cat-bot.auto-crouch" label="Autocrouch"/>
             <AutoVariable width="fill" target="cat-bot.mark-human-after-kills" label="Mark human after kills"/>
             <AutoVariable width="fill" target="cat-bot.micspam.enable" label="Micspam"/>

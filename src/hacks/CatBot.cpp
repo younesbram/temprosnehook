@@ -22,7 +22,7 @@ static settings::Boolean auto_disguise{ "misc.autodisguise", "true" };
 
 settings::Int abandon_if_ipc_bots_gte{ "cat-bot.abandon-if.ipc-bots-gte", "0" };
 static settings::Int abandon_if_humans_lte{ "cat-bot.abandon-if.humans-lte", "0" };
-static settings::Int abandon_if_players_lte{ "cat-bot.abandon-if.players-lte", "0" };
+static settings::Int requeue_if_players_lte{ "cat-bot.requeue-if.players-lte", "0" };
 
 static settings::Boolean micspam{ "cat-bot.micspam.enable", "false" };
 static settings::Int micspam_on{ "cat-bot.micspam.interval-on", "3" };
@@ -896,12 +896,12 @@ void update()
                 return;
             }
         }
-        if (*abandon_if_players_lte)
+        if (*requeue_if_players_lte)
         {
-            if (count_total <= *abandon_if_players_lte)
+            if (count_total <= *requeue_if_players_lte)
             {
-                logging::Info("Abandoning because there are %d total players in game, and abandon_if_players_lte is %d.", count_total, *abandon_if_players_lte);
-                tfmm::Abandon();
+                logging::Info("Requeuing because there are %d total players in game, and requeue_if_players_lte is %d.", count_total, *requeue_if_players_lte);
+                tfmm::StartQueue();
                 return;
             }
         }

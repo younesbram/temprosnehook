@@ -38,8 +38,6 @@ static settings::Boolean silent{ "aimbot.silent", "true" };
 static settings::Boolean target_lock{ "aimbot.lock-target", "false" };
 #if ENABLE_VISUALS
 static settings::Boolean assistance_only{ "aimbot.assistance.only", "false" };
-static settings::Boolean fov_draw{ "aimbot.fov-circle.enable", "0" };
-static settings::Float fovcircle_opacity{ "aimbot.fov-circle.opacity", "0.7" };
 #endif
 static settings::Int hitbox{ "aimbot.hitbox", "0" };
 static settings::Boolean zoomed_only{ "aimbot.zoomed-only", "true" };
@@ -53,8 +51,6 @@ static settings::Float proj_speed{ "aimbot.projectile.speed", "0" };
 static settings::Float proj_start_vel{ "aimbot.projectile.initial-velocity", "0" };
 
 static settings::Float sticky_autoshoot{ "aimbot.projectile.sticky-autoshoot", "0.5" };
-
-static settings::Boolean aimbot_debug{ "aimbot.debug", "false" };
 
 static settings::Boolean auto_spin_up{ "aimbot.auto.spin-up", "false" };
 static settings::Boolean minigun_tapfire{ "aimbot.auto.tapfire", "false" };
@@ -1361,53 +1357,6 @@ void Reset()
     projectile_mode = false;
 }
 
-#if ENABLE_VISUALS
-static void DrawText()
-{
-    // Don't draw to screen when aimbot is disabled
-    if (!enable)
-        return;
-
-    // Fov ring to represent when a target will be shot
-    if (*fov_draw)
-    {
-        // It can't use fovs greater than 180, so we check for that
-        if (fov > 0.0f && fov < 180.0f)
-        {
-            // Don't show ring while player is dead
-            if (CE_GOOD(LOCAL_E) && g_pLocalPlayer->alive)
-            {
-                rgba_t color = colors::gui;
-                color.a      = *fovcircle_opacity;
-
-                int width, height;
-                g_IEngine->GetScreenSize(width, height);
-
-                // Math
-                float mon_fov  = static_cast<float>(width) / static_cast<float>(height) / (4.0f / 3.0f);
-                float fov_real = RAD2DEG(2.0f * atanf(mon_fov * tanf(DEG2RAD(draw::fov / 2.0f))));
-                float radius   = tan(DEG2RAD(static_cast<float>(fov)) / 2.0f) / tan(DEG2RAD(fov_real) / 2.0f) * static_cast<float>(width);
-
-                draw::Circle(static_cast<float>(width) / 2, static_cast<float>(height) / 2, radius, color, 1, 100);
-            }
-        }
-    }
-    // Debug stuff
-    if (!*aimbot_debug)
-        return;
-    for (const auto &ent : entity_cache::player_cache)
-    {
-        Vector screen;
-        Vector oscreen;
-        if (draw::WorldToScreen(cd.aim_position, screen) && draw::WorldToScreen(ent->m_vecOrigin(), oscreen))
-        {
-            draw::Rectangle(screen.x - 2, screen.y - 2, 4, 4, colors::white);
-            draw::Line(oscreen.x, oscreen.y, screen.x - oscreen.x, screen.y - oscreen.y, colors::EntityF(ent), 0.5f);
-        }
-    }
-}
-#endif
-
 void RvarCallback(settings::VariableBase<float> &, float after)
 {
     force_backtrack_aimbot = after >= 200.0f;
@@ -1422,7 +1371,7 @@ static InitRoutine EC(
         EC::Register(EC::CreateMove, CreateMove, "CM_Aimbot", EC::late);
         EC::Register(EC::CreateMoveWarp, CreateMoveWarp, "CMW_Aimbot", EC::late);
 #if ENABLE_VISUALS
-        EC::Register(EC::Draw, DrawText, "DRAW_Aimbot", EC::average);
+        EC::Register(EC::Draw, "DRAW_Aimbot", EC::average);
 #endif
     });
 

@@ -6,27 +6,41 @@
 [![License](https://img.shields.io/github/license/explowz/cathook.svg?style=flat-square)](LICENSE)
 [![Issues](https://img.shields.io/github/issues/explowz/cathook.svg?style=flat-square)](https://github.com/rosneburgerworks/cathook/issues)
 
-Free open-source GNU/Linux training software for the game **Team Fortress 2**. Designed as an internal cheat - [Shared Library](https://en.wikipedia.org/wiki/Library_(computing)#Shared_libraries) (SO) loadable into game process. Compatible with the Steam version of the game.
+Cathook, but without bloat.
 
-## Table of Contents
+## Bloat Removed
 
-- [Table of Contents](#table-of-contents)
-- [Getting started](#getting-started)
-    - [Dependencies](#dependencies)
-    - [Downloading](#downloading)
-    - [Loading / Injecting into game process](#loading--injecting-into-game-process)
-- [FAQ](#faq)
-    - [How do I open the menu?](#how-do-i-open-the-menu)
-    - [Where is my config file saved?](#where-is-my-config-file-saved)
-    - [Loading / Injecting into game process](#loading--injecting-into-game-process)
+Minecraft Health Bar (wtf)
+Spellforcer
+Uberspam
+Rich Presence Changer
+Nullnexus and Identify (broken)
+Startup Sounds
+AntiCheat (cheater detection)
+
+And much, much more!
+
+## Rosnehook Features (just a bit)
+
+#### Rathook Navigation Spin
+#### Smoother Look At Path
+#### Green Navigation Draw
+#### Path During Setup on BLU
+
+## Benefits of Rosnehook (why Rosnehook over Cathook)
+
+#### Much Better Performance
+#### Works on Ubuntu (looking at you nullworks)
+#### Faster Building and other boost related stuff
+#### Better for Catbots (Rosnebots)
 
 ## Getting started
 
 ### Dependencies
 
-The `dialog` package is not mandatory, yet recommended.
+The `dialog` package is not mandatory, yet highly recommended.
 
-Dependencies are handled automatically by the [dependencycheck](https://github.com/explowz/cathook/blob/master/scripts/dependencycheck) script.
+Dependencies are handled automatically by the [dependencycheck](https://github.com/rosneburgerworks/cathook/blob/master/scripts/dependencycheck) script.
 
 ### Downloading
 

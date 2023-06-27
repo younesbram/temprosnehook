@@ -68,16 +68,6 @@ static settings::Boolean buildings_sentry{ "aimbot.target.sentry", "true" };
 static settings::Boolean npcs{ "aimbot.target.npcs", "true" };
 static settings::Int teammates{ "aimbot.target.teammates", "0" };
 
-/*
- * 0 Always on
- * 1 Disable if being spectated in first person
- * 2 Disable if being spectated
- */
-static settings::Int specmode("aimbot.spectator-mode", "0");
-static settings::Boolean specenable("aimbot.spectator.enable", "false");
-static settings::Float specfov("aimbot.spectator.fov", "0");
-static settings::Int specslow("aimbot.spectator.slow", "0");
-
 settings::Boolean engine_projpred{ "aimbot.debug.engine-pp", "true" };
 
 struct AimbotCalculatedData_s
@@ -208,35 +198,6 @@ inline bool ShouldBacktrack(CachedEntity *ent)
     if (!shouldbacktrack_cache || ent && ent->m_Type() != ENTITY_PLAYER || !backtrack::getGoodTicks(ent))
         return false;
     return true;
-}
-
-void SpectatorUpdate()
-{
-    switch (*specmode)
-    {
-    // Always on
-    default:
-    case 0:
-        break;
-    // Disable if being spectated in first person
-    case 1:
-        if (g_pLocalPlayer->spectator_state == g_pLocalPlayer->FIRSTPERSON)
-        {
-            enable   = *specenable;
-            slow_aim = *specslow;
-            fov      = *specfov;
-        }
-        break;
-    // Disable if being spectated
-    case 2:
-        if (g_pLocalPlayer->spectator_state == g_pLocalPlayer->ANY)
-        {
-            enable   = *specenable;
-            slow_aim = *specslow;
-            fov      = *specfov;
-        }
-        break;
-    }
 }
 
 #define GET_MIDDLE(c1, c2) ((corners[c1] + corners[c2]) / 2.0f)
@@ -482,8 +443,6 @@ static void CreateMove()
 
     bool aimkey_status = UpdateAimkey();
 
-    if (*specmode != 0)
-        SpectatorUpdate();
     if (!enable || !LOCAL_E || !g_pLocalPlayer->alive || !aimkey_status || !ShouldAim())
     {
         target_last = nullptr;

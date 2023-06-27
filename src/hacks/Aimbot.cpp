@@ -442,8 +442,6 @@ static void CreateMove()
 
     bool aimkey_status = UpdateAimkey();
 
-    if (*specmode != 0)
-        SpectatorUpdate();
     if (!enable || !LOCAL_E || !g_pLocalPlayer->alive || !aimkey_status || !ShouldAim())
     {
         target_last = nullptr;
@@ -1325,9 +1323,6 @@ static InitRoutine EC(
         EC::Register(EC::LevelShutdown, Reset, "RESET_Aimbot", EC::average);
         EC::Register(EC::CreateMove, CreateMove, "CM_Aimbot", EC::late);
         EC::Register(EC::CreateMoveWarp, CreateMoveWarp, "CMW_Aimbot", EC::late);
-#if ENABLE_VISUALS
-        EC::Register(EC::Draw, DrawText, "DRAW_Aimbot", EC::average);
-#endif
     });
 
 } // namespace hacks::aimbot

@@ -12,7 +12,6 @@
             <AutoVariable width="fill" target="debug.projectiles" label="Debug projectiles"/>
             <AutoVariable width="fill" target="debug.tcm" label="Debug TCM"/>
             <AutoVariable width="fill" target="aimbot.debug" label="Debug aimbot"/>
-            <AutoVariable width="fill" target="aimbot.debug.engine-pp" label="Debug engine PP"/>
         </List>
     </Box>
 </Tab>

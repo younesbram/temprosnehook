@@ -11,11 +11,17 @@ Cathook, but without bloat.
 ## Bloat Removed
 
 Minecraft Health Bar (wtf)
+
 Spellforcer
+
 Uberspam
+
 Rich Presence Changer
+
 Nullnexus and Identify (broken)
+
 Startup Sounds
+
 AntiCheat (cheater detection)
 
 And much, much more!

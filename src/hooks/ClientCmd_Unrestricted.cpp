@@ -7,7 +7,7 @@ namespace hooked_methods
 {
 DEFINE_HOOKED_METHOD(ClientCmd_Unrestricted, void, IVEngineClient013 *_this, const char *command)
 {
-    if (ipc::peer && *hacks::catbot::abandon_if_ipc_bots_gte)
+    if (ipc::peer && *hacks::catbot::requeue_if_ipc_bots_gte)
     {
         std::string command_str(command);
 
@@ -32,7 +32,7 @@ DEFINE_HOOKED_METHOD(ClientCmd_Unrestricted, void, IVEngineClient013 *_this, con
                 }
             }
 
-            if (count_ipc > 0 && count_ipc >= *hacks::catbot::abandon_if_ipc_bots_gte)
+            if (count_ipc > 0 && count_ipc >= *hacks::catbot::requeue_if_ipc_bots_gte)
                 return;
         }
     }

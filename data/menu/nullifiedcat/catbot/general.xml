@@ -27,9 +27,9 @@
         <List width="200">
             <AutoVariable width="fill" target="cat-bot.enable" label="Enable utilities"/>
             <AutoVariable width="fill" target="player-tools.betrayal-limit" label="Betrayal limit"/>
-            <AutoVariable width="fill" target="cat-bot.abandon-if.bots-gte" label="Abandon if bots Gte"/>
-            <AutoVariable width="fill" target="cat-bot.abandon-if.ipc-bots-gte" label="Abandon if IPC bots Gte"/>
-            <AutoVariable width="fill" target="cat-bot.abandon-if.humans-lte" label="Abandon if humans Lte"/>
+            <AutoVariable width="fill" target="cat-bot.requeue-if.bots-gte" label="Requeue if bots Gte"/>
+            <AutoVariable width="fill" target="cat-bot.requeue-if.ipc-bots-gte" label="Requeue if IPC bots Gte"/>
+            <AutoVariable width="fill" target="cat-bot.requeue-if.humans-lte" label="Requeue if humans Lte"/>
             <AutoVariable width="fill" target="cat-bot.requeue-if.players-lte" label="Requeue if players Lte"/>
             <AutoVariable width="fill" target="cat-bot.auto-crouch" label="Autocrouch"/>
             <AutoVariable width="fill" target="cat-bot.mark-human-after-kills" label="Mark human after kills"/>

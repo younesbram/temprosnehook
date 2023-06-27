@@ -23,7 +23,7 @@
 #include "drawmgr.hpp"
 
 static settings::Boolean info_text{ "hack-info.enable", "true" };
-static settings::Boolean info_text_min{ "hack-info.minimal", "false" };
+static settings::Boolean info_text_min{ "hack-info.minimal", "true" };
 static settings::Rgba info_background_color{"hack-info.background", "000000b3"};
 static settings::Rgba info_foreground_color{"hack-info.foreground", "ffffff"};
 static settings::Int info_x{"hack-info.x", "10"};

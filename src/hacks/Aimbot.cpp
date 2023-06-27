@@ -36,6 +36,11 @@ static settings::Boolean wait_for_charge{ "aimbot.wait-for-charge", "false" };
 
 static settings::Boolean silent{ "aimbot.silent", "true" };
 static settings::Boolean target_lock{ "aimbot.lock-target", "false" };
+#if ENABLE_VISUALS
+static settings::Boolean assistance_only{ "aimbot.assistance.only", "false" };
+static settings::Boolean fov_draw{ "aimbot.fov-circle.enable", "0" };
+static settings::Float fovcircle_opacity{ "aimbot.fov-circle.opacity", "0.7" };
+#endif
 static settings::Int hitbox{ "aimbot.hitbox", "0" };
 static settings::Boolean zoomed_only{ "aimbot.zoomed-only", "true" };
 static settings::Boolean only_can_shoot{ "aimbot.can-shoot-only", "true" };
@@ -66,6 +71,16 @@ static settings::Boolean ignore_vaccinator{ "aimbot.target.ignore-vaccinator", "
 static settings::Boolean buildings_sentry{ "aimbot.target.sentry", "true" };
 static settings::Boolean npcs{ "aimbot.target.npcs", "true" };
 static settings::Int teammates{ "aimbot.target.teammates", "0" };
+
+/*
+ * 0 Always on
+ * 1 Disable if being spectated in first person
+ * 2 Disable if being spectated
+ */
+static settings::Int specmode("aimbot.spectator-mode", "0");
+static settings::Boolean specenable("aimbot.spectator.enable", "false");
+static settings::Float specfov("aimbot.spectator.fov", "0");
+static settings::Int specslow("aimbot.spectator.slow", "0");
 
 settings::Boolean engine_projpred{ "aimbot.debug.engine-pp", "true" };
 
@@ -197,6 +212,35 @@ inline bool ShouldBacktrack(CachedEntity *ent)
     if (!shouldbacktrack_cache || ent && ent->m_Type() != ENTITY_PLAYER || !backtrack::getGoodTicks(ent))
         return false;
     return true;
+}
+
+void SpectatorUpdate()
+{
+    switch (*specmode)
+    {
+    // Always on
+    default:
+    case 0:
+        break;
+    // Disable if being spectated in first person
+    case 1:
+        if (g_pLocalPlayer->spectator_state == g_pLocalPlayer->FIRSTPERSON)
+        {
+            enable   = *specenable;
+            slow_aim = *specslow;
+            fov      = *specfov;
+        }
+        break;
+    // Disable if being spectated
+    case 2:
+        if (g_pLocalPlayer->spectator_state == g_pLocalPlayer->ANY)
+        {
+            enable   = *specenable;
+            slow_aim = *specslow;
+            fov      = *specfov;
+        }
+        break;
+    }
 }
 
 #define GET_MIDDLE(c1, c2) ((corners[c1] + corners[c2]) / 2.0f)
@@ -666,6 +710,11 @@ bool ShouldAim()
     // Using the minigun and we have no ammo?
     if (LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun) && CE_INT(LOCAL_E, netvar.m_iAmmo + 4) == 0)
         return false;
+#if ENABLE_VISUALS
+    if (*assistance_only && !MouseMoving())
+        return false;
+#endif
+    return true;
 }
 
 // Function to find a suitable target
@@ -1309,6 +1358,53 @@ void Reset()
     target_last     = nullptr;
     projectile_mode = false;
 }
+
+#if ENABLE_VISUALS
+static void DrawText()
+{
+    // Don't draw to screen when aimbot is disabled
+    if (!enable)
+        return;
+
+    // Fov ring to represent when a target will be shot
+    if (*fov_draw)
+    {
+        // It can't use fovs greater than 180, so we check for that
+        if (fov > 0.0f && fov < 180.0f)
+        {
+            // Don't show ring while player is dead
+            if (CE_GOOD(LOCAL_E) && g_pLocalPlayer->alive)
+            {
+                rgba_t color = colors::gui;
+                color.a      = *fovcircle_opacity;
+
+                int width, height;
+                g_IEngine->GetScreenSize(width, height);
+
+                // Math
+                float mon_fov  = static_cast<float>(width) / static_cast<float>(height) / (4.0f / 3.0f);
+                float fov_real = RAD2DEG(2.0f * atanf(mon_fov * tanf(DEG2RAD(draw::fov / 2.0f))));
+                float radius   = tan(DEG2RAD(static_cast<float>(fov)) / 2.0f) / tan(DEG2RAD(fov_real) / 2.0f) * static_cast<float>(width);
+
+                draw::Circle(static_cast<float>(width) / 2, static_cast<float>(height) / 2, radius, color, 1, 100);
+            }
+        }
+    }
+    // Debug stuff
+    if (!*aimbot_debug)
+        return;
+    for (const auto &ent : entity_cache::player_cache)
+    {
+        Vector screen;
+        Vector oscreen;
+        if (draw::WorldToScreen(cd.aim_position, screen) && draw::WorldToScreen(ent->m_vecOrigin(), oscreen))
+        {
+            draw::Rectangle(screen.x - 2, screen.y - 2, 4, 4, colors::white);
+            draw::Line(oscreen.x, oscreen.y, screen.x - oscreen.x, screen.y - oscreen.y, colors::EntityF(ent), 0.5f);
+        }
+    }
+}
+#endif
 
 void RvarCallback(settings::VariableBase<float> &, float after)
 {

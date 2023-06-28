@@ -16,7 +16,7 @@ extern bool angleCheck(CachedEntity *from, CachedEntity *to, std::optional<Vecto
 namespace hacks::antibackstab
 {
 static settings::Boolean enable{ "antibackstab.enable", "false" };
-static settings::Float distance{ "antibackstab.distance", "200" };
+static settings::Float distance{ "antibackstab.distance", "0" };
 bool noaa = false;
 
 float GetAngle(CachedEntity *spy)
@@ -35,9 +35,14 @@ float GetAngle(CachedEntity *spy)
         anglediff -= 360;
     if (anglediff < -180)
         anglediff += 360;
-    // logging::Info("Angle: %.2f | %.2f | %.2f | %.2f", yaw, yaw2, anglediff, yaw - yaw2);
     return anglediff;
 }
+
+static void CreateMove()
+{
+
+}
+
 static InitRoutine EC(
     []()
     {

@@ -54,7 +54,6 @@ static settings::Boolean item_health_packs{ "esp.item.health", "true" };
 // static settings::Boolean item_powerups{ "esp.item.powerup", "true" };
 static settings::Boolean item_money{ "esp.item.money", "true" };
 static settings::Boolean item_spellbooks{ "esp.item.spellbook", "true" };
-static settings::Boolean item_explosive{ "esp.item.explosive", "true" };
 static settings::Boolean item_crumpkin{ "esp.item.crumpkin", "true" };
 static settings::Boolean item_gargoyle{ "esp.item.gargoyle", "true" };
 static settings::Boolean item_objectives{ "esp.item.objectives", "false" };

@@ -933,15 +933,14 @@ void DoAutoshoot(CachedEntity *target_entity)
         current_user_cmd->buttons |= IN_ATTACK2;
 }
 
-Vector PredictEntity(CachedEntity *entity)
+int NotVisibleHitbox(CachedEntity *target, int preferred)
 {
-    // Pull out predicted data
-    Vector &result            = cd.aim_position;
-    const short int curr_type = entity->m_Type();
-
-    // If using projectiles, predict a vector
-    switch (curr_type)
-
+    if (target->hitboxes.VisibilityCheck(preferred))
+        return preferred;
+    // Else attempt to find any hitbox at all
+    else
+        return hitbox_t::spine_1;
+}
 
 int AutoHitbox(CachedEntity *target)
 {

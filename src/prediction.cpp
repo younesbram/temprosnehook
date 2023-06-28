@@ -719,8 +719,6 @@ static InitRoutine init(
             []()
             {
                 // Don't run if we don't use it
-                if (!hacks::aimbot::!debug_pp_draw)
-                    return;
                 for (const auto &ent : entity_cache::player_cache)
                 {
                     auto &buffer = previous_positions.at(ent->m_IDX - 1);

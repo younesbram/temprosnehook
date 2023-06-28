@@ -933,6 +933,16 @@ void DoAutoshoot(CachedEntity *target_entity)
         current_user_cmd->buttons |= IN_ATTACK2;
 }
 
+Vector PredictEntity(CachedEntity *entity)
+{
+    // Pull out predicted data
+    Vector &result            = cd.aim_position;
+    const short int curr_type = entity->m_Type();
+
+    // If using projectiles, predict a vector
+    switch (curr_type)
+}
+
 int AutoHitbox(CachedEntity *target)
 {
     int preferred      = 3;

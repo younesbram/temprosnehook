@@ -136,7 +136,7 @@ void dispatchUserMessage(bf_read &buffer, int type)
         if (*chat_partysay)
         {
             char formated_string[256];
-            std::snprintf(formated_string, sizeof(formated_string), "[CAT] [%s] votekick called: %s => %s (%s)", team_name, info2.name, info.name, reason);
+            std::snprintf(formated_string, sizeof(formated_string), "[ROSNEHOOK] [%s] votekick called: %s => %s (%s)", team_name, info2.name, info.name, reason);
             re::CTFPartyClient::GTFPartyClient()->SendPartyChat(formated_string);
         }
 #if ENABLE_VISUALS
@@ -238,7 +238,7 @@ public:
             if (*chat_partysay)
             {
                 char formated_string[256];
-                std::snprintf(formated_string, sizeof(formated_string), "[CAT] %s voted %s", info.name, vote_option ? "No" : "Yes");
+                std::snprintf(formated_string, sizeof(formated_string), "[ROSNEHOOK] %s voted %s", info.name, vote_option ? "No" : "Yes");
 
                 re::CTFPartyClient::GTFPartyClient()->SendPartyChat(formated_string);
             }

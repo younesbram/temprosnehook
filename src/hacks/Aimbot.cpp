@@ -829,35 +829,6 @@ bool IsTargetStateGood(CachedEntity *entity)
     default:
         break;
     }
-
-    // Check for stickybombs
-    if (entity->m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile))
-    {
-        // Enabled
-        // Teammates, Even with friendly fire enabled, stickies can NOT be destroyed
-        if (!entity->m_bEnemy())
-            return false;
-
-        // Only hitscan weapons can break stickies so check for them.
-        if (!(GetWeaponMode() == weapon_hitscan || GetWeaponMode() == weapon_melee))
-            return false;
-
-        // Distance
-        if (entity->m_flDistance() > EffectiveTargetingRange())
-            return false;
-
-        // Check if target is a pipe bomb
-        if (CE_INT(entity, netvar.iPipeType) != 1)
-            return false;
-
-        // Moving Sticky?
-        Vector velocity;
-        velocity::EstimateAbsVelocity(RAW_ENT(entity), velocity);
-        if (!velocity.IsZero())
-            return false;
-
-        return true;
-    }
     return false;
 }
 

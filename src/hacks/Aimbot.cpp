@@ -1067,8 +1067,6 @@ bool UpdateAimkey()
             if (!aimkey_flip)
                 allow_aimkey = false;
             break;
-        default:
-            break;
         }
         pressed_last_tick = key_down;
     }

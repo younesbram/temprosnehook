@@ -45,11 +45,6 @@ static settings::Boolean only_can_shoot{ "aimbot.can-shoot-only", "true" };
 
 static settings::Int normal_slow_aim{ "aimbot.slow", "0" };
 
-static settings::Boolean projectile_aimbot{ "aimbot.projectile.enable", "true" };
-static settings::Float proj_gravity{ "aimbot.projectile.gravity", "0" };
-static settings::Float proj_speed{ "aimbot.projectile.speed", "0" };
-static settings::Float proj_start_vel{ "aimbot.projectile.initial-velocity", "0" };
-
 static settings::Float sticky_autoshoot{ "aimbot.projectile.sticky-autoshoot", "0.5" };
 
 static settings::Boolean auto_spin_up{ "aimbot.auto.spin-up", "false" };
@@ -67,8 +62,6 @@ static settings::Boolean ignore_vaccinator{ "aimbot.target.ignore-vaccinator", "
 static settings::Boolean buildings_sentry{ "aimbot.target.sentry", "true" };
 static settings::Boolean npcs{ "aimbot.target.npcs", "true" };
 static settings::Int teammates{ "aimbot.target.teammates", "0" };
-
-settings::Boolean engine_projpred{ "aimbot.debug.engine-pp", "true" };
 
 struct AimbotCalculatedData_s
 {
@@ -93,12 +86,6 @@ float stop_moving_time = 0;
 
 // Used to make rapidfire not knock your enemies out of range
 unsigned last_target_ignore_timer = 0;
-
-// Projectile info
-bool projectile_mode{ false };
-float cur_proj_speed{ 0.0f };
-float cur_proj_grav{ 0.0f };
-float cur_proj_start_vel{ 0.0f };
 
 bool shouldbacktrack_cache = false;
 
@@ -187,7 +174,7 @@ inline float ProjectileHitboxSize(int projectile_size)
 
 inline void UpdateShouldBacktrack()
 {
-    if (hacks::backtrack::hasData() || projectile_mode || !(*backtrack_aimbot || force_backtrack_aimbot))
+    if (hacks::backtrack::hasData() || !(*backtrack_aimbot || force_backtrack_aimbot))
         shouldbacktrack_cache = false;
     else
         shouldbacktrack_cache = true;
@@ -431,7 +418,6 @@ Vector viewangles_this_tick(0.0f);
 
 // If slow aimbot allows autoshoot
 bool slow_can_shoot = false;
-bool projectileAimbotRequired;
 
 // The main "loop" of the aimbot.
 static void CreateMove()
@@ -455,8 +441,6 @@ static void CreateMove()
         fov = std::min(fov > 0.0f ? fov : FLT_MAX, 10.0f);
     bool should_backtrack    = hacks::backtrack::backtrackEnabled();
     int weapon_mode          = GetWeaponMode();
-    projectile_mode          = false;
-    projectileAimbotRequired = false;
     bool should_zoom         = *auto_zoom;
     switch (weapon_mode)
     {
@@ -480,101 +464,8 @@ static void CreateMove()
         if (target_last)
             DoAutoshoot(target_last);
         break;
-    case weapon_projectile:
-    case weapon_throwable:
-        if (*projectile_aimbot)
-        {
-            projectileAimbotRequired = true;
-            projectile_mode          = GetProjectileData(LOCAL_W, cur_proj_speed, cur_proj_grav, cur_proj_start_vel);
-            if (!projectile_mode)
-            {
-                target_last = nullptr;
-                return;
-            }
-            if (*proj_speed != 0.0f)
-                cur_proj_speed = *proj_speed;
-            if (*proj_gravity != 0)
-                cur_proj_grav = *proj_gravity;
-            if (*proj_start_vel != 0)
-                cur_proj_start_vel = *proj_start_vel;
-            target_last = RetrieveBestTarget(aimkey_status);
-            if (target_last)
-            {
-                int weapon_case = LOCAL_W->m_iClassID();
-                if (ProjectileSpecialCases(target_last, weapon_case))
-                    DoAutoshoot(target_last);
-            }
-        }
-        [[fallthrough]];
     default:
         break;
-    }
-}
-
-bool ProjectileSpecialCases(CachedEntity *target_entity, int weapon_case)
-{
-    switch (weapon_case)
-    {
-    case CL_CLASS(CTFCompoundBow):
-    {
-        bool release = false;
-        if (autoshoot)
-            current_user_cmd->buttons |= IN_ATTACK;
-        // Grab time when charge began
-        float begincharge = CE_FLOAT(LOCAL_W, netvar.flChargeBeginTime);
-        float charge      = g_GlobalVars->curtime - begincharge;
-        if (begincharge == 0.0f)
-            charge = 0.0f;
-        int damage        = std::floor(50.0f + 70.0f * fminf(1.0f, charge));
-        int charge_damage = std::floor(50.0f + 70.0f * fminf(1.0f, charge)) * 3.0f;
-        if (HasCondition<TFCond_Slowed>(LOCAL_E) && (autoshoot || !(current_user_cmd->buttons & IN_ATTACK)) && (!*wait_for_charge || charge >= 1.0f || damage >= target_entity->m_iHealth() || charge_damage >= target_entity->m_iHealth()))
-            release = true;
-        return release;
-    }
-    case CL_CLASS(CTFCannon):
-    {
-        bool release = false;
-        if (autoshoot)
-            current_user_cmd->buttons |= IN_ATTACK;
-        float detonate_time = CE_FLOAT(LOCAL_W, netvar.flDetonateTime);
-        // Currently charging up
-        if (detonate_time > g_GlobalVars->curtime)
-        {
-            if (*wait_for_charge)
-            {
-                // Shoot when a straight shot would result in only 100ms left on fuse upon target hit
-                float best_charge = PredictEntity(target_entity).DistTo(g_pLocalPlayer->v_Eye) / cur_proj_speed + 0.1;
-                if (detonate_time - g_GlobalVars->curtime <= best_charge)
-                    release = true;
-            }
-            else
-                release = true;
-        }
-        return release;
-    }
-    case CL_CLASS(CTFPipebombLauncher):
-    {
-        float chargebegin = CE_FLOAT(LOCAL_W, netvar.flChargeBeginTime);
-        float chargetime  = g_GlobalVars->curtime - chargebegin;
-
-        DoAutoshoot();
-        bool currently_charging_pipe = false;
-
-        // Grenade started charging
-        if (chargetime < 6.0f && chargebegin != 0.0f)
-            currently_charging_pipe = true;
-
-        // Grenade was released
-        if (!(current_user_cmd->buttons & IN_ATTACK) && currently_charging_pipe)
-        {
-            currently_charging_pipe = false;
-            Aim(target_entity);
-            return false;
-        }
-        [[fallthrough]];
-    }
-    default:
-        return true;
     }
 }
 
@@ -868,7 +759,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         cd.hitbox = BestHitbox(entity);
         if (*vischeck_hitboxes && !*multipoint)
         {
-            if (*vischeck_hitboxes == 1 && playerlist::AccessData(entity->player_info->friendsID).state != playerlist::k_EState::RAGE || projectileAimbotRequired && cur_proj_grav > 0.01f)
+            if (*vischeck_hitboxes == 1 && playerlist::AccessData(entity->player_info->friendsID).state != playerlist::k_EState::RAGE)
                 return true;
             else
             {
@@ -977,52 +868,8 @@ bool Aim(CachedEntity *entity)
 {
     // Get angles from eye to target
     Vector is_it_good = PredictEntity(entity);
-    if (!projectileAimbotRequired && !IsEntityVectorVisible(entity, is_it_good, true, MASK_SHOT_HULL, nullptr, true))
-        return false;
 
     Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, is_it_good, LOCAL_E);
-
-    if (projectileAimbotRequired) // unfortunately you have to check this twice, otherwise you'd have to run GetAimAtAngles far too early
-    {
-        const Vector &orig   = getShootPos(angles);
-        const bool grav_comp = 0.01f < cur_proj_grav;
-        if (grav_comp)
-        {
-            const QAngle &angl = VectorToQAngle(angles);
-            Vector end_targ    = is_it_good;
-            Vector fwd, right, up;
-            AngleVectors3(angl, &fwd, &right, &up);
-            // I have no clue why this is 200.0f; nowhere in the SDK is this explained.
-            // It appears to work though
-            Vector vel = 0.9f * (fwd * cur_proj_speed + up * 200.0f);
-            fwd.z      = 0.0f;
-            fwd.NormalizeInPlace();
-            float alongvel = FastSqrt(SQR(vel.x) + SQR(vel.y));
-            fwd *= alongvel;
-            const float gravity  = cur_proj_grav * g_ICvar->FindVar("sv_gravity")->GetFloat() * -1.0f;
-            const float maxTime  = 2.5f;
-            const float timeStep = 0.01f;
-            Vector curr_pos      = orig;
-            trace_t ptr_trace;
-            Vector last_pos                 = orig;
-            const IClientEntity *rawest_ent = RAW_ENT(entity);
-            for (float t = 0.0f; t < maxTime; t += timeStep, last_pos = curr_pos)
-            {
-                curr_pos.x = orig.x + fwd.x * t;
-                curr_pos.y = orig.y + fwd.y * t;
-                curr_pos.z = orig.z + vel.z * t + 0.5f * gravity * SQR(t);
-                if (!DidProjectileHit(last_pos, curr_pos, entity, ProjectileHitboxSize(LOCAL_W->m_iClassID()), true, &ptr_trace) || (IClientEntity *) ptr_trace.m_pEnt == rawest_ent)
-                    break;
-            }
-            if (!DidProjectileHit(end_targ, ptr_trace.endpos, entity, ProjectileHitboxSize(LOCAL_W->m_iClassID()), true, &ptr_trace))
-                return false;
-            Vector ent_check = entity->m_vecOrigin();
-            if (!DidProjectileHit(last_pos, ent_check, entity, ProjectileHitboxSize(LOCAL_W->m_iClassID()), false))
-                return false;
-        }
-        else if (!DidProjectileHit(orig, is_it_good, entity, ProjectileHitboxSize(LOCAL_W->m_iClassID()), grav_comp))
-            return false;
-    }
 
     if (fov > 0.0f && cd.fov > fov)
         return false;
@@ -1086,72 +933,6 @@ void DoAutoshoot(CachedEntity *target_entity)
     }
     if (LOCAL_W->m_iClassID() == CL_CLASS(CTFLaserPointer))
         current_user_cmd->buttons |= IN_ATTACK2;
-}
-
-// Grab a vector for a specific ent
-Vector PredictEntity(CachedEntity *entity)
-{
-    // Pull out predicted data
-    Vector &result            = cd.aim_position;
-    const short int curr_type = entity->m_Type();
-
-    // If using projectiles, predict a vector
-    switch (curr_type)
-    {
-    // Player
-    case ENTITY_PLAYER:
-        if (projectileAimbotRequired)
-        {
-            std::pair<Vector, Vector> tmp_result;
-            // Use prediction engine if user settings allow
-            if (*engine_projpred)
-                tmp_result = ProjectilePrediction_Engine(entity, cd.hitbox, cur_proj_speed, cur_proj_grav, PlayerGravityMod(entity), cur_proj_start_vel);
-            else
-                tmp_result = ProjectilePrediction(entity, cd.hitbox, cur_proj_speed, cur_proj_grav, PlayerGravityMod(entity), cur_proj_start_vel);
-
-            // Don't use the initial velocity compensated one in vischecks
-            result = tmp_result.second;
-        }
-        else
-        {
-            {
-                // Allow multipoint logic to run
-                if (!*multipoint)
-                {
-                    result = entity->hitboxes.GetHitbox(cd.hitbox)->center;
-                    break;
-                }
-
-                std::optional<Vector> best_pos = GetBestHitpoint(entity, cd.hitbox);
-                if (best_pos)
-                    result = *best_pos;
-            }
-        }
-        break;
-    // Buildings
-    case ENTITY_BUILDING:
-        if (cur_proj_grav != 0)
-        {
-            std::pair<Vector, Vector> temp_result = BuildingPrediction(entity, GetBuildingPosition(entity), cur_proj_speed, cur_proj_grav, cur_proj_start_vel);
-            result                                = temp_result.second;
-        }
-        else
-            result = GetBuildingPosition(entity);
-        break;
-    // NPCs (Skeletons, merasmus, etc)
-    case ENTITY_NPC:
-        result = entity->hitboxes.GetHitbox(std::max(0, entity->hitboxes.GetNumHitboxes() / 2 - 1))->center;
-        break;
-    // Other
-    default:
-        result = entity->m_vecOrigin();
-        break;
-    }
-    cd.predict_tick = tickcount;
-    cd.fov          = GetFov(g_pLocalPlayer->v_OrigViewangles, g_pLocalPlayer->v_Eye, result);
-
-    // Return the found vector
-    return result;
 }
 
 int NotVisibleHitbox(CachedEntity *target, int preferred)
@@ -1313,7 +1094,6 @@ CachedEntity *CurrentTarget()
 void Reset()
 {
     target_last     = nullptr;
-    projectile_mode = false;
 }
 
 void RvarCallback(settings::VariableBase<float> &, float after)

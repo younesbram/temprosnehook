@@ -57,7 +57,6 @@
 #include "core/netvars.hpp"
 #include "core/vfunc.hpp"
 #include "hooks.hpp"
-#include <prediction.hpp>
 #include <itemtypes.hpp>
 #include <chatstack.hpp>
 #include "pathio.hpp"

@@ -52,10 +52,7 @@ static settings::Boolean item_esp{ "esp.item.enable", "true" };
 static settings::Boolean item_ammo_packs{ "esp.item.ammo", "false" };
 static settings::Boolean item_health_packs{ "esp.item.health", "true" };
 // static settings::Boolean item_powerups{ "esp.item.powerup", "true" };
-static settings::Boolean item_money{ "esp.item.money", "true" };
-static settings::Boolean item_spellbooks{ "esp.item.spellbook", "true" };
 static settings::Boolean item_crumpkin{ "esp.item.crumpkin", "true" };
-static settings::Boolean item_gargoyle{ "esp.item.gargoyle", "true" };
 static settings::Boolean item_objectives{ "esp.item.objectives", "false" };
 
 static settings::Boolean proj_esp{ "esp.projectile.enable", "false" };
@@ -1216,77 +1213,11 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 // Powerup esp
                 // else if (item_powerups && (Hash::IsPowerup(szName)))
                 // AddEntityString(ent, powerups[itemtype - ITEM_POWERUP_FIRST]);
-                // Halloween spell esp
-                else if (item_spellbooks && (Hash::IsSpellbook(szName) || Hash::IsSpellbookRare(szName)))
-                {
-                    if (Hash::IsSpellbookRare(szName))
-                        AddEntityString(ent, rare_spell_str, colors::FromRGBA8(139, 31, 221, 255));
-                    else
-                        AddEntityString(ent, spell_str, colors::green);
-                }
                 // Crumpkin esp https://wiki.teamfortress.com/wiki/Halloween_pumpkin
                 else if (item_crumpkin && Hash::IsCrumpkin(szName))
                     AddEntityString(ent, crumpkin_str, colors::FromRGBA8(253, 203, 88, 255));
             }
-            // MVM Money esp
-            if (item_money && classid == CL_CLASS(CCurrencyPack) && !CE_BYTE(ent, netvar.bDistributed))
-                AddEntityString(ent, mvm_money_str);
         }
-    }
-}
-
-// Draw 3D box around player/building
-void _FASTCALL Draw3DBox(CachedEntity *ent, const rgba_t &clr)
-{
-    if (CE_INVALID(ent) || !ent->m_bAlivePlayer())
-        return;
-
-    Vector origin = RAW_ENT(ent)->GetCollideable()->GetCollisionOrigin();
-    Vector mins   = RAW_ENT(ent)->GetCollideable()->OBBMins();
-    Vector maxs   = RAW_ENT(ent)->GetCollideable()->OBBMaxs();
-    // Dormant
-    if (RAW_ENT(ent)->IsDormant())
-        origin = *ent->m_vecDormantOrigin();
-
-    // Create an array for storing box points
-    Vector corners[8]; // World vectors
-    Vector points[8];  // Screen vectors
-
-    // Create points for the box based on max and mins
-    float x    = maxs.x - mins.x;
-    float y    = maxs.y - mins.y;
-    float z    = maxs.z - mins.z;
-    corners[0] = mins;
-    corners[1] = mins + Vector(x, 0, 0);
-    corners[2] = mins + Vector(x, y, 0);
-    corners[3] = mins + Vector(0, y, 0);
-    corners[4] = mins + Vector(0, 0, z);
-    corners[5] = mins + Vector(x, 0, z);
-    corners[6] = mins + Vector(x, y, z);
-    corners[7] = mins + Vector(0, y, z);
-
-    // Rotate the box and check if any point of the box isn't on the screen
-    for (unsigned i = 0; i < 8; ++i)
-    {
-        float yaw    = NET_VECTOR(RAW_ENT(ent), netvar.m_angEyeAngles).y;
-        float s      = sinf(DEG2RAD(yaw));
-        float c      = cosf(DEG2RAD(yaw));
-        float xx     = corners[i].x;
-        float yy     = corners[i].y;
-        corners[i].x = (xx * c) - (yy * s);
-        corners[i].y = (xx * s) + (yy * c);
-        corners[i] += origin;
-
-        if (!draw::WorldToScreen(corners[i], points[i]))
-            return;
-    }
-    rgba_t draw_clr = clr;
-    // Draw the actual box
-    for (unsigned i = 1; i <= 4; ++i)
-    {
-        draw::Line((points[i - 1].x), (points[i - 1].y), (points[i % 4].x) - (points[i - 1].x), (points[i % 4].y) - (points[i - 1].y), draw_clr, 0.5f);
-        draw::Line((points[i - 1].x), (points[i - 1].y), (points[i + 3].x) - (points[i - 1].x), (points[i + 3].y) - (points[i - 1].y), draw_clr, 0.5f);
-        draw::Line((points[i + 3].x), (points[i + 3].y), (points[i % 4 + 4].x) - (points[i + 3].x), (points[i % 4 + 4].y) - (points[i + 3].y), draw_clr, 0.5f);
     }
 }
 

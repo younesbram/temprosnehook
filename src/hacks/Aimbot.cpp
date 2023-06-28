@@ -61,8 +61,6 @@ static settings::Boolean buildings_sentry{ "aimbot.target.sentry", "true" };
 static settings::Boolean npcs{ "aimbot.target.npcs", "true" };
 static settings::Int teammates{ "aimbot.target.teammates", "0" };
 
-settings::Boolean engine_projpred{ "aimbot.debug.engine-pp", "true" };
-
 struct AimbotCalculatedData_s
 {
     unsigned long predict_tick{ 0 };

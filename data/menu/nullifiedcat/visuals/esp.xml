@@ -27,6 +27,9 @@
                               tooltip="Intel, carts and mvm bombs."/>
                 <AutoVariable width="fill" target="esp.item.crumpkin" label="Crumpkin"
                               tooltip="Ammo box that also gives crits."/>
+            </List>
+        </Box>
+    </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Projectiles" x="165">
         <List width="150">
             <AutoVariable width="fill" target="esp.projectile.enable" label="Enable projectile ESP"

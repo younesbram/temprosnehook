@@ -28,8 +28,6 @@
                 <AutoVariable width="fill" target="esp.item.spellbook" label="Spellbook"/>
                 <AutoVariable width="fill" target="esp.item.objectives" label="Objective"
                               tooltip="Intel, carts and mvm bombs."/>
-                <AutoVariable width="fill" target="esp.item.explosive" label="Explosive"
-                              tooltip="Environmental hazards like bombs."/>
                 <AutoVariable width="fill" target="esp.item.crumpkin" label="Crumpkin"
                               tooltip="Ammo box that also gives crits."/>
                 <AutoVariable width="fill" target="esp.item.gargoyle" label="Gargoyle"
@@ -48,7 +46,6 @@
         <List width="150">
             <AutoVariable width="fill" target="esp.box.player-3d" label="3D players"
                           tooltip="Overrides setting for 'Box mode'."/>
-            <AutoVariable width="fill" target="esp.box.building-3d" label="3D buildings"/>
             <AutoVariable width="fill" target="esp.box.corner-size" label="Corner size"/>
             <AutoVariable width="fill" target="esp.bones" label="Bone ESP"/>
             <AutoVariable width="fill" target="esp.bones.thickness" label="Bone thickness" min="0.1" max="5"

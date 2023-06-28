@@ -17,10 +17,8 @@ static settings::Boolean enable{ "esp.enable", "false" };
 static settings::Int max_dist{ "esp.range", "4096" };
 
 static settings::Int box_esp{ "esp.box.mode", "2" };
-static settings::Int box_corner_size_height{ "esp.box.corner-size.height", "10" };
-static settings::Int box_corner_size_width{ "esp.box.corner-size.width", "10" };
-static settings::Boolean box_3d_player{ "esp.box.player-3d", "false" };
-static settings::Boolean box_3d_building{ "esp.box.building-3d", "false" };
+static settings::Int box_corner_size_height{ "esp.box.corner-size.height", "11" };
+static settings::Int box_corner_size_width{ "esp.box.corner-size.width", "11" };
 
 static settings::Boolean draw_bones{ "esp.bones", "false" };
 static settings::Float bones_thickness{ "esp.bones.thickness", "0.5" };
@@ -645,9 +643,8 @@ void _FASTCALL BoxEsp(EntityType &type, bool &transparent, rgba_t &fg, CachedEnt
             fg.g *= 0.75f;
             fg.b *= 0.75f;
         }
-        if (!box_3d_player && box_esp)
+        if (!box_esp)
             DrawBox(ent, fg);
-        else if (box_3d_player)
             Draw3DBox(ent, fg);
         break;
     case ENTITY_BUILDING:
@@ -703,9 +700,8 @@ void _FASTCALL BoxEsp(EntityType &type, bool &transparent, rgba_t &fg, CachedEnt
             if (visible)
                 draw::Triangle(screen[0].x, screen[0].y, screen[1].x, screen[1].y, screen[2].x, screen[2].y, fg);
         }
-        if (!box_3d_building && box_esp)
+        if (!box_esp)
             DrawBox(ent, fg);
-        else if (box_3d_building)
             Draw3DBox(ent, fg);
         break;
     }
@@ -848,7 +844,7 @@ void ProcessEntityPT()
         bool transparent = vischeck && ent_data.transparent;
 
         // Box esp
-        if (box_esp || box_3d_player || box_3d_building)
+        if (box_esp)
             BoxEsp(type, transparent, fg, ent);
 
         if (draw_bones)
@@ -1193,22 +1189,6 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             if (model)
             {
                 const auto szName = g_IModelInfo->GetModelName(model);
-                // Gargoyle esp
-                if (item_gargoyle && classid == CL_CLASS(CHalloweenGiftPickup))
-                {
-                    if (HandleToIDX(CE_INT(ent, netvar.m_hTargetPlayer)) == g_pLocalPlayer->entity_idx)
-                        AddEntityString(ent, gargoyle_str, colors::FromRGBA8(199, 21, 133, 255));
-                    return;
-                }
-                // Explosive/Environmental hazard esp
-                else if (item_explosive && (classid == CL_CLASS(CTFPumpkinBomb) || Hash::IsHazard(szName)))
-                {
-                    if (classid == CL_CLASS(CTFPumpkinBomb))
-                        AddEntityString(ent, pumpkinbomb_str, colors::FromRGBA8(255, 162, 0, 255));
-                    else
-                        AddEntityString(ent, explosive_str, colors::FromRGBA8(255, 162, 0, 255));
-                    return;
-                }
                 if (item_objectives && (classid == CL_CLASS(CCaptureFlag) || (Hash::IsFlag(szName) || Hash::IsBombCart(szName) || Hash::IsBombCartRed(szName))))
                 {
                     rgba_t color = ent->m_iTeam() == TEAM_BLU ? colors::blu : (ent->m_iTeam() == TEAM_RED ? colors::red : colors::white);

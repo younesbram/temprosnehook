@@ -941,7 +941,7 @@ Vector PredictEntity(CachedEntity *entity)
 
     // If using projectiles, predict a vector
     switch (curr_type)
-}
+
 
 int AutoHitbox(CachedEntity *target)
 {

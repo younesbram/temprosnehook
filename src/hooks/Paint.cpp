@@ -12,7 +12,6 @@
 #if ENABLE_VISUALS
 #include "drawmgr.hpp"
 #endif
-extern settings::Boolean die_if_vac;
 #if !ENABLE_VISUALS
 static Timer check_mm_ban{};
 #endif
@@ -66,7 +65,7 @@ DEFINE_HOOKED_METHOD(Paint, void, IEngineVGui *this_, PaintMode_t mode)
             hack::command_stack().pop();
         }
 #if !ENABLE_VISUALS
-        if (*die_if_vac && check_mm_ban.test_and_set(1000) && tfmm::IsMMBanned())
+        if (check_mm_ban.test_and_set(1000) && tfmm::IsMMBanned())
             *(int *) 0 = 0;
 #endif
 

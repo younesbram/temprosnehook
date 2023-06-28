@@ -84,9 +84,6 @@ DECLARE_HOOKED_METHOD(SDL_PollEvent, int, SDL_Event *)
 DECLARE_HOOKED_METHOD(SDL_SetClipboardText, int, const char *)
 #endif
 #endif
-#if ENABLE_VISUALS || ENABLE_TEXTMODE
-DECLARE_HOOKED_METHOD(IVModelRender *, const DrawModelState_t &, const ModelRenderInfo_t &, matrix3x4_t *)
-#endif
 // CTFPlayerInventory
 DECLARE_HOOKED_METHOD(GetMaxItemCount, int, int *)
 // g_ISoundEngine

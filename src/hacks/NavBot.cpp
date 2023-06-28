@@ -76,7 +76,7 @@ bool shouldSearchHealth(bool low_priority = false)
         return false;
     float health_percent = LOCAL_E->m_iHealth() / g_pPlayerResource->GetMaxHealth(LOCAL_E);
     // Get health when below 65%, or below 80% and just patrolling
-    return health_percent < 0.64f || low_priority && (navparser::NavEngine::current_priority <= patrol || navparser::NavEngine::current_priority == lowprio_health) && health_percent <= 0.80f;
+    return health_percent < 0.64f || low_priority && (navparser::NavEngine::current_priority <= patrol || navparser::NavEngine::current_priority == lowprio_health) && health_percent <= 0.80f; // this is broken
 }
 
 // Should we search ammo at all?

@@ -53,7 +53,6 @@ static settings::Float proj_start_vel{ "aimbot.projectile.initial-velocity", "0"
 static settings::Float sticky_autoshoot{ "aimbot.projectile.sticky-autoshoot", "0.5" };
 
 static settings::Boolean auto_spin_up{ "aimbot.auto.spin-up", "false" };
-static settings::Boolean minigun_tapfire{ "aimbot.auto.tapfire", "false" };
 static settings::Boolean auto_zoom{ "aimbot.auto.zoom", "false" };
 static settings::Boolean auto_unzoom{ "aimbot.auto.unzoom", "false" };
 static settings::Float zoom_distance{ "aimbot.zoom.distance", "1250.0" };
@@ -509,32 +508,6 @@ static void CreateMove()
     default:
         break;
     }
-}
-
-int tapfire_delay = 0;
-bool HitscanSpecialCases(CachedEntity *target_entity, int weapon_case)
-{
-    if (weapon_case == CL_CLASS(CTFMinigun))
-    {
-        if (!*minigun_tapfire)
-            DoAutoshoot(target_entity);
-        else
-        {
-            // Used to keep track of what tick we're in right now
-            tapfire_delay++;
-
-            // This is the exact delay needed to hit
-            if (tapfire_delay >= 17 || target_entity->m_flDistance() <= 1250.0f)
-            {
-                DoAutoshoot(target_entity);
-                tapfire_delay = 0;
-            }
-            return true;
-        }
-        return true;
-    }
-    else
-        return false;
 }
 
 // Just hold m1 if we were aiming at something before and are in rapidfire

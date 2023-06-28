@@ -11,6 +11,11 @@
 // Found in C_BasePlayer. It represents "m_pCurrentCommand"
 #define CURR_CUSERCMD_PTR 4452
 
+namespace hacks::aimbot
+{
+extern settings::Boolean engine_projpred;
+}
+
 static settings::Boolean debug_pp_extrapolate{ "debug.pp-extrapolate", "false" };
 static settings::Boolean debug_pp_draw{ "debug.pp-draw", "false" };
 static settings::Boolean debug_pp_draw_engine{ "debug.pp-draw.engine", "false" };
@@ -719,6 +724,8 @@ static InitRoutine init(
             []()
             {
                 // Don't run if we don't use it
+                if (!hacks::aimbot::engine_projpred && !debug_pp_draw)
+                    return;
                 for (const auto &ent : entity_cache::player_cache)
                 {
                     auto &buffer = previous_positions.at(ent->m_IDX - 1);

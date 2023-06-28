@@ -11,6 +11,14 @@
 // Found in C_BasePlayer. It represents "m_pCurrentCommand"
 #define CURR_CUSERCMD_PTR 4452
 
+namespace hacks::aimbot
+{
+extern settings::Boolean engine_projpred;
+}
+
+static settings::Boolean debug_pp_extrapolate{ "debug.pp-extrapolate", "false" };
+static settings::Boolean debug_pp_draw{ "debug.pp-draw", "false" };
+static settings::Boolean debug_pp_draw_engine{ "debug.pp-draw.engine", "false" };
 static settings::Int debug_pp_steps{ "debug.pp-steps", "66" };
 // The higher the sample size, the more previous positions we will take into account to calculate the next position. Lower = Faster reaction Higher = Stability
 static settings::Int sample_size("debug.strafepred.samplesize", "10");
@@ -293,6 +301,117 @@ std::vector<Vector> Predict(CachedEntity *player, Vector pos, float offset, Vect
     }
     return positions;
 }
+
+#if ENABLE_VISUALS
+void Prediction_PaintTraverse()
+{
+    if (g_Settings.bInvalid)
+        return;
+    if (debug_pp_draw || debug_pp_draw_engine)
+    {
+        if (!sv_gravity)
+        {
+            sv_gravity = g_ICvar->FindVar("sv_gravity");
+            if (!sv_gravity)
+                return;
+        }
+
+        for (const auto &ent : entity_cache::player_cache)
+        {
+            if (CE_BAD(ent) || !ent->m_bAlivePlayer())
+                continue;
+
+            Vector velocity;
+            velocity::EstimateAbsVelocity(RAW_ENT(ent), velocity);
+
+            if (debug_pp_draw_engine)
+            {
+                std::vector<Vector> data;
+                Vector original_origin = ent->m_vecOrigin();
+                Vector new_origin      = original_origin;
+
+                Vector new_velocity = velocity;
+
+                Vector mins = RAW_ENT(ent)->GetCollideable()->OBBMins();
+                Vector maxs = RAW_ENT(ent)->GetCollideable()->OBBMaxs();
+
+                for (int i = 0; i < 64; i++)
+                {
+                    const_cast<Vector &>(RAW_ENT(ent)->GetAbsOrigin()) = new_origin;
+                    CE_VECTOR(ent, 0x354)                              = new_origin;
+                    ent->m_vecOrigin()                                 = new_origin;
+                    new_origin                                         = EnginePrediction(ent, g_GlobalVars->interval_per_tick, &new_velocity);
+                    if (DistanceToGround(new_origin, mins, maxs) > 0.0f)
+                        new_velocity.z -= sv_gravity->GetFloat() * PlayerGravityMod(ent) * g_GlobalVars->interval_per_tick;
+
+                    data.push_back(new_origin);
+                }
+                CE_VECTOR(ent, 0x354)                              = original_origin;
+                ent->m_vecOrigin()                                 = original_origin;
+                const_cast<Vector &>(RAW_ENT(ent)->GetAbsOrigin()) = original_origin;
+
+                Vector previous_screen;
+                if (!draw::WorldToScreen(ent->m_vecOrigin(), previous_screen))
+                    continue;
+                rgba_t color = colors::FromRGBA8(0, 0, 255, 255);
+                for (const auto &j : data)
+                {
+                    Vector screen;
+                    if (draw::WorldToScreen(j, screen))
+                    {
+                        draw::Line(screen.x, screen.y, previous_screen.x - screen.x, previous_screen.y - screen.y, color, 2);
+                        previous_screen = screen;
+                    }
+                    else
+                        break;
+
+                    color.b -= 1.0f / 20.0f;
+                }
+                /*if (!ent->m_bEnemy())
+                    continue;
+                auto pos  = ProjectilePrediction_Engine(ent, hitbox_t::spine_3, 1980.0f, 0.0f, 1.0f, 0.0f);
+                auto pos2 = ProjectilePrediction(ent, hitbox_t::spine_3, 1980.0f, 0.0f, 1.0f, 0.0f);
+
+                Vector aaa;
+                if (draw::WorldToScreen(pos.first, aaa))
+                    draw::Rectangle(aaa.x, aaa.y, 5, 5, colors::yellow);
+                if (draw::WorldToScreen(pos2.first, aaa))
+                    draw::Rectangle(aaa.x, aaa.y, 5, 5, colors::orange);*/
+            }
+            if (debug_pp_draw)
+            {
+
+                auto data = Predict(ent, ent->m_vecOrigin(), 0.0f, velocity, Vector(0, 0, -sv_gravity->GetFloat()), std::make_pair(RAW_ENT(ent)->GetCollideable()->OBBMins(), RAW_ENT(ent)->GetCollideable()->OBBMaxs()), 64);
+                Vector previous_screen;
+                if (!draw::WorldToScreen(ent->m_vecOrigin(), previous_screen))
+                    continue;
+                rgba_t color = colors::FromRGBA8(255, 0, 0, 255);
+                for (const auto &j : data)
+                {
+                    Vector screen;
+                    if (draw::WorldToScreen(j, screen))
+                    {
+                        draw::Line(screen.x, screen.y, previous_screen.x - screen.x, previous_screen.y - screen.y, color, 2);
+                        previous_screen = screen;
+                    }
+                    else
+                        break;
+
+                    color.r -= 1.0f / 20.0f;
+                }
+
+                /*if (!ent->m_bEnemy())
+                    continue;
+                auto pos = ProjectilePrediction(ent, hitbox_t::spine_3, 1980.0f, 0.0f, 1.0f, 0.0f);
+
+                Vector aaa;
+                if (draw::WorldToScreen(pos, aaa))
+                    draw::Rectangle(aaa.x, aaa.y, 5, 5, colors::yellow);*/
+            }
+        }
+    }
+}
+#endif
 
 Vector EnginePrediction(CachedEntity *entity, float time, Vector *vecVelocity)
 {
@@ -604,6 +723,9 @@ static InitRoutine init(
             EC::CreateMove,
             []()
             {
+                // Don't run if we don't use it
+                if (!hacks::aimbot::engine_projpred && !debug_pp_draw)
+                    return;
                 for (const auto &ent : entity_cache::player_cache)
                 {
                     auto &buffer = previous_positions.at(ent->m_IDX - 1);

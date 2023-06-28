@@ -67,7 +67,7 @@ void DrawCheatVisuals()
         {
             auto color = colors::RainbowCurrent();
             color.a    = 1.0f;
-            AddSideString("rosnehook by rosneburgerworks", color);
+            AddSideString("rosnehook by rosneburgerhook", color);
             if (!*info_text_min)
             {
                 AddSideString(hack::GetVersion(), colors::gui);

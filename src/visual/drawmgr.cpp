@@ -15,7 +15,6 @@
 #include <glez/draw.hpp>
 #endif
 #include <settings/Bool.hpp>
-#include <settings/Rgba.hpp>
 #include <menu/GuiInterface.hpp>
 #include "common.hpp"
 #include "visual/drawing.hpp"
@@ -23,11 +22,7 @@
 #include "drawmgr.hpp"
 
 static settings::Boolean info_text{ "hack-info.enable", "true" };
-static settings::Boolean info_text_min{ "hack-info.minimal", "true" };
-static settings::Rgba info_background_color{"hack-info.background", "000000b3"};
-static settings::Rgba info_foreground_color{"hack-info.foreground", "ffffff"};
-static settings::Int info_x{"hack-info.x", "10"};
-static settings::Int info_y{"hack-info.y", "10"};
+static settings::Boolean info_text_min{ "hack-info.minimal", "false" };
 
 void RenderCheatVisuals()
 {
@@ -71,19 +66,16 @@ void DrawCheatVisuals()
         if (*info_text)
         {
             auto color = colors::RainbowCurrent();
-            std::string hack_info_text;
-            if(!info_text_min) {
-                hack_info_text = "Rosnehook InDev | " + hack::GetVersion() + 
-                "\nPress '" + open_gui_button.toString() + "' to open the HUD.";
+            color.a    = 1.0f;
+            AddSideString("rosnehook by rosneburgerhook", color);
+            if (!*info_text_min)
+            {
+                AddSideString(hack::GetVersion(), colors::gui);
+                AddSideString(hack::GetType(), colors::gui);
+#if ENABLE_GUI
+                AddSideString("Press '" + open_gui_button.toString() + "' key to open/close cheat menu.", colors::gui);
+#endif
             }
-            else {
-                hack_info_text = "Rosnehook InDev";
-            }
-            float w, h;
-            fonts::center_screen->stringSize(hack_info_text, &w, &h); // Scale these to size of string
-            // Draw the newer information.
-            draw::Rectangle(*info_x - 5, *info_y - 5, w + 10, h + 10, *info_background_color);
-            draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
         }
     }
     if (spectator_target)
@@ -93,7 +85,7 @@ void DrawCheatVisuals()
         EC::run(EC::Draw);
     }
     if (CE_GOOD(LOCAL_E))
-    {
+    {   
         Prediction_PaintTraverse();
     }
     {

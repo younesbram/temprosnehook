@@ -295,11 +295,6 @@ void CreateMoveEarly()
 
             if (!tick.in_range)
                 continue;
-
-#if ENABLE_VISUALS
-            if (draw)
-                draw_positions.push_back(tick.hitboxes.at(0).center);
-#endif
         }
     }
 }

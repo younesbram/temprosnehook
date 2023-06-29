@@ -174,7 +174,7 @@ inline float ProjectileHitboxSize(int projectile_size)
 
 inline void UpdateShouldBacktrack()
 {
-    if (hacks::backtrack::hasData() || projectile_mode || !(*backtrack_aimbot || force_backtrack_aimbot))
+    if (hacks::backtrack::hasData() || !(*backtrack_aimbot || force_backtrack_aimbot))
         shouldbacktrack_cache = false;
     else
         shouldbacktrack_cache = true;
@@ -761,7 +761,7 @@ bool IsTargetStateGood(CachedEntity *entity)
         cd.hitbox = BestHitbox(entity);
         if (*vischeck_hitboxes && !*multipoint)
         {
-            if (*vischeck_hitboxes == 1 && playerlist::AccessData(entity->player_info->friendsID).state != playerlist::k_EState::RAGE || projectileAimbotRequired && cur_proj_grav > 0.01f)
+            if (*vischeck_hitboxes == 1 && playerlist::AccessData(entity->player_info->friendsID).state != playerlist::k_EState::RAGE)
                 return true;
             else
             {
@@ -949,7 +949,6 @@ Vector PredictEntity(CachedEntity *entity)
     {
     // Player
     case ENTITY_PLAYER:
-        else
         {
             {
                 // Allow multipoint logic to run
@@ -1140,7 +1139,6 @@ CachedEntity *CurrentTarget()
 void Reset()
 {
     target_last     = nullptr;
-    projectile_mode = false;
 }
 
 void RvarCallback(settings::VariableBase<float> &, float after)

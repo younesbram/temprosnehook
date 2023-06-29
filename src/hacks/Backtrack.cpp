@@ -6,20 +6,6 @@ namespace hacks::backtrack
 static settings::Boolean enabled("backtrack.enabled", "false");
 settings::Float latency("backtrack.latency", "0");
 static settings::Int bt_slots("backtrack.slots", "0");
-
-#if ENABLE_VISUALS
-static settings::Boolean draw("backtrack.draw", "false");
-settings::Boolean chams{ "backtrack.chams", "false" };
-settings::Boolean chams_wireframe{ "backtrack.chams.wireframe", "false" };
-settings::Int chams_ticks{ "backtrack.chams.ticks", "1" };
-settings::Rgba chams_color{ "backtrack.chams.color", "ff00ff10" };
-settings::Boolean chams_overlay{ "backtrack.chams.overlay", "true" };
-settings::Rgba chams_color_overlay{ "backtrack.chams.color.overlay", "000000ff" };
-settings::Float chams_envmap_tint_r{ "backtrack.chams.envmap.tint.r", "1" };
-settings::Float chams_envmap_tint_g{ "backtrack.chams.envmap.tint.g", "0" };
-settings::Float chams_envmap_tint_b{ "backtrack.chams.envmap.tint.b", "1" };
-#endif
-
 static bool isEnabled();
 
 #define MAX_BACKTRACK_TICKS 80
@@ -375,26 +361,6 @@ bool backtrackEnabled()
     return isBacktrackEnabled;
 }
 
-#if ENABLE_VISUALS
-void Draw()
-{
-    if (!isBacktrackEnabled || !draw)
-        return;
-
-    if (!g_IEngine->IsInGame())
-        return;
-
-    Vector screen;
-    for (auto &pos : draw_positions)
-    {
-        if (draw::WorldToScreen(pos, screen))
-            draw::Rectangle(screen.x - 2, screen.y - 2, 4, 4, colors::green);
-    }
-    if (red_position && draw::WorldToScreen(*red_position, screen))
-        draw::Rectangle(screen.x - 2, screen.y - 2, 4, 4, colors::red);
-}
-#endif
-
 static InitRoutine init(
     []()
     {
@@ -402,9 +368,6 @@ static InitRoutine init(
         EC::Register(EC::CreateMove, CreateMoveLate, "bt_createmove", EC::very_late);
         EC::Register(EC::Shutdown, Shutdown, "bt_shutdown");
         EC::Register(EC::LevelInit, Shutdown, "bt_shutdown");
-#if ENABLE_VISUALS
-        EC::Register(EC::Draw, Draw, "bt_draw");
-#endif
     });
 
 } // namespace hacks::backtrack

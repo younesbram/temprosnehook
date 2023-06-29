@@ -10,7 +10,7 @@ Cathook, but without bloat.
 
 ## Bloat Removed
 
-Minecraft Health Bar (wtf)
+Minecraft Health Bar (lol)
 
 Spellforcer
 
@@ -18,17 +18,17 @@ Uberspam
 
 Rich Presence Changer
 
-Nullnexus and Identify (broken)
+Nullnexus and Identify (removed)
 
 Startup Sounds
 
-AntiCheat (cheater detection)
+AntiCheat (cheater detection, useless)
 
 And much, much more!
 
 ## Rosnehook Features (just a bit)
 
-#### Rathook Navigation Spin
+#### Navigation Spin
 #### Smoother Look At Path
 #### Green Navigation Draw
 #### Path During Setup on BLU
@@ -36,9 +36,8 @@ And much, much more!
 ## Benefits of Rosnehook (why Rosnehook over Cathook)
 
 #### Much Better Performance
-#### Works on Ubuntu (looking at you nullworks)
 #### Faster Building and other boost related stuff
-#### Better for Catbots (Rosnebots)
+#### CatBots lasts longer
 
 ## Getting started
 

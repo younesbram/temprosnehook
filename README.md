@@ -28,7 +28,7 @@ And much, much more!
 
 ## Rosnehook Features (just a bit)
 
-#### Navigation Spin
+#### Rathook Navigation Spin
 #### Smoother Look At Path
 #### Green Navigation Draw
 #### Path During Setup on BLU
@@ -37,7 +37,7 @@ And much, much more!
 
 #### Much Better Performance
 #### Faster Building and other boost related stuff
-#### CatBots lasts longer
+#### Catbots (Rosnebots) lasts longer
 
 ## Getting started
 

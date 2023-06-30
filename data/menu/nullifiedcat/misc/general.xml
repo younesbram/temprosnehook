@@ -44,6 +44,8 @@
             <AutoVariable width="fill" target="misc.random-name" label="Random name"/>
             <AutoVariable width="fill" target="noisemaker-spam.enable" label="Infinite noisemaker spam"/>
             <AutoVariable width="fill" target="misc.force-halloween" label="Force halloween"/>
+        </List>
+    </Box>
     <Box height="content" width="content" padding="12 6 6 6" name="Region selector" y="250">
         <List width="155">
             <AutoVariable width="fill" target="dc.enable" label="Enable"/>

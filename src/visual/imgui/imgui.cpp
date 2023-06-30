@@ -3104,15 +3104,14 @@ ImVec2 ImGui::CalcTextSize(const char *text, const char *text_end, bool hide_tex
 // Helper to calculate coarse clipping of large list of evenly sized items.
 // NB: Prefer using the ImGuiListClipper higher-level helper if you can! Read comments and instructions there on how those use this sort of pattern.
 // NB: 'items_count' is only used to clamp the result, if you don't know your count you can use INT_MAX
-void ImGui::CalcListClipping(int items_count, float items_height, int *out_items_display_start, int *out_items_display_end)
+void ImGui::CalcListClipping(int items_count, float items_height, int* out_items_display_start, int* out_items_display_end)
 {
-    ImGuiContext &g     = *GImGui;
-    ImGuiWindow *window = g.CurrentWindow;
+    ImGuiContext& g = *GImGui;
+    ImGuiWindow* window = g.CurrentWindow;
     if (g.LogEnabled)
     {
-        // If logging is active, do not perform any clipping
         *out_items_display_start = 0;
-        *out_items_display_end   = items_count;
+        *out_items_display_end = items_count;
         return;
     }
     if (window->SkipItems)
@@ -3121,25 +3120,23 @@ void ImGui::CalcListClipping(int items_count, float items_height, int *out_items
         return;
     }
 
-    // We create the union of the ClipRect and the NavScoringRect which at worst should be 1 page away from ClipRect
     ImRect unclipped_rect = window->ClipRect;
     if (g.NavMoveRequest)
         unclipped_rect.Add(g.NavScoringRectScreen);
 
     const ImVec2 pos = window->DC.CursorPos;
-    int start        = (int) ((unclipped_rect.Min.y - pos.y) / items_height);
-    int end          = (int) ((unclipped_rect.Max.y - pos.y) / items_height);
+    int start = static_cast<int>((unclipped_rect.Min.y - pos.y) / items_height);
+    int end = static_cast<int>((unclipped_rect.Max.y - pos.y) / items_height);
 
-    // When performing a navigation request, ensure we have one item extra in the direction we are moving to
     if (g.NavMoveRequest && g.NavMoveClipDir == ImGuiDir_Up)
         start--;
     if (g.NavMoveRequest && g.NavMoveClipDir == ImGuiDir_Down)
         end++;
 
-    start                    = ImClamp(start, 0, items_count);
-    end                      = ImClamp(end + 1, start, items_count);
+    start = ImClamp(start, 0, items_count);
+    end = ImClamp(end + 1, start, items_count);
     *out_items_display_start = start;
-    *out_items_display_end   = end;
+    *out_items_display_end = end;
 }
 
 // Find window given position, search front-to-back
@@ -3187,20 +3184,16 @@ static void FindHoveredWindow()
 // Test if mouse cursor is hovering given rectangle
 // NB- Rectangle is clipped by our current clip setting
 // NB- Expand the rectangle to be generous on imprecise inputs systems (g.Style.TouchExtraPadding)
-bool ImGui::IsMouseHoveringRect(const ImVec2 &r_min, const ImVec2 &r_max, bool clip)
+bool ImGui::IsMouseHoveringRect(const ImVec2& r_min, const ImVec2& r_max, bool clip)
 {
-    ImGuiContext &g = *GImGui;
+    ImGuiContext& g = *GImGui;
 
-    // Clip
     ImRect rect_clipped(r_min, r_max);
     if (clip)
         rect_clipped.ClipWith(g.CurrentWindow->ClipRect);
 
-    // Expand for touch input
     const ImRect rect_for_touch(rect_clipped.Min - g.Style.TouchExtraPadding, rect_clipped.Max + g.Style.TouchExtraPadding);
-    if (!rect_for_touch.Contains(g.IO.MousePos))
-        return false;
-    return true;
+    return rect_for_touch.Contains(g.IO.MousePos);
 }
 
 int ImGui::GetKeyIndex(ImGuiKey imgui_key)
@@ -3472,10 +3465,12 @@ bool ImGui::IsItemEdited()
 // Allow last item to be overlapped by a subsequent item. Both may be activated during the same frame before the later one takes priority.
 void ImGui::SetItemAllowOverlap()
 {
-    ImGuiContext &g = *GImGui;
-    if (g.HoveredId == g.CurrentWindow->DC.LastItemId)
+    ImGuiContext& g = *GImGui;
+    ImGuiWindow* window = g.CurrentWindow;
+    
+    if (g.HoveredId == window->DC.LastItemId)
         g.HoveredIdAllowOverlap = true;
-    if (g.ActiveId == g.CurrentWindow->DC.LastItemId)
+    if (g.ActiveId == window->DC.LastItemId)
         g.ActiveIdAllowOverlap = true;
 }
 

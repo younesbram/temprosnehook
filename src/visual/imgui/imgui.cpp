@@ -315,31 +315,31 @@ void ImGuiIO::AddInputCharacter(ImWchar c)
     InputQueueCharacters.push_back(c);
 }
 
-void ImGuiIO::AddInputCharactersUTF8(const char* utf8_chars)
+void ImGuiIO::AddInputCharactersUTF8(const char *utf8_chars)
 {
     while (*utf8_chars != 0)
     {
         unsigned int c = 0;
         utf8_chars += ImTextCharFromUtf8(&c, utf8_chars, NULL);
-        if (c <= 0xFFFF)
-            InputQueueCharacters.push_back(static_cast<ImWchar>(c));
+        if (c > 0 && c <= 0xFFFF)
+            InputQueueCharacters.push_back((ImWchar) c);
     }
 }
 
 void ImGuiIO::ClearInputCharacters()
 {
-    InputQueueCharacters.clear();
+    InputQueueCharacters.resize(0);
 }
 
 //-----------------------------------------------------------------------------
 // [SECTION] MISC HELPERS/UTILITIES (Maths, String, Format, Hash, File functions)
 //-----------------------------------------------------------------------------
 
-ImVec2 ImLineClosestPoint(const ImVec2& a, const ImVec2& b, const ImVec2& p)
+ImVec2 ImLineClosestPoint(const ImVec2 &a, const ImVec2 &b, const ImVec2 &p)
 {
-    ImVec2 ap = p - a;
+    ImVec2 ap     = p - a;
     ImVec2 ab_dir = b - a;
-    float dot = ap.x * ab_dir.x + ap.y * ab_dir.y;
+    float dot     = ap.x * ab_dir.x + ap.y * ab_dir.y;
     if (dot < 0.0f)
         return a;
     float ab_len_sqr = ab_dir.x * ab_dir.x + ab_dir.y * ab_dir.y;
@@ -348,26 +348,26 @@ ImVec2 ImLineClosestPoint(const ImVec2& a, const ImVec2& b, const ImVec2& p)
     return a + ab_dir * dot / ab_len_sqr;
 }
 
-bool ImTriangleContainsPoint(const ImVec2& a, const ImVec2& b, const ImVec2& c, const ImVec2& p)
+bool ImTriangleContainsPoint(const ImVec2 &a, const ImVec2 &b, const ImVec2 &c, const ImVec2 &p)
 {
     bool b1 = ((p.x - b.x) * (a.y - b.y) - (p.y - b.y) * (a.x - b.x)) < 0.0f;
     bool b2 = ((p.x - c.x) * (b.y - c.y) - (p.y - c.y) * (b.x - c.x)) < 0.0f;
     bool b3 = ((p.x - a.x) * (c.y - a.y) - (p.y - a.y) * (c.x - a.x)) < 0.0f;
-    return b1 == b2 && b2 == b3;
+    return ((b1 == b2) && (b2 == b3));
 }
 
-void ImTriangleBarycentricCoords(const ImVec2& a, const ImVec2& b, const ImVec2& c, const ImVec2& p, float& out_u, float& out_v, float& out_w)
+void ImTriangleBarycentricCoords(const ImVec2 &a, const ImVec2 &b, const ImVec2 &c, const ImVec2 &p, float &out_u, float &out_v, float &out_w)
 {
-    ImVec2 v0 = b - a;
-    ImVec2 v1 = c - a;
-    ImVec2 v2 = p - a;
-    float denom = v0.x * v1.y - v1.x * v0.y;
-    out_v = (v2.x * v1.y - v1.x * v2.y) / denom;
-    out_w = (v0.x * v2.y - v2.x * v0.y) / denom;
-    out_u = 1.0f - out_v - out_w;
+    ImVec2 v0         = b - a;
+    ImVec2 v1         = c - a;
+    ImVec2 v2         = p - a;
+    const float denom = v0.x * v1.y - v1.x * v0.y;
+    out_v             = (v2.x * v1.y - v1.x * v2.y) / denom;
+    out_w             = (v0.x * v2.y - v2.x * v0.y) / denom;
+    out_u             = 1.0f - out_v - out_w;
 }
 
-ImVec2 ImTriangleClosestPoint(const ImVec2& a, const ImVec2& b, const ImVec2& c, const ImVec2& p)
+ImVec2 ImTriangleClosestPoint(const ImVec2 &a, const ImVec2 &b, const ImVec2 &c, const ImVec2 &p)
 {
     ImVec2 proj_ab = ImLineClosestPoint(a, b, p);
     ImVec2 proj_bc = ImLineClosestPoint(b, c, p);
@@ -375,7 +375,7 @@ ImVec2 ImTriangleClosestPoint(const ImVec2& a, const ImVec2& b, const ImVec2& c,
     float dist2_ab = ImLengthSqr(p - proj_ab);
     float dist2_bc = ImLengthSqr(p - proj_bc);
     float dist2_ca = ImLengthSqr(p - proj_ca);
-    float m = ImMin(dist2_ab, ImMin(dist2_bc, dist2_ca));
+    float m        = ImMin(dist2_ab, ImMin(dist2_bc, dist2_ca));
     if (m == dist2_ab)
         return proj_ab;
     if (m == dist2_bc)
@@ -383,66 +383,63 @@ ImVec2 ImTriangleClosestPoint(const ImVec2& a, const ImVec2& b, const ImVec2& c,
     return proj_ca;
 }
 
-
 // Consider using _stricmp/_strnicmp under Windows or strcasecmp/strncasecmp. We don't actually use either ImStricmp/ImStrnicmp in the codebase any more.
-int ImStricmp(const char* str1, const char* str2)
+int ImStricmp(const char *str1, const char *str2)
 {
-    while (toupper(*str2) == toupper(*str1))
+    int d;
+    while ((d = toupper(*str2) - toupper(*str1)) == 0 && *str1)
     {
-        if (*str1 == '\0')
-            return 0;
         str1++;
         str2++;
     }
-    return toupper(*str2) - toupper(*str1);
+    return d;
 }
 
-int ImStrnicmp(const char* str1, const char* str2, size_t count)
+int ImStrnicmp(const char *str1, const char *str2, size_t count)
 {
-    while (count > 0 && toupper(*str2) == toupper(*str1))
+    int d = 0;
+    while (count > 0 && (d = toupper(*str2) - toupper(*str1)) == 0 && *str1)
     {
-        if (*str1 == '\0')
-            return 0;
         str1++;
         str2++;
         count--;
     }
-    return count == 0 ? 0 : toupper(*str2) - toupper(*str1);
+    return d;
 }
 
-void ImStrncpy(char* dst, const char* src, size_t count)
+void ImStrncpy(char *dst, const char *src, size_t count)
 {
-    if (count > 0)
-    {
+    if (count < 1)
+        return;
+    if (count > 1)
         strncpy(dst, src, count - 1);
-        dst[count - 1] = '\0';
-    }
+    dst[count - 1] = 0;
 }
 
-char* ImStrdup(const char* str)
+char *ImStrdup(const char *str)
 {
     size_t len = strlen(str);
-    void* buf = ImGui::MemAlloc(len + 1);
-    return static_cast<char*>(memcpy(buf, static_cast<const void*>(str), len + 1));
+    void *buf  = ImGui::MemAlloc(len + 1);
+    return (char *) memcpy(buf, (const void *) str, len + 1);
 }
 
-char* ImStrdupcpy(char* dst, size_t* p_dst_size, const char* src)
+char *ImStrdupcpy(char *dst, size_t *p_dst_size, const char *src)
 {
     size_t dst_buf_size = p_dst_size ? *p_dst_size : strlen(dst) + 1;
-    size_t src_size = strlen(src) + 1;
+    size_t src_size     = strlen(src) + 1;
     if (dst_buf_size < src_size)
     {
         ImGui::MemFree(dst);
-        dst = static_cast<char*>(ImGui::MemAlloc(src_size));
+        dst = (char *) ImGui::MemAlloc(src_size);
         if (p_dst_size)
             *p_dst_size = src_size;
     }
-    return static_cast<char*>(memcpy(dst, static_cast<const void*>(src), src_size));
+    return (char *) memcpy(dst, (const void *) src, src_size);
 }
 
-const char* ImStrchrRange(const char* str, const char* str_end, char c)
+const char *ImStrchrRange(const char *str, const char *str_end, char c)
 {
-    const char* p = static_cast<const char*>(memchr(str, static_cast<int>(c), str_end - str));
+    const char *p = (const char *) memchr(str, (int) c, str_end - str);
     return p;
 }
 
@@ -3104,14 +3101,15 @@ ImVec2 ImGui::CalcTextSize(const char *text, const char *text_end, bool hide_tex
 // Helper to calculate coarse clipping of large list of evenly sized items.
 // NB: Prefer using the ImGuiListClipper higher-level helper if you can! Read comments and instructions there on how those use this sort of pattern.
 // NB: 'items_count' is only used to clamp the result, if you don't know your count you can use INT_MAX
-void ImGui::CalcListClipping(int items_count, float items_height, int* out_items_display_start, int* out_items_display_end)
+void ImGui::CalcListClipping(int items_count, float items_height, int *out_items_display_start, int *out_items_display_end)
 {
-    ImGuiContext& g = *GImGui;
-    ImGuiWindow* window = g.CurrentWindow;
+    ImGuiContext &g     = *GImGui;
+    ImGuiWindow *window = g.CurrentWindow;
     if (g.LogEnabled)
     {
+        // If logging is active, do not perform any clipping
         *out_items_display_start = 0;
-        *out_items_display_end = items_count;
+        *out_items_display_end   = items_count;
         return;
     }
     if (window->SkipItems)
@@ -3120,23 +3118,25 @@ void ImGui::CalcListClipping(int items_count, float items_height, int* out_items
         return;
     }
 
+    // We create the union of the ClipRect and the NavScoringRect which at worst should be 1 page away from ClipRect
     ImRect unclipped_rect = window->ClipRect;
     if (g.NavMoveRequest)
         unclipped_rect.Add(g.NavScoringRectScreen);
 
     const ImVec2 pos = window->DC.CursorPos;
-    int start = static_cast<int>((unclipped_rect.Min.y - pos.y) / items_height);
-    int end = static_cast<int>((unclipped_rect.Max.y - pos.y) / items_height);
+    int start        = (int) ((unclipped_rect.Min.y - pos.y) / items_height);
+    int end          = (int) ((unclipped_rect.Max.y - pos.y) / items_height);
 
+    // When performing a navigation request, ensure we have one item extra in the direction we are moving to
     if (g.NavMoveRequest && g.NavMoveClipDir == ImGuiDir_Up)
         start--;
     if (g.NavMoveRequest && g.NavMoveClipDir == ImGuiDir_Down)
         end++;
 
-    start = ImClamp(start, 0, items_count);
-    end = ImClamp(end + 1, start, items_count);
+    start                    = ImClamp(start, 0, items_count);
+    end                      = ImClamp(end + 1, start, items_count);
     *out_items_display_start = start;
-    *out_items_display_end = end;
+    *out_items_display_end   = end;
 }
 
 // Find window given position, search front-to-back
@@ -3184,16 +3184,20 @@ static void FindHoveredWindow()
 // Test if mouse cursor is hovering given rectangle
 // NB- Rectangle is clipped by our current clip setting
 // NB- Expand the rectangle to be generous on imprecise inputs systems (g.Style.TouchExtraPadding)
-bool ImGui::IsMouseHoveringRect(const ImVec2& r_min, const ImVec2& r_max, bool clip)
+bool ImGui::IsMouseHoveringRect(const ImVec2 &r_min, const ImVec2 &r_max, bool clip)
 {
-    ImGuiContext& g = *GImGui;
+    ImGuiContext &g = *GImGui;
 
+    // Clip
     ImRect rect_clipped(r_min, r_max);
     if (clip)
         rect_clipped.ClipWith(g.CurrentWindow->ClipRect);
 
+    // Expand for touch input
     const ImRect rect_for_touch(rect_clipped.Min - g.Style.TouchExtraPadding, rect_clipped.Max + g.Style.TouchExtraPadding);
-    return rect_for_touch.Contains(g.IO.MousePos);
+    if (!rect_for_touch.Contains(g.IO.MousePos))
+        return false;
+    return true;
 }
 
 int ImGui::GetKeyIndex(ImGuiKey imgui_key)
@@ -3465,12 +3469,10 @@ bool ImGui::IsItemEdited()
 // Allow last item to be overlapped by a subsequent item. Both may be activated during the same frame before the later one takes priority.
 void ImGui::SetItemAllowOverlap()
 {
-    ImGuiContext& g = *GImGui;
-    ImGuiWindow* window = g.CurrentWindow;
-    
-    if (g.HoveredId == window->DC.LastItemId)
+    ImGuiContext &g = *GImGui;
+    if (g.HoveredId == g.CurrentWindow->DC.LastItemId)
         g.HoveredIdAllowOverlap = true;
-    if (g.ActiveId == window->DC.LastItemId)
+    if (g.ActiveId == g.CurrentWindow->DC.LastItemId)
         g.ActiveIdAllowOverlap = true;
 }   
 

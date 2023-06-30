@@ -315,31 +315,31 @@ void ImGuiIO::AddInputCharacter(ImWchar c)
     InputQueueCharacters.push_back(c);
 }
 
-void ImGuiIO::AddInputCharactersUTF8(const char *utf8_chars)
+void ImGuiIO::AddInputCharactersUTF8(const char* utf8_chars)
 {
     while (*utf8_chars != 0)
     {
         unsigned int c = 0;
         utf8_chars += ImTextCharFromUtf8(&c, utf8_chars, NULL);
-        if (c > 0 && c <= 0xFFFF)
-            InputQueueCharacters.push_back((ImWchar) c);
+        if (c <= 0xFFFF)
+            InputQueueCharacters.push_back(static_cast<ImWchar>(c));
     }
 }
 
 void ImGuiIO::ClearInputCharacters()
 {
-    InputQueueCharacters.resize(0);
+    InputQueueCharacters.clear();
 }
 
 //-----------------------------------------------------------------------------
 // [SECTION] MISC HELPERS/UTILITIES (Maths, String, Format, Hash, File functions)
 //-----------------------------------------------------------------------------
 
-ImVec2 ImLineClosestPoint(const ImVec2 &a, const ImVec2 &b, const ImVec2 &p)
+ImVec2 ImLineClosestPoint(const ImVec2& a, const ImVec2& b, const ImVec2& p)
 {
-    ImVec2 ap     = p - a;
+    ImVec2 ap = p - a;
     ImVec2 ab_dir = b - a;
-    float dot     = ap.x * ab_dir.x + ap.y * ab_dir.y;
+    float dot = ap.x * ab_dir.x + ap.y * ab_dir.y;
     if (dot < 0.0f)
         return a;
     float ab_len_sqr = ab_dir.x * ab_dir.x + ab_dir.y * ab_dir.y;
@@ -348,26 +348,26 @@ ImVec2 ImLineClosestPoint(const ImVec2 &a, const ImVec2 &b, const ImVec2 &p)
     return a + ab_dir * dot / ab_len_sqr;
 }
 
-bool ImTriangleContainsPoint(const ImVec2 &a, const ImVec2 &b, const ImVec2 &c, const ImVec2 &p)
+bool ImTriangleContainsPoint(const ImVec2& a, const ImVec2& b, const ImVec2& c, const ImVec2& p)
 {
     bool b1 = ((p.x - b.x) * (a.y - b.y) - (p.y - b.y) * (a.x - b.x)) < 0.0f;
     bool b2 = ((p.x - c.x) * (b.y - c.y) - (p.y - c.y) * (b.x - c.x)) < 0.0f;
     bool b3 = ((p.x - a.x) * (c.y - a.y) - (p.y - a.y) * (c.x - a.x)) < 0.0f;
-    return ((b1 == b2) && (b2 == b3));
+    return b1 == b2 && b2 == b3;
 }
 
-void ImTriangleBarycentricCoords(const ImVec2 &a, const ImVec2 &b, const ImVec2 &c, const ImVec2 &p, float &out_u, float &out_v, float &out_w)
+void ImTriangleBarycentricCoords(const ImVec2& a, const ImVec2& b, const ImVec2& c, const ImVec2& p, float& out_u, float& out_v, float& out_w)
 {
-    ImVec2 v0         = b - a;
-    ImVec2 v1         = c - a;
-    ImVec2 v2         = p - a;
-    const float denom = v0.x * v1.y - v1.x * v0.y;
-    out_v             = (v2.x * v1.y - v1.x * v2.y) / denom;
-    out_w             = (v0.x * v2.y - v2.x * v0.y) / denom;
-    out_u             = 1.0f - out_v - out_w;
+    ImVec2 v0 = b - a;
+    ImVec2 v1 = c - a;
+    ImVec2 v2 = p - a;
+    float denom = v0.x * v1.y - v1.x * v0.y;
+    out_v = (v2.x * v1.y - v1.x * v2.y) / denom;
+    out_w = (v0.x * v2.y - v2.x * v0.y) / denom;
+    out_u = 1.0f - out_v - out_w;
 }
 
-ImVec2 ImTriangleClosestPoint(const ImVec2 &a, const ImVec2 &b, const ImVec2 &c, const ImVec2 &p)
+ImVec2 ImTriangleClosestPoint(const ImVec2& a, const ImVec2& b, const ImVec2& c, const ImVec2& p)
 {
     ImVec2 proj_ab = ImLineClosestPoint(a, b, p);
     ImVec2 proj_bc = ImLineClosestPoint(b, c, p);
@@ -375,7 +375,7 @@ ImVec2 ImTriangleClosestPoint(const ImVec2 &a, const ImVec2 &b, const ImVec2 &c,
     float dist2_ab = ImLengthSqr(p - proj_ab);
     float dist2_bc = ImLengthSqr(p - proj_bc);
     float dist2_ca = ImLengthSqr(p - proj_ca);
-    float m        = ImMin(dist2_ab, ImMin(dist2_bc, dist2_ca));
+    float m = ImMin(dist2_ab, ImMin(dist2_bc, dist2_ca));
     if (m == dist2_ab)
         return proj_ab;
     if (m == dist2_bc)
@@ -383,63 +383,66 @@ ImVec2 ImTriangleClosestPoint(const ImVec2 &a, const ImVec2 &b, const ImVec2 &c,
     return proj_ca;
 }
 
+
 // Consider using _stricmp/_strnicmp under Windows or strcasecmp/strncasecmp. We don't actually use either ImStricmp/ImStrnicmp in the codebase any more.
-int ImStricmp(const char *str1, const char *str2)
+int ImStricmp(const char* str1, const char* str2)
 {
-    int d;
-    while ((d = toupper(*str2) - toupper(*str1)) == 0 && *str1)
+    while (toupper(*str2) == toupper(*str1))
     {
+        if (*str1 == '\0')
+            return 0;
         str1++;
         str2++;
     }
-    return d;
+    return toupper(*str2) - toupper(*str1);
 }
 
-int ImStrnicmp(const char *str1, const char *str2, size_t count)
+int ImStrnicmp(const char* str1, const char* str2, size_t count)
 {
-    int d = 0;
-    while (count > 0 && (d = toupper(*str2) - toupper(*str1)) == 0 && *str1)
+    while (count > 0 && toupper(*str2) == toupper(*str1))
     {
+        if (*str1 == '\0')
+            return 0;
         str1++;
         str2++;
         count--;
     }
-    return d;
+    return count == 0 ? 0 : toupper(*str2) - toupper(*str1);
 }
 
-void ImStrncpy(char *dst, const char *src, size_t count)
+void ImStrncpy(char* dst, const char* src, size_t count)
 {
-    if (count < 1)
-        return;
-    if (count > 1)
+    if (count > 0)
+    {
         strncpy(dst, src, count - 1);
-    dst[count - 1] = 0;
+        dst[count - 1] = '\0';
+    }
 }
 
-char *ImStrdup(const char *str)
+char* ImStrdup(const char* str)
 {
     size_t len = strlen(str);
-    void *buf  = ImGui::MemAlloc(len + 1);
-    return (char *) memcpy(buf, (const void *) str, len + 1);
+    void* buf = ImGui::MemAlloc(len + 1);
+    return static_cast<char*>(memcpy(buf, static_cast<const void*>(str), len + 1));
 }
 
-char *ImStrdupcpy(char *dst, size_t *p_dst_size, const char *src)
+char* ImStrdupcpy(char* dst, size_t* p_dst_size, const char* src)
 {
     size_t dst_buf_size = p_dst_size ? *p_dst_size : strlen(dst) + 1;
-    size_t src_size     = strlen(src) + 1;
+    size_t src_size = strlen(src) + 1;
     if (dst_buf_size < src_size)
     {
         ImGui::MemFree(dst);
-        dst = (char *) ImGui::MemAlloc(src_size);
+        dst = static_cast<char*>(ImGui::MemAlloc(src_size));
         if (p_dst_size)
             *p_dst_size = src_size;
     }
-    return (char *) memcpy(dst, (const void *) src, src_size);
+    return static_cast<char*>(memcpy(dst, static_cast<const void*>(src), src_size));
 }
 
-const char *ImStrchrRange(const char *str, const char *str_end, char c)
+const char* ImStrchrRange(const char* str, const char* str_end, char c)
 {
-    const char *p = (const char *) memchr(str, (int) c, str_end - str);
+    const char* p = static_cast<const char*>(memchr(str, static_cast<int>(c), str_end - str));
     return p;
 }
 

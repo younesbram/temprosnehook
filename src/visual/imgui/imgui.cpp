@@ -3472,7 +3472,7 @@ void ImGui::SetItemAllowOverlap()
         g.HoveredIdAllowOverlap = true;
     if (g.ActiveId == window->DC.LastItemId)
         g.ActiveIdAllowOverlap = true;
-}
+}   
 
 ImVec2 ImGui::GetItemRectMin()
 {

@@ -22,7 +22,6 @@
             <AutoVariable width="fill" target="misc.show-spectators" label="Show spectators"/>
             <AutoVariable width="fill" target="misc.auto-abandon" label="Auto abandon"/>
             <AutoVariable width="fill" target="misc.auto-balance-spam" label="Auto-balance spam"/>
-            <AutoVariable width="fill" target="misc.die-if-vac" label="Crash on VAC"/>
         </List>
     </Box>
     <Box height="content" width="content" padding="12 6 6 6" name="Exploits" x="166">

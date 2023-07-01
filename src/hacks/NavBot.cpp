@@ -1229,11 +1229,10 @@ std::optional<Vector> getPayloadGoal(int our_team)
     current_capturetype = payload;
 
     // Adjust position, so it's not floating high up, provided the local player is close.
-    if (LOCAL_E->m_vecOrigin().DistToSqr(*position) <= SQR(150.0f))
-        (*position).z = LOCAL_E->m_vecOrigin().z;
+    if (g_pLocalPlayer->v_Origin.DistToSqr(*position) <= Sqr(150.0f))
+        position->z = LOCAL_E->m_vecOrigin().z;
     // If close enough, don't move (mostly due to lifts)
-    if ((*position).DistToSqr(LOCAL_E->m_vecOrigin()) <= SQR(50.0f))
-    {
+    if (position->DistToSqr(g_pLocalPlayer->v_Origin) <= Sqr(50.0f))    {
         overwrite_capture = true;
         return std::nullopt;
     }
@@ -1250,7 +1249,7 @@ std::optional<Vector> getControlPointGoal(int our_team)
 
     current_capturetype = controlpoints;
     // If close enough, don't move
-    if ((*position).DistToSqr(LOCAL_E->m_vecOrigin()) <= SQR(50.0f))
+    if (position->DistToSqr(LOCAL_E->m_vecOrigin()) <= Sqr(50.0f))
     {
         overwrite_capture = true;
         return std::nullopt;
@@ -1265,7 +1264,7 @@ bool captureObjectives()
     static Timer capture_timer;
     static Vector previous_target(0.0f);
 
-    if (!*capture_objectives || g_pGameRules->m_bInWaitingForPlayers || g_pGameRules->m_bPlayingSpecialDeliveryMode || !capture_timer.check(2000))
+    if (!*capture_objectives || g_pGameRules->m_iRoundState == 5 || g_pGameRules->m_bInWaitingForPlayers || g_pGameRules->m_bPlayingSpecialDeliveryMode || !capture_timer.check(2000))
         return false;
 
     // Priority too high, don't try
@@ -1335,7 +1334,7 @@ bool doRoam()
         target = getControlPointGoal(enemy_team);
     if (target)
     {
-        if ((*target).DistToSqr(g_pLocalPlayer->v_Origin) <= SQR(250.0f))
+    if (target->DistToSqr(g_pLocalPlayer->v_Origin) <= Sqr(250.0f))
         {
             navparser::NavEngine::cancelPath();
             return true;

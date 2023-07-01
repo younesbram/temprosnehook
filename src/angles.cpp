@@ -46,7 +46,7 @@ float angle_data_s::deviation(int steps) const
     }
     if (hy > 180)
         hy = 360 - hy;
-    return FastSqrt(SQR(hx) + SQR(hy));
+    return std::hypot(hx, hy);
 }
 
 void Update()

@@ -394,7 +394,7 @@ public:
                     Vector area = i.m_center;
                     area.z += PLAYER_JUMP_HEIGHT;
                     // Out of range
-                    if (building_origin.DistToSqr(area) > Sqr(1100 + HALF_PLAYER_WIDTH))
+                    if (building_origin.DistToSqr(area) > SQR(1100 + HALF_PLAYER_WIDTH))
                         continue;
                     // Check if sentry can see us
                     if (!IsVectorVisibleNavigation(building_origin, area))
@@ -470,14 +470,8 @@ bool isReady()
         return false;
 
     std::string level_name = GetLevelName();
-
-    bool game_ready             = *enabled && map && map->state == NavState::Active;
-    bool level_ready            = level_name == "plr_pipeline" || g_pGameRules->m_iRoundState > 3;
-    bool in_setup               = g_pGameRules->m_bInSetup && g_pLocalPlayer->team == TEAM_BLU;
-    // FIXME: If we're on a control point map, and blue is the attacking team, then the gates are closed, so we shouldn't path
-    bool in_waiting_for_players = g_pGameRules->m_bInWaitingForPlayers;
-
-    return game_ready && level_ready && !in_setup && !in_waiting_for_players;
+    return *enabled && map && map->state == NavState::Active &&
+           (level_name == "plr_pipeline" || g_pGameRules->m_iRoundState > 3);
 }
 
 bool isPathing()
@@ -644,7 +638,7 @@ static void followCrumbs()
         current_vec.z = g_pLocalPlayer->v_Origin.z;
 
     // We are close enough to the crumb to have reached it
-    if (current_vec.DistTo(g_pLocalPlayer->v_Origin) < 50)
+    if (current_vec.DistToSqr(g_pLocalPlayer->v_Origin) < Sqr(50.0f))
     {
         last_crumb = crumbs[0];
         crumbs.erase(crumbs.begin());

@@ -123,7 +123,7 @@ std::vector<CachedEntity *> getDispensers()
 
         // This fixes the fact that players can just place dispensers in unreachable locations
         auto local_nav = navparser::NavEngine::findClosestNavSquare(ent->m_vecOrigin());
-        if (local_nav->getNearestPoint(ent->m_vecOrigin().AsVector2D()).DistToSqr(ent->m_vecOrigin()) > Sqr(300.0f) || local_nav->getNearestPoint(ent->m_vecOrigin().AsVector2D()).z - ent->m_vecOrigin().z > navparser::PLAYER_JUMP_HEIGHT)
+        if (local_nav->getNearestPoint(ent->m_vecOrigin().AsVector2D()).DistToSqr(ent->m_vecOrigin()) > SQR(300.0f) || local_nav->getNearestPoint(ent->m_vecOrigin().AsVector2D()).z - ent->m_vecOrigin().z > navparser::PLAYER_JUMP_HEIGHT)
             continue;
         entities.push_back(ent);
     }
@@ -271,7 +271,7 @@ std::pair<CachedEntity *, float> getNearestPlayerDistance()
         const auto ent_origin = *ent->m_vecDormantOrigin();
         const auto dist_sq    = g_pLocalPlayer->v_Origin.DistToSqr(ent_origin);
 
-        if (dist_sq >= Sqr(distance))
+        if (dist_sq >= SQR(distance))
             continue;
 
         distance = FastSqrt(dist_sq);
@@ -1229,10 +1229,11 @@ std::optional<Vector> getPayloadGoal(int our_team)
     current_capturetype = payload;
 
     // Adjust position, so it's not floating high up, provided the local player is close.
-    if (g_pLocalPlayer->v_Origin.DistToSqr(*position) <= Sqr(150.0f))
-        position->z = LOCAL_E->m_vecOrigin().z;
+    if (LOCAL_E->m_vecOrigin().DistToSqr(*position) <= SQR(150.0f))
+        (*position).z = LOCAL_E->m_vecOrigin().z;
     // If close enough, don't move (mostly due to lifts)
-    if (position->DistToSqr(g_pLocalPlayer->v_Origin) <= Sqr(50.0f))    {
+    if ((*position).DistToSqr(LOCAL_E->m_vecOrigin()) <= SQR(50.0f))
+    {
         overwrite_capture = true;
         return std::nullopt;
     }
@@ -1249,7 +1250,7 @@ std::optional<Vector> getControlPointGoal(int our_team)
 
     current_capturetype = controlpoints;
     // If close enough, don't move
-    if (position->DistToSqr(LOCAL_E->m_vecOrigin()) <= Sqr(50.0f))
+    if ((*position).DistToSqr(LOCAL_E->m_vecOrigin()) <= SQR(50.0f))
     {
         overwrite_capture = true;
         return std::nullopt;
@@ -1264,7 +1265,7 @@ bool captureObjectives()
     static Timer capture_timer;
     static Vector previous_target(0.0f);
 
-    if (!*capture_objectives || g_pGameRules->m_iRoundState == 5 || g_pGameRules->m_bInWaitingForPlayers || g_pGameRules->m_bPlayingSpecialDeliveryMode || !capture_timer.check(2000))
+    if (!*capture_objectives || g_pGameRules->m_bInWaitingForPlayers || g_pGameRules->m_bPlayingSpecialDeliveryMode || !capture_timer.check(2000))
         return false;
 
     // Priority too high, don't try
@@ -1334,7 +1335,7 @@ bool doRoam()
         target = getControlPointGoal(enemy_team);
     if (target)
     {
-    if (target->DistToSqr(g_pLocalPlayer->v_Origin) <= Sqr(250.0f))
+        if ((*target).DistToSqr(g_pLocalPlayer->v_Origin) <= SQR(250.0f))
         {
             navparser::NavEngine::cancelPath();
             return true;

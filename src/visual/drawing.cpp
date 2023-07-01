@@ -283,7 +283,7 @@ void Line(float x1, float y1, float x2_offset, float y2_offset, rgba_t color, fl
         x1 += 0.5f;
         y1 += 0.5f;
 
-        float length = FastSqrt(Sqr(x2_offset) + Sqr(y2_offset));
+        float length = FastSqrt(SQR(x2_offset) + SQR(y2_offset));
         x2_offset *= (length - 1.0f) / length;
         y2_offset *= (length - 1.0f) / length;
 

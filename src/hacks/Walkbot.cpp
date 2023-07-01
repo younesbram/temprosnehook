@@ -156,7 +156,7 @@ float distance_2d(Vector &xyz)
 {
     float dx = xyz.x - g_pLocalPlayer->v_Origin.x;
     float dy = xyz.y - g_pLocalPlayer->v_Origin.y;
-    return FastSqrt(SQR(dx) + SQR(dy));
+    return FastSqrt(Sqr(dx) + Sqr(dy));
 }
 
 namespace state

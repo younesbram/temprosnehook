@@ -123,7 +123,7 @@ std::vector<CachedEntity *> getDispensers()
 
         // This fixes the fact that players can just place dispensers in unreachable locations
         auto local_nav = navparser::NavEngine::findClosestNavSquare(ent->m_vecOrigin());
-        if (local_nav->getNearestPoint(ent->m_vecOrigin().AsVector2D()).DistToSqr(ent->m_vecOrigin()) > SQR(300.0f) || local_nav->getNearestPoint(ent->m_vecOrigin().AsVector2D()).z - ent->m_vecOrigin().z > navparser::PLAYER_JUMP_HEIGHT)
+        if (local_nav->getNearestPoint(ent->m_vecOrigin().AsVector2D()).DistToSqr(ent->m_vecOrigin()) > Sqr(300.0f) || local_nav->getNearestPoint(ent->m_vecOrigin().AsVector2D()).z - ent->m_vecOrigin().z > navparser::PLAYER_JUMP_HEIGHT)
             continue;
         entities.push_back(ent);
     }
@@ -271,7 +271,7 @@ std::pair<CachedEntity *, float> getNearestPlayerDistance()
         const auto ent_origin = *ent->m_vecDormantOrigin();
         const auto dist_sq    = g_pLocalPlayer->v_Origin.DistToSqr(ent_origin);
 
-        if (dist_sq >= SQR(distance))
+        if (dist_sq >= Sqr(distance))
             continue;
 
         distance = FastSqrt(dist_sq);

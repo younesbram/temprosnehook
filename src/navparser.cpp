@@ -394,7 +394,7 @@ public:
                     Vector area = i.m_center;
                     area.z += PLAYER_JUMP_HEIGHT;
                     // Out of range
-                    if (building_origin.DistToSqr(area) > SQR(1100 + HALF_PLAYER_WIDTH))
+                    if (building_origin.DistToSqr(area) > Sqr(1100 + HALF_PLAYER_WIDTH))
                         continue;
                     // Check if sentry can see us
                     if (!IsVectorVisibleNavigation(building_origin, area))

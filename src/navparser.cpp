@@ -470,8 +470,6 @@ bool isReady()
         return false;
 
     std::string level_name = GetLevelName();
-    return *enabled && map && map->state == NavState::Active &&
-           (level_name == "plr_pipeline" || g_pGameRules->m_iRoundState > 3);
 }
 
 bool isPathing()

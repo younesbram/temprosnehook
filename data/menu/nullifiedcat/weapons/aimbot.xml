@@ -25,8 +25,6 @@
             <AutoVariable width="fill" target="aimbot.can-shoot-only" label="Only shoot when able"/>
             <AutoVariable width="fill" target="aimbot.zoomed-only" label="Zoomed only"
                           tooltip="If applicable, the aimbot will only shoot if you are scoped in."/>
-            <AutoVariable width="fill" target="aimbot.assistance.only" label="Assistance only"
-                          tooltip="Aimbot will only activate if your mouse has moved in the last half second."/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Target selection" x="170">

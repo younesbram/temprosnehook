@@ -1265,7 +1265,7 @@ bool captureObjectives()
     static Timer capture_timer;
     static Vector previous_target(0.0f);
 
-    if (!*capture_objectives || g_pGameRules->m_iRoundState == 5 || g_pGameRules->m_bInWaitingForPlayers || g_pGameRules->m_bPlayingSpecialDeliveryMode || !capture_timer.check(2000))
+    if (!*capture_objectives || g_pGameRules->m_bInWaitingForPlayers || g_pGameRules->m_bPlayingSpecialDeliveryMode || !capture_timer.check(2000))
         return false;
 
     // Priority too high, don't try

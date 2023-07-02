@@ -80,9 +80,6 @@ bool enable;
 int previous_x, previous_y;
 int current_x, current_y;
 
-float last_mouse_check = 0;
-float stop_moving_time = 0;
-
 // Used to make rapidfire not knock your enemies out of range
 unsigned last_target_ignore_timer = 0;
 bool shouldbacktrack_cache = false;
@@ -508,24 +505,6 @@ static void CreateMoveWarp()
     else if (!hacks::warp::in_rapidfire)
         CreateMove();
 }
-
-#if ENABLE_VISUALS
-bool MouseMoving()
-{
-    if (SERVER_TIME - last_mouse_check < 0.02)
-        SDL_GetMouseState(&previous_x, &previous_y);
-    else
-    {
-        SDL_GetMouseState(&current_x, &current_y);
-        last_mouse_check = SERVER_TIME;
-    }
-
-    if (previous_x != current_x || previous_y != current_y)
-        stop_moving_time = SERVER_TIME + 0.5;
-
-    return SERVER_TIME <= stop_moving_time;
-}
-#endif
 
 // The first check to see if the player should aim in the first place
 bool ShouldAim()

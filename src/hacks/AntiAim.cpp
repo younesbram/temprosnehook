@@ -228,17 +228,6 @@ bool ShouldAA(CUserCmd *cmd)
         return false;
     int classid = LOCAL_W->m_iClassID();
     auto mode   = GetWeaponMode();
-    switch (mode)
-    {
-    case weapon_melee:
-        if (g_pLocalPlayer->weapon_melee_damage_tick)
-            return false;
-        // Spy knife needs special treatment. There is no delay between IN_ATTACK and a hit
-        if (g_pLocalPlayer->clazz == tf_class::tf_spy && cmd->buttons & IN_ATTACK && CanShoot())
-            return false;
-    default:
-        break;
-    }
     if (safe_space)
     {
         safe_space--;

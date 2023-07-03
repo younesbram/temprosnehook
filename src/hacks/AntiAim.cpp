@@ -224,8 +224,6 @@ void SendNetMessage(INetMessage &msg)
 
 bool ShouldAA(CUserCmd *cmd)
 {
-    if (hacks::antibackstab::noaa)
-        return false;
     if (cmd->buttons & IN_USE)
         return false;
     int classid = LOCAL_W->m_iClassID();

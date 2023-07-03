@@ -56,12 +56,4 @@
             </List>
         </Box>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Anti-backstab" x="410" y="200">
-        <List width="165">
-            <AutoVariable width="fill" target="antibackstab.enable" label="Enable anti-backstab"/>
-            <AutoVariable width="fill" target="antibackstab.angle" label="Detection angle"/>
-            <AutoVariable width="fill" target="antibackstab.distance" label="Detection distance"/>
-            <AutoVariable width="fill" target="antibackstab.silent" label="Silent"/>
-        </List>
-    </Box>
 </Tab>

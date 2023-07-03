@@ -228,16 +228,6 @@ bool ShouldAA(CUserCmd *cmd)
         return false;
     int classid = LOCAL_W->m_iClassID();
     auto mode   = GetWeaponMode();
-    if (!(classid == CL_CLASS(CTFCompoundBow) || mode == weapon_melee) && CanShoot() && (cmd->buttons & IN_ATTACK))
-    {
-        return false;
-    }
-    if (classid == CL_CLASS(CTFLunchBox) && (cmd->buttons & IN_ATTACK2))
-        return false;
-    if (classid == CL_CLASS(CTFGrapplingHook) && !g_pLocalPlayer->bAttackLastTick && (cmd->buttons & IN_ATTACK))
-    {
-        SetSafeSpace(2);
-    }
     switch (mode)
     {
     case weapon_melee:

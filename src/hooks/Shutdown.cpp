@@ -24,7 +24,6 @@ DEFINE_HOOKED_METHOD(Shutdown, void, INetChannel *this_, const char *reason)
 {
     g_Settings.bInvalid = true;
     logging::Info("Disconnect: %s", reason);
-    }
 #if ENABLE_IPC
     ipc::UpdateServerAddress(true);
 #endif

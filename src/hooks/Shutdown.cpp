@@ -24,11 +24,6 @@ DEFINE_HOOKED_METHOD(Shutdown, void, INetChannel *this_, const char *reason)
 {
     g_Settings.bInvalid = true;
     logging::Info("Disconnect: %s", reason);
-    if (strstr(reason, "banned") || strstr(reason, "Generic_Kicked") && tfmm::IsMMBanned())
-    {
-        logging::Info("VAC/Matchmaking banned");
-        *(int *) nullptr = 0;
-        exit(1);
     }
 #if ENABLE_IPC
     ipc::UpdateServerAddress(true);

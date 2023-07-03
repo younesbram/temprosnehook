@@ -10,13 +10,14 @@
 #include <hacks/AntiAim.hpp>
 
 #include "common.hpp"
-namespace hacks::shared::antiaim
+
+namespace hacks::antiaim
 {
 bool force_fakelag = false;
 float used_yaw     = 0.0f;
-static settings::Boolean enable{ "antiaim.enable", "0" };
+static settings::Boolean enable{ "antiaim.enable", "false" };
 
-static settings::Boolean no_clamping{ "antiaim.no-clamp", "0" };
+static settings::Boolean no_clamping{ "antiaim.no-clamp", "false" };
 static settings::Float roll{ "antiaim.roll", "0" };
 static settings::Float spin{ "antiaim.spin-speed", "10" };
 
@@ -29,7 +30,7 @@ static settings::Float yaw_fake_static{ "antiaim.yaw.fake.static", "0" };
 static settings::Int yaw_real{ "antiaim.yaw.real", "0" };
 static settings::Float yaw_real_static{ "antiaim.yaw.real.static", "0" };
 
-static settings::Boolean aaaa_enable{ "antiaim.aaaa.enable", "0" };
+static settings::Boolean aaaa_enable{ "antiaim.aaaa.enable", "false" };
 static settings::Float aaaa_interval{ "antiaim.aaaa.interval.seconds", "0" };
 static settings::Float aaaa_interval_random_high{ "antiaim.aaaa.interval.random-high", "10" };
 static settings::Float aaaa_interval_random_low{ "antiaim.aaaa.interval.random-low", "2" };
@@ -41,10 +42,7 @@ static settings::Int yaw_sideways_min{ "antiaim.yaw.sideways.min", "0" };
 static settings::Int yaw_sideways_max{ "antiaim.yaw.sideways.max", "4" };
 
 // Two values for fake and real angles
-float cur_yaw[2] = {
-	0.0f,
-	0.0f
-};
+float cur_yaw[2] = { 0.0f, 0.0f };
 
 int safe_space = 0;
 
@@ -72,13 +70,9 @@ float GetAAAAPitch()
 float GetAAAATimerLength()
 {
     if (aaaa_interval)
-    {
         return (float) aaaa_interval;
-    }
     else
-    {
         return RandFloatRange((float) aaaa_interval_random_low, (float) aaaa_interval_random_high);
-    }
 }
 
 void NextAAAA()
@@ -215,7 +209,7 @@ void SendNetMessage(INetMessage &msg)
     if (!enable)
         return;
 
-    if(!((KeyValues *) (((unsigned *) &msg)[4])))
+    if (!((KeyValues *) (((unsigned *) &msg)[4])))
         return;
 
     auto name = ((KeyValues *) (((unsigned *) &msg)[4]))->GetName();
@@ -234,10 +228,36 @@ bool ShouldAA(CUserCmd *cmd)
         return false;
     int classid = LOCAL_W->m_iClassID();
     auto mode   = GetWeaponMode();
-    if ((cmd->buttons & IN_ATTACK) && (classid == CL_CLASS(CTFCompoundBow) || mode == weapon_melee)) && CanShoot())
+    if (!(classid == CL_CLASS(CTFCompoundBow) || mode == weapon_melee) && CanShoot() && (cmd->buttons & IN_ATTACK))
     {
         return false;
     }
+    if (classid == CL_CLASS(CTFLunchBox) && (cmd->buttons & IN_ATTACK2))
+        return false;
+    if (classid == CL_CLASS(CTFGrapplingHook) && !g_pLocalPlayer->bAttackLastTick && (cmd->buttons & IN_ATTACK))
+    {
+        SetSafeSpace(2);
+    }
+    switch (mode)
+    {
+    case weapon_projectile:
+        if (classid == CL_CLASS(CTFCompoundBow))
+        {
+            if (!(cmd->buttons & IN_ATTACK))
+            {
+                if (g_pLocalPlayer->bAttackLastTick)
+                    SetSafeSpace(4);
+            }
+            break;
+        }
+        [[fallthrough]];
+    case weapon_throwable:
+        if ((cmd->buttons & (IN_ATTACK | IN_ATTACK2)) || g_pLocalPlayer->bAttackLastTick)
+        {
+            SetSafeSpace(8);
+            return false;
+        }
+        break;
     case weapon_melee:
         if (g_pLocalPlayer->weapon_melee_damage_tick)
             return false;
@@ -281,7 +301,7 @@ float edgeDistance(float edgeRayYaw)
     // trace::g_pFilterNoPlayer to only focus on the enviroment
     g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_no_player, &trace);
     // Pythagorean theorem to calculate distance
-    float edgeDistance = (sqrt(pow(trace.startpos.x - trace.endpos.x, 2) + pow(trace.startpos.y - trace.endpos.y, 2)));
+    float edgeDistance = FastSqrt(pow(trace.startpos.x - trace.endpos.x, 2) + pow(trace.startpos.y - trace.endpos.y, 2));
     return edgeDistance;
 }
 
@@ -294,14 +314,13 @@ bool findEdge(float edgeOrigYaw)
     float edgeRightDist = edgeDistance(edgeOrigYaw + 21);
     edgeRightDist       = edgeRightDist + edgeDistance(edgeOrigYaw + 27);
 
-    // If the distance is too far, then set the distance to max so the angle
-    // isnt used
+    // If the distance is too far, then set the distance to max so the angle isn't used
     if (edgeLeftDist >= 260)
         edgeLeftDist = 999999999;
     if (edgeRightDist >= 260)
         edgeRightDist = 999999999;
 
-    // If none of the vectors found a wall, then dont edge
+    // If none of the vectors found a wall, then don't edge
     if (edgeLeftDist == edgeRightDist)
         return false;
 
@@ -318,7 +337,7 @@ bool findEdge(float edgeOrigYaw)
     {
         edgeToEdgeOn = 2;
         // Same as above
-       if ((((int) pitch_real == 2) || ((int) pitch_real == 4)) && !g_pLocalPlayer->isFakeAngleCM)
+        if ((((int) pitch_real == 2) || ((int) pitch_real == 4)) && !g_pLocalPlayer->isFakeAngleCM)
             edgeToEdgeOn = 1;
         return true;
     }
@@ -327,10 +346,10 @@ bool findEdge(float edgeOrigYaw)
 // Function to give you a static angle to use
 float useEdge(float edgeViewAngle)
 {
-    // Var to be disabled when a angle is choosen to prevent the others from
+    // Var to be disabled when an angle is chosen to prevent the others from
     // conflicting
     bool edgeTest = true;
-    if (((edgeViewAngle < -135) || (edgeViewAngle > 135)) && edgeTest == true)
+    if ((edgeViewAngle < -135) || (edgeViewAngle > 135))
     {
         if (edgeToEdgeOn == 1)
             edgeYaw = (float) -90;
@@ -338,7 +357,7 @@ float useEdge(float edgeViewAngle)
             edgeYaw = (float) 90;
         edgeTest = false;
     }
-    if ((edgeViewAngle >= -135) && (edgeViewAngle < -45) && edgeTest == true)
+    if ((edgeViewAngle >= -135) && (edgeViewAngle < -45) && edgeTest)
     {
         if (edgeToEdgeOn == 1)
             edgeYaw = (float) 0;
@@ -346,7 +365,7 @@ float useEdge(float edgeViewAngle)
             edgeYaw = (float) 179;
         edgeTest = false;
     }
-    if ((edgeViewAngle >= -45) && (edgeViewAngle < 45) && edgeTest == true)
+    if ((edgeViewAngle >= -45) && (edgeViewAngle < 45) && edgeTest)
     {
         if (edgeToEdgeOn == 1)
             edgeYaw = (float) 90;
@@ -354,109 +373,109 @@ float useEdge(float edgeViewAngle)
             edgeYaw = (float) -90;
         edgeTest = false;
     }
-    if ((edgeViewAngle <= 135) && (edgeViewAngle >= 45) && edgeTest == true)
+    if ((edgeViewAngle <= 135) && (edgeViewAngle >= 45) && edgeTest)
     {
         if (edgeToEdgeOn == 1)
             edgeYaw = (float) 179;
         if (edgeToEdgeOn == 2)
             edgeYaw = (float) 0;
-        edgeTest = false;
     }
     // return with the angle choosen
     return edgeYaw;
 }
+
 static float randyaw = 0.0f;
 void ProcessUserCmd(CUserCmd *cmd)
 {
-	// Not running
+    // Not running
     if (!enable)
         return;
     if (!ShouldAA(cmd))
         return;
     if (!pitch_fake && !pitch_real && !yaw_fake && !yaw_real)
         return;
-    
+
     static bool keepmode = true;
     keepmode             = !keepmode;
     float &p             = cmd->viewangles.x;
     float &y             = cmd->viewangles.y;
     static bool flip     = false;
     bool clamp           = !no_clamping;
-    bool yaw_mode		 = true;
+    bool yaw_mode        = true;
 
     static int ticksUntilSwap = 0;
     static bool swap          = true;
-	
-	// Reset the ticks and swap for some reason...
+
+    // Reset the ticks and swap for some reason...
     if (ticksUntilSwap > 0 && (*yaw_fake != 8 || *yaw_real != 8))
     {
         swap           = true;
         ticksUntilSwap = 0;
     }
-    
+
     // Yaw logic
     if (g_pLocalPlayer->isFakeAngleCM)
-		yaw_mode = false;
-	
-	switch ((int) (yaw_mode ? yaw_real : yaw_fake))
-	{
-	case 1: // Custom
-		y = (float) (yaw_mode ? yaw_real_static : yaw_fake_static);
-		break;
-	case 2: // Custom Offset
-		y += (float) (yaw_mode ? yaw_real_static : yaw_fake_static);
-		break;
-	case 3: // Left
-		y -= 90.0f;
-		break;
-	case 4: // Right
-		y += 90.0f;
-		break;
-	case 5: // Back
-		y += 180.0f;
-		break;
-	case 6: // Spin
-		cur_yaw[yaw_mode] += yaw_mode ? (float) spin : -((float) spin);
-		while (cur_yaw[yaw_mode] > 180.0f)
-			cur_yaw[yaw_mode] += -360.0f;
-		while (cur_yaw[yaw_mode] < -180.0f)
-			cur_yaw[yaw_mode] += 360.0f;
-		y = cur_yaw[yaw_mode];
-		break;
-	case 7: // Edge
-		// Attempt to find an edge and if found, rotate around it
-		if (findEdge(y))
-			y = useEdge(y);
-		break;
-	case 8: // Sideways
-		if (!yaw_mode)
-			swap = !swap;
-		y += swap ? 90.0f : -90.0f;
-		break;
-	case 9: // Heck
-		FuckYaw(y);
-		clamp = false;
-		break;
-	case 10: // Omega
-		if (!yaw_mode)
+        yaw_mode = false;
+
+    switch ((int) (yaw_mode ? yaw_real : yaw_fake))
+    {
+    case 1: // Custom
+        y = (float) (yaw_mode ? yaw_real_static : yaw_fake_static);
+        break;
+    case 2: // Custom Offset
+        y += (float) (yaw_mode ? yaw_real_static : yaw_fake_static);
+        break;
+    case 3: // Left
+        y -= 90.0f;
+        break;
+    case 4: // Right
+        y += 90.0f;
+        break;
+    case 5: // Back
+        y += 180.0f;
+        break;
+    case 6: // Spin
+        cur_yaw[yaw_mode] += yaw_mode ? (float) spin : -((float) spin);
+        while (cur_yaw[yaw_mode] > 180.0f)
+            cur_yaw[yaw_mode] += -360.0f;
+        while (cur_yaw[yaw_mode] < -180.0f)
+            cur_yaw[yaw_mode] += 360.0f;
+        y = cur_yaw[yaw_mode];
+        break;
+    case 7: // Edge
+        // Attempt to find an edge and if found, rotate around it
+        if (findEdge(y))
+            y = useEdge(y);
+        break;
+    case 8: // Sideways
+        if (!yaw_mode)
+            swap = !swap;
+        y += swap ? 90.0f : -90.0f;
+        break;
+    case 9: // Heck
+        FuckYaw(y);
+        clamp = false;
+        break;
+    case 10: // Omega
+        if (!yaw_mode)
         {
             randyaw += RandFloatRange(-30.0f, 30.0f);
             y = randyaw;
         }
         else
             y = randyaw - 180.0f + RandFloatRange(-40.0f, 40.0f);
-		break;
-	case 11: // Random
-		y     = RandFloatRange(-65536.0f, 65536.0f);
-		clamp = false;
-		break;
-	case 12: // Random Clamped
-		y = RandFloatRange(-180.0f, 180.0f);
-		break;
-	default:
-		break;
-	}
-    
+        break;
+    case 11: // Random
+        y     = RandFloatRange(-65536.0f, 65536.0f);
+        clamp = false;
+        break;
+    case 12: // Random Clamped
+        y = RandFloatRange(-180.0f, 180.0f);
+        break;
+    default:
+        break;
+    }
+
     // Pitch logic
     switch (int(pitch_real))
     {
@@ -485,7 +504,7 @@ void ProcessUserCmd(CUserCmd *cmd)
         FuckPitch(p);
         clamp = false;
     }
-    
+
     // Fake is done afterwards so that they can be applied on top of the real angles set above
     switch (int(pitch_fake))
     {
@@ -496,13 +515,13 @@ void ProcessUserCmd(CUserCmd *cmd)
         p += 360.0f;
         break;
     case 3: // Inverse
-		if (p <= -89.0f)
-			p += 360.0f;
-		else if (p >= 89.0f)
-			p -= 360.0f;
+        if (p <= -89.0f)
+            p += 360.0f;
+        else if (p >= 89.0f)
+            p -= 360.0f;
         break;
     }
-    
+
     flip = !flip;
     if (clamp)
         fClampAngle(cmd->viewangles);
@@ -524,5 +543,5 @@ bool isEnabled()
     return *enable;
 }
 
-static InitRoutine fakelag_check([]() { yaw_fake.installChangeCallback([](settings::VariableBase<int> &, int after) { force_fakelag = after > 0 ? true : false; }); });
-} // namespace hacks::shared::antiaim
+static InitRoutine fakelag_check([]() { yaw_fake.installChangeCallback([](settings::VariableBase<int> &, int after) { force_fakelag = after > 0; }); });
+} // namespace hacks::antiaim

@@ -25,8 +25,8 @@ static settings::Int requeue_if_humans_lte{ "cat-bot.requeue-if.humans-lte", "0"
 static settings::Int requeue_if_players_lte{ "cat-bot.requeue-if.players-lte", "0" };
 
 static settings::Boolean micspam{ "cat-bot.micspam.enable", "false" };
-static settings::Int micspam_on{ "cat-bot.micspam.interval-on", "3" };
-static settings::Int micspam_off{ "cat-bot.micspam.interval-off", "60" };
+static settings::Int micspam_on{ "cat-bot.micspam.interval-on", "1" };
+static settings::Int micspam_off{ "cat-bot.micspam.interval-off", "0" };
 
 static settings::Boolean auto_crouch{ "cat-bot.auto-crouch", "false" };
 static settings::Boolean always_crouch{ "cat-bot.always-crouch", "false" };

@@ -236,36 +236,6 @@ bool ShouldAA(CUserCmd *cmd)
         return false;
     int classid = LOCAL_W->m_iClassID();
     auto mode   = GetWeaponMode();
-    if ((cmd->buttons & IN_ATTACK) && !(IsTF2() && (classid == CL_CLASS(CTFCompoundBow) || mode == weapon_melee)) && CanShoot())
-    {
-        return false;
-    }
-    if ((cmd->buttons & IN_ATTACK2) && classid == CL_CLASS(CTFLunchBox))
-        return false;
-    if ((cmd->buttons & IN_ATTACK) && classid == CL_CLASS(CTFGrapplingHook) && !g_pLocalPlayer->bAttackLastTick)
-    {
-        SetSafeSpace(2);
-    }
-    switch (mode)
-    {
-    case weapon_projectile:
-        if (classid == CL_CLASS(CTFCompoundBow))
-        {
-            if (!(cmd->buttons & IN_ATTACK))
-            {
-                if (g_pLocalPlayer->bAttackLastTick)
-                    SetSafeSpace(4);
-            }
-            break;
-        }
-        [[fallthrough]];
-    case weapon_throwable:
-        if ((cmd->buttons & (IN_ATTACK | IN_ATTACK2)) || g_pLocalPlayer->bAttackLastTick)
-        {
-            SetSafeSpace(8);
-            return false;
-        }
-        break;
     case weapon_melee:
         if (g_pLocalPlayer->weapon_melee_damage_tick)
             return false;

@@ -10,7 +10,7 @@
 #include <hacks/AntiAim.hpp>
 
 #include "common.hpp"
-namespace hacks::shared::antiaim
+namespace hacks::antiaim
 {
 bool force_fakelag = false;
 float used_yaw     = 0.0f;

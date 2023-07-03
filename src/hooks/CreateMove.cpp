@@ -266,7 +266,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
             static int fakelag_queue      = 0;
 
             if (CE_GOOD(LOCAL_E))
-                if (!hacks::nospread::is_syncing && (fakelag_amount || (hacks::antiaim::force_fakelag && hacks::antiaim::isEnabled())))
+                if (!hacks::nospread::is_syncing && (fakelag_amount && hacks::antiaim::isEnabled())))
                 {
                     // Do not fakelag when trying to attack
                     bool do_fakelag = true;

@@ -75,14 +75,14 @@ void DrawCheatVisuals()
         float w, h;
         if (*info_style == 0)
         {
-            hack_info_text = "Rosnehook InDev " + hack::GetVersion() + " " + hack::GetType() +
+            hack_info_text = "Rosnehook InDev " + hack::GetVersion() +
                              "\nPress '" + open_gui_button.toString() + "' to open the HUD.";
             fonts::center_screen->stringSize(hack_info_text, &w, &h);
             draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
         }
         else if (*info_style == 1)
         {
-            hack_info_text = "Rosnehook " + hack::GetVersion() + " " + hack::GetType();
+            hack_info_text = "Rosnehook " + hack::GetVersion();
             fonts::center_screen->stringSize(hack_info_text, &w, &h);   
             draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
         }

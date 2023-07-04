@@ -67,7 +67,7 @@ void DrawCheatVisuals()
         PROF_SECTION(DRAW_info)
         std::string name_s, reason_s;
         PROF_SECTION(PT_info_text)
-        if (*info_text)
+        if (*info_text && (!g_IEngine->IsConnected() || g_IEngine->Con_IsVisible()))
         {
             float w, h;
             std::string hack_info_text;
@@ -93,7 +93,7 @@ void DrawCheatVisuals()
         EC::run(EC::Draw);
     }
     if (CE_GOOD(LOCAL_E))
-    {   
+    {
         Prediction_PaintTraverse();
     }
     {

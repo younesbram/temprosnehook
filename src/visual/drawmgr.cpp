@@ -6,6 +6,7 @@
  */
 
 #include <MiscTemporary.hpp>
+#include <hacks/Aimbot.hpp>
 #include <hacks/hacklist.hpp>
 #if ENABLE_IMGUI_DRAWING
 #include "imgui/imrenderer.hpp"
@@ -15,10 +16,13 @@
 #include <glez/draw.hpp>
 #endif
 #include <settings/Bool.hpp>
+#include <settings/Float.hpp>
+#include <settings/Rgba.hpp>
 #include <menu/GuiInterface.hpp>
 #include "common.hpp"
 #include "visual/drawing.hpp"
 #include "hack.hpp"
+#include "menu/menu/Menu.hpp"
 #include "drawmgr.hpp"
 
 static settings::Boolean info_text{ "hack-info.enable", "true" };

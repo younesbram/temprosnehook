@@ -25,11 +25,7 @@
 #include "menu/menu/Menu.hpp"
 #include "drawmgr.hpp"
 
-static settings::Boolean info_text{ "hack-info.enable", "true" };
-static settings::Int info_style{ "hack-info.style", "0" };
-static settings::Rgba info_background_color{"hack-info.background", "00000b3"};
-static settings::Rgba info_foreground_color{"hack-info.foreground", "ffffff"};
-static settings::Rgba info_ring_background{"hack-info.ring.background", "ff6c96"};
+static settings::Boolean info_text{"hack-info.enable", "true"};
 static settings::Int info_x{"hack-info.x", "10"};
 static settings::Int info_y{"hack-info.y", "10"};
 
@@ -68,28 +64,56 @@ void BeginCheatVisuals()
 
 void DrawCheatVisuals()
 {
-    PROF_SECTION(DRAW_info);
-    std::string hack_info_text;
-    if (info_text)
     {
-        float w, h;
-        if (*info_style == 0)
+        PROF_SECTION(DRAW_info);
+        std::string name_s, reason_s;
+        if (info_text && draw::inited)
         {
-            hack_info_text = "Rosnehook InDev " + hack::GetVersion() +
-                             "\nPress '" + open_gui_button.toString() + "' to open the HUD.";
-            fonts::center_screen->stringSize(hack_info_text, &w, &h);
-            draw::Rectangle(*info_x - 5.0f, *info_y - 5.0f, w + 10.0f, h + 10.0f, *info_background_color);
-            draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
-        }
-        else if (*info_style == 1)
-        {
-            hack_info_text = "Rosnehook " + hack::GetVersion();
-            fonts::center_screen->stringSize(hack_info_text, &w, &h);
-            draw::Rectangle(*info_x - 5.0f, *info_y - 5.0f, w + 10.0f, h + 10.0f, *info_background_color);
-            draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
+            // Setup time
+            char timeString[10];
+            time_t current_time;
+            struct tm *time_info;
+
+            time(&current_time);
+            time_info = localtime(&current_time);
+            strftime(timeString, sizeof(timeString), "%H:%M:%S", time_info);
+
+            // Server info (if applicable)
+            std::string server_info;
+            auto netchannel = g_IEngine->GetNetChannelInfo();
+            if (netchannel)
+            {
+                // Get ping same way as net_graph
+                float avgLatency = netchannel->GetAvgLatency(FLOW_OUTGOING);
+                float adjust = 0.0f;
+
+                static const ConVar *pUpdateRate = g_pCVar->FindVar("cl_updaterate");
+                if (!pUpdateRate)
+                    pUpdateRate = g_pCVar->FindVar("cl_updaterate");
+                else
+                {
+                    if (pUpdateRate->GetFloat() > 0.001f)
+                    {
+                        adjust = -0.5f / pUpdateRate->GetFloat();
+                        avgLatency += adjust;
+                    }
+                }
+                avgLatency = MAX( 0.0, avgLatency );
+
+                server_info = " | " + std::to_string((int)(avgLatency*1000.0f)) + " ms";
+            }
+
+            std::string result = std::string(format_cstr("Rosnehook InDev | %s%s", timeString, server_info.c_str()).get());
+
+            float w, h;
+            fonts::center_screen->stringSize(result, &w, &h);
+
+            // oh good GOD please dojnt crash beecause of annoying rectangles
+            draw::Rectangle(*info_x - 5, *info_y - 5, w + 10, h + 10, colors::Transparent(colors::black, *info_alpha));
+            draw::Line(*info_x - 5, *info_y - 5, w + 10, 0, colors::gui, 2.0f);
+            draw::String(*info_x, *info_y, colors::gui, result.c_str(), *fonts::center_screen);
         }
     }
-
     if (spectator_target)
         AddCenterString("Press SPACE to stop spectating");
 

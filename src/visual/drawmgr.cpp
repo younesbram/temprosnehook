@@ -68,9 +68,8 @@ void DrawCheatVisuals()
     {
         PROF_SECTION(DRAW_info);
         std::string name_s, reason_s;
-        if (info_text && draw::inited)
+        if (info_text && draw::Initialize)
         {
-            // Setup time
             char timeString[10];
             time_t current_time;
             struct tm *time_info;
@@ -79,12 +78,10 @@ void DrawCheatVisuals()
             time_info = localtime(&current_time);
             strftime(timeString, sizeof(timeString), "%H:%M:%S", time_info);
 
-            // Server info (if applicable)
             std::string server_info;
             auto netchannel = g_IEngine->GetNetChannelInfo();
             if (netchannel)
             {
-                // Get ping same way as net_graph
                 float avgLatency = netchannel->GetAvgLatency(FLOW_OUTGOING);
                 float adjust = 0.0f;
 
@@ -104,7 +101,7 @@ void DrawCheatVisuals()
                 server_info = " | " + std::to_string((int)(avgLatency*1000.0f)) + " ms";
             }
 
-            std::string result = std::string(format_cstr("Rosnehook InDev | %s%s", timeString, server_info.c_str()).get());
+            std::string result = std::string(strfmt("Rosnehook InDev | %s%s", timeString, server_info.c_str()).get());
 
             float w, h;
             fonts::center_screen->stringSize(result, &w, &h);

@@ -25,10 +25,12 @@
 #include "menu/menu/Menu.hpp"
 #include "drawmgr.hpp"
 
-static settings::Boolean info_text{"hack-info.enable", "true"};
+static settings::Boolean info_text{ "hack-info.enable", "true" };
+static settings::Int info_style{ "hack-info.style", "0" };
+static settings::Rgba info_background_color{"hack-info.background", "00000b3"};
+static settings::Rgba info_foreground_color{"hack-info.foreground", "ffffff"};
 static settings::Int info_x{"hack-info.x", "10"};
 static settings::Int info_y{"hack-info.y", "10"};
-static settings::Float info_alpha{"hack-info.alpha", "0.7"};
 
 void RenderCheatVisuals()
 {
@@ -75,7 +77,7 @@ void DrawCheatVisuals()
             std::string hack_info_text;
             if (*info_style == 0) {
                 hack_info_text = "Rosnehook InDev " + hack::GetVersion() + 
-                "\nPress '" + open_gui_button.toString() + "' to open the HUD.";
+                "\nPress '" + open_gui_button.toString() + "' to open the menu.";
                 fonts::center_screen->stringSize(hack_info_text, &w, &h);
                 draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
             }

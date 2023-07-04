@@ -123,7 +123,7 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, boo
     hacks::antianticheat::SendNetMsg(msg);
 
     // net_StringCmd
-    if (msg.GetType() == 4 && (newlines_msg || crypt_chat))
+    if (msg.GetType() == 4 && (newlines_msg))
     {
         std::string str(msg.ToString());
         say_idx      = str.find("net_StringCmd: \"say \"");

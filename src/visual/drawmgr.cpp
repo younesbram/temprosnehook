@@ -68,50 +68,48 @@ void BeginCheatVisuals()
 
 void DrawCheatVisuals()
 {
+    PROF_SECTION(DRAW_info);
+    std::string hack_info_text;
+    if (info_text)
     {
-        PROF_SECTION(DRAW_info);
-        std::string name_s, reason_s;
-        PROF_SECTION(PT_info_text);
-        if (info_text)
+        float w, h;
+        if (*info_style == 0)
         {
-            float w, h;
-            std::string hack_info_text;
-            if (*info_style == 0) {
-                hack_info_text = "Rosnehook InDev " + hack::GetVersion() + " " + hack::GetType() + 
-                "\nPress '" + open_gui_button.toString() + "' to open the HUD.";
-                fonts::center_screen->stringSize(hack_info_text, &w, &h);
-                draw::Rectangle(*info_x - 5, *info_y - 5, w + 10, h + 10, *info_background_color);
-                draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
-            }
-            else if (*info_style == 1) {
-                hack_info_text = "Rosnehook " + hack::GetVersion() + " " + hack::GetType();
-                fonts::center_screen->stringSize(hack_info_text, &w, &h);
-                draw::Rectangle(*info_x - 5, *info_y - 5, w + 10, h + 10, *info_background_color);
-                draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
-            }
+            hack_info_text = "Rosnehook InDev " + hack::GetVersion() + " " + hack::GetType() +
+                             "\nPress '" + open_gui_button.toString() + "' to open the HUD.";
+            fonts::center_screen->stringSize(hack_info_text, &w, &h);
+            draw::Rectangle(*info_x - 5, *info_y - 5, w + 10, h + 10, *info_background_color);
+            draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
+        }
+        else if (*info_style == 1)
+        {
+            hack_info_text = "Rosnehook " + hack::GetVersion() + " " + hack::GetType();
+            fonts::center_screen->stringSize(hack_info_text, &w, &h);
+            draw::Rectangle(*info_x - 5, *info_y - 5, w + 10, h + 10, *info_background_color);
+            draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
         }
     }
+
     if (spectator_target)
         AddCenterString("Press SPACE to stop spectating");
-    {
-        PROF_SECTION(DRAW_WRAPPER)
-        EC::run(EC::Draw);
-    }
+
+    PROF_SECTION(DRAW_WRAPPER)
+    EC::run(EC::Draw);
+
     if (CE_GOOD(LOCAL_E))
     {
         Prediction_PaintTraverse();
     }
-    {
-        PROF_SECTION(DRAW_strings)
-        DrawStrings();
-    }
+
+    PROF_SECTION(DRAW_strings)
+    DrawStrings();
+
 #if ENABLE_GUI
-    {
-        PROF_SECTION(DRAW_GUI)
-        gui::draw();
-    }
+    PROF_SECTION(DRAW_GUI)
+    gui::draw();
 #endif
 }
+
 
 void EndCheatVisuals()
 {

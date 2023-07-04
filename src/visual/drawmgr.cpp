@@ -72,7 +72,7 @@ void DrawCheatVisuals()
     std::string hack_info_text;
     if (info_text)
     {
-        float w,h;
+        float w, h;
         if (*info_style == 0)
         {
             hack_info_text = "Rosnehook InDev " + hack::GetVersion() + " " + hack::GetType() +

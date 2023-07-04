@@ -26,7 +26,12 @@
 #include "drawmgr.hpp"
 
 static settings::Boolean info_text{ "hack-info.enable", "true" };
-static settings::Boolean info_text_min{ "hack-info.minimal", "false" };
+static settings::Int info_style{ "hack-info.style", "0" };
+static settings::Rgba info_background_color{"hack-info.background", "00000b3"};
+static settings::Rgba info_foreground_color{"hack-info.foreground", "ffffff"};
+static settings::Rgba info_ring_background{"hack-info.ring.background", "ff6c96"};
+static settings::Int info_x{"hack-info.x", "10"};
+static settings::Int info_y{"hack-info.y", "10"};
 
 void RenderCheatVisuals()
 {

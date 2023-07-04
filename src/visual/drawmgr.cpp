@@ -27,7 +27,6 @@
 
 static settings::Boolean info_text{ "hack-info.enable", "true" };
 static settings::Int info_style{ "hack-info.style", "0" };
-static settings::Int size{ "hack.info.size", "50" };
 static settings::Rgba info_background_color{"hack-info.background", "00000b3"};
 static settings::Rgba info_foreground_color{"hack-info.foreground", "ffffff"};
 static settings::Rgba info_ring_background{"hack-info.ring.background", "ff6c96"};
@@ -79,9 +78,6 @@ void DrawCheatVisuals()
             hack_info_text = "Rosnehook InDev " + hack::GetVersion() + " " + hack::GetType() +
                              "\nPress '" + open_gui_button.toString() + "' to open the HUD.";
             fonts::center_screen->stringSize(hack_info_text, &w, &h);
-            float bar_bg_x_size            = *size * 2.0f;
-            float bar_bg_y_size            = *size / 5.0f;
-            draw::Rectangle(*info_x - 5.0f, *info_y - 5.0f, bar_bg_x_size + 10.0f, bar_bg_y_size + 10.0f, *info_background_color);
             draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
         }
         else if (*info_style == 1)

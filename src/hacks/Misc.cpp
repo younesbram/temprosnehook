@@ -28,7 +28,6 @@ static settings::Int auto_jump_chance{ "misc.auto-jump.chance", "100" };
 static settings::Int auto_strafe{ "misc.autostrafe", "0" };
 static settings::Boolean accurate_movement{ "misc.accurate-movement", "false" };
 settings::Boolean tauntslide{ "misc.tauntslide", "false" };
-static settings::Boolean auto_balance_spam{ "misc.auto-balance-spam", "false" };
 static settings::Boolean nopush_enabled{ "misc.no-push", "false" };
 static settings::Boolean dont_hide_stealth_kills{ "misc.dont-hide-stealth-kills", "true" };
 static settings::Boolean unlimit_bumpercart_movement{ "misc.bumpercarthax.enable", "true" };
@@ -148,7 +147,6 @@ void SendAutoBalanceRequest()
 CatCommand SendAutoBlRqCatCom("request_balance", "Request Infinite Auto-Balance", [](const CCommand &args) { SendAutoBalanceRequest(); });
 
 int last_number{ 0 };
-static Timer auto_balance_timer{};
 
 int getCarriedBuilding()
 {
@@ -374,10 +372,6 @@ static void CreateMove()
             }
         }
     }
-
-    // Spams infinite autobalance spam function
-    if (*auto_balance_spam && auto_balance_timer.test_and_set(150))
-        SendAutoBalanceRequest();
 
     // Simple No-Push through cvars
     g_ICvar->FindVar("tf_avoidteammates_pushaway")->SetValue(!*nopush_enabled);

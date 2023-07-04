@@ -78,7 +78,7 @@ void DrawCheatVisuals()
             hack_info_text = "Rosnehook InDev " + hack::GetVersion() + " " + hack::GetType() +
                              "\nPress '" + open_gui_button.toString() + "' to open the HUD.";
             fonts::center_screen->stringSize(hack_info_text, &w, &h);
-            draw::Rectangle(*info_x - 5.0f,*info_y - 5.0f, w + 10, h + 10, *info_background_color);
+            draw::Rectangle(*info_x - 5.0f,*info_y - 5.0f, *info_background_color);
             draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
         }
         else if (*info_style == 1)

@@ -22,7 +22,11 @@
 #include "drawmgr.hpp"
 
 static settings::Boolean info_text{ "hack-info.enable", "true" };
-static settings::Boolean info_text_min{ "hack-info.minimal", "false" };
+static settings::Int info_style{ "hack-info.style", "0" };
+static settings::Rgba info_background_color{"hack-info.background", "000000b3"};
+static settings::Rgba info_foreground_color{"hack-info.foreground", "ffffff"};
+static settings::Int info_x{"hack-info.x", "10"};
+static settings::Int info_y{"hack-info.y", "10"};
 
 void RenderCheatVisuals()
 {
@@ -60,21 +64,25 @@ void BeginCheatVisuals()
 void DrawCheatVisuals()
 {
     {
-        PROF_SECTION(DRAW_info)
+        PROF_SECTION(DRAW_info);
         std::string name_s, reason_s;
-        PROF_SECTION(PT_info_text)
-        if (*info_text)
+        PROF_SECTION(PT_info_text);
+        if (info_text)
         {
-            auto color = colors::RainbowCurrent();
-            color.a    = 1.0f;
-            AddSideString("rosnehook by rosneburgerhook", color);
-            if (!*info_text_min)
-            {
-                AddSideString(hack::GetVersion(), colors::gui);
-                AddSideString(hack::GetType(), colors::gui);
-#if ENABLE_GUI
-                AddSideString("Press '" + open_gui_button.toString() + "' key to open/close cheat menu.", colors::gui);
-#endif
+            float w, h;
+            std::string hack_info_text;
+            if (*info_style == 0) {
+                hack_info_text = "Rosnehook InDev " + hack::GetVersion() + 
+                "\nPress '" + open_gui_button.toString() + "' to open the menu.";
+                fonts::center_screen->stringSize(hack_info_text, &w, &h);
+                draw::Rectangle(*info_x - 5, *info_y - 5, w + 10, h + 10, *info_background_color);
+                draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
+            }
+            else if (*info_style == 1) {
+                hack_info_text = "Rosnehook InDev " + hack::GetVersion();
+                fonts::center_screen->stringSize(hack_info_text, &w, &h);
+                draw::Rectangle(*info_x - 5, *info_y - 5, w + 10, h + 10, *info_background_color);
+                draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
             }
         }
     }

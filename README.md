@@ -10,7 +10,7 @@ Cathook, but without bloat.
 
 ## Bloat Removed
 
-Minecraft Health Bar (lol)
+Minecraft Health Bar (loll)
 
 Spellforcer
 

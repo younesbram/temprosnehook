@@ -6,6 +6,7 @@
  */
 
 #include <MiscTemporary.hpp>
+#include <hacks/Aimbot.hpp>
 #include <hacks/hacklist.hpp>
 #if ENABLE_IMGUI_DRAWING
 #include "imgui/imrenderer.hpp"
@@ -15,10 +16,13 @@
 #include <glez/draw.hpp>
 #endif
 #include <settings/Bool.hpp>
+#include <settings/Float.hpp>
+#include <settings/Rgba.hpp>
 #include <menu/GuiInterface.hpp>
 #include "common.hpp"
 #include "visual/drawing.hpp"
 #include "hack.hpp"
+#include "menu/menu/Menu.hpp"
 #include "drawmgr.hpp"
 
 static settings::Boolean info_text{ "hack-info.enable", "true" };
@@ -60,22 +64,25 @@ void BeginCheatVisuals()
 void DrawCheatVisuals()
 {
     {
-        PROF_SECTION(DRAW_info)
+        PROF_SECTION(DRAW_info);
         std::string name_s, reason_s;
-        PROF_SECTION(PT_info_text)
-        if (*info_text && (!g_IEngine->IsConnected() || g_IEngine->Con_IsVisible()))
+        PROF_SECTION(PT_info_text);
+        if (info_text)
         {
-            auto color = colors::RainbowCurrent();
-            color.a    = 1.0f;
-            AddSideString("rosnehook by rosneburgerworks", color);
-            if (!*info_text_min)
-            {
-                AddSideString(hack::GetVersion(), colors::gui); // GitHub commit and date
-                AddSideString(hack::GetType(), colors::gui);    // Compile type
-#if ENABLE_GUI
-                AddSideString("Press '" + open_gui_button.toString() + "' key to open/close cheat menu.", colors::gui);
-                AddSideString("Use mouse to navigate in menu.", colors::gui);
-#endif
+            float w, h;
+            std::string hack_info_text;
+            if (*info_style == 0) {
+                hack_info_text = "Rosnehook InDev " + hack::GetVersion() + " " + hack::GetType() + 
+                "\nPress '" + open_gui_button.toString() + "' to open the HUD.";
+                fonts::center_screen->stringSize(hack_info_text, &w, &h);
+                draw::Rectangle(*info_x - 5, *info_y - 5, w + 10, h + 10, *info_background_color);
+                draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
+            }
+            else if (*info_style == 1) {
+                hack_info_text = "Rosnehook " + hack::GetVersion() + " " + hack::GetType();
+                fonts::center_screen->stringSize(hack_info_text, &w, &h);
+                draw::Rectangle(*info_x - 5, *info_y - 5, w + 10, h + 10, *info_background_color);
+                draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
             }
         }
     }

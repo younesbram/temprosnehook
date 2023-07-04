@@ -64,10 +64,10 @@ void BeginCheatVisuals()
 void DrawCheatVisuals()
 {
     {
-        PROF_SECTION(DRAW_info);
+        PROF_SECTION(DRAW_info)
         std::string name_s, reason_s;
-        PROF_SECTION(PT_info_text);
-        if (info_text)
+        PROF_SECTION(PT_info_text)
+        if (*info_text)
         {
             float w, h;
             std::string hack_info_text;

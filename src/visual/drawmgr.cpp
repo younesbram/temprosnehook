@@ -28,6 +28,7 @@
 static settings::Boolean info_text{"hack-info.enable", "true"};
 static settings::Int info_x{"hack-info.x", "10"};
 static settings::Int info_y{"hack-info.y", "10"};
+static settings::Float info_alpha{"hack-info.alpha", "0.7"};
 
 void RenderCheatVisuals()
 {

@@ -21,8 +21,6 @@
                           tooltip="WARNING: Advanced users only."/>
             <AutoVariable width="fill" target="hack-info.enable" label="Enable Rosnehook label"
                           tooltip="Toggles Rosnehook label."/>
-            <AutoVariable width="width" target="hack-info.style" label="Style of label"
-                          tooltip="Sets the Rosnehook label style">
             <AutoVariable width="fill" target="hack-info.x" label="Label X Position" tooltip="x-position of hack info."/>
             <AutoVariable width="fill" target="hack-info.y" label="Label Y Position" tooltip="x-position of hack info."/>
             <AutoVariable width="fill" target="hack-info.background" label="Label Background Color" tooltip="Label background color."/>

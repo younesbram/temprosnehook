@@ -23,6 +23,7 @@ Nullnexus and Identify (removed)
 Startup Sounds
 
 AntiCheat (cheater detection, useless)
+Homosexual Cheat (very much homosexual) 
 
 And much, much more!
 

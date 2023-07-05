@@ -12,7 +12,6 @@
 static settings::Boolean auto_abandon{ "misc.auto-abandon", "false" };
 static settings::String custom_disconnect_reason{ "misc.disconnect-reason", "" };
 settings::Boolean random_name{ "misc.random-name", "false" };
-extern settings::String force_name;
 extern std::string name_forced;
 
 namespace hooked_methods
@@ -37,35 +36,6 @@ DEFINE_HOOKED_METHOD(Shutdown, void, INetChannel *this_, const char *reason)
     hacks::autojoin::OnShutdown();
     std::string message = reason;
     votelogger::onShutdown(message);
-    if (*random_name && randomnames_file.TryLoad("names.txt"))
-    {
-        std::random_device rd;
-        std::mt19937 mt(rd());
-        std::uniform_int_distribution<unsigned int> dist(0, randomnames_file.lines.size());
-        name_forced = randomnames_file.lines.at(dist(mt));
-    }
-    else
-        name_forced = "";
 }
 
-static InitRoutine init(
-    []()
-    {
-        random_name.installChangeCallback(
-            [](settings::VariableBase<bool> &, bool after)
-            {
-                if (after)
-                {
-                    if (randomnames_file.TryLoad("names.txt"))
-                    {
-                        std::random_device rd;
-                        std::mt19937 mt(rd());
-                        std::uniform_int_distribution<unsigned int> dist(0, randomnames_file.lines.size());
-                        name_forced = randomnames_file.lines.at(dist(mt));
-                    }
-                }
-                else
-                    name_forced = "";
-            });
-    });
 } // namespace hooked_methods

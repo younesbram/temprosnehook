@@ -28,7 +28,6 @@
             <AutoVariable width="fill" target="name.custom" label="Custom name"/>
             <AutoVariable width="fill" target="misc.disconnect-reason" label="Custom disconnect message"
                           tooltip="Doesn't work on Valve servers."/>
-            <AutoVariable width="fill" target="misc.random-name" label="Random name"/>
             <AutoVariable width="fill" target="noisemaker-spam.enable" label="Infinite noisemaker spam"/>
         </List>
     </Box>

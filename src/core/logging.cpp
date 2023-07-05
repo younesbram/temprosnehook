@@ -47,7 +47,7 @@ static inline void Log(const char *result, bool file_only)
     logging::handle.flush();
 #if ENABLE_VISUALS
     if (!hack::shutdown && !file_only && *log_to_console)
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "CAT: %s\n", result);
+        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "ROSNEHOOK: %s\n", result);
 #endif
 }
 #endif

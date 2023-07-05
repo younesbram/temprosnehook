@@ -1734,7 +1734,7 @@ void PrintChat(const char *fmt, ...)
         va_start(list, fmt);
         vsprintf(buf.get(), fmt, list);
         va_end(list);
-        std::unique_ptr<char[]> str = std::move(strfmt("\x07%06X[CAT]\x01 %s", 0x1434a4, buf.get()));
+        std::unique_ptr<char[]> str = std::move(strfmt("\x07%06X[ROSNEHOOK]\x01 %s", 0x1434a4, buf.get()));
         // FIXME DEBUG LOG
         logging::Info("%s", str.get());
         chat->Printf(str.get());

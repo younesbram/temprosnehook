@@ -16,8 +16,8 @@ namespace playerlist
 {
 boost::unordered_flat_map<unsigned, userdata> data{};
 
-const std::string k_Names[]                                     = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "PAZER", "ABUSE", "PARTY" };
-const char *const k_pszNames[]                                  = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "PAZER", "ABUSE", "PARTY" };
+const std::string k_Names[]                                     = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "ABUSE", "PARTY" };
+const char *const k_pszNames[]                                  = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "ABUSE", "PARTY" };
 const std::array<std::pair<k_EState, size_t>, 5> k_arrGUIStates = { std::pair(k_EState::DEFAULT, 0), { k_EState::FRIEND, 1 }, { k_EState::RAGE, 2 } };
 #if ENABLE_VISUALS
 std::array<rgba_t, 8> k_Colors = { colors::empty, colors::FromRGBA8(99, 226, 161, 255), colors::FromRGBA8(226, 204, 99, 255), colors::FromRGBA8(232, 134, 6, 255), colors::FromRGBA8(232, 134, 6, 255), colors::empty, colors::FromRGBA8(150, 75, 0, 255), colors::FromRGBA8(99, 226, 161, 255) };
@@ -26,9 +26,9 @@ std::array<rgba_t, 8> k_Colors = { colors::empty, colors::FromRGBA8(99, 226, 161
 static bool ShouldSave(const userdata &data)
 {
 #if ENABLE_VISUALS
-    return data.color || data.state == k_EState::FRIEND || data.state == k_EState::RAGE || data.state == k_EState::PAZER || data.state == k_EState::ABUSE;
+    return data.color || data.state == k_EState::FRIEND || data.state == k_EState::RAGE || data.state == k_EState::ABUSE;
 #endif
-    return data.state == k_EState::FRIEND || data.state == k_EState::RAGE || data.state == k_EState::PAZER || data.state == k_EState::ABUSE;
+    return data.state == k_EState::FRIEND || data.state == k_EState::RAGE || data.state == k_EState::ABUSE;
 }
 
 void Save()
@@ -207,7 +207,6 @@ bool ChangeState(unsigned int steamid, k_EState state, bool force)
         else
             return false;
     case k_EState::RAGE:
-    case k_EState::PAZER:
     case k_EState::ABUSE:
         return false;
     }

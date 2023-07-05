@@ -98,7 +98,7 @@ int GetScoreForEntity(CachedEntity *entity)
     if (total > 99)
         total = 99;
     auto player_state = entity->player_info ? playerlist::AccessData(entity->player_info->friendsID).state : playerlist::k_EState::DEFAULT;
-    if (player_state == playerlist::k_EState::ABUSE || player_state == playerlist::k_EState::PAZER || player_state == playerlist::k_EState::RAGE)
+    if (player_state == playerlist::k_EState::ABUSE || player_state == playerlist::k_EState::RAGE)
         total = 999;
     if (g_pGameRules->m_bPlayingMannVsMachine && clazz == tf_medic)
         total = 999;

@@ -459,9 +459,9 @@ static void CreateMove()
                     else if (!g_pLocalPlayer->holding_sniper_rifle)
                         Aim(target_entity);
 
-                    if(!hitscan_special_cases(target_entity, weapon_case))
+                    if(!HitscanSpecialCases(target_entity, weapon_case))
                         DoAutoshoot();
-                    else if (hitscan_special_cases(target_entity, weapon_case) && (CE_INT(LOCAL_W, netvar.m_iClip1) == 0))
+                    else if (HitscanSpecialCases(target_entity, weapon_case) && (CE_INT(LOCAL_W, netvar.m_iClip1) == 0))
                         DoAutoshoot();
             }
         break;

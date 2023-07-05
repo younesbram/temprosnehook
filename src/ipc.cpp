@@ -352,7 +352,7 @@ void StoreClientData()
     data.ts_injected  = time_injected;
     data.textmode     = ENABLE_TEXTMODE;
     if (g_ISteamUser)
-        strncpy(data.name, GetNamestealName(g_ISteamUser->GetSteamID()).c_str(), sizeof(data.name));
+        strncpy(data.name, sizeof(data.name));
 }
 
 void Heartbeat()

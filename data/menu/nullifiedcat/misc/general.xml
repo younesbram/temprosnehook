@@ -25,7 +25,6 @@
     </Box>
     <Box height="content" width="content" padding="12 6 6 6" name="Exploits" x="166">
         <List width="205">
-            <AutoVariable width="fill" target="name.custom" label="Custom name"/>
             <AutoVariable width="fill" target="misc.disconnect-reason" label="Custom disconnect message"
                           tooltip="Doesn't work on Valve servers."/>
             <AutoVariable width="fill" target="noisemaker-spam.enable" label="Infinite noisemaker spam"/>

@@ -37,9 +37,7 @@ And much, much more!
 ## Benefits of Rosnehook (why Rosnehook over Cathook)
 
 #### Much Better Performance
-#### it deathstares tooo, so betta aimbot! 
-#### more crashing than eva! 
-#### For you guys who cannot fucking debloat bcuz yall are ape brainZ to do yourselfs! 
+#### For you guys who cannot fucking debloat bcuz yall are ape brainZ! 
 #### Faster Building and other boost related stuff
 #### Catbots (Rosnebots) lasts longer
 

@@ -430,7 +430,7 @@ static void CreateMove()
 
     bool aimkey_status = UpdateAimkey();
 
-    if (!enable || !LOCAL_E || !g_pLocalPlayer->alive || !aimkey_status || !ShouldAim())
+    if (!enable || !LOCAL_E || !LOCAL_E->m_bAlivePlayer( || !aimkey_status || !ShouldAim())
     {
         target_last = nullptr;
         return;

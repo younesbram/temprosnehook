@@ -35,8 +35,6 @@ static settings::Boolean ping_reducer{ "misc.ping-reducer.enable", "false" };
 static settings::Int force_ping{ "misc.ping-reducer.target", "0" };
 static settings::Boolean force_wait{ "misc.force-enable-wait", "true" };
 static settings::Boolean scc{ "misc.scoreboard.match-custom-team-colors", "false" };
-static settings::Boolean infinite_lunchbox{ "misc.infinite-lunchbox", "false" };
-static settings::Button infinite_lunchbox_key{ "misc.infinite-lunchbox-key", "<null>" };
 #if ENABLE_VISUALS
 static settings::Boolean debug_info{ "misc.debug-info", "false" };
 static settings::Boolean misc_drawhitboxes{ "misc.draw-hitboxes", "false" };
@@ -341,23 +339,6 @@ static void CreateMove()
     // Tauntslide needs improvement for movement, but it mostly works
     if (*tauntslide && CE_GOOD(LOCAL_E) && HasCondition<TFCond_Taunting>(LOCAL_E))
         current_user_cmd->viewangles.x = (current_user_cmd->buttons & IN_BACK) ? 91.0f : (current_user_cmd->buttons & IN_FORWARD) ? 0.0f : 90.0f;
-
-    // Infinite lunchbox
-    if (*infinite_lunchbox && infinite_lunchbox_key.isKeyDown() && g_pLocalPlayer->alive)
-    {
-        int weapon_id = HandleToIDX(CE_INT(LOCAL_E, netvar.hActiveWeapon));
-        if (weapon_id == CL_CLASS(CTFLunchBox))
-        {
-            current_user_cmd->buttons |= IN_ATTACK;
-
-            static float flLastSendTime = g_GlobalVars->curtime; // don't get disconnected
-            if (fabsf(g_GlobalVars->curtime - flLastSendTime) > .5f)
-            {
-                g_IEngine->ClientCmd_Unrestricted("taunt");
-                flLastSendTime = g_GlobalVars->curtime;
-            }
-        }
-    }
 
     // Simple No-Push through cvars
     g_ICvar->FindVar("tf_avoidteammates_pushaway")->SetValue(!*nopush_enabled);

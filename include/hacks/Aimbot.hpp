@@ -32,6 +32,7 @@ bool Aim(CachedEntity *entity);
 void DoAutoshoot(CachedEntity *target = nullptr);
 int NotVisibleHitbox(CachedEntity *target, int preferred);
 std::vector<Vector> GetHitpointsVischeck(CachedEntity *ent, int hitbox);
+bool small_box_checker(CachedEntity* target_entity);
 float ProjectileHitboxSize(int projectile_size);
 int AutoHitbox(CachedEntity *target);
 bool HitscanSpecialCases(CachedEntity *target_entity, int weapon_case);

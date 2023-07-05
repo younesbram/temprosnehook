@@ -98,7 +98,7 @@ static int last_buttons{ 0 };
 
 static void updateAntiAfk()
 {
-    if (current_user_cmd->buttons != last_buttons || g_pLocalPlayer->alive)
+    if (current_user_cmd->buttons != last_buttons || g_pLocalPlayer->life_state)
     {
         anti_afk_timer.update();
         last_buttons = current_user_cmd->buttons;
@@ -222,14 +222,14 @@ static void CreateMove()
     if (*anti_afk)
         updateAntiAfk();
 
-    if (*auto_jump && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->alive)
+    if (*auto_jump && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
     {
         static int ticks_last_jump = 0;
 
         if (UniformRandomInt(0, 99) > *auto_jump_chance)
             return;
 
-        bool ground = g_pLocalPlayer->flags & FL_ONGROUND;
+        bool ground = CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND;
         bool jump   = current_user_cmd->buttons & IN_JUMP;
 
         if (!ground && jump && ticks_last_jump++ >= 9)
@@ -240,14 +240,14 @@ static void CreateMove()
     }
 
     // Automatically strafes in the air
-    if (*auto_strafe && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->alive)
+    if (*auto_strafe && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
     {
         auto movetype = (unsigned) CE_VAR(LOCAL_E, 0x194, unsigned char);
 
         if (movetype == MoveType_t::MOVETYPE_NOCLIP || movetype == MoveType_t::MOVETYPE_LADDER)
             return;
 
-        auto flags              = g_pLocalPlayer->flags;
+        auto flags              = CE_INT(LOCAL_E, netvar.iFlags);
         static bool was_jumping = false;
         bool is_jumping         = current_user_cmd->buttons & IN_JUMP;
 
@@ -309,9 +309,9 @@ static void CreateMove()
         }
     }
 
-    if (*accurate_movement && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->alive)
+    if (*accurate_movement && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
     {
-        if (!(g_pLocalPlayer->flags & FL_ONGROUND))
+        if (!(CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND))
             return;
 
         if (current_user_cmd->buttons & (IN_MOVELEFT | IN_MOVERIGHT | IN_FORWARD | IN_BACK))

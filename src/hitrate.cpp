@@ -96,7 +96,7 @@ void Update()
 {
     CachedEntity *weapon = LOCAL_W;
     // Hitscan only
-    if (CE_GOOD(weapon) && GetWeaponMode() == weapon_hitscan)
+    if (CE_GOOD(weapon) && g_pLocalPlayer->weapon_mode == weapon_hitscan)
     {
 
         int ammo = CE_INT(LOCAL_E, netvar.m_iAmmo + 4);
@@ -135,7 +135,7 @@ public:
         {
             if (CE_GOOD(LOCAL_W) && (LOCAL_W->m_iClassID() == CL_CLASS(CTFSniperRifle) || LOCAL_W->m_iClassID() == CL_CLASS(CTFSniperRifleDecap)))
                 OnHit(event->GetBool("crit"), event->GetInt("userid"), true);
-            else if (CE_GOOD(LOCAL_W) && GetWeaponMode() == weapon_hitscan)
+            else if (CE_GOOD(LOCAL_W) && g_pLocalPlayer->weapon_mode == weapon_hitscan)
                 OnHit(false, event->GetInt("userid"), false);
         }
     }

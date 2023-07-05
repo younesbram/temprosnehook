@@ -286,7 +286,7 @@ static bool isValidTarget(CachedEntity *entity)
 
 static void cm()
 {
-    if (!enable || CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive || CE_BAD(LOCAL_W))
+    if (!enable || CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
     {
         follow_target = 0;
         if (navparser::NavEngine::current_priority == Priority_list::followbot)
@@ -501,7 +501,7 @@ static void cm()
             navtarget     = false;
         }
 
-        if (CE_BAD(ent) || !startFollow(ent, false))
+        if (!CE_GOOD(ent) || !startFollow(ent, false))
         {
             breadcrumbs.clear();
             static Timer navtimer{};
@@ -624,8 +624,9 @@ static void cm()
         static float last_slot_check = 0.0f;
         if (g_GlobalVars->curtime < last_slot_check)
             last_slot_check = 0.0f;
-        if (follow_target && ((always_medigun && g_pPlayerResource->GetClass(LOCAL_E) == tf_medic) || mimic_slot) && (g_GlobalVars->curtime - last_slot_check > 1.0f) && !g_pLocalPlayer->alive && !CE_BYTE(ENTITY(follow_target), netvar.iLifeState))
+        if (follow_target && ((always_medigun && g_pPlayerResource->GetClass(LOCAL_E) == tf_medic) || mimic_slot) && (g_GlobalVars->curtime - last_slot_check > 1.0f) && !g_pLocalPlayer->life_state && !CE_BYTE(ENTITY(follow_target), netvar.iLifeState))
         {
+
             // We are checking our slot so reset the timer
             last_slot_check = g_GlobalVars->curtime;
 

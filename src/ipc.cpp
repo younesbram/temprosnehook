@@ -351,8 +351,6 @@ void StoreClientData()
     data.friendid     = g_ISteamUser->GetSteamID().GetAccountID();
     data.ts_injected  = time_injected;
     data.textmode     = ENABLE_TEXTMODE;
-    if (g_ISteamUser)
-        strncpy(data.name, sizeof(data.name));
 }
 
 void Heartbeat()

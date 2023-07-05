@@ -12,7 +12,6 @@
 #include "AntiAntiAim.hpp"
 #include <random>
 
-static settings::Boolean halloween_mode{ "misc.force-halloween", "false" };
 extern settings::Boolean random_name;
 extern settings::String force_name;
 extern std::string name_forced;
@@ -31,10 +30,6 @@ DEFINE_HOOKED_METHOD(LevelInit, void, void *this_, const char *name)
     gui::onLevelLoad();
 #endif
     ConVar *holiday = g_ICvar->FindVar("tf_forced_holiday");
-    if (halloween_mode)
-        holiday->SetValue(2);
-    else if (holiday->m_nValue == 2)
-        holiday->SetValue(0);
 #endif
     hacks::anti_anti_aim::resolver_map.clear();
     g_IEngine->ClientCmd_Unrestricted("exec cat_matchexec");

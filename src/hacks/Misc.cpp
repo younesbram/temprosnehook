@@ -132,20 +132,6 @@ CatCommand fix_cursor("fix_cursor", "Fix the GUI cursor being visible",
                           g_ISurface->SetCursorAlwaysVisible(false);
                       });
 
-// Use to send an autobalance request to the server that doesn't prevent you from
-// using it again, Allowing infinite use of it.
-void SendAutoBalanceRequest()
-{ // Credits to blackfire
-    if (!g_IEngine->IsInGame())
-        return;
-    auto *kv = new KeyValues("AutoBalanceVolunteerReply");
-    kv->SetInt("response", 1);
-    g_IEngine->ServerCmdKeyValues(kv);
-}
-
-// Catcommand for above
-CatCommand SendAutoBlRqCatCom("request_balance", "Request Infinite Auto-Balance", [](const CCommand &args) { SendAutoBalanceRequest(); });
-
 int last_number{ 0 };
 
 int getCarriedBuilding()

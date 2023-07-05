@@ -464,6 +464,7 @@ static void CreateMove()
                     else if (HitscanSpecialCases(target_entity, weapon_case) && (CE_INT(LOCAL_W, netvar.m_iClip1) == 0))
                         DoAutoshoot();
             }
+        }
         break;
     case weapon_melee:
         if (should_backtrack)

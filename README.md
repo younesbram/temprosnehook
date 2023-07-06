@@ -7,6 +7,7 @@
 [![Issues](https://img.shields.io/github/issues/explowz/cathook.svg?style=flat-square)](https://github.com/rosneburgerworks/cathook/issues)
 
 Cathook, but without bloat, pasting ddodddssing methods, and calling everyone a literal gay slur, because any critism is higghly illgal. 
+this cheat should be renamed REALITYHOOK! 
 
 ## Bloat Removed
 

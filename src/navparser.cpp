@@ -739,7 +739,7 @@ static void followCrumbs()
             static Timer choose_new_point;
 
             static int wait_time = 20;
-            static int aim_speed = 30;
+            static int aim_speed = 25;
 
             if (looked_at_point && choose_new_point.test_and_set(wait_time))
             {
@@ -758,7 +758,7 @@ static void followCrumbs()
                     choose_new_point.update();
                 looked_at_point = true;
                 wait_time       = 20 + UniformRandomInt(0, 2);
-                aim_speed       = 30 + UniformRandomInt(0, 2); // it was smooth at 13
+                aim_speed       = 25 + UniformRandomInt(0, 2); // it was smooth at 13
             }
 
             Vector next_slow = next;

@@ -9,6 +9,7 @@
 Cathook, but without bloat, pasting ddodddssing methods, and calling everyone a literal gay slur, because any critism is higghly illgal. 
 this cheat should be renamed REALITYHOOK! 
 WE ARE PAIRED WITH A NON EXISTANT CHEAT TOO! NAMED COWHOOK! 
+WE ALSO HATE PEDOS!!
 
 ## Bloat Removed
 

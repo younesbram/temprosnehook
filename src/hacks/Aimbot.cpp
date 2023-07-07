@@ -907,6 +907,17 @@ bool Aim(CachedEntity *entity)
 // A function to check whether player can autoshoot
 bool began_charge = false;
 int began_sticky  = 0;
+class BaseCombatWeapon
+{
+public:
+    // ... other member variables and functions ...
+
+    bool m_bInReload; // Indicates whether the weapon is currently in the middle of a reload
+
+    // ... other member variables and functions ...
+};
+
+// Example usage of the BaseCombatWeapon class
 void DoAutoshoot(CachedEntity *target_entity)
 {
     // Enable check

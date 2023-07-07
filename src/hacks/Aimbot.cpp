@@ -907,6 +907,8 @@ bool Aim(CachedEntity *entity)
 // A function to check whether player can autoshoot
 bool began_charge = false;
 int began_sticky  = 0;
+#include "external/source-sdk-2013-headers/mp/src/game/shared/basecombatweapon_shared.h"
+
 void DoAutoshoot(CachedEntity *target_entity)
 {
     // Enable check
@@ -925,7 +927,7 @@ void DoAutoshoot(CachedEntity *target_entity)
         attack = false;
 
     // Disable shooting during reloading
-    if (CE_INT(LOCAL_W, netvar.m_bInReload))
+    if (LOCAL_W->m_bInReload)
         attack = false;
 
     if (attack)

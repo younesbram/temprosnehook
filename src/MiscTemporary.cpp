@@ -47,6 +47,90 @@ void color_callback(settings::VariableBase<int> &, int)
 DetourHook cl_warp_sendmovedetour;
 DetourHook cl_nospread_sendmovedetour;
 
+static std::optional<BytePatch> patch;
+static std::optional<BytePatch> patch2;
+
+void ApplyScopePatch()
+{
+    if (!patch)
+    {
+        // Remove scope
+        patch = BytePatch(CSignature::GetClientSignature, "81 EC ? ? ? ? A1 ? ? ? ? 8B 7D 08 8B 10 89 04 24 FF 92", 0x0, { 0x5B, 0x5E, 0x5F, 0x5D, 0xC3 });
+        // Keep rifle visible
+        patch2 = BytePatch(CSignature::GetClientSignature, "74 ? A1 ? ? ? ? 8B 40 ? 85 C0 75 ? C9", 0x0, { 0x70 });
+    }
+
+    patch->Patch();
+    if (no_zoom)
+        patch2->Patch();
+}
+
+void ShutdownScopePatch()
+{
+    patch->Shutdown();
+    if (patch2)
+        patch2->Shutdown();
+}
+
+void ApplyZoomPatch()
+{
+    if (no_scope)
+        patch2->Patch();
+}
+
+void ShutdownZoomPatch()
+{
+    patch2->Shutdown();
+}
+
+void ApplyInterpSetting()
+{
+    backup_lerp = cl_interp->GetFloat();
+
+    // We should adjust cl_interp to be as low as possible
+    if (cl_interp->GetFloat() > 0.152f)
+        cl_interp->SetValue(0.152f);
+}
+
+void ShutdownInterpSetting()
+{
+    if (backup_lerp)
+    {
+        cl_interp->SetValue(backup_lerp);
+        backup_lerp = 0.0f;
+    }
+}
+
+void InitializePatches()
+{
+    no_scope.installChangeCallback(
+        [](settings::VariableBase<bool>&, bool after)
+        {
+            if (after)
+                ApplyScopePatch();
+            else
+                ShutdownScopePatch();
+        });
+
+    no_zoom.installChangeCallback(
+        [](settings::VariableBase<bool>&, bool after)
+        {
+            if (after)
+                ApplyZoomPatch();
+            else
+                ShutdownZoomPatch();
+        });
+
+    nolerp.installChangeCallback(
+        [](settings::VariableBase<bool>&, bool after)
+        {
+            if (after)
+                ApplyInterpSetting();
+            else
+                ShutdownInterpSetting();
+        });
+}
+
 static InitRoutine misc_init(
     []()
     {
@@ -55,79 +139,11 @@ static InitRoutine misc_init(
         cl_warp_sendmovedetour.Init(cl_sendmove_addr, (void*)hacks::warp::CL_SendMove_hook);
         cl_nospread_sendmovedetour.Init(cl_sendmove_addr, (void*)hacks::nospread::CL_SendMove_hook);
 
-        static std::optional<BytePatch> patch;
-        static std::optional<BytePatch> patch2;
-
         print_r.installChangeCallback(color_callback);
         print_g.installChangeCallback(color_callback);
         print_b.installChangeCallback(color_callback);
 
-        no_scope.installChangeCallback(
-            [](settings::VariableBase<bool>&, bool after)
-            {
-                if (!patch)
-                {
-                    // Remove scope
-                    patch = BytePatch(CSignature::GetClientSignature, "81 EC ? ? ? ? A1 ? ? ? ? 8B 7D 08 8B 10 89 04 24 FF 92", 0x0, { 0x5B, 0x5E, 0x5F, 0x5D, 0xC3 });
-                    // Keep rifle visible
-                    patch2 = BytePatch(CSignature::GetClientSignature, "74 ? A1 ? ? ? ? 8B 40 ? 85 C0 75 ? C9", 0x0, { 0x70 });
-                }
-
-                if (after)
-                {
-                    patch->Patch();
-                    if (no_zoom)
-                        patch2->Patch();
-                }
-                else
-                {
-                    patch->Shutdown();
-                    if (patch2)
-                        patch2->Shutdown();
-                }
-            });
-
-        no_zoom.installChangeCallback(
-            [](settings::VariableBase<bool>&, bool after)
-            {
-                // std::optional so the addresses are searched when needed, not on inject
-                if (!patch2)
-                {
-                    // Keep rifle visible
-                    patch2 = BytePatch(CSignature::GetClientSignature, "74 ? A1 ? ? ? ? 8B 40 ? 85 C0 75 ? C9", 0x0, { 0x70 });
-                }
-
-                if (after)
-                {
-                    if (no_scope)
-                        patch2->Patch();
-                }
-                else
-                {
-                    patch2->Shutdown();
-                }
-            });
-
-        nolerp.installChangeCallback(
-            [](settings::VariableBase<bool>&, bool after)
-            {
-                if (!after)
-                {
-                    if (backup_lerp)
-                    {
-                        cl_interp->SetValue(backup_lerp);
-                        backup_lerp = 0.0f;
-                    }
-                }
-                else
-                {
-                    backup_lerp = cl_interp->GetFloat();
-
-                    // We should adjust cl_interp to be as low as possible
-                    if (cl_interp->GetFloat() > 0.152f)
-                        cl_interp->SetValue(0.152f);
-                }
-            });
+        InitializePatches();
 
         EC::Register(
             EC::Shutdown,
@@ -135,15 +151,9 @@ static InitRoutine misc_init(
             {
                 cl_warp_sendmovedetour.Shutdown();
                 cl_nospread_sendmovedetour.Shutdown();
-
-                if (backup_lerp)
-                {
-                    cl_interp->SetValue(backup_lerp);
-                    backup_lerp = 0.0f;
-                }
-
-                patch.reset();
-                patch2.reset();
+                ShutdownScopePatch();
+                ShutdownZoomPatch();
+                ShutdownInterpSetting();
             },
             "misctemp_shutdown");
 

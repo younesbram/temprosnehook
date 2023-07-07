@@ -907,8 +907,6 @@ bool Aim(CachedEntity *entity)
 // A function to check whether player can autoshoot
 bool began_charge = false;
 int began_sticky  = 0;
-#include "external/source-sdk-2013-headers/mp/src/game/shared/basecombatweapon_shared.h"
-
 void DoAutoshoot(CachedEntity *target_entity)
 {
     // Enable check

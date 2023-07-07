@@ -907,17 +907,6 @@ bool Aim(CachedEntity *entity)
 // A function to check whether player can autoshoot
 bool began_charge = false;
 int began_sticky  = 0;
-class BaseCombatWeapon
-{
-public:
-    // ... other member variables and functions ...
-
-    bool m_bInReload; // Indicates whether the weapon is currently in the middle of a reload
-
-    // ... other member variables and functions ...
-};
-
-// Example usage of the BaseCombatWeapon class
 void DoAutoshoot(CachedEntity *target_entity)
 {
     // Enable check
@@ -935,15 +924,23 @@ void DoAutoshoot(CachedEntity *target_entity)
     else if (CE_INT(LOCAL_W, netvar.m_iClip1) == 0)
         attack = false;
 
-    // Disable shooting during reloading
-    if (LOCAL_W->m_bInReload)
-        attack = false;
-
     if (attack)
     {
-        // TO DO: Sending both reload and attack will activate the Hitman's Heatmaker ability
-        // Don't activate it only on first kill (or somehow activate it before a shot)
-        current_user_cmd->buttons |= IN_ATTACK | (*autoreload && CarryingHeatmaker() ? IN_RELOAD : 0);
+        if (CE_INT(LOCAL_W, netvar.m_iReloadState) == 0)
+        {
+            // Only aim if not reloading
+            current_user_cmd->buttons |= IN_ATTACK;
+        }
+
+        if (*autoreload && CarryingHeatmaker())
+        {
+            if (CE_INT(LOCAL_W, netvar.m_iClip1) == 0 && CE_INT(LOCAL_W, netvar.m_iReloadState) == 0)
+            {
+                // Start reload if clip is empty and not already reloading
+                current_user_cmd->buttons |= IN_RELOAD;
+            }
+        }
+
         if (target_entity)
         {
             auto hitbox = cd.hitbox;
@@ -951,6 +948,7 @@ void DoAutoshoot(CachedEntity *target_entity)
         }
         *bSendPackets = true;
     }
+
     if (LOCAL_W->m_iClassID() == CL_CLASS(CTFLaserPointer))
         current_user_cmd->buttons |= IN_ATTACK2;
 }

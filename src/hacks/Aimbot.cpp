@@ -405,6 +405,7 @@ void DoAutoZoom(bool target_found, CachedEntity *target)
             zoom_time.update();
         if (!g_pLocalPlayer->bZoomed)
             current_user_cmd->buttons |= IN_ATTACK2;
+            return false;
     }
     // Auto-Unzoom
     else if (*auto_unzoom && zoom_time.check(3000) && !target_found && g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed && nearest.second > *zoom_distance)

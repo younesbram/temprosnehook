@@ -645,9 +645,10 @@ bool isAreaValidForStayNear(Vector ent_origin, CNavArea *area, bool fix_local_z 
 }
 
 // Actual logic, used to de-duplicate code
-bool stayNearTarget(CachedEntity *ent)
+bool stayNearTarget(CachedEntity* ent)
 {
     auto ent_origin = ent->m_vecDormantOrigin();
+
     // No origin recorded, don't bother
     if (!ent_origin)
         return false;
@@ -655,29 +656,25 @@ bool stayNearTarget(CachedEntity *ent)
     // Add the vischeck height
     ent_origin->z += navparser::PLAYER_JUMP_HEIGHT;
 
-    // Use std::pair to avoid using the distance functions more than once
-    std::vector<std::pair<CNavArea *, float>> good_areas{};
+    std::vector<std::pair<CNavArea*, float>> good_areas;
 
-    for (auto &area : navparser::NavEngine::getNavFile()->m_areas)
+    for (auto& area : navparser::NavEngine::getNavFile()->m_areas)
     {
         auto area_origin = area.m_center;
 
-        // Is this area valid for stay near purposes?
         if (!isAreaValidForStayNear(*ent_origin, &area, false))
             continue;
 
         float distance = (*ent_origin).DistToSqr(area_origin);
-        // Good area found
         good_areas.emplace_back(&area, distance);
     }
-    // Sort based on distance
-    if (selected_config.prefer_far)
-        std::sort(good_areas.begin(), good_areas.end(), [](std::pair<CNavArea *, float> a, std::pair<CNavArea *, float> b) { return a.second > b.second; });
-    else
-        std::sort(good_areas.begin(), good_areas.end(), [](std::pair<CNavArea *, float> a, std::pair<CNavArea *, float> b) { return a.second < b.second; });
 
-    // Try to path to all the good areas, based on distance
-    if (std::ranges::any_of(good_areas, [](std::pair<CNavArea *, float> area) { return navparser::NavEngine::navTo(area.first->m_center, staynear, true, !navparser::NavEngine::isPathing()); }))
+    if (selected_config.prefer_far)
+        std::sort(good_areas.begin(), good_areas.end(), [](const auto& a, const auto& b) { return a.second > b.second; });
+    else
+        std::sort(good_areas.begin(), good_areas.end(), [](const auto& a, const auto& b) { return a.second < b.second; });
+
+    if (std::ranges::any_of(good_areas, [](const auto& area) { return navparser::NavEngine::navTo(area.first->m_center, staynear, true, !navparser::NavEngine::isPathing()); }))
         return true;
 
     return false;

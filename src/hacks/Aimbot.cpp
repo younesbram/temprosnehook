@@ -380,7 +380,7 @@ bool AllowNoScope(CachedEntity *target)
 
     return false;
 }
-bool attack = true;
+
 void DoAutoZoom(bool target_found, CachedEntity *target)
 {
     bool idle = hacks::followbot::IsIdle();
@@ -913,6 +913,8 @@ void DoAutoshoot(CachedEntity *target_entity)
     // Enable check
     if (!*autoshoot)
         return;
+    bool attack = true;
+
     // Rifle check
     if (g_pLocalPlayer->holding_sniper_rifle && *zoomed_only && !CanHeadshot() && !AllowNoScope(target_entity))
         attack = false;

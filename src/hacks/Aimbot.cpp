@@ -925,7 +925,7 @@ void DoAutoshoot(CachedEntity *target_entity)
         attack = false;
 
     // Disable shooting during reloading
-    if (CE_INT(LOCAL_W, netvar.m_iReloadSequence) != -1)
+    if (LOCAL_W->IsReloading())
         attack = false;
 
     if (attack)

@@ -925,7 +925,7 @@ void DoAutoshoot(CachedEntity *target_entity)
         attack = false;
 
     // Disable shooting during reloading
-    if (CE_INT(LOCAL_W, netvar.m_bInReload))
+    if (CE_INT(LOCAL_W, netvar.m_iReloadSequence) != -1)
         attack = false;
 
     if (attack)
@@ -943,7 +943,6 @@ void DoAutoshoot(CachedEntity *target_entity)
     if (LOCAL_W->m_iClassID() == CL_CLASS(CTFLaserPointer))
         current_user_cmd->buttons |= IN_ATTACK2;
 }
-
 
 // Grab a vector for a specific ent
 Vector PredictEntity(CachedEntity *entity)

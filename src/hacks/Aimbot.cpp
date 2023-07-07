@@ -926,21 +926,9 @@ void DoAutoshoot(CachedEntity *target_entity)
 
     if (attack)
     {
-        if (CE_INT(LOCAL_W, netvar.m_iReloadState) == 0)
-        {
-            // Only aim if not reloading
-            current_user_cmd->buttons |= IN_ATTACK;
-        }
-
-        if (*autoreload && CarryingHeatmaker())
-        {
-            if (CE_INT(LOCAL_W, netvar.m_iClip1) == 0 && CE_INT(LOCAL_W, netvar.m_iReloadState) == 0)
-            {
-                // Start reload if clip is empty and not already reloading
-                current_user_cmd->buttons |= IN_RELOAD;
-            }
-        }
-
+        // TO DO: Sending both reload and attack will activate the Hitman's Heatmaker ability
+        // Don't activate it only on first kill (or somehow activate it before a shot)
+        current_user_cmd->buttons |= IN_ATTACK | (*autoreload && CarryingHeatmaker() ? IN_RELOAD : 0);
         if (target_entity)
         {
             auto hitbox = cd.hitbox;
@@ -948,7 +936,6 @@ void DoAutoshoot(CachedEntity *target_entity)
         }
         *bSendPackets = true;
     }
-
     if (LOCAL_W->m_iClassID() == CL_CLASS(CTFLaserPointer))
         current_user_cmd->buttons |= IN_ATTACK2;
 }

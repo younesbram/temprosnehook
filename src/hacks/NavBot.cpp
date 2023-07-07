@@ -687,35 +687,36 @@ bool isStayNearTargetValid(CachedEntity *ent)
 }
 
 // Recursive function to find hiding spot
-std::optional<std::pair<CNavArea *, int>> findClosestHidingSpot(CNavArea *area, Vector vischeck_point, int recursion_count, int index = 0)
+std::optional<std::pair<CNavArea*, int>> findClosestHidingSpot(CNavArea* area, const Vector& vischeck_point, int recursion_count, int index = 0)
 {
-    static std::vector<CNavArea *> already_recursed;
+    static std::vector<CNavArea*> already_recursed;
+
     if (index == 0)
         already_recursed.clear();
+
     Vector area_origin = area->m_center;
     area_origin.z += navparser::PLAYER_JUMP_HEIGHT;
 
-    // Increment recursion index
     index++;
 
-    // If the area works, return it
     if (!IsVectorVisibleNavigation(area_origin, vischeck_point))
-        return std::pair<CNavArea *, int>{ area, index - 1 };
-    // Termination condition not hit yet
+        return std::make_pair(area, index - 1);
     else if (index != recursion_count)
     {
-        // Store the nearest area
-        std::optional<std::pair<CNavArea *, int>> best_area = std::nullopt;
+        std::optional<std::pair<CNavArea*, int>> best_area = std::nullopt;
 
-        for (auto &connection : area->m_connections)
+        for (auto& connection : area->m_connections)
         {
             if (std::find(already_recursed.begin(), already_recursed.end(), connection.area) != already_recursed.end())
                 continue;
+
             already_recursed.push_back(connection.area);
-            auto area = findClosestHidingSpot(connection.area, vischeck_point, recursion_count, index);
-            if (area && (!best_area || area->second < best_area->second))
-                best_area = { area->first, area->second };
+            auto connection_area = findClosestHidingSpot(connection.area, vischeck_point, recursion_count, index);
+            
+            if (connection_area && (!best_area || connection_area->second < best_area->second))
+                best_area = { connection_area->first, connection_area->second };
         }
+
         return best_area;
     }
     else

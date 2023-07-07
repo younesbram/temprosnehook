@@ -920,11 +920,12 @@ void DoAutoshoot(CachedEntity *target_entity)
     // Autoshoot breaks with Slow aimbot, so use a workaround to detect when it can
     else if (slow_aim != 0 && !slow_can_shoot)
         attack = false;
-    // maybe deathstare fix
-    else if (g_pLocalPlayer->holding_sniper_rifle && (IN_RELOAD == 0))
-        attack = false;
     // Don't autoshoot without anything in clip
     else if (CE_INT(LOCAL_W, netvar.m_iClip1) == 0)
+        attack = false;
+
+    // Disable shooting during reloading
+    if (CE_INT(LOCAL_W, netvar.m_bInReload))
         attack = false;
 
     if (attack)
@@ -942,6 +943,7 @@ void DoAutoshoot(CachedEntity *target_entity)
     if (LOCAL_W->m_iClassID() == CL_CLASS(CTFLaserPointer))
         current_user_cmd->buttons |= IN_ATTACK2;
 }
+
 
 // Grab a vector for a specific ent
 Vector PredictEntity(CachedEntity *entity)

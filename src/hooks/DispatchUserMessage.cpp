@@ -10,7 +10,6 @@
 #include <settings/Bool.hpp>
 #include "HookedMethods.hpp"
 #include "CatBot.hpp"
-#include "ChatCommands.hpp"
 #include <iomanip>
 #include "votelogger.hpp"
 #include "nospread.hpp"
@@ -244,8 +243,6 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
                     break;
                 }
         }
-        if (event.find("TF_Chat") == 0)
-            hacks::ChatCommands::handleChatMessage(message, data[0]);
         chatlog::LogMessage(data[0], message);
         buf = bf_read(data.c_str(), data.size());
         buf.Seek(0);

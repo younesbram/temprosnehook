@@ -11,6 +11,8 @@ this cheat should be renamed REALITYHOOK!
 WE ARE PAIRED WITH A NON EXISTANT CHEAT TOO! NAMED COWHOOK! 
 WE ALSO HATE PEDOS!!
 
+### Support Server: https://discord.gg/Ap3BptbY56
+
 ## Bloat Removed
 
 Minecraft Health Bar (loll)

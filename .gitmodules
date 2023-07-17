@@ -3,10 +3,10 @@
 	url = https://github.com/nullworks/libglez
 [submodule "libxoverlay"]
 	path = external/libxoverlay
-	url = https://github.com/Loser911/libxoverlay
+	url = https://github.com/rosneburgerworks/libxoverlay
 [submodule "simple-ipc"]
 	path = external/simple-ipc
-	url = https://github.com/Loser911/simple-ipc
+	url = https://github.com/rosne-gamingyt/simple-ipc
 [submodule "external/MicroPather"]
 	path = external/MicroPather
 	url = https://github.com/nullworks/MicroPather

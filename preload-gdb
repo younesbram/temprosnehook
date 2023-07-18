@@ -25,8 +25,9 @@ cp "bin/libcathook.so" "$FILENAME"
 
 echo "Preloading cathook as $FILENAME!"
 TF2_PATH=$(realpath ~/.steam/steam/steamapps/common/Team\ Fortress\ 2/)
+LD_LIBRARY_PATH=$(~/".steam/steam/ubuntu12_32/steam-runtime/run.sh" printenv LD_LIBRARY_PATH):.
 pushd "$TF2_PATH" || exit
-LD_PRELOAD="$FILENAME" LD_LIBRARY_PATH="$TF2_PATH/bin" "$TF2_PATH/hl2_linux" -game tf &
+LD_PRELOAD="$FILENAME" LD_LIBRARY_PATH="$LD_LIBRARY_PATH/bin" "$TF2_PATH/hl2_linux" -game tf &
 echo "Game preloading!"
 popd || exit
 sleep 1

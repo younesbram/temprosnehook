@@ -6,14 +6,18 @@
  */
 
 #include "common.hpp"
+#include <unistd.h>
 #include <regex>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <hacks/AntiAim.hpp>
 #include <settings/Bool.hpp>
 
 #include "core/sharedobj.hpp"
 #include "filesystem.h"
 #include "DetourHook.hpp"
-#include "AntiCheatBypass.hpp"
+
 #include "hack.hpp"
 #include <thread>
 
@@ -41,6 +45,14 @@ static settings::Boolean misc_drawhitboxes{ "misc.draw-hitboxes", "false" };
 // Useful for debugging with showlagcompensation
 static settings::Boolean misc_drawhitboxes_dead{ "misc.draw-hitboxes.dead-players", "false" };
 static settings::Boolean show_spectators{ "misc.show-spectators", "false" };
+
+#if ENABLE_VISUALS
+/* Allows editing of the rich presence info in steam's friends UI */
+static settings::Boolean rich_presence{ "misc.rich-presence", "false" };
+static settings::String rich_presence_file{ "misc.rich-presence.file-name", "rich_presence.txt" };
+static settings::Int rich_presence_party_size{ "misc.rich-presence.party_size", "1337" };
+static settings::Int rich_presence_change_delay{ "misc.rich-presence.delay", "5000" };
+#endif
 
 // Need our own Text drawing
 static std::array<std::string, 32> spectator_strings;
@@ -773,6 +785,46 @@ static CatCommand debug_print_weaponid("debug_weaponid", "Print the weapon IDs o
                                            }
                                        });
 
+#if ENABLE_VISUALS
+
+static std::vector<std::string> rich_presence_text;
+static size_t current_presence_idx = 0;
+static Timer richPresenceTimer;
+
+void PresenceReload(std::string after)
+{
+    rich_presence_text.clear();
+    current_presence_idx = 0;
+    if (!after.empty())
+    {
+        static TextFile teamspam;
+        if (teamspam.TryLoad(after))
+            rich_presence_text = teamspam.lines;
+    }
+}
+
+static void PresencePaint()
+{
+    if (!rich_presence || !richPresenceTimer.test_and_set(*rich_presence_change_delay))
+        return;
+
+    if (!rich_presence_text.empty())
+    {
+        g_ISteamFriends->SetRichPresence("steam_display", "#TF_RichPresence_Display");
+        g_ISteamFriends->SetRichPresence("state", "PlayingMatchGroup");
+        g_ISteamFriends->SetRichPresence("matchgrouploc", "SpecialEvent");
+
+        if (current_presence_idx >= rich_presence_text.size())
+            current_presence_idx = 0;
+
+        g_ISteamFriends->SetRichPresence("currentmap", rich_presence_text[current_presence_idx].c_str());
+        current_presence_idx++;
+    }
+    g_ISteamFriends->SetRichPresence("steam_player_group_size", std::to_string(*rich_presence_party_size + 1).c_str());
+}
+
+static CatCommand reload_presence("presence_reload", "Reload rich presence file", []() { PresenceReload(*rich_presence_file); });
+
 #if ENABLE_VISUALS && !ENFORCE_STREAM_SAFETY
 // This makes us able to see enemy class and status in scoreboard and player panel
 static std::unique_ptr<BytePatch> patch_playerpanel;
@@ -1068,6 +1120,10 @@ static InitRoutine init(
         EC::Register(EC::Shutdown, Shutdown, "draw_local_player", EC::average);
         EC::Register(EC::CreateMove_NoEnginePred, CreateMove, "cm_misc_hacks", EC::early);
         EC::Register(EC::CreateMoveWarp, CreateMove, "cmw_misc_hacks", EC::average);
+#if ENABLE_VISUALS
+        rich_presence_file.installChangeCallback([](settings::VariableBase<std::string> &var, std::string after) { PresenceReload(after); });
+        EC::Register(EC::Paint, PresencePaint, "paint_rich_presence");
+#endif
 #if ENABLE_VISUALS
         EC::Register(EC::Draw, Draw, "draw_misc_hacks", EC::average);
 #if !ENFORCE_STREAM_SAFETY

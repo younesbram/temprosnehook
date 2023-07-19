@@ -823,6 +823,8 @@ static void PresencePaint()
     g_ISteamFriends->SetRichPresence("steam_player_group_size", std::to_string(*rich_presence_party_size + 1).c_str());
 }
 
+#endif
+
 static CatCommand reload_presence("presence_reload", "Reload rich presence file", []() { PresenceReload(*rich_presence_file); });
 
 #if ENABLE_VISUALS && !ENFORCE_STREAM_SAFETY

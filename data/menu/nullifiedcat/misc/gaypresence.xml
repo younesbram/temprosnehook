@@ -1,0 +1,10 @@
+<Tab name="gay presence" padding="4 4 4 4">
+    <Box height="content" width="content" padding="12 6 6 6" name="rich poopoo">
+        <List width="200">
+            <AutoVariable width="fill" target="misc.rich-presence" label="the tickle"/>
+            <AutoVariable width="fill" target="misc.rich-presence.file-name" label="very gay"/>
+            <AutoVariable width="fill" target="misc.rich-presence.party_size" label="poopy size"/>
+            <AutoVariable width="fill" target="misc.rich-presence.delay" label="Delay (ms)"/>
+        </List>
+    </Box>
+</Tab>

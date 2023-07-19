@@ -13,7 +13,7 @@
 #include <fcntl.h>
 #include <hacks/AntiAim.hpp>
 #include <settings/Bool.hpp>
-
+#include "AntiCheatBypass.hpp"
 #include "core/sharedobj.hpp"
 #include "filesystem.h"
 #include "DetourHook.hpp"

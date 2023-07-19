@@ -74,7 +74,7 @@ void dispatchUserMessage(bf_read &buffer, int type)
         // Vote setup Failed
         int reason   = buffer.ReadByte();
         int cooldown = buffer.ReadShort();
-        int delay    = 4;
+        int delay    = 0;
 
         if (reason == 2) // VOTE_FAILED_RATE_EXCEEDED
             delay = cooldown;

@@ -13,39 +13,6 @@ WE ALSO HATE PEDOS!!
 
 ### Support Server: https://discord.gg/Ap3BptbY56
 
-## Bloat Removed
-
-Minecraft Health Bar (loll)
-
-Spellforcer
-
-Uberspam
-
-Rich Presence Changer
-
-Nullnexus and Identify (removed)
-
-Startup Sounds
-
-AntiCheat (cheater detection, useless)
-Homosexual Cheat (very much homosexual) 
-
-And much, much more!
-
-## Rosnehook Features (just a bit)
-
-#### Rathook Navigation Spin
-#### Smoother Look At Path
-#### Green Navigation Draw
-#### Path During Setup on BLU
-
-## Benefits of Rosnehook (why Rosnehook over Cathook)
-
-#### Much Better Performance
-#### For you guys who cannot fucking debloat bcuz yall are ape brainZ! 
-#### Faster Building and other boost related stuff
-#### Catbots (Rosnebots) lasts longer
-
 ## Getting started
 
 ### Dependencies

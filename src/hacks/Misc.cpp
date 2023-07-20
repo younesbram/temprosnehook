@@ -791,6 +791,8 @@ static std::vector<std::string> rich_presence_text;
 static size_t current_presence_idx = 0;
 static Timer richPresenceTimer;
 
+static CatCommand reload_presence("presence_reload", "Reload rich presence file", []() { PresenceReload(*rich_presence_file); });
+
 void PresenceReload(std::string after)
 {
     rich_presence_text.clear();
@@ -824,8 +826,6 @@ static void PresencePaint()
 }
 
 #endif
-
-static CatCommand reload_presence("presence_reload", "Reload rich presence file", []() { PresenceReload(*rich_presence_file); });
 
 #if ENABLE_VISUALS && !ENFORCE_STREAM_SAFETY
 // This makes us able to see enemy class and status in scoreboard and player panel

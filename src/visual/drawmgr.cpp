@@ -73,7 +73,8 @@ void DrawCheatVisuals()
         PROF_SECTION(PT_info_text);
         if (info_text)
         {
-            static w, h;
+            static w = 100;
+            static h = 100;
             std::string hack_info_text;
             if (*info_style == 0) {
                 hack_info_text = "Rosnehook InDev " + hack::GetVersion();

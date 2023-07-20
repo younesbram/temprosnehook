@@ -1,3 +1,7 @@
-REPLACE CONTENTS OF THIS FILE WITH ACTUAL KILLSAYS.
-Usable killsay macros: 
-%team% %class% %killer% %name% %myteam% %myclass% \n
+L %name% GOT FUCKED BY ROSNEHOOK
+%team% IS BEING DESTROYED BY ROSNEHOOK
+%myclass% GAMING
+%myteam% FUCKING SUCKS GET ROSNEHOOK LMAO
+%killer% IS FUCKING %name% WITH ROSNEHOOK LMAO
+%team% SHOULD SWAP TO %myteam% LMAO
+%name% GET FUCKED BY ROSNEHOOK

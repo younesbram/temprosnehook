@@ -65,8 +65,8 @@ void BeginCheatVisuals()
     ResetStrings();
 }
 
-static int w = 100;
-static int h = 100;
+static float w = 100.0f;
+static float h = 100.0f;
 
 void DrawCheatVisuals()
 {

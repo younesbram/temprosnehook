@@ -233,16 +233,17 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
                 boost::replace_all(message2, toreplace[i], replacewith[i]);
 
             for (const auto &filter : res)
+            {
                 if (boost::contains(message2, filter))
                 {
-                    chat_stack::Say("\e" + clear, true);
-                    retrun     = true;
+                    chat_stack::Say("I am not a bot.", true); // omega tonic
+                    retrun = true;
                     lastfilter = message;
-                    lastname   = format(name);
+                    lastname = format(name);
                     gitgud.update();
                     break;
-                }
         }
+    }
         chatlog::LogMessage(data[0], message);
         buf = bf_read(data.c_str(), data.size());
         buf.Seek(0);

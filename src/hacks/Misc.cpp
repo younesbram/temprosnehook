@@ -791,8 +791,6 @@ static std::vector<std::string> rich_presence_text;
 static size_t current_presence_idx = 0;
 static Timer richPresenceTimer;
 
-static CatCommand reload_presence("presence_reload", "Reload rich presence file", []() { PresenceReload(*rich_presence_file); });
-
 void PresenceReload(std::string after)
 {
     rich_presence_text.clear();
@@ -824,6 +822,8 @@ static void PresencePaint()
     }
     g_ISteamFriends->SetRichPresence("steam_player_group_size", std::to_string(*rich_presence_party_size + 1).c_str());
 }
+
+static CatCommand reload_presence("presence_reload", "Reload rich presence file", []() { PresenceReload(*rich_presence_file); });
 
 #endif
 

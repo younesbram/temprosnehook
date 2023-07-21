@@ -68,7 +68,7 @@ void DrawCheatVisuals()
     {
         PROF_SECTION(DRAW_info);
         std::string name_s, reason_s;
-        if (*info_text && g_IEngine->Con_IsVisible()))
+        if (*info_text && g_IEngine->Con_IsVisible())
         {
             // Setup time
             char timeString[10];

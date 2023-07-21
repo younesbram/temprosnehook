@@ -128,8 +128,6 @@ void DrawCheatVisuals()
     }
     if (CE_GOOD(g_pLocalPlayer->entity) && !g_Settings.bInvalid)
     {
-        PROF_SECTION(DRAW_skinchanger);
-        hacks::skinchanger::DrawText();
         Prediction_PaintTraverse();
     }
     {

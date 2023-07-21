@@ -84,6 +84,7 @@
         <List width="177">
             <AutoVariable width="fill" target="chat.clean" label="Remove newlines" tooltip="Hides newline spam."/>
             <AutoVariable width="fill" target="chat.anti-spam" label="Anti-spam" tooltip="Hides chat spam."/>
+            <AutoVariable width="fill" target="chat.crypto" label="Crypto chat"/>
             <AutoVariable width="fill" target="chat.prefix-newlines" label="Newlines"/>
             <AutoVariable width="fill" target="chat.log-events" label="Event logger"/>
             <AutoVariable width="fill" target="chat.log-events.hurt" label="Log hurt events"/>

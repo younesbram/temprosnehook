@@ -65,6 +65,15 @@ void BeginCheatVisuals()
     ResetStrings();
 }
 
+double getRandom(double lower_bound, double upper_bound)
+{
+    std::uniform_real_distribution<double> unif(lower_bound, upper_bound);
+    static std::mt19937 rand_engine(std::time(nullptr));
+
+    double x = unif(rand_engine);
+    return x;
+}
+
 void DrawCheatVisuals()
 {
     {
@@ -73,7 +82,7 @@ void DrawCheatVisuals()
         PROF_SECTION(PT_info_text);
         if (info_text)
         {
-            static float w, h;
+            float w, h;
             std::string hack_info_text;
             if (*info_style == 0) {
                 hack_info_text = "Rosnehook InDev " + hack::GetVersion();

@@ -1,4 +1,4 @@
-<Tab name="Chat" padding="4 4 4 4">
+<Tab name="chat/spam" padding="4 4 4 4">
     <Box padding="12 6 6 6" width="content" height="content" name="Chat spam">
         <List width="150">
             <LabeledObject width="fill" label="Spam mode">

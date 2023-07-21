@@ -16,6 +16,7 @@
 #endif
 #include "menu/GuiInterface.hpp"
 #include <SDL2/SDL_video.h>
+#include <SDLHooks.hpp>
 #include "soundcache.hpp"
 
 // String -> Wstring
@@ -87,7 +88,7 @@ std::string ShrinkString(std::string data, int max_x, fonts::font &font)
     int dotdot_with = x;
 
     if (padding + dotdot_with > max_x)
-        return {};
+        return std::string();
 
     if (!data.empty())
     {
@@ -157,6 +158,7 @@ void font::changeSize(int new_font_size)
 std::unique_ptr<font> menu{ nullptr };
 std::unique_ptr<font> esp{ nullptr };
 std::unique_ptr<font> center_screen{ nullptr };
+std::unique_ptr<font> nacl_watermark{ nullptr };
 } // namespace fonts
 
 static InitRoutine font_size(
@@ -283,7 +285,7 @@ void Line(float x1, float y1, float x2_offset, float y2_offset, rgba_t color, fl
         x1 += 0.5f;
         y1 += 0.5f;
 
-        float length = FastSqrt(SQR(x2_offset) + SQR(y2_offset));
+        float length = sqrtf(x2_offset * x2_offset + y2_offset * y2_offset);
         x2_offset *= (length - 1.0f) / length;
         y2_offset *= (length - 1.0f) / length;
 
@@ -317,7 +319,9 @@ void Line(float x1, float y1, float x2_offset, float y2_offset, rgba_t color, fl
         g_ISurface->DrawTexturedPolygon(4, vertices);
     }
     else
+    {
         g_ISurface->DrawLine(x1, y1, x1 + x2_offset, y1 + y2_offset);
+    }
 #elif ENABLE_GLEZ_DRAWING
     glez::draw::line(x1, y1, x2_offset, y2_offset, color, thickness);
 #endif

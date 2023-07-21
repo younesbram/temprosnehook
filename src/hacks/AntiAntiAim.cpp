@@ -18,6 +18,7 @@ static inline void modifyAngles()
 {
     for (const auto &player : entity_cache::player_cache)
     {
+        auto player = ENTITY(i);
         if (CE_BAD(player) || !player->m_bAlivePlayer() || !player->m_bEnemy() || !player->player_info->friendsID)
             continue;
         auto &data  = resolver_map[player->player_info->friendsID];
@@ -31,10 +32,11 @@ static inline void CreateMove()
     // Empty the array
     sniperdot_array.fill(nullptr);
     // Find sniper dots
-    for (auto &dot_ent : entity_cache::valid_ents)
+    for (int i = g_IEngine->GetMaxClients() + 1; i <= HIGHEST_ENTITY; i++)
     {
+        CachedEntity *dot_ent = ENTITY(i);
         // Not a sniper dot
-        if (dot_ent->m_iClassID() != CL_CLASS(CSniperDot))
+        if (CE_BAD(dot_ent) || dot_ent->m_iClassID() != CL_CLASS(CSniperDot))
             continue;
         // Get the player it belongs to
         auto ent_idx = HandleToIDX(CE_INT(dot_ent, netvar.m_hOwnerEntity));
@@ -52,11 +54,13 @@ void frameStageNotify(ClientFrameStage_t stage)
     if (!enable || !g_IEngine->IsInGame())
         return;
     if (stage == FRAME_NET_UPDATE_POSTDATAUPDATE_START)
+    {
         modifyAngles();
+    }
 #endif
 }
 
-static std::array<float, 5> yaw_resolves{ 0.0f, 180.0f, 65.0f, -65.0f, -180.0f };
+static std::array<float, 8> yaw_resolves{ 0.0f, 180.0f, 65.0f, 90.0f, -180.0f, 260.0f, 30.0f, 20.0f };
 
 static float resolveAngleYaw(float angle, brutedata &brute)
 {
@@ -69,7 +73,7 @@ static float resolveAngleYaw(float angle, brutedata &brute)
 
     // Yaw Resolving
     // Find out which angle we should try
-    int entry = (int) std::floor((brute.brutenum / 2.0f)) % yaw_resolves.size();
+    int entry = (int) std::floor((brute.brutenum / 5.0f)) % yaw_resolves.size();
     angle += yaw_resolves[entry];
 
     while (angle > 180)
@@ -108,13 +112,13 @@ static float resolveAnglePitch(float angle, brutedata &brute, CachedEntity *ent)
     // No sniper dot/not using a sniperrifle.
     if (sniper_dot == nullptr)
     {
-        if (brute.brutenum % 2)
+        if (brute.brutenum % 3)
         {
             // Pitch resolver
-            if (angle >= 90)
-                angle = -89;
-            if (angle <= -90)
-                angle = 89;
+            if (angle >= 195)
+                angle = -195;
+            if (angle <= -270)
+                angle = 50;
         }
     }
     // Sniper dot found, use it.
@@ -161,8 +165,8 @@ void increaseBruteNum(int idx)
 
 static void pitchHook(const CRecvProxyData *pData, void *pStruct, void *pOut)
 {
-    float flPitch     = pData->m_Value.m_Float;
-    auto *flPitch_out = (float *) pOut;
+    float flPitch      = pData->m_Value.m_Float;
+    float *flPitch_out = (float *) pOut;
 
     if (!enable)
     {
@@ -173,13 +177,13 @@ static void pitchHook(const CRecvProxyData *pData, void *pStruct, void *pOut)
     auto client_ent   = (IClientEntity *) (pStruct);
     CachedEntity *ent = ENTITY(client_ent->entindex());
     if (CE_GOOD(ent))
-        *flPitch_out = resolveAnglePitch(flPitch, resolver_map[ent->player_info->friendsID], ent);
+        *flPitch_out = resolveAnglePitch(flPitch, resolver_map[ent->player_info.friendsID], ent);
 }
 
 static void yawHook(const CRecvProxyData *pData, void *pStruct, void *pOut)
 {
-    float flYaw     = pData->m_Value.m_Float;
-    auto *flYaw_out = (float *) pOut;
+    float flYaw      = pData->m_Value.m_Float;
+    float *flYaw_out = (float *) pOut;
 
     if (!enable)
     {
@@ -210,14 +214,14 @@ static void hook()
         {
             for (int i = 0; i < pClass->m_pRecvTable->m_nProps; ++i)
             {
-                auto *pProp1 = (RecvPropRedef *) &(pClass->m_pRecvTable->m_pProps[i]);
+                RecvPropRedef *pProp1 = (RecvPropRedef *) &(pClass->m_pRecvTable->m_pProps[i]);
                 if (!pProp1)
                     continue;
                 const char *pszName2 = pProp1->m_pVarName;
                 if (!strcmp(pszName2, "tfnonlocaldata"))
                     for (int j = 0; j < pProp1->m_pDataTable->m_nProps; j++)
                     {
-                        auto *pProp2 = (RecvPropRedef *) &(pProp1->m_pDataTable->m_pProps[j]);
+                        RecvPropRedef *pProp2 = (RecvPropRedef *) &(pProp1->m_pDataTable->m_pProps[j]);
                         if (!pProp2)
                             continue;
                         const char *name = pProp2->m_pVarName;

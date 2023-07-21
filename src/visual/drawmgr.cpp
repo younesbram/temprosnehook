@@ -86,8 +86,8 @@ void DrawCheatVisuals()
             std::string hack_info_text;
             if (*info_style == 0) {
                 hack_info_text = "Rosnehook InDev " + hack::GetVersion();
-                fonts::center_screen->stringSize(hack_info_text, &w, &h);
-                draw::Rectangle(*info_x - 5, *info_y - 5, w + 10, h + 10, colors::Transparent(colors::black, *info_alpha));
+                *fonts::center_screen->stringSize(hack_info_text, &w, &h);
+                draw::Rectangle(*info_x - 5.0f, *info_y - 5.0f, 90.0f + 10.0f, 90.0f + 10.0f, *info_background_color);
                 draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
             }
         }

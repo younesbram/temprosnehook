@@ -82,12 +82,16 @@ void DrawCheatVisuals()
         PROF_SECTION(PT_info_text);
         if (info_text)
         {
+         std::string result = std::string(format_cstr("Rosnehook| %s%s", timeString, server_info.c_str()).get());
+
+            // Sizes for rectangle and line
             float w, h;
-            std::string hack_info_text;
-            if (*info_style == 0) {
-                hack_info_text = "Rosnehook InDev " + hack::GetVersion();
-                fonts::center_screen->stringSize(hack_info_text, &w, &h);
-                draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
+            fonts::center_screen->stringSize(result, &w, &h);
+
+            // Draw!
+            draw::Rectangle(*info_x - 5, *info_y - 5, w + 10, h + 10, colors::Transparent(colors::black, *info_alpha));
+            draw::Line(*info_x - 5, *info_y - 5, w + 10, 0, colors::gui, 2.0f);
+            draw::String(*info_x, *info_y, colors::gui, result.c_str(), *fonts::center_screen);
             }
         }
     }   

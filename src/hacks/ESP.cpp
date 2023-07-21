@@ -90,9 +90,12 @@ inline bool HitboxUpdate(CachedEntity *ent)
     auto hit = ent->hitboxes.GetHitbox(0);
     if (!hit)
         return false;
+
     Vector hbm, hbx;
     if (!draw::WorldToScreen(hit->min, hbm) || !draw::WorldToScreen(hit->max, hbx))
         return false;
+
+    return true;
 }
 
 // Sets an entitys esp color

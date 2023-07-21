@@ -214,7 +214,6 @@ void hack::Hook()
 
 #if ENABLE_VISUALS || ENABLE_TEXTMODE
     hooks::modelrender.Set(g_IVModelRender);
-    hooks::modelrender.HookMethod(HOOK_ARGS(DrawModelExecute));
     hooks::modelrender.Apply();
 #endif
     hooks::enginevgui.Set(g_IEngineVGui);

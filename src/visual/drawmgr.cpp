@@ -69,7 +69,7 @@ void DrawCheatVisuals()
     {
         PROF_SECTION(DRAW_info);
         std::string name_s, reason_s;
-        if (info_text && draw::inited)
+        if (*info_text && g_IEngine->Con_IsVisible()))
         {
             // Setup time
             char timeString[10];
@@ -106,7 +106,7 @@ void DrawCheatVisuals()
                 server_info = " | " + std::to_string((int)(avgLatency*1000.0f)) + " ms";
             }
 
-            std::string result = std::string(format_cstr("Fuckhook | %s%s", timeString, server_info.c_str()).get());
+            std::string result = std::string(("Ronsehook | %s%s", timeString, server_info.c_str()).get());
 
             // Sizes for rectangle and line
             float w, h;

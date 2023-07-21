@@ -25,7 +25,7 @@ Dependencies are handled automatically by the [dependencycheck](https://github.c
 
 Open a terminal window and enter the following command:
 
-    bash <(wget -qO- https://raw.githubusercontent.com/rosneburgerworks/One-in-all-cathook-install/master/install-all)
+    git clone https://github.com/rosneburgerworks/cathook; cd cathook; ./install-all
 
 The `cathook` folder should have been created successfully, containing all source files.
 

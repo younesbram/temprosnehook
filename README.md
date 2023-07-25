@@ -9,6 +9,7 @@
 Cathook, but without bloat, pasting ddodddssing methods, and calling everyone a literal gay slur, because any critism is higghly illgal. 
 this cheat should be renamed REALITYHOOK!
 WE ALSO HATE PEDOS!!
+we also know that reality's left nut got ddosed when he was 3 years of age!
 
 ## Getting started
 

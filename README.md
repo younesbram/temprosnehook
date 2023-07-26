@@ -15,6 +15,9 @@ WE ARE ALSO PAIRED WITH SUPER SCRET CHEAT: NIGHOOK!!
 also, reality is currently being monitored by fbi due to his lack of testosterone.
 plus, realtiyhok.cc is real and will ddos your router!
 even dashie broke outta jail to wish xarq0n happy birthday, and got really made when his aimware was ddosed by realtiy!!!
+also realtiy ddosed rosnehook nullnexus server! this will take a long time to recover (mentally too!)
+after that, reality jerked off to ddoser porn with xarq0n and the "gang"!
+maka sure you dont get in reality's way, because he is going throguh puberty!
 
 ## Getting started
 

@@ -18,6 +18,8 @@ even dashie broke outta jail to wish xarq0n happy birthday, and got really made 
 also realtiy ddosed rosnehook nullnexus server! this will take a long time to recover (mentally too!)
 after that, reality jerked off to ddoser porn with xarq0n and the "gang"!
 maka sure you dont get in reality's way, because he is going throguh puberty!
+everyone here should should leave this repo and neg for realityhook because it works on ubuntu!!!!!!!!!!!!
+please make sure not to question realitys school skills, as he dropped out at the age of -1.
 
 ## Getting started
 

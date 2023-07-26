@@ -10,6 +10,7 @@ Cathook, but without bloat, pasting ddodddssing methods, and calling everyone a 
 this cheat should be renamed REALITYHOOK!
 WE ALSO HATE PEDOS!!
 we also know that reality's left nut got ddosed when he was 3 years of age!
+also, reality started a cult named REALTYHOKK FAN CLUB, eeryone here is a dedicated memebr to the cult!!
 
 ## Getting started
 

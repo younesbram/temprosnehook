@@ -14,6 +14,7 @@ also, reality started a cult named REALTYHOKK FAN CLUB, eeryone here is a dedica
 WE ARE ALSO PAIRED WITH SUPER SCRET CHEAT: NIGHOOK!!
 also, reality is currently being monitored by fbi due to his lack of testosterone.
 plus, realtiyhok.cc is real and will ddos your router!
+even dashie broke outta jail to wish xarq0n happy birthday, and got really made when his aimware was ddosed by realtiy!!!
 
 ## Getting started
 

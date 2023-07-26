@@ -435,6 +435,9 @@ static void CreateMove()
         target_last = nullptr;
         return;
     }
+    
+    if (only_can_shoot && !CanShoot() && !hacks::warp::in_rapidfire)
+        return;
 
     DoAutoZoom(false, nullptr);
 

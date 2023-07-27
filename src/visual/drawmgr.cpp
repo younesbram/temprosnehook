@@ -26,7 +26,6 @@
 #include "drawmgr.hpp"
 
 static settings::Boolean info_text{ "hack-info.enable", "true" };
-static settings::Int info_style{ "hack-info.style", "0" };
 static settings::Rgba info_background_color{"hack-info.background", "00000b3"};
 static settings::Rgba info_foreground_color{"hack-info.foreground", "ffffff"};
 static settings::Int info_x{"hack-info.x", "10"};

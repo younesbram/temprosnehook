@@ -13,14 +13,16 @@
 
 #include <SimpleIPC/ipcb.hpp>
 #include "pthread.h"
-#include <ctime>
+#include <time.h>
 
 class CatCommand;
 
 namespace ipc
 {
+
 namespace commands
 {
+
 constexpr unsigned execute_client_cmd      = 1;
 constexpr unsigned set_follow_steamid      = 2;
 constexpr unsigned execute_client_cmd_long = 3;
@@ -93,7 +95,7 @@ struct user_data_s
 
 using peer_t = cat_ipc::Peer<server_data_s, user_data_s>;
 
-extern peer_t *peer;
+extern std::unique_ptr<peer_t> peer;
 
 void update_mapname();
 

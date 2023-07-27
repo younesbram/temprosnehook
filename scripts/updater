@@ -162,7 +162,7 @@ function performupdate() {
   mkdir -p ./build
   # Update cathook
   pushd build && cmake .. && cmake --build . --target cathook -- -j"$(nproc --all)" || {
-    echo -e "\033[1;31m \n \nFailed to compile cathook\n\033[0m"
+    echo -e "\033[1;31m \n \nFailed to compile Rosnehook\n\033[0m"
     exit 1
   }
   # Update data

@@ -26,6 +26,7 @@
 #include "drawmgr.hpp"
 
 static settings::Boolean info_text{ "hack-info.enable", "true" };
+static settings::Int info_style{ "hack-info.style", "0" };
 static settings::Rgba info_background_color{"hack-info.background", "00000b3"};
 static settings::Rgba info_foreground_color{"hack-info.foreground", "ffffff"};
 static settings::Int info_x{"hack-info.x", "10"};
@@ -75,7 +76,6 @@ double getRandom(double lower_bound, double upper_bound)
 
 void DrawCheatVisuals()
 {
-    #if ENABLE_GUI
     {
         PROF_SECTION(DRAW_info);
         std::string name_s, reason_s;
@@ -87,12 +87,10 @@ void DrawCheatVisuals()
             if (*info_style == 0) {
                 hack_info_text = "Rosnehook InDev " + hack::GetVersion();
                 fonts::center_screen->stringSize(hack_info_text, &w, &h);
-                draw::Rectangle(*info_x - 5.0f, *info_y - 5.0f, w + 10.0f, h + 10.0f, *info_background_color);
                 draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
             }
         }
-    }
-    #endif
+    }   
     if (spectator_target)
     {
         AddCenterString("Press SPACE to stop spectating");

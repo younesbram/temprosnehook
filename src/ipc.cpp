@@ -23,6 +23,7 @@ static settings::Int bot_chunks("ipc.bot-chunks", "1");
 
 namespace ipc
 {
+
 static settings::String server_name{ "ipc.server", "cathook_followbot_server" };
 
 CatCommand fix_deadlock("ipc_fix_deadlock", "Fix deadlock",
@@ -42,18 +43,18 @@ CatCommand connect("ipc_connect", "Connect to IPC server",
                            logging::Info("Already connected!");
                            return;
                        }
-                       peer = new peer_t(*server_name, false, false);
+                       peer = std::make_unique<peer_t>(*server_name, false, false);
                        try
                        {
                            peer->Connect();
                            logging::Info("peer count: %i", peer->memory->peer_count);
                            logging::Info("magic number: 0x%08x", peer->memory->global_data.magic_number);
                            logging::Info("magic number offset: 0x%08x", (uintptr_t) &peer->memory->global_data.magic_number - (uintptr_t) peer->memory);
-                           peer->SetCommandHandler(commands::execute_client_cmd, [](cat_ipc::command_s &command, void *payload) { hack::command_stack().emplace((const char *) &command.cmd_data); });
-                           peer->SetCommandHandler(commands::execute_client_cmd_long, [](cat_ipc::command_s &command, void *payload) { hack::command_stack().emplace((const char *) payload); });
+                           peer->SetCommandHandler(commands::execute_client_cmd, [](const cat_ipc::Command &command, const void *payload) { hack::command_stack().emplace(reinterpret_cast<const char*>(&command.cmd_data));} );
+                           peer->SetCommandHandler(commands::execute_client_cmd_long, [](const cat_ipc::Command &command, const void *payload) { hack::command_stack().emplace(static_cast<const char*>(payload)); });
                            user_data_s &data = peer->memory->peer_user_data[peer->client_id];
 
-                           // Preserve accumulated data
+                           // Preserve accumulated dataS
                            ipc::user_data_s::accumulated_t accumulated{};
                            memcpy(&accumulated, &data.accumulated, sizeof(accumulated));
                            memset(&data, 0, sizeof(data));
@@ -67,8 +68,7 @@ CatCommand connect("ipc_connect", "Connect to IPC server",
                        catch (std::exception &error)
                        {
                            logging::Info("Runtime error: %s", error.what());
-                           delete peer;
-                           peer = nullptr;
+                           peer.reset();
                        }
                    });
 CatCommand connect_ghost("ipc_connect_ghost", "Connect to ipc but do not actually receive any commands",
@@ -79,7 +79,7 @@ CatCommand connect_ghost("ipc_connect_ghost", "Connect to ipc but do not actuall
                                  logging::Info("Already connected!");
                                  return;
                              }
-                             peer = new peer_t(*server_name, false, false);
+                             peer = std::make_unique<peer_t>(*server_name, false, false);
                              try
                              {
                                  *const_cast<bool *>(&peer->is_ghost) = true;
@@ -91,15 +91,13 @@ CatCommand connect_ghost("ipc_connect_ghost", "Connect to ipc but do not actuall
                              catch (std::exception &error)
                              {
                                  logging::Info("Runtime error: %s", error.what());
-                                 delete peer;
-                                 peer = nullptr;
+                                 peer.reset();
                              }
                          });
 CatCommand disconnect("ipc_disconnect", "Disconnect from IPC server",
                       []()
                       {
-                          delete peer;
-                          peer = nullptr;
+                          peer.reset();
                       });
 CatCommand exec("ipc_exec", "Execute command (first argument = bot ID)",
                 [](const CCommand &args)
@@ -111,7 +109,7 @@ CatCommand exec("ipc_exec", "Execute command (first argument = bot ID)",
                         logging::Info("Target id is NaN!");
                         return;
                     }
-                    if (target_id > 255)
+                    if (target_id > cat_ipc::max_peers - 1)
                     {
                         logging::Info("Invalid target id: %u", target_id);
                         return;
@@ -128,11 +126,11 @@ CatCommand exec("ipc_exec", "Execute command (first argument = bot ID)",
                     ReplaceString(command, " && ", " ; ");
                     if (command.length() >= 63)
                     {
-                        peer->SendMessage(nullptr, target_id, ipc::commands::execute_client_cmd_long, command.c_str(), command.length() + 1);
+                        peer->SendMessage(0, target_id, ipc::commands::execute_client_cmd_long, command.c_str(), command.length() + 1);
                     }
                     else
                     {
-                        peer->SendMessage(command.c_str(), target_id, ipc::commands::execute_client_cmd, nullptr, 0);
+                        peer->SendMessage(command.c_str(), target_id, ipc::commands::execute_client_cmd, 0, 0);
                     }
                 });
 CatCommand exec_all("ipc_exec_all", "Execute command (on every peer)",
@@ -142,11 +140,11 @@ CatCommand exec_all("ipc_exec_all", "Execute command (on every peer)",
                         ReplaceString(command, " && ", " ; ");
                         if (command.length() >= 63)
                         {
-                            peer->SendMessage(nullptr, -1, ipc::commands::execute_client_cmd_long, command.c_str(), command.length() + 1);
+                            peer->SendMessage(0, -1, ipc::commands::execute_client_cmd_long, command.c_str(), command.length() + 1);
                         }
                         else
                         {
-                            peer->SendMessage(command.c_str(), -1, ipc::commands::execute_client_cmd, nullptr, 0);
+                            peer->SendMessage(command.c_str(), -1, ipc::commands::execute_client_cmd, 0, 0);
                         }
                     });
 
@@ -157,7 +155,7 @@ CatCommand exec_sync("ipc_sync_all", "Sync's certain variable (on every peer)",
                          if (!peer)
                          {
                              connected                            = true;
-                             peer                                 = new peer_t(*server_name, false, false);
+                             peer                                 = std::make_unique<peer_t>(*server_name, false, false);
                              *const_cast<bool *>(&peer->is_ghost) = true;
 
                              try
@@ -168,8 +166,7 @@ CatCommand exec_sync("ipc_sync_all", "Sync's certain variable (on every peer)",
                              {
                                  logging::Info("Runtime error: %s", error.what());
                                  g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Failed to connect to IPC.\n");
-                                 delete peer;
-                                 peer = nullptr;
+                                 peer.reset();
                                  return;
                              }
                          }
@@ -209,7 +206,7 @@ CatCommand exec_sync("ipc_sync_all", "Sync's certain variable (on every peer)",
                                      int local_fid = peer->memory->peer_user_data[peer->client_id].friendid;
 
                                      if (peer_fid != local_fid)
-                                         peer->SendMessage(nullptr, -1, ipc::commands::execute_client_cmd_long, command.c_str(), command.length() + 1);
+                                         peer->SendMessage(0, -1, ipc::commands::execute_client_cmd_long, command.c_str(), command.length() + 1);
                                  }
                              }
                          }
@@ -225,7 +222,7 @@ CatCommand exec_sync("ipc_sync_all", "Sync's certain variable (on every peer)",
                                          int local_fid = peer->memory->peer_user_data[peer->client_id].friendid;
 
                                          if (peer_fid != local_fid)
-                                             peer->SendMessage(command.c_str(), i, ipc::commands::execute_client_cmd, nullptr, 0);
+                                             peer->SendMessage(command.c_str(), i, ipc::commands::execute_client_cmd, 0, 0);
                                      }
                                  }
                              }
@@ -233,13 +230,10 @@ CatCommand exec_sync("ipc_sync_all", "Sync's certain variable (on every peer)",
 
                          /* if the user wasnt connected to the ipc before running sync_all, disconnect */
                          if (connected)
-                         {
-                             delete peer;
-                             peer = nullptr;
-                         }
+                             peer.reset();
                      });
 
-peer_t *peer{ nullptr };
+std::unique_ptr<peer_t> peer;
 
 CatCommand debug_get_ingame_ipc("ipc_debug_dump_server", "Show other bots on server",
                                 []()
@@ -247,7 +241,7 @@ CatCommand debug_get_ingame_ipc("ipc_debug_dump_server", "Show other bots on ser
                                     std::vector<unsigned> players{};
                                     for (int j = 1; j <= MAX_PLAYERS; j++)
                                     {
-                                        player_info_s info{};
+                                        player_info_s info;
                                         if (GetPlayerInfo(j, &info))
                                         {
                                             if (info.friendsID)
@@ -345,7 +339,7 @@ void UpdateTemporaryData()
             }
 
             data.ingame.player_count = players;
-            hacks::catbot::update_ipc_data(data);
+            hacks::shared::catbot::update_ipc_data(data);
         }
         else
         {

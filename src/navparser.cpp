@@ -883,7 +883,7 @@ static void CreateMove()
     if (!isReady())
         return;
 
-    if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive())
+    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
     {
         cancelPath();
         return;
@@ -986,7 +986,7 @@ void Draw()
 {
     if (!isReady() || !*draw)
         return;
-    if (*draw_debug_areas && CE_GOOD(LOCAL_E) && g_pLocalPlayer->alive())
+    if (*draw_debug_areas && CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
     {
         auto area = map->findClosestNavSquare(g_pLocalPlayer->v_Origin);
         auto edge = area->getNearestPoint(g_pLocalPlayer->v_Origin.AsVector2D());

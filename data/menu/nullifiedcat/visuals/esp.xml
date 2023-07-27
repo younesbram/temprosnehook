@@ -108,22 +108,4 @@
             <AutoVariable width="fill" target="esp.info.weapon" label="Weapon"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Head ESP" x="330" y="225">
-        <List width="150">
-            <LabeledObject width="fill" label="Head ESP mode"
-                           tooltip="Puts a certain icon over players' heads, independent of regular ESP settings.">
-                <Select target="headesp.mode">
-                    <Option name="Off" value="0"/>
-                    <Option name="Circle" value="1"/>
-                    <Option name="Class" value="2"/>
-                    <Option name="Joy" value="3"/>
-                    <Option name="Thinking" value="4"/>
-                </Select>
-            </LabeledObject>
-            <AutoVariable width="fill" target="headesp.size-scaling" label="Size scaling"
-                          tooltip="Sets the size of the head ESP." min="2.5" max="8.01" step="0.1"/>
-            <AutoVariable width="fill" target="headesp.teammates" label="Teammates"
-                          tooltip="Toggles whether teammates have the head ESP."/>
-        </List>
-    </Box>
 </Tab>

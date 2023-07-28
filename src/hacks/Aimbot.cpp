@@ -1,3 +1,4 @@
+// this aimbot sucks ass asf
 /*
  * Aimbot.cpp
  *

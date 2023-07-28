@@ -417,7 +417,6 @@ Vector viewangles_this_tick(0.0f);
 
 // If slow aimbot allows autoshoot
 bool slow_can_shoot = false;
-bool projectileAimbotRequired;
 
 // The main "loop" of the aimbot.
 static void CreateMove()

@@ -923,9 +923,6 @@ void DoAutoshoot(CachedEntity *target_entity)
     // Autoshoot breaks with Slow aimbot, so use a workaround to detect when it can
     else if (slow_aim != 0 && !slow_can_shoot)
         attack = false;
-    // Don't autoshoot without anything in clip
-    else if (CE_INT(LOCAL_W, netvar.m_iClip1) == 0)
-        attack = false;
 
     if (attack)
     {

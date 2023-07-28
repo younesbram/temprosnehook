@@ -28,7 +28,6 @@ static settings::Boolean micspam{ "cat-bot.micspam.enable", "false" };
 static settings::Int micspam_on{ "cat-bot.micspam.interval-on", "1" };
 static settings::Int micspam_off{ "cat-bot.micspam.interval-off", "0" };
 
-static settings::Boolean auto_crouch{ "cat-bot.auto-crouch", "false" };
 static settings::Boolean always_crouch{ "cat-bot.always-crouch", "false" };
 static settings::Boolean random_votekicks{ "cat-bot.votekicks", "false" };
 static settings::Boolean votekick_rage_only{ "cat-bot.votekicks.rage-only", "false" };
@@ -617,50 +616,6 @@ CatCommand report_uid("report_steamid", "Report with steamid",
                       });
 
 Timer crouchcdr{};
-void smart_crouch()
-{
-    if (g_Settings.bInvalid)
-        return;
-    if (!current_user_cmd)
-        return;
-    if (*always_crouch)
-    {
-        current_user_cmd->buttons |= IN_DUCK;
-        if (crouchcdr.test_and_set(10000))
-            current_user_cmd->buttons &= ~IN_DUCK;
-        return;
-    }
-    bool foundtar      = false;
-    static bool crouch = false;
-    if (crouchcdr.test_and_set(2000))
-    {
-        for (const auto &ent : entity_cache::player_cache)
-        {
-            if (CE_BAD(ent) || ent->m_Type() != ENTITY_PLAYER || ent->m_iTeam() == LOCAL_E->m_iTeam() || !ent->hitboxes.GetHitbox(0) || !ent->m_bAlivePlayer() || !player_tools::shouldTarget(ent))
-                continue;
-            bool failedvis = false;
-            for (uint8_t i = 0; i < 18; ++i)
-                if (IsVectorVisible(g_pLocalPlayer->v_Eye, ent->hitboxes.GetHitbox(i)->center))
-                    failedvis = true;
-            if (failedvis)
-                continue;
-            for (uint8_t i = 0; i < 18; ++i)
-            {
-                if (!LOCAL_E->hitboxes.GetHitbox(i))
-                    continue;
-                // Check if they see my hitboxes
-                if (!IsVectorVisible(ent->hitboxes.GetHitbox(0)->center, LOCAL_E->hitboxes.GetHitbox(i)->center) && !IsVectorVisible(ent->hitboxes.GetHitbox(0)->center, LOCAL_E->hitboxes.GetHitbox(i)->min) && !IsVectorVisible(ent->hitboxes.GetHitbox(0)->center, LOCAL_E->hitboxes.GetHitbox(i)->max))
-                    continue;
-                foundtar = true;
-                crouch   = true;
-            }
-        }
-        if (!foundtar && crouch)
-            crouch = false;
-    }
-    if (crouch)
-        current_user_cmd->buttons |= IN_DUCK;
-}
 
 CatCommand print_ammo("debug_print_ammo", "debug",
                       []()
@@ -706,9 +661,6 @@ static void cm()
 
     if (CE_BAD(LOCAL_E) || CE_BAD(LOCAL_W))
         return;
-
-    if (*auto_crouch)
-        smart_crouch();
 
     static const int classes[3]{ tf_spy, tf_sniper, tf_pyro };
     if (*auto_disguise && g_pPlayerResource->GetClass(LOCAL_E) == tf_spy && !IsPlayerDisguised(LOCAL_E) && disguise.test_and_set(3000))

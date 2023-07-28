@@ -44,7 +44,6 @@ static settings::Boolean zoomed_only{ "aimbot.zoomed-only", "true" };
 static settings::Boolean only_can_shoot{ "aimbot.can-shoot-only", "true" };
 
 static settings::Int normal_slow_aim{ "aimbot.slow", "0" };
-static settings::Float sticky_autoshoot{ "aimbot.projectile.sticky-autoshoot", "0.5" };
 
 static settings::Boolean auto_spin_up{ "aimbot.auto.spin-up", "false" };
 static settings::Boolean minigun_tapfire{ "aimbot.auto.tapfire", "false" };
@@ -436,7 +435,7 @@ static void CreateMove()
         return;
     }
     
-    if (only_can_shoot && !CanShoot() && !hacks::warp::in_rapidfire)
+    if (only_can_shoot && !CanShoot())
         return;
 
     DoAutoZoom(false, nullptr);
@@ -839,35 +838,6 @@ bool IsTargetStateGood(CachedEntity *entity)
     default:
         break;
     }
-
-    // Check for stickybombs
-    if (entity->m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile))
-    {
-        // Enabled
-        // Teammates, Even with friendly fire enabled, stickies can NOT be destroyed
-        if (!entity->m_bEnemy())
-            return false;
-
-        // Only hitscan weapons can break stickies so check for them.
-        if (!(GetWeaponMode() == weapon_hitscan || GetWeaponMode() == weapon_melee))
-            return false;
-
-        // Distance
-        if (entity->m_flDistance() > EffectiveTargetingRange())
-            return false;
-
-        // Check if target is a pipe bomb
-        if (CE_INT(entity, netvar.iPipeType) != 1)
-            return false;
-
-        // Moving Sticky?
-        Vector velocity;
-        velocity::EstimateAbsVelocity(RAW_ENT(entity), velocity);
-        if (!velocity.IsZero())
-            return false;
-
-        return true;
-    }
     return false;
 }
 
@@ -909,7 +879,6 @@ bool Aim(CachedEntity *entity)
 
 // A function to check whether player can autoshoot
 bool began_charge = false;
-int began_sticky  = 0;
 void DoAutoshoot(CachedEntity *target_entity)
 {
     // Enable check
@@ -919,7 +888,7 @@ void DoAutoshoot(CachedEntity *target_entity)
 
     // Rifle check
     if (g_pLocalPlayer->holding_sniper_rifle && *zoomed_only && !CanHeadshot() && !AllowNoScope(target_entity))
-        attack = false;
+        attack = false; // NILL KIGGERS
     // Autoshoot breaks with Slow aimbot, so use a workaround to detect when it can
     else if (slow_aim != 0 && !slow_can_shoot)
         attack = false;

@@ -371,7 +371,7 @@ static void CreateMove()
         break;
     case 4:
         //source = &builtin_blanks;
-        source = &savetf2
+        source = &savetf2;
         break;
     case 5:
         source = &builtin_nonecore;
@@ -381,7 +381,7 @@ static void CreateMove()
         break;
     case 7:
         //source = &builtin_lithium; no need anymore
-        source = &randomnn
+        source = &randomnn;
         break;
     default:
         return;

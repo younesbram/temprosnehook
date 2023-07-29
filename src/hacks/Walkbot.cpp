@@ -1,5 +1,5 @@
 // ima delete this later
-
+// ???? why. how the bots is gonna walk without this shit??
 /*
  * Walkbot.cpp
  *

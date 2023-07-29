@@ -5,7 +5,7 @@
  *  Created on: Oct 9, 2016
  *      Author: nullifiedcat
  */
-
+// To do: findout the DEFUALT FUCKING SETTINGS 
 #include <hacks/Aimbot.hpp>
 #include <hacks/AntiAim.hpp>
 #include <hacks/ESP.hpp>
@@ -23,7 +23,7 @@
 
 namespace hacks::aimbot
 {
-static settings::Boolean normal_enable{ "aimbot.enable", "false" };
+static settings::Boolean normal_enable{ "aimbot.enable", "true" };
 static settings::Button aimkey{ "aimbot.aimkey.button", "<null>" };
 static settings::Int aimkey_mode{ "aimbot.aimkey.mode", "1" };
 static settings::Boolean autoshoot{ "aimbot.autoshoot", "true" };
@@ -48,21 +48,21 @@ static settings::Int normal_slow_aim{ "aimbot.slow", "0" };
 
 static settings::Boolean auto_spin_up{ "aimbot.auto.spin-up", "false" };
 static settings::Boolean minigun_tapfire{ "aimbot.auto.tapfire", "false" };
-static settings::Boolean auto_zoom{ "aimbot.auto.zoom", "false" };
-static settings::Boolean auto_unzoom{ "aimbot.auto.unzoom", "false" };
+static settings::Boolean auto_zoom{ "aimbot.auto.zoom", "true" };
+static settings::Boolean auto_unzoom{ "aimbot.auto.unzoom", "true" };
 static settings::Float zoom_distance{ "aimbot.zoom.distance", "1250.0" };
 
 static settings::Boolean backtrack_aimbot{ "aimbot.backtrack", "false" };
 static settings::Boolean backtrack_last_tick_only("aimbot.backtrack.only-last-tick", "true");
 static bool force_backtrack_aimbot = false;
-
+// wtf is this above
 static settings::Float max_range{ "aimbot.target.max-range", "4096" };
 static settings::Boolean ignore_vaccinator{ "aimbot.target.ignore-vaccinator", "true" };
 static settings::Boolean buildings_sentry{ "aimbot.target.sentry", "true" };
 static settings::Boolean npcs{ "aimbot.target.npcs", "true" };
 static settings::Int teammates{ "aimbot.target.teammates", "0" };
 
-settings::Boolean engine_projpred{ "aimbot.debug.engine-pp", "true" };
+settings::Boolean engine_projpred{ "aimbot.debug.engine-pp", "true" }; // lags harder than my dad + crash
 
 struct AimbotCalculatedData_s
 {

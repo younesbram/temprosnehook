@@ -24,15 +24,15 @@ struct KillsayStorage
 static boost::unordered_flat_map<int, KillsayStorage> killsay_storage{};
 
 // Thanks HellJustFroze for linking me http://daviseford.com/shittalk/ -- not anymore
-const std::vector<std::string> builtin_default = { "Did i miss my shot on '%name%'? if i didnt then oh well he got rekt", "'%name%' got fucked and raped by a bot. should've quit the game entirely", "I would insult %name%, but nature did a better job.", "With that aim i'm surprised you're able to hit install. '%name%'", "Some people get paid to suck, you do it for free, '%name%'.", "'%name%' bro if u had BEST AIM on fps games and still dies to me ur a noob and give me all of ur unusuals.", "Hey '%name%' If your main is %class%, you should give up.", "Hey %name%, i see you can't play %class%. Try quitting the game.", "%name% : Wow my cheat sucks i should get rosnehook", "☐ Not rekt ☑ Rekt ☑ Really Rekt ☑ Tyrannosaurus Rekt" };
-
+const std::vector<std::string> builtin_default = { "Did i miss my shot on '%name%'? if i didnt then oh well he got rekt", "'%name%' got fucked and raped by a bot. should've quit the game entirely", "I would insult %name%, but nature did a better job.", "Some people get paid to suck, you do it for free, '%name%'.", "'%name%' bro if u had BEST AIM on fps games and still dies to me ur a noob and give me all of ur unusuals.", "Hey '%name%' If your main is %class%, you should give up.", "Hey %name%, i see you can't play %class%. Try quitting the game.", "%name% : Wow my cheat sucks i should get rosnehook", "☐ Not rekt ☑ Rekt ☑ Really Rekt ☑ Tyrannosaurus Rekt" };
+const std::vector<std::string> withthataim = { "'%name%' had to use aim labs just to be able to hit the install button", "With that aim if you were one of the terrorist on 9/11 you would've flew between the towers", "With that aim youre the reason there's bots in every lobby", "If ur aim had that aim. you wouldnt exists"}; //SO COLD BRUH
 const std::vector<std::string> builtin_nonecore_mlg = { "GET REKT U SCRUB", "GET REKT M8", "U GOT NOSCOPED M8", "U GOT QUICKSCOPED M8", "2 FAST 4 U, SCRUB", "U GOT REKT, M8" };
 const std::string tf_classes_killsay[]              = { "class", "scout", "sniper", "soldier", "demoman", "medic", "heavy", "pyro", "spy", "engineer" };
 const std::string tf_teams_killsay[]                = { "RED", "BLU" };
 static std::string lastmsg{};
 
 TextFile file{};
-
+//????????
 std::string ComposeKillSay(IGameEvent *event)
 {
     const std::vector<std::string> *source = nullptr;
@@ -42,6 +42,8 @@ std::string ComposeKillSay(IGameEvent *event)
         source = &file.lines;
         break;
     case 2:
+        source = &withthataim;
+        break;
     case 3:
         source = &builtin_default;
         break;

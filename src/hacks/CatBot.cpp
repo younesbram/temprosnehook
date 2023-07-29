@@ -31,13 +31,13 @@ static settings::Int micspam_off{ "cat-bot.micspam.interval-off", "0" };
 static settings::Boolean always_crouch{ "cat-bot.always-crouch", "false" };
 static settings::Boolean random_votekicks{ "cat-bot.votekicks", "false" };
 static settings::Boolean votekick_rage_only{ "cat-bot.votekicks.rage-only", "false" };
-static settings::Boolean autoReport{ "cat-bot.autoreport", "true" };
+static settings::Boolean autoReport{ "cat-bot.autoreport", "false" }; // autoreport makes u vac banned
 static settings::Boolean autovote_map{ "cat-bot.autovote-map", "true" };
 
 //static settings::Boolean mvm_autoupgrade{ "mvm.autoupgrade", "false" };
 
-settings::Boolean catbotmode{ "cat-bot.enable", "false" };
-settings::Boolean anti_motd{ "cat-bot.anti-motd", "false" };
+settings::Boolean catbotmode{ "cat-bot.enable", "true" }; // i forgur :troll:
+settings::Boolean anti_motd{ "cat-bot.anti-motd", "true" }; // may reduces lag idk
 
 // These are used for randomly loading a config on respawn for the bots
 

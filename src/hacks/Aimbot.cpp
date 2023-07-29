@@ -888,7 +888,7 @@ void DoAutoshoot(CachedEntity *target_entity)
 
     // Rifle check
     if (g_pLocalPlayer->holding_sniper_rifle && *zoomed_only && !CanHeadshot() && !AllowNoScope(target_entity))
-        attack = false; // NILL KIGGERS
+        attack = false;
     // Autoshoot breaks with Slow aimbot, so use a workaround to detect when it can
     else if (slow_aim != 0 && !slow_can_shoot)
         attack = false;

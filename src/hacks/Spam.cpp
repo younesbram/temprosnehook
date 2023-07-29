@@ -429,7 +429,7 @@ void init()
     reloadSpamFile();
 }
 
-const std::vector<std::string> builtin_default    = { "Rosnehook - BONES? well yes", "Rosnehook - AA DOESNT WORK", "Rosnehook - SAME AIMBOT AS LMAOBOX", "Rosnehook - unexplainable misses", "Rosnehook - so private that valve will rat your pc just to check rosnehook code!", "Rosnehook - REMOVED BLOATWARE", "Rosnehook - furry and pedo killer!", "Rosnehook - not even SMAC can ban us! (they have to manual ban us)" };
+const std::vector<std::string> builtin_default    = { "Rosnehook - BONES? well yes", "Rosnehook - RATS FOR FREE", "Rosnehook - SAME AIMBOT AS LMAOBOX", "Rosnehook - unexplainable misses", "Rosnehook - so private that valve will rat your pc just to check rosnehook code!", "Rosnehook - REMOVED BLOATWARE", "Rosnehook - furry and pedo killer!", "Rosnehook - not even SMAC can ban us! (they have to manual ban us)" };
 const std::vector<std::string> builtin_lennyfaces = { "( ͡° ͜ʖ ͡°)", "( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)", "ʕ•ᴥ•ʔ", "(▀̿Ĺ̯▀̿ ̿)", "( ͡°╭͜ʖ╮͡° )", "(ง'̀-'́)ง", "(◕‿◕✿)", "༼ つ  ͡° ͜ʖ ͡° ༽つ" };
 //const std::vector<std::string> builtin_blanks     = { "\e"
 //                                                          "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"

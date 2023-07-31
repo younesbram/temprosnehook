@@ -84,10 +84,7 @@ void DrawCheatVisuals()
         PROF_SECTION(DRAW_WRAPPER)
         EC::run(EC::Draw);
     }
-    if (CE_GOOD(LOCAL_E))
-    {
-        Prediction_PaintTraverse();
-    }
+
     {
         PROF_SECTION(DRAW_strings)
         DrawStrings();

@@ -22,7 +22,7 @@
                           tooltip="Shows the Aimbot's FOV."/>
             <AutoVariable width="fill" target="aimbot.fov-circle.opacity" label="FOV opacity"
                           tooltip="Controls the FOV circle's opacity." min="0" max="1" step="0.05"/>
-            <AutoVariable width="fill" target="aimbot.can-shoot-only" label="Aim when reload"/>
+            <AutoVariable width="fill" target="aimbot.can-shoot-only" label="Fix Deathstare"/>
             <AutoVariable width="fill" target="aimbot.zoomed-only" label="Zoomed only"
                           tooltip="If applicable, the aimbot will only shoot if you are scoped in."/>
         </List>

@@ -87,7 +87,7 @@ void DrawCheatVisuals()
     if (CE_GOOD(LOCAL_E))
     {
         PROF_SECTION(DRAW_skinchanger)
-        hacks::skinchanger::DrawText();
+        // hacks::skinchanger::DrawText();
         Prediction_PaintTraverse();
     }
     {

@@ -42,7 +42,7 @@ static settings::Boolean assistance_only{ "aimbot.assistance.only", "false" };
 #endif
 static settings::Int hitbox{ "aimbot.hitbox", "0" };
 static settings::Boolean zoomed_only{ "aimbot.zoomed-only", "true" };
-static settings::Boolean only_can_shoot{ "aimbot.can-shoot-only", "true" };
+static settings::Boolean only_can_shoot{ "aimbot.can-shoot-only", "false" };
 
 static settings::Int normal_slow_aim{ "aimbot.slow", "0" };
 

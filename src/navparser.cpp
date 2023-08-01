@@ -17,6 +17,7 @@
 #include "common.hpp"
 #include "micropather.h"
 #include "CNavFile.h"
+#include "teamroundtimer.hpp"
 #include "Aimbot.hpp"
 #include "MiscAimbot.hpp"
 #include "navparser.hpp"
@@ -203,7 +204,7 @@ public:
 
     float LeastCostEstimate(void *start, void *end) override
     {
-        return reinterpret_cast<CNavArea *>(start)->m_center.DistToSqr(reinterpret_cast<CNavArea *>(end)->m_center);
+        return reinterpret_cast<CNavArea *>(start)->m_center.DistTo(reinterpret_cast<CNavArea *>(end)->m_center);
     }
 
     void AdjacentCost(void *main, std::vector<micropather::StateCost> *adjacent) override
@@ -216,11 +217,22 @@ public:
             auto cached_connection = vischeck_cache.find(connection_key);
 
             // Entered and marked bad?
-            if (cached_connection != vischeck_cache.end() && !cached_connection->second.vischeck_state)
-                continue;
+            if (cached_connection != vischeck_cache.end())
+                if (!cached_connection->second.vischeck_state)
+                    continue;
 
             // If the extern blacklist is running, ensure we don't try to use a bad area
-            if (!free_blacklist_blocked && std::any_of(free_blacklist.begin(), free_blacklist.end(), [&](const auto &entry) { return entry.first == connection.area; }))
+            bool is_blacklisted = false;
+            if (!free_blacklist_blocked)
+                for (const auto &entry : free_blacklist)
+                {
+                    if (entry.first == connection.area)
+                    {
+                        is_blacklisted = true;
+                        break;
+                    }
+                }
+            if (is_blacklisted)
                 continue;
 
             auto points = determinePoints(&area, connection.area);
@@ -244,7 +256,7 @@ public:
             {
                 if (cached->second.vischeck_state)
                 {
-                    float cost = connection.area->m_center.DistToSqr(area.m_center);
+                    float cost = connection.area->m_center.DistTo(area.m_center);
                     adjacent->push_back(micropather::StateCost{ reinterpret_cast<void *>(connection.area), cost });
                 }
             }
@@ -255,7 +267,7 @@ public:
                 {
                     vischeck_cache[key] = { TICKCOUNT_TIMESTAMP(60), true };
 
-                    float cost = points.next.DistToSqr(points.current);
+                    float cost = points.next.DistTo(points.current);
                     adjacent->push_back(micropather::StateCost{ reinterpret_cast<void *>(connection.area), cost });
                 }
                 else
@@ -382,7 +394,7 @@ public:
                     Vector area = i.m_center;
                     area.z += PLAYER_JUMP_HEIGHT;
                     // Out of range
-                    if (building_origin.DistToSqr(area) > Sqr(1100.0f + HALF_PLAYER_WIDTH))
+                    if (building_origin.DistToSqr(area) > SQR(1100 + HALF_PLAYER_WIDTH))
                         continue;
                     // Check if sentry can see us
                     if (!IsVectorVisibleNavigation(building_origin, area))
@@ -401,7 +413,7 @@ public:
                     Vector area = i.m_center;
                     area.z += PLAYER_JUMP_HEIGHT;
                     // Out of range
-                    if (sticky_origin.DistToSqr(area) > Sqr(130.0f + HALF_PLAYER_WIDTH))
+                    if (sticky_origin.DistToSqr(area) > (130 + HALF_PLAYER_WIDTH) * (130 + HALF_PLAYER_WIDTH))
                         continue;
                     // Check if Sticky can see the reason
                     if (!IsVectorVisibleNavigation(sticky_origin, area))
@@ -641,7 +653,7 @@ static void followCrumbs()
         current_vec.z = g_pLocalPlayer->v_Origin.z;
 
     // We are close enough to the second crumb, Skip both (This is especially helpful with drop-downs)
-    if (crumbs.size() > 1 && crumbs[1].vec.DistToSqr(g_pLocalPlayer->v_Origin) < Sqr(50.0f))
+    if (crumbs.size() > 1 && crumbs[1].vec.DistTo(g_pLocalPlayer->v_Origin) < 50)
     {
         last_crumb = crumbs[1];
         crumbs.erase(crumbs.begin(), std::next(crumbs.begin()));
@@ -668,7 +680,7 @@ static void followCrumbs()
     // 1. No jumping if zoomed (or revved)
     // 2. Jump if it's necessary to do so based on z values
     // 3. Jump if stuck (not getting closer) for more than stuck_time/2
-    if ((!(g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed) && !(g_pLocalPlayer->bRevved || g_pLocalPlayer->bRevving) && (crouch || crumbs[0].vec.z - g_pLocalPlayer->v_Origin.z > 18.0f) && last_jump.check(200)) || (last_jump.check(200) && inactivity.check(*stuck_time / 2)))
+    if ((!(g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed) && !(g_pLocalPlayer->bRevved || g_pLocalPlayer->bRevving) && (crouch || crumbs[0].vec.z - g_pLocalPlayer->v_Origin.z > 18) && last_jump.check(200)) || (last_jump.check(200) && inactivity.check(*stuck_time / 2)))
     {
         auto local = map->findClosestNavSquare(g_pLocalPlayer->v_Origin);
         // Check if current area allows jumping
@@ -686,7 +698,7 @@ static void followCrumbs()
             ticks_since_jump++;
 
             // Update jump timer now since we are back on ground
-            if (crouch && g_pLocalPlayer->flags & FL_ONGROUND && ticks_since_jump > 3)
+            if (crouch && CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND && ticks_since_jump > 3)
             {
                 // Reset
                 crouch = false;
@@ -830,7 +842,7 @@ static void CreateMove()
     if (!isReady())
         return;
 
-    if (CE_BAD(LOCAL_E) || LOCAL_E->m_bAlivePlayer())
+    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
     {
         cancelPath();
         return;

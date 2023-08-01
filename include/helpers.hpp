@@ -19,9 +19,7 @@ class Vector;
 class ICvar;
 void SetCVarInterface(ICvar *iface);
 
-constexpr float PI    = 3.14159265358979323846f;
-constexpr float RADPI = 57.295779513082f;
-#define DEG2RAD(x) ((float) (x) * (float) (PI / 180.0f))
+constexpr float RADPI = 180.0f / M_PI_F;
 
 #include <enums.hpp>
 #include <conditions.hpp>
@@ -43,8 +41,6 @@ constexpr float RADPI = 57.295779513082f;
 #define TICKS_TO_TIME(t) (TICK_INTERVAL * (t))
 #define ROUND_TO_TICKS(t) (TICK_INTERVAL * TIME_TO_TICKS(t))
 #define SERVER_TIME (TICK_INTERVAL * CE_INT(LOCAL_E, netvar.nTickBase))
-
-// typedef void ( *FnCommandCallback_t )( const CCommand &command );
 
 template <typename Iter, typename RandomGenerator> Iter select_randomly(Iter start, Iter end, RandomGenerator &g)
 {
@@ -161,11 +157,14 @@ bool HasWeapon(CachedEntity *ent, int wantedId);
 bool IsAmbassador(CachedEntity *ent);
 bool AmbassadorCanHeadshot();
 // Validate a UserCmd
-#define VERIFIED_CMD_SIZE 90
+constexpr unsigned char VERIFIED_CMD_SIZE = 90;
 void ValidateUserCmd(CUserCmd *cmd, int sequence_nr);
 
 // Convert a TF2 handle into an IDX -> ENTITY(IDX)
-#define HandleToIDX(handle) (handle & 0xFFFF)
+FORCEINLINE int HandleToIDX(int handle)
+{
+    return handle & 0xFFFF;
+}
 
 inline const char *teamname(int team)
 {
@@ -179,6 +178,7 @@ inline const char *teamname(int team)
         return "SPEC";
     }
 }
+
 extern const std::string classes[10];
 inline const char *classname(int clazz)
 {
@@ -214,10 +214,6 @@ char GetUpperChar(ButtonCode_t button);
 char GetChar(ButtonCode_t button);
 
 bool IsEntityVisiblePenetration(CachedEntity *entity, int hb);
-
-// void RunEnginePrediction(IClientEntity* ent, CUserCmd *ucmd = NULL);
-// void StartPrediction(CUserCmd* cmd);
-// void EndPrediction();
 
 float RandFloatRange(float min, float max);
 int UniformRandomInt(int min, int max);

@@ -966,7 +966,7 @@ int NotVisibleHitbox(CachedEntity *target, int preferred)
 
 int AutoHitbox(CachedEntity *target)
 {
-    int preferred      = 3;
+    int preferred      = hitbox_t::spine_1;
     auto target_health = static_cast<float>(target->m_iHealth()); // This was used way too many times. Due to how pointers work (defrencing)+the compiler already dealing with tons of AIDS global variables it likely derefrenced it every time it was called.
     int ci             = LOCAL_W->m_iClassID();
 

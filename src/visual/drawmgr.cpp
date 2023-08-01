@@ -66,7 +66,7 @@ void DrawCheatVisuals()
         {
             auto color = colors::RainbowCurrent();
             color.a    = 1.0f;
-            AddSideString("Ronsehook | For TF2", color);
+            AddSideString("Rosnehook | For TF2", color);
             if (!*info_text_min)
             {
 #if ENABLE_GUI

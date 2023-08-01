@@ -20,7 +20,6 @@ static Timer previous_entity_delay{};
 // TODO: Refactor this jank
 std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool zcheck,  float range)
 {
-
     CachedEntity *bestent                             = nullptr;
     float bestscr                                     = FLT_MAX;
     Vector predicted{};
@@ -177,7 +176,7 @@ float CAM_CapYaw_Hook(IInput *this_, float fVal)
     return fVal;
 }
 
-#define foffset(p, i) ((unsigned char *) &p)[i]
+#define foffset(p, i) ((uint8_t *) &p)[i]
 static InitRoutine init(
     []()
     {

@@ -112,7 +112,7 @@ ConVar *CreateConVar(const std::string &name, const std::string &value, const st
     strncpy(valuec, value.c_str(), 255);
     strncpy(helpc, help.c_str(), 255);
     // logging::Info("Creating ConVar: %s %s %s", namec, valuec, helpc);
-    auto *ret = new ConVar(const_cast<const char *>(namec), const_cast<const char *>(valuec), 0, const_cast<const char *>(helpc));
+    auto ret = new ConVar(const_cast<const char *>(namec), const_cast<const char *>(valuec), 0, const_cast<const char *>(helpc));
     g_ICvar->RegisterConCommand(ret);
     RegisteredVarsList().push_back(ret);
     return ret;

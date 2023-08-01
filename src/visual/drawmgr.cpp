@@ -66,11 +66,9 @@ void DrawCheatVisuals()
         {
             auto color = colors::RainbowCurrent();
             color.a    = 1.0f;
-            AddSideString("Ronsehook | For Verson TF2", color);
+            AddSideString("Ronsehook | For TF2", color);
             if (!*info_text_min)
             {
-                AddSideString(hack::GetVersion(), colors::gui); // GitHub commit and date
-                AddSideString(hack::GetType(), colors::gui);    // Compile type
 #if ENABLE_GUI
                 AddSideString("Press '" + open_gui_button.toString() + "' key to open/close cheat menu.", colors::gui);
 #endif

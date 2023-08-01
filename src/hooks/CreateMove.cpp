@@ -8,6 +8,7 @@
 #include "common.hpp"
 #include "hack.hpp"
 #include "MiscTemporary.hpp"
+#include <link.h>
 #include <hacks/hacklist.hpp>
 #include <settings/Bool.hpp>
 #include <hacks/AntiAntiAim.hpp>
@@ -16,6 +17,9 @@
 #include "HookedMethods.hpp"
 #include "nospread.hpp"
 #include "Warp.hpp"
+
+// Found in C_BasePlayer. It represents "m_pCurrentCommand"
+#define CURR_CUSERCMD_PTR 4452
 
 static settings::Boolean roll_speedhack{ "misc.roll-speedhack", "false" };
 static settings::Boolean forward_speedhack{ "misc.roll-speedhack.forward", "false" };
@@ -357,7 +361,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
                 vsilent.x = cmd->forwardmove;
                 vsilent.y = cmd->sidemove;
                 vsilent.z = cmd->upmove;
-                speed     = std::hypot(vsilent.x, vsilent.y);
+                speed     = FastSqrt(SQR(vsilent.x) + SQR(vsilent.y));
                 VectorAngles(vsilent, ang);
                 yaw                 = DEG2RAD(ang.y - g_pLocalPlayer->v_OrigViewangles.y + cmd->viewangles.y);
                 cmd->forwardmove    = cos(yaw) * speed;

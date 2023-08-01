@@ -22,6 +22,7 @@
 #include "drawmgr.hpp"
 
 static settings::Boolean info_text{ "hack-info.enable", "true" };
+static settings::Boolean info_text_min{ "hack-info.minimal", "false" };
 
 void RenderCheatVisuals()
 {

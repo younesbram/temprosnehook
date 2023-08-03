@@ -11,6 +11,7 @@
 
 namespace velocity
 {
+
 EstimateAbsVelocity_t EstimateAbsVelocity{};
 
 void Init()

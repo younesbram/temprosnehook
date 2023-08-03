@@ -11,7 +11,7 @@
 
 inline void CachedEntity::Update()
 {
-#if !PROXY_ENTITY
+#ifndef PROXY_ENTITY
     m_pEntity = g_IEntityList->GetClientEntity(idx);
     if (!m_pEntity)
         return;
@@ -23,7 +23,7 @@ inline void CachedEntity::Update()
 
 inline CachedEntity::CachedEntity(u_int16_t idx) : m_IDX(idx), hitboxes(hitbox_cache::EntityHitboxCache{ idx })
 {
-#if !PROXY_ENTITY
+#ifndef PROXY_ENTITY
     m_pEntity = nullptr;
 #endif
 }
@@ -72,7 +72,7 @@ void Update()
 {
     max                    = g_IEntityList->GetHighestEntityIndex();
     u_int16_t current_ents = g_IEntityList->NumberOfEntities(false);
-    valid_ents.clear(); // Reserving isn't necessary as this doesn't reallocate it
+    valid_ents.clear();
     player_cache.clear();
     if (g_Settings.bInvalid)
         return;

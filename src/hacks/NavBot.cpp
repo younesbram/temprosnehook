@@ -58,7 +58,7 @@ constexpr bot_class_config CONFIG_MID_RANGE   = { 200.0f, 500.0f, 3000.0f, true 
 constexpr bot_class_config CONFIG_LONG_RANGE  = { 300.0f, 500.0f, 4000.0f, true };
 /*constexpr bot_class_config CONFIG_ENGINEER            = { 200.0f, 500.0f, 3000.0f, false };
 constexpr bot_class_config CONFIG_GUNSLINGER_ENGINEER = { 50.0f, 300.0f, 2000.0f, false };*/
-bot_class_config selected_config = CONFIG_MID_RANGE;
+bot_class_config selected_config;
 
 static Timer health_cooldown{};
 static Timer ammo_cooldown{};
@@ -74,7 +74,7 @@ bool shouldSearchHealth(bool low_priority = false)
     // Priority too high
     if (navparser::NavEngine::current_priority > health)
         return false;
-    float health_percent = LOCAL_E->m_iHealth() / g_pPlayerResource->GetMaxHealth(LOCAL_E);
+    float health_percent = static_cast<float>(g_pLocalPlayer->health) / LOCAL_E->m_iMaxHealth();
     // Get health when below 65%, or below 80% and just patrolling
     return health_percent < 0.64f || low_priority && (navparser::NavEngine::current_priority <= patrol || navparser::NavEngine::current_priority == lowprio_health) && health_percent <= 0.80f;
 }
@@ -90,7 +90,7 @@ bool shouldSearchAmmo()
     if (navparser::NavEngine::current_priority > ammo)
         return false;
 
-    int *weapon_list = (int *) ((uint64_t) (RAW_ENT(LOCAL_E)) + netvar.hMyWeapons);
+    int *weapon_list = &CE_INT(LOCAL_E, netvar.hMyWeapons);
     if (!weapon_list)
         return false;
     if (g_pLocalPlayer->holding_sniper_rifle && CE_INT(LOCAL_E, netvar.m_iAmmo + 4) <= 5)
@@ -483,7 +483,7 @@ void updateEnemyBlacklist(int slot)
     if (should_run_normal)
         navparser::NavEngine::clearFreeBlacklist(navparser::BlacklistReason(navparser::ENEMY_NORMAL));
     // Clear blacklist for dormant entities
-    if (should_run_dormant || !*blacklist_dormat)
+    if (should_run_dormant)
         navparser::NavEngine::clearFreeBlacklist(navparser::BlacklistReason(navparser::ENEMY_DORMANT));
 
     // #NoFear
@@ -538,7 +538,7 @@ void updateEnemyBlacklist(int slot)
             // Square the distance
             distance *= distance;
 
-            if ((*origin).DistToSqr(checked_origin.second) < distance)
+            if (origin->DistToSqr(checked_origin.second) < distance)
             {
                 should_check = false;
 
@@ -847,7 +847,7 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest)
             hacks::NavBot::isVisible = false;
     }
     // If we are close enough, don't even bother with using the navparser to get there
-    if (nearest.second < 400 && hacks::NavBot::isVisible)
+    if (nearest.second < 400.0f && hacks::NavBot::isVisible)
     {
         AimAt(g_pLocalPlayer->v_Eye, nearest.first->hitboxes.GetHitbox(head)->center, current_user_cmd);
         WalkTo(nearest.first->m_vecOrigin());
@@ -858,8 +858,7 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest)
     {
         // Don't constantly path, it's slow.
         // The closer we are, the more we should try to path
-        if (!melee_cooldown.test_and_set(nearest.second < 400 ? 400 : nearest.second < 2000 ? 1000 : 4000) && navparser::NavEngine::isPathing())
-            return navparser::NavEngine::current_priority == prio_melee;
+        if (!melee_cooldown.test_and_set(nearest.second < 400.0f ? 200 : nearest.second < 1000.0f ? 500 : 2000) && navparser::NavEngine::isPathing())
 
         // Just walk at the enemy l0l
         if (navparser::NavEngine::navTo(nearest.first->m_vecOrigin(), prio_melee, true, !navparser::NavEngine::isPathing()))
@@ -930,7 +929,7 @@ bool snipeSentries()
         return false;
 
     // Sentries don't move often, so we can use a slightly longer timer
-    if (!sentry_snipe_cooldown.test_and_set(2000))
+    if (!sentry_snipe_cooldown.test_and_set(3000))
         return navparser::NavEngine::current_priority == snipe_sentry || isSnipeTargetValid(previous_target);
 
     if (isSnipeTargetValid(previous_target))
@@ -1381,11 +1380,11 @@ static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &ne
         if (HasWeapon(LOCAL_E, 56) || HasWeapon(LOCAL_E, 1005) || HasWeapon(LOCAL_E, 1092))
             return primary;
 
-        if (nearest.second <= 200)
+        if (nearest.second <= 200.0f)
             return melee;
-        else if (nearest.second <= 300 && nearest.first->m_iHealth() < 75)
+        else if (nearest.second <= 300.0f && nearest.first->m_iHealth() < 75)
             return secondary;
-        else if (nearest.second <= 400 && nearest.first->m_iHealth() < 75)
+        else if (nearest.second <= 400.0f && nearest.first->m_iHealth() < 75)
             return active_slot;
         else
             return primary;
@@ -1417,7 +1416,7 @@ static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &ne
             else
                 return melee;
         }
-        else if (nearest.second <= 500)
+        else if (nearest.second <= 500.0f)
             return primary;
         else
             return secondary;
@@ -1551,7 +1550,6 @@ void Draw()
     for (const auto &area : *navparser::NavEngine::getFreeBlacklist())
     {
         Vector out;
-
         if (draw::WorldToScreen(area.first->m_center, out))
             draw::Rectangle(out.x - 2.0f, out.y - 2.0f, 4.0f, 4.0f, colors::red);
     }

@@ -67,40 +67,9 @@ bool EntityHitboxCache::VisibilityCheck(int id)
     return m_VisCheck >> id & 1;
 }
 
-static settings::Int setupbones_time{ "source.setupbones-time", "4" };
+static settings::Int setupbones_time{ "source.setupbones-time", "2" }; // 2 will make it hit p
 
-void EntityHitboxCache::UpdateBones()
-{
-    // Do not run for bad ents/non player ents
-    if (!m_bInit)
-        Init();
-    auto bone_ptr = GetBones();
-    if (!bone_ptr || bones.empty())
-        return;
-
-    // Thanks to the epic doghook developers (mainly F1ssion and MrSteyk)
-    // I do not have to find all of these signatures and dig through ida
-    struct BoneCache;
-
-    typedef BoneCache *(*GetBoneCache_t)(unsigned int);
-    typedef void (*BoneCacheUpdateBones_t)(BoneCache *, matrix3x4_t *bones, unsigned int, float time);
-    static auto hitbox_bone_cache_handle_offset = *(unsigned int *) (CSignature::GetClientSignature("8B 86 ? ? ? ? 89 04 24 E8 ? ? ? ? 85 C0 89 C3 74 48") + 2);
-    static auto studio_get_bone_cache           = (GetBoneCache_t) CSignature::GetClientSignature("55 89 E5 56 53 BB ? ? ? ? 83 EC 50 C7 45 D8");
-    static auto bone_cache_update_bones         = (BoneCacheUpdateBones_t) CSignature::GetClientSignature("55 89 E5 57 31 FF 56 53 83 EC 1C 8B 5D 08 0F B7 53 10");
-
-    auto hitbox_bone_cache_handle = CE_VAR(parent_ref, hitbox_bone_cache_handle_offset, unsigned int);
-    if (hitbox_bone_cache_handle)
-    {
-        BoneCache *bone_cache = studio_get_bone_cache(hitbox_bone_cache_handle);
-        if (bone_cache && !bones.empty())
-            bone_cache_update_bones(bone_cache, bones.data(), bones.size(), g_GlobalVars->curtime);
-    }
-
-    // Mark for update
-    /*int *entity_flags = (int *) ((uintptr_t) RAW_ENT(parent_ref) + 400);
-    // (EFL_DIRTY_SURROUNDING_COLLISION_BOUNDS | EFL_DIRTY_SPATIAL_PARTITION)
-    *entity_flags |= (1 << 14) | (1 << 15);*/
-}
+// STOP PUTTING USELESS SIGS EVERYWHERE FAGGOT !
 
 matrix3x4_t *EntityHitboxCache::GetBones(int numbones)
 {
@@ -143,10 +112,9 @@ matrix3x4_t *EntityHitboxCache::GetBones(int numbones)
         {
             PROF_SECTION(bone_setup)
 
-            // Only use reconstructed setupbones on players
-            /*if (parent_ref->m_Type() == ENTITY_PLAYER)
-                bones_setup = setupbones_reconst::SetupBones(RAW_ENT(parent_ref), bones.data(), 0x7FF00);
-            else*/
+            // ALSO, WHAT IN THE NAME OF GOD IS 0x7FF00 !?!?!?!?!?!?!?!? WHY IS THIS USED INSTEAD OF BONE_USED_BY_HITBOX ENUM BUILT INTO THE SDK >?!?!?!?!?!? !?!?!?!? !? !?!?!
+            // WHATEVER, ALL (PUBLIC) CHEATS USE THIS RANDOM SIGNED BINARY PIECE OF SHIT, SO THEY CANT BE WRONG (RIGHT!?!?!?!)
+            // I NEED MENTAL HELP WITH THIS FAGGOT ROSNEHOOK/CATHOOK CODE
             bones_setup = RAW_ENT(parent_ref)->SetupBones(bones.data(), numbones, BONE_USED_BY_HITBOX, bones_setup_time);
         }
     }

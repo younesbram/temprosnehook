@@ -1,4 +1,5 @@
-# Rosnehook
+# important notice
+## I won't be dedicating as much time to Rosnehook from now on. I've been yearning for a more manageable life, as every day seems to blend into the same monotonous routine, gradually wearing down my mental health and well-being. My priority is to restore stability to my mental and physical health, rather than focusing on Rosnehook. Don't worry! I will still work on it, but not as often.
 
 Cathook, but without bloat, pasting ddodddssing methods, and calling everyone a literal gay slur, because any critism is higghly illgal. 
 this cheat should be renamed REALITYHOOK!

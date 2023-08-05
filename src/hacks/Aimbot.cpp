@@ -86,7 +86,7 @@ float last_mouse_check = 0;
 float stop_moving_time = 0;
 
 // Used to make rapidfire not knock your enemies out of range
-unsigned last_target_ignore_timer = 0;
+unsigned int last_target_ignore_timer = 0;
 bool shouldbacktrack_cache = false;
 
 // Func to find value of how far to target ents
@@ -545,13 +545,13 @@ bool ShouldAim()
     if (g_pLocalPlayer->using_action_slot_item)
         return false;
     // Our team lost, so we can't hurt the enemy team
-    if (g_pGameRules->m_iRoundState == 5 && g_pGameRules->m_iWinningTeam != g_pLocalPlayer->team)
+    if (TFGameRules()->RoundHasBeenWon() && TFGameRules()->GetWinningTeam() != g_pLocalPlayer->team)
         return false;
     // Using a forbidden weapon?
     if (!LOCAL_W || LOCAL_W->m_iClassID() == CL_CLASS(CTFKnife) || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 237 || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 265)
         return false;
     // Carrying A building?
-    if (CE_BYTE(LOCAL_E, netvar.m_bCarryingObject) != 0)
+    if (CE_BYTE(LOCAL_E, netvar.m_bCarryingObject))
         return false;
     // Is bonked?
     if (HasCondition<TFCond_Bonked>(LOCAL_E))
@@ -1126,7 +1126,7 @@ static InitRoutine EC(
     {
         hacks::backtrack::latency.installChangeCallback(RvarCallback);
         EC::Register(EC::LevelInit, Reset, "INIT_Aimbot", EC::average);
-        EC::Register(EC::LevelShutdown, Reset, "RESET_Aimbot", EC::average);
+        EC::Register(EC::LevelShutdown, Reset, "SHUTDOWN_Aimbot", EC::average);
         EC::Register(EC::CreateMove, CreateMove, "CM_Aimbot", EC::late);
         EC::Register(EC::CreateMoveWarp, CreateMoveWarp, "CMW_Aimbot", EC::late);
     });

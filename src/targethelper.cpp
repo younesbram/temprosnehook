@@ -40,7 +40,7 @@ int GetScoreForEntity(CachedEntity *entity)
     }
 
     int clazz      = CE_INT(entity, netvar.iClass);
-    int health     = CE_INT(entity, netvar.iHealth);
+    int health     = entity->m_iHealth();
     float distance = entity->m_flDistance();
     bool zoomed    = HasCondition<TFCond_Zoomed>(entity);
     bool pbullet   = HasCondition<TFCond_SmallBulletResist>(entity);
@@ -98,9 +98,11 @@ int GetScoreForEntity(CachedEntity *entity)
     if (total > 99)
         total = 99;
     auto player_state = entity->player_info ? playerlist::AccessData(entity->player_info->friendsID).state : playerlist::k_EState::DEFAULT;
-    if (player_state == playerlist::k_EState::ABUSE || player_state == playerlist::k_EState::RAGE)
+    if (player_state == playerlist::k_EState::ABUSE || player_state == playerlist::k_EState::PAZER || player_state == playerlist::k_EState::RAGE)
         total = 999;
-    if (g_pGameRules->m_bPlayingMannVsMachine && clazz == tf_medic)
+    if (!*hacks::aimbot::aim_sentrybuster && IsSentryBuster(entity))
+        total = 0;
+    if (TFGameRules()->IsMannVsMachineMode() && clazz == tf_medic)
         total = 999;
     return total;
 }

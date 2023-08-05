@@ -48,10 +48,6 @@ void GetSkeleton(IClientEntity *ent, CStudioHdr *pStudioHdr, Vector pos[], Quate
         if (layer[i] >= 0 && layer[i] < m_AnimOverlay.Count())
         {
             CAnimationLayer &pLayer = m_AnimOverlay[layer[i]];
-
-            // UNDONE: Is it correct to use overlay weight for IK too?
-            if (!remove_taunts || std::find(ignore_sequences.begin(), ignore_sequences.end(), pLayer.m_nSequence) == ignore_sequences.end())
-                boneSetup.AccumulatePose(pos, q, pLayer.m_nSequence, pLayer.m_flCycle, pLayer.m_flWeight, g_GlobalVars->curtime, *m_pIk);
         }
     }
 

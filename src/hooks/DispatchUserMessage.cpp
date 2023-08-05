@@ -32,10 +32,6 @@ const static std::string clear("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
 std::string lastfilter{};
 std::string lastname{};
 
-namespace hacks::autoheal
-{
-extern std::vector<int> called_medic;
-}
 namespace hooked_methods
 {
 static Timer sendmsg{};
@@ -110,9 +106,6 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
         int voice_menu = buf.ReadByte();
         // Third Byte represents the command in that voicemenu (starting from 0)
         int command_id = buf.ReadByte();
-
-        if (voice_menu == 1 && command_id == 6)
-            hacks::autoheal::called_medic.push_back(ent_id);
         // If we don't .Seek(0) the game will have a bad  time reading
         buf.Seek(0);
         break;

@@ -2,7 +2,6 @@
     <TabContainer width="fill" height="fill">
         <Include path="nullifiedcat/weapons/aimbot.xml"/>
         <Include path="nullifiedcat/weapons/triggerbot.xml"/>
-        <Include path="nullifiedcat/weapons/autoheal.xml"/>
         <Include path="nullifiedcat/weapons/exploits.xml"/>
     </TabContainer>
 </Tab>

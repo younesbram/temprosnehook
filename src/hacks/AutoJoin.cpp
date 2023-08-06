@@ -89,7 +89,7 @@ void UpdateSearch()
     startqueue_timer.test_and_set(5000);
 #if !ENABLE_VISUALS
     if (queue_timer.test_and_set(600000))
-        tfmm::LeaveQueue();
+        g_IEngine->ClientCmd_Unrestricted("quit"); // lol
 #endif
 }
 

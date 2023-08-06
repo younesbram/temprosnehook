@@ -57,10 +57,10 @@ static bool force_backtrack_aimbot = false;
 static settings::Float max_range{ "aimbot.target.max-range", "4096" };
 static settings::Boolean ignore_vaccinator{ "aimbot.target.ignore-vaccinator", "false" };
 static settings::Boolean buildings_sentry{ "aimbot.target.sentry", "true" };
-static settings::Boolean npcs{ "aimbot.target.npcs", "false" };
+static settings::Boolean npcs{ "aimbot.target.npcs", "true" };
 static settings::Int teammates{ "aimbot.target.teammates", "0" };
 
-settings::Boolean engine_projpred{ "aimbot.debug.engine-pp", "true" }; // lags harder than my dad + crash
+settings::Boolean engine_projpred{ "aimbot.debug.engine-pp", "true" };
 
 struct AimbotCalculatedData_s
 {

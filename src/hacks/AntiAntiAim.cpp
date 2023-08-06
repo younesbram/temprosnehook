@@ -61,7 +61,7 @@ void frameStageNotify(ClientFrameStage_t stage)
 
 static std::array<float, 8> yaw_resolves{ 0.0f, 180.0f, 65.0f, 90.0f, -180.0f, 260.0f, 30.0f, 20.0f };
 
-static float resolveAngleYaw(float angle, brutedata &brute, CachedEntity *shooting_target)
+static float resolveAngleYaw(float angle, brutedata &brute)
 {
     brute.original_angle.y = angle;
     while (angle > 180)
@@ -82,17 +82,13 @@ static float resolveAngleYaw(float angle, brutedata &brute, CachedEntity *shooti
         angle += 360;
     brute.new_angle.y = angle;
 
-    // Check if shooting at the target
-    if (shooting_target != nullptr)
-    {
-        // Print resolved yaw
-        PrintChat("Resolved yaw against target: %f", angle);
-    }
+    // put resolved yaw in gamechat (rijin real)
+    PrintChat("[ROSNEHOOK] Resolved yaw: %f", angle);
 
     return angle;
 }
 
-static float resolveAnglePitch(float angle, brutedata &brute, CachedEntity *ent, CachedEntity *shooting_target)
+static float resolveAnglePitch(float angle, brutedata &brute, CachedEntity *ent)
 {
     brute.original_angle.x = angle;
 
@@ -144,12 +140,8 @@ static float resolveAnglePitch(float angle, brutedata &brute, CachedEntity *ent,
 
     brute.new_angle.x = angle;
 
-    // Check if shooting at the target
-    if (shooting_target != nullptr)
-    {
-        // Print resolved pitch
-        PrintChat("Resolved pitch against target: %f", angle);
-    }
+    // put resolved pitch in gamechat (rijin real)
+    PrintChat("[ROSNEHOOK] Resolved pitch: %f", angle);
 
     return angle;
 }

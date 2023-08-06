@@ -6,6 +6,7 @@
 #include "hacks/AntiAntiAim.hpp"
 #include "sdk/dt_recv_redef.h"
 #include "localplayer.hpp"
+#include "core/netvars.hpp"
 
 namespace hacks::anti_anti_aim
 {
@@ -83,7 +84,7 @@ static float resolveAngleYaw(float angle, brutedata &brute)
         angle += 360;
     brute.new_angle.y = angle;
 
-    if (g_pLocalPlayer->bZoomed && IN_ATTACK)
+    if (g_pLocalPlayer->bZoomed && netvar.flNextPrimaryAttack)
         // put resolved yaw in gamechat (rijin real)
         PrintChat("[ROSNEHOOK] Resolved yaw: %f", angle);
 
@@ -141,7 +142,7 @@ static float resolveAnglePitch(float angle, brutedata &brute, CachedEntity *ent)
     }
 
     brute.new_angle.x = angle;
-    if (g_pLocalPlayer->bZoomed && IN_ATTACK)
+    if (g_pLocalPlayer->bZoomed && netvar.flNextPrimaryAttack)
         // put resolved pitch in gamechat (rijin real)
         PrintChat("[ROSNEHOOK] Resolved pitch: %f", angle);
 

@@ -1,9 +1,11 @@
+// this aimbot sucks ass asf
 /*
  * Aimbot.cpp
  *
  *  Created on: Oct 9, 2016
  *      Author: nullifiedcat
  */
+// To do: findout the DEFUALT FUCKING SETTINGS 
 #include <hacks/Aimbot.hpp>
 #include <hacks/AntiAim.hpp>
 #include <hacks/ESP.hpp>
@@ -51,11 +53,11 @@ static settings::Boolean auto_unzoom{ "aimbot.auto.unzoom", "true" };
 static settings::Float zoom_distance{ "aimbot.zoom.distance", "1250.0" };
 
 static settings::Boolean backtrack_aimbot{ "aimbot.backtrack", "false" };
-static settings::Boolean backtrack_last_tick_only("aimbot.backtrack.only-last-tick", "false");
+static settings::Boolean backtrack_last_tick_only("aimbot.backtrack.only-last-tick", "true");
 static bool force_backtrack_aimbot = false;
 // wtf is this above
 static settings::Float max_range{ "aimbot.target.max-range", "4096" };
-static settings::Boolean ignore_vaccinator{ "aimbot.target.ignore-vaccinator", "false" };
+static settings::Boolean ignore_vaccinator{ "aimbot.target.ignore-vaccinator", "true" };
 static settings::Boolean buildings_sentry{ "aimbot.target.sentry", "true" };
 static settings::Boolean npcs{ "aimbot.target.npcs", "true" };
 static settings::Int teammates{ "aimbot.target.teammates", "0" };
@@ -259,6 +261,7 @@ std::vector<Vector> GetValidHitpoints(CachedEntity *ent, int hitbox)
             ++i;
         }
     }
+
     return hitpoints;
 }
 
@@ -385,7 +388,7 @@ void DoAutoZoom(bool target_found, CachedEntity *target)
     // Keep track of our zoom time
     static Timer zoom_time{};
 
-    // Minigun spun up handler + doesnt work properly. 
+    // Minigun spun up handler
     if (*auto_spin_up && LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun))
     {
         if (target_found)

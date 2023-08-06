@@ -81,6 +81,10 @@ static float resolveAngleYaw(float angle, brutedata &brute)
     while (angle < -180)
         angle += 360;
     brute.new_angle.y = angle;
+
+    // put resolved yaw in gamechat (rijin real)
+    PrintChat("[ROSNEHOOK] Resolved yaw: %f", angle);
+
     return angle;
 }
 
@@ -135,6 +139,10 @@ static float resolveAnglePitch(float angle, brutedata &brute, CachedEntity *ent)
     }
 
     brute.new_angle.x = angle;
+
+    // put resolved pitch in gamechat (rijin real)
+    PrintChat("[ROSNEHOOK] Resolved pitch: %f", angle);
+
     return angle;
 }
 

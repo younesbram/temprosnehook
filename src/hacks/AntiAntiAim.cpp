@@ -8,42 +8,45 @@
 #include "localplayer.hpp"
 #include "core/netvars.hpp"
 
-namespace hacks::anti_anti_aim
-{
+namespace hacks::anti_anti_aim {
+
 static settings::Boolean enable{ "anti-anti-aim.enable", "false" };
 static settings::Boolean debug{ "anti-anti-aim.debug.enable", "false" };
 
 boost::unordered_flat_map<unsigned, brutedata> resolver_map;
-std::array<CachedEntity *, 32> sniperdot_array;
+std::array<CachedEntity*, 32> sniperdot_array;
 
-static inline void modifyAngles()
-{
-    for (const auto &player : entity_cache::player_cache)
-    {
+static inline void modifyAngles() {
+    for (const auto& player : entity_cache::player_cache) {
         if (CE_BAD(player) || !player->m_bAlivePlayer() || !player->m_bEnemy() || !player->player_info->friendsID)
             continue;
-        auto &data  = resolver_map[player->player_info->friendsID];
-        auto &angle = CE_VECTOR(player, netvar.m_angEyeAngles);
-        angle.x     = data.new_angle.x;
-        angle.y     = data.new_angle.y;
+
+        auto& data = resolver_map[player->player_info->friendsID];
+        auto& angle = CE_VECTOR(player, netvar.m_angEyeAngles);
+        angle.x = data.new_angle.x;
+        angle.y = data.new_angle.y;
     }
 }
-static inline void CreateMove()
-{
+
+static inline void CreateMove() {
     // Empty the array
     sniperdot_array.fill(nullptr);
+
     // Find sniper dots
-    for (int i = g_GlobalVars->maxClients + 1; i <= HIGHEST_ENTITY; i++)
-    {
-        CachedEntity *dot_ent = ENTITY(i);
+    for (int i = g_GlobalVars->maxClients + 1; i <= HIGHEST_ENTITY; i++) {
+        CachedEntity* dot_ent = ENTITY(i);
+
         // Not a sniper dot
         if (CE_BAD(dot_ent) || dot_ent->m_iClassID() != CL_CLASS(CSniperDot))
             continue;
+
         // Get the player it belongs to
         auto ent_idx = HandleToIDX(CE_INT(dot_ent, netvar.m_hOwnerEntity));
+
         // IDX check
         if (IDX_BAD(ent_idx) || ent_idx > sniperdot_array.size() || ent_idx <= 0)
             continue;
+
         // Good sniper dot, add to array
         sniperdot_array.at(ent_idx - 1) = dot_ent;
     }

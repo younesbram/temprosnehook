@@ -22,7 +22,7 @@ void Update()
         return;
     // Find flags if missing
     if (!flags[0].ent || !flags[1].ent)
-        for (int i = g_IEngine->GetMaxClients() + 1; i < MAX_ENTITIES; i++)
+        for (int i = g_GlobalVars->maxClients + 1; i < MAX_ENTITIES; i++)
         {
             CachedEntity *ent = ENTITY(i);
             // We cannot identify a bad entity as a flag due to the unreliability of it
@@ -167,7 +167,7 @@ void Update()
         for (auto &entry : payloads)
             entry.clear();
 
-        for (int i = g_IEngine->GetMaxClients() + 1; i < MAX_ENTITIES; i++)
+        for (int i = g_GlobalVars->maxClients + 1; i < MAX_ENTITIES; i++)
         {
             CachedEntity *ent = ENTITY(i);
             // Not the object we need or invalid (team)
@@ -241,7 +241,7 @@ void UpdateObjectiveResource()
     if (CE_GOOD(objective_resource) && objective_resource->m_iClassID() == CL_CLASS(CTFObjectiveResource))
         return;
     // Find ObjectiveResource and gamerules
-    for (int i = g_IEngine->GetMaxClients() + 1; i < MAX_ENTITIES; i++)
+    for (int i = g_GlobalVars->maxClients + 1; i < MAX_ENTITIES; i++)
     {
         CachedEntity *ent = ENTITY(i);
         if (CE_BAD(ent) || ent->m_iClassID() != CL_CLASS(CTFObjectiveResource))

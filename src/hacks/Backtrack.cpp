@@ -269,7 +269,7 @@ void CreateMoveEarly()
     if ((int) bt_data.size() != g_GlobalVars->maxClients)
         bt_data.resize(g_GlobalVars->maxClients);
 
-    for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+    for (int i = 1; i <= g_GlobalVars->maxClients; i++)
     {
         CachedEntity *ent = ENTITY(i);
         int index         = i - 1;

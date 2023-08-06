@@ -394,7 +394,7 @@ public:
                     Vector area = i.m_center;
                     area.z += PLAYER_JUMP_HEIGHT;
                     // Out of range
-                    if (building_origin.DistToSqr(area) > SQR(1100 + HALF_PLAYER_WIDTH))
+                    if (building_origin.DistToSqr(area) > Sqr(1100.0f + HALF_PLAYER_WIDTH))
                         continue;
                     // Check if sentry can see us
                     if (!IsVectorVisibleNavigation(building_origin, area))
@@ -413,7 +413,7 @@ public:
                     Vector area = i.m_center;
                     area.z += PLAYER_JUMP_HEIGHT;
                     // Out of range
-                    if (sticky_origin.DistToSqr(area) > (130 + HALF_PLAYER_WIDTH) * (130 + HALF_PLAYER_WIDTH))
+                    if (sticky_origin.DistToSqr(area) > Sqr(130.0f + HALF_PLAYER_WIDTH))
                         continue;
                     // Check if Sticky can see the reason
                     if (!IsVectorVisibleNavigation(sticky_origin, area))
@@ -471,7 +471,7 @@ bool isReady()
 
     std::string level_name = GetLevelName();
     return *enabled && map && map->state == NavState::Active &&
-           (level_name == "plr_pipeline" || g_pGameRules->m_iRoundState > 3);
+           (level_name == "plr_pipeline" || TFGameRules()->State_Get() > CGameRules::GR_STATE_PREROUND);
 }
 
 bool isPathing()

@@ -33,7 +33,7 @@ static inline void CreateMove()
     // Empty the array
     sniperdot_array.fill(nullptr);
     // Find sniper dots
-    for (int i = g_IEngine->GetMaxClients() + 1; i <= HIGHEST_ENTITY; i++)
+    for (int i = g_GlobalVars->maxClients + 1; i <= HIGHEST_ENTITY; i++)
     {
         CachedEntity *dot_ent = ENTITY(i);
         // Not a sniper dot
@@ -83,10 +83,6 @@ static float resolveAngleYaw(float angle, brutedata &brute)
     while (angle < -180)
         angle += 360;
     brute.new_angle.y = angle;
-
-    if (g_pLocalPlayer->bZoomed && netvar.flNextPrimaryAttack)
-        // put resolved yaw in gamechat (rijin real)
-        PrintChat("[ROSNEHOOK] Resolved yaw: %f", angle);
 
     return angle;
 }
@@ -142,9 +138,6 @@ static float resolveAnglePitch(float angle, brutedata &brute, CachedEntity *ent)
     }
 
     brute.new_angle.x = angle;
-    if (g_pLocalPlayer->bZoomed && netvar.flNextPrimaryAttack)
-        // put resolved pitch in gamechat (rijin real)
-        PrintChat("[ROSNEHOOK] Resolved pitch: %f", angle);
 
     return angle;
 }

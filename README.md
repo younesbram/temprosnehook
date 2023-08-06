@@ -16,7 +16,8 @@ maka sure you dont get in reality's way, because he is going throguh puberty!
 everyone here should should leave this repo and neg for realityhook because it works on ubuntu!!!!!!!!!!!!
 please make sure not to question realitys school skills, as he dropped out at the age of -1.
 Reality, a self-proclaimed idiot, dropped out of school at just three years old. Armed with a mischievous spirit, he embarked on a unique mission to "ddos" everyone he encountered. With each pranking encounter, he unknowingly brought laughter and joy to those around him. Reality's unconventional path taught us that sometimes, embracing our inner fool can lead to unexpected connections and happiness in the most absurd of ways.
-if OneTF2 makes another commit ima go batshit insane
+
+ONETF2 tf2s most idiotic cheater ever, posting thigh pics, his own morbidly obese face on discord and now getting his mommy to get him some cheeseburgers, so he can become a literal statistic on the obesity rage chart, reality cannot get his pasting methods into him, he's just gone purely morbidly obese and that obesity is blocking that method, just like vac blocking cat bots. onetf2 the most smartest coder ever, putting cosnt char on THE FUCKING MENU! let's give a round of applause, yippie more McDonald's! here onetf2 eat up you fatty. 🍔 🍔 🍔 
 
 ## Getting started
 

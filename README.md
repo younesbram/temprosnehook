@@ -1,6 +1,7 @@
 # important notice
 ## I won't be dedicating as much time to Rosnehook from now on. I've been yearning for a more manageable life, as every day seems to blend into the same monotonous routine, gradually wearing down my mental health and well-being. My priority is to restore stability to my mental and physical health, rather than focusing on Rosnehook. Don't worry! I will still work on it, but not as often.
 
+### Reality!
 Cathook, but without bloat, pasting ddodddssing methods, and calling everyone a literal gay slur, because any critism is higghly illgal. 
 this cheat should be renamed REALITYHOOK!
 WE ALSO HATE PEDOS!!
@@ -17,6 +18,7 @@ everyone here should should leave this repo and neg for realityhook because it w
 please make sure not to question realitys school skills, as he dropped out at the age of -1.
 Reality, a self-proclaimed idiot, dropped out of school at just three years old. Armed with a mischievous spirit, he embarked on a unique mission to "ddos" everyone he encountered. With each pranking encounter, he unknowingly brought laughter and joy to those around him. Reality's unconventional path taught us that sometimes, embracing our inner fool can lead to unexpected connections and happiness in the most absurd of ways.
 
+### OneTF2!
 ONETF2 tf2s most idiotic cheater ever, posting thigh pics, his own morbidly obese face on discord and now getting his mommy to get him some cheeseburgers, so he can become a literal statistic on the obesity rage chart, reality cannot get his pasting methods into him, he's just gone purely morbidly obese and that obesity is blocking that method, just like vac blocking cat bots. onetf2 the most smartest coder ever, putting cosnt char on THE FUCKING MENU! let's give a round of applause, yippie more McDonald's! here onetf2 eat up you fatty. 🍔 🍔 🍔 
 
 ## Getting started

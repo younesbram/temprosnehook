@@ -432,7 +432,7 @@ static void CreateMove()
         return;
     }
 
-    if (only_can_shoot && !slow_aim && !CanShoot())
+    if (*only_can_shoot && !slow_aim && !CanShoot())
         return;
 
     DoAutoZoom(false, nullptr);

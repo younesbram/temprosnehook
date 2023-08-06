@@ -66,7 +66,7 @@ void DrawCheatVisuals()
         {
             auto color = colors::RainbowCurrent();
             color.a    = 1.0f;
-            AddSideString("Rosnehook | For TF2", color);
+            AddSideString("Rosnehook | TF2", color);
             if (!*info_text_min)
             {
 #if ENABLE_GUI
@@ -81,7 +81,6 @@ void DrawCheatVisuals()
         PROF_SECTION(DRAW_WRAPPER)
         EC::run(EC::Draw);
     }
-
     {
         PROF_SECTION(DRAW_strings)
         DrawStrings();

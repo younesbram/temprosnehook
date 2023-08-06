@@ -32,7 +32,6 @@ static settings::Int esp_text_position{ "esp.text-position", "0" };
 static settings::Int esp_expand{ "esp.expand", "0" };
 static settings::Boolean vischeck{ "esp.vischeck", "true" };
 static settings::Boolean hide_invis{ "esp.hide-invis", "false" };
-static settings::Boolean legit{ "esp.legit", "false" };
 
 static settings::Boolean local_esp{ "esp.show.local", "true" };
 static settings::Boolean buildings{ "esp.show.buildings", "true" };
@@ -991,15 +990,6 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             player_info_s info{};
             if (!GetPlayerInfo(ent->m_IDX, &info))
                 return;
-
-            // Legit mode handling
-            if (legit && ent->m_bEnemy() && playerlist::IsDefault(info.friendsID))
-            {
-                if (IsPlayerInvisible(ent))
-                    return; // Invis check
-                if (vischeck && !ent->IsVisible())
-                    return;
-            }
 
             // Powerup handling
             if (powerup_esp)

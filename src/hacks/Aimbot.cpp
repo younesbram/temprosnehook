@@ -1,11 +1,9 @@
-// this aimbot sucks ass asf
 /*
  * Aimbot.cpp
  *
  *  Created on: Oct 9, 2016
  *      Author: nullifiedcat
  */
-// To do: findout the DEFUALT FUCKING SETTINGS 
 #include <hacks/Aimbot.hpp>
 #include <hacks/AntiAim.hpp>
 #include <hacks/ESP.hpp>
@@ -42,7 +40,7 @@ static settings::Boolean assistance_only{ "aimbot.assistance.only", "false" };
 #endif
 static settings::Int hitbox{ "aimbot.hitbox", "0" };
 static settings::Boolean zoomed_only{ "aimbot.zoomed-only", "true" };
-static settings::Boolean only_can_shoot{ "aimbot.can-shoot-only", "false" };
+static settings::Boolean only_can_shoot{ "aimbot.can-shoot-only", "true" };
 
 static settings::Int normal_slow_aim{ "aimbot.slow", "0" };
 
@@ -62,7 +60,7 @@ static settings::Boolean buildings_sentry{ "aimbot.target.sentry", "true" };
 static settings::Boolean npcs{ "aimbot.target.npcs", "true" };
 static settings::Int teammates{ "aimbot.target.teammates", "0" };
 
-settings::Boolean engine_projpred{ "aimbot.debug.engine-pp", "true" };
+settings::Boolean engine_projpred{ "aimbot.debug.engine-pp", "false" };
 
 struct AimbotCalculatedData_s
 {

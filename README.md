@@ -23,7 +23,7 @@ ONETF2 tf2s most idiotic cheater ever, posting thigh pics, his own morbidly obes
 also, onetf2 keeps adding const char to drawmgr.cpp, when he just had to remove the FUCKING SKINCHANGER SHIT! YOU DIDNT HAVE TO ADD SKIN CHANGER, JUST REMOVE IT FROM DRAWMGR!!!!!!!!!!!!!!!
 
 ### Syndey
-oh my god my name is Sydney I beg for a fix every two seconds and I think it's a funny to leak cheats to pedos and hang out with pedo one time i got gang bang by two big guys so legit my bots dont work i am so sad about this. I like getting boy penetrated by big dom big slong males because im an angry homosexual waaaaaa, waaaaa i need to cry to my boyfu ):::
+oh my god my name is Sydney I beg for a fix every two seconds and I think it's a funny to leak cheats to pedos and hang out with pedo one time i got gang bang by two big guys so legit my bots dont work i am so sad about this. I like getting boy penetrated by big dom big slong males because I'm an angry homosexual waaaaaa, waaaaa i need to cry to my boyfu ):::
 
 ## Getting started
 

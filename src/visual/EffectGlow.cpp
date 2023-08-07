@@ -221,7 +221,7 @@ rgba_t EffectGlow::GlowColor(IClientEntity *entity)
 
     ent = ENTITY(entity->entindex());
     if (CE_BAD(ent))
-        return colors::white;
+        return colors::rainbow;
     if (ent == hacks::aimbot::CurrentTarget() && aimbot_color)
         return colors::target;
     if (re::C_BaseCombatWeapon::IsBaseCombatWeapon(entity))
@@ -407,7 +407,7 @@ void EffectGlow::DrawEntity(IClientEntity *entity)
             {
                 rgba_t mod_original;
                 g_IVRenderView->GetColorModulation(mod_original.rgba);
-                g_IVRenderView->SetColorModulation(colors::white);
+                g_IVRenderView->SetColorModulation(colors::rainbow);
                 attach->DrawModel(1);
                 g_IVRenderView->SetColorModulation(mod_original.rgba);
             }

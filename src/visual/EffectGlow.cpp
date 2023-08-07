@@ -1,3 +1,10 @@
+/*
+ * EffectGlow.cpp
+ *
+ *  Created on: Apr 13, 2017
+ *      Author: nullifiedcat
+ */
+
 #include <visual/EffectGlow.hpp>
 #include <MiscTemporary.hpp>
 #include <hacks/Aimbot.hpp>
@@ -7,14 +14,14 @@
 IMaterialSystem *materials = nullptr;
 
 CScreenSpaceEffectRegistration *CScreenSpaceEffectRegistration::s_pHead = nullptr;
-IScreenSpaceEffectManager *g_pScreenSpaceEffects = nullptr;
-CScreenSpaceEffectRegistration **g_ppScreenSpaceRegistrationHead = nullptr;
+IScreenSpaceEffectManager *g_pScreenSpaceEffects                        = nullptr;
+CScreenSpaceEffectRegistration **g_ppScreenSpaceRegistrationHead        = nullptr;
 CScreenSpaceEffectRegistration::CScreenSpaceEffectRegistration(const char *pName, IScreenSpaceEffect *pEffect)
 {
     logging::Info("Creating new effect '%s', head: 0x%08x", pName, *g_ppScreenSpaceRegistrationHead);
-    m_pEffectName = pName;
-    m_pEffect = pEffect;
-    m_pNext = *g_ppScreenSpaceRegistrationHead;
+    m_pEffectName                    = pName;
+    m_pEffect                        = pEffect;
+    m_pNext                          = *g_ppScreenSpaceRegistrationHead;
     *g_ppScreenSpaceRegistrationHead = this;
     logging::Info("New head: 0x%08x", *g_ppScreenSpaceRegistrationHead);
 }
@@ -60,8 +67,8 @@ struct ShaderStencilState_t
     {
         m_bEnable = false;
         m_PassOp = m_FailOp = m_ZFailOp = STENCILOPERATION_KEEP;
-        m_CompareFunc = STENCILCOMPARISONFUNCTION_ALWAYS;
-        m_nReferenceValue = 0;
+        m_CompareFunc                   = STENCILCOMPARISONFUNCTION_ALWAYS;
+        m_nReferenceValue               = 0;
         m_nTestMask = m_nWriteMask = 0xFFFFFFFF;
     }
 
@@ -86,12 +93,13 @@ ITexture *GetBuffer(int i)
     {
         ITexture *fullframe;
         fullframe = g_IMaterialSystem->FindTexture("_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET);
+        // char *newname    = new char[32];
         std::unique_ptr<char[]> newname(new char[32]);
         std::string name = format("_cathook_buff", i);
         strncpy(newname.get(), name.c_str(), 30);
         logging::Info("Creating new buffer %d with size %dx%d %s", i, fullframe->GetActualWidth(), fullframe->GetActualHeight(), newname.get());
 
-        int textureFlags = TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_EIGHTBITALPHA;
+        int textureFlags      = TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_EIGHTBITALPHA;
         int renderTargetFlags = CREATERENDERTARGETFLAGS_HDR;
 
         ITexture *texture;
@@ -147,182 +155,279 @@ void EffectGlow::Init()
         kv->SetInt("$ignorez", 1);
         kv->SetInt("$translucent", 1);
         kv->SetInt("$alphatest", 1);
-        mat_blur_x.Init("__cathook_glow_blur_x", kv);
+        mat_blur_x.Init("_cathook_blurx", kv);
+        mat_blur_x->Refresh();
     }
     {
         auto *kv = new KeyValues("BlurFilterY");
         kv->SetString("$basetexture", "_cathook_buff2");
+        kv->SetInt("$bloomamount", 5);
         kv->SetInt("$ignorez", 1);
         kv->SetInt("$translucent", 1);
         kv->SetInt("$alphatest", 1);
-        mat_blur_y.Init("__cathook_glow_blur_y", kv);
+        mat_blur_y.Init("_cathook_blury", kv);
+        mat_blur_y->Refresh();
     }
+    {
+        SS_NeverSolid.m_bEnable         = true;
+        SS_NeverSolid.m_PassOp          = STENCILOPERATION_REPLACE;
+        SS_NeverSolid.m_FailOp          = STENCILOPERATION_KEEP;
+        SS_NeverSolid.m_ZFailOp         = STENCILOPERATION_KEEP;
+        SS_NeverSolid.m_CompareFunc     = STENCILCOMPARISONFUNCTION_ALWAYS;
+        SS_NeverSolid.m_nWriteMask      = 1;
+        SS_NeverSolid.m_nReferenceValue = 1;
+    }
+    {
+        SS_SolidInvisible.m_bEnable         = true;
+        SS_SolidInvisible.m_PassOp          = STENCILOPERATION_REPLACE;
+        SS_SolidInvisible.m_FailOp          = STENCILOPERATION_KEEP;
+        SS_SolidInvisible.m_ZFailOp         = STENCILOPERATION_KEEP;
+        SS_SolidInvisible.m_CompareFunc     = STENCILCOMPARISONFUNCTION_ALWAYS;
+        SS_SolidInvisible.m_nWriteMask      = 1;
+        SS_SolidInvisible.m_nReferenceValue = 1;
+    }
+    /*case 3: https://puu.sh/vobH4/5da8367aef.png*/
+    {
+        SS_Drawing.m_bEnable         = true;
+        SS_Drawing.m_nReferenceValue = 0;
+        SS_Drawing.m_nTestMask       = 1;
+        SS_Drawing.m_CompareFunc     = STENCILCOMPARISONFUNCTION_EQUAL;
+        SS_Drawing.m_PassOp          = STENCILOPERATION_ZERO;
+    }
+
+    logging::Info("Init done!");
     init = true;
 #endif
 }
 
 void EffectGlow::Shutdown()
 {
-    if (!init)
-        return;
-#if !ENFORCE_STREAM_SAFETY
-    logging::Info("Shutdown Glow...");
-    mat_blur_y.Shutdown();
-    mat_blur_x.Shutdown();
-    mat_blit.Shutdown();
-    mat_unlit_z.Shutdown();
-    mat_unlit.Shutdown();
-    // Clear the buffers
-    for (int i = 0; i < 4; ++i)
+    if (init)
     {
-        if (buffers[i])
-        {
-            buffers[i]->SetTextureRenderTarget(nullptr);
-            buffers[i]->DecrementReferenceCount();
-            buffers[i].Shutdown();
-        }
+        mat_unlit.Shutdown();
+        mat_unlit_z.Shutdown();
+        mat_blit.Shutdown();
+        mat_blur_x.Shutdown();
+        mat_blur_y.Shutdown();
+        init = false;
+        logging::Info("Shutdown glow");
     }
-    init = false;
-#endif
 }
 
-bool EffectGlow::ShouldRenderGlow(IClientEntity *pEntity)
+rgba_t EffectGlow::GlowColor(IClientEntity *entity)
 {
-    if (pEntity == nullptr || !pEntity->IsPlayer() || pEntity->IsDormant())
-        return false;
+    static CachedEntity *ent;
+    static IClientEntity *owner;
 
-    C_BasePlayer *player = reinterpret_cast<C_BasePlayer *>(pEntity);
-    if (player->IsLocalPlayer())
-        return false;
-
-    if (pEntity->IsAlive() && player->GetTeam() != g_LocalPlayer->GetTeam())
-        return true;
-
-    return false;
-}
-
-void EffectGlow::RenderGlow(IClientEntity *pEntity)
-{
-#if !ENFORCE_STREAM_SAFETY
-    if (pEntity->IsAlive() && !pEntity->IsDormant())
+    ent = ENTITY(entity->entindex());
+    if (CE_BAD(ent))
+        return colors::white;
+    if (ent == hacks::aimbot::CurrentTarget() && aimbot_color)
+        return colors::target;
+    if (re::C_BaseCombatWeapon::IsBaseCombatWeapon(entity))
     {
-        float r, g, b;
+        owner = re::C_TFWeaponBase::GetOwnerViaInterface(entity);
+        if (owner)
+            return GlowColor(owner);
+    }
+    switch (ent->m_Type())
+    {
+    case ENTITY_BUILDING:
         if (health)
-        {
-            r = (1.0f - pEntity->GetHealth() / 100.0f) * 1.0f;
-            g = pEntity->GetHealth() / 100.0f * 1.0f;
-            b = 0.0f;
-        }
-        else
-        {
-            r = 0.0f;
-            g = 1.0f;
-            b = 0.0f;
-        }
-        if (aimbot_color && Aimbot::validAimbotTarget(pEntity) && Aimbot::canAimAt(pEntity))
-        {
-            r = 0.0f;
-            g = 0.0f;
-            b = 1.0f;
-        }
-        if (pEntity->GetTeam() == g_LocalPlayer->GetTeam() && !teammates)
-            return;
-        if (pEntity->IsDisguised() && !disguised)
-            return;
-        if (!players && pEntity->IsPlayer())
-            return;
-        if (!medkits && pEntity->IsHealthPack())
-            return;
-        if (!ammobox && pEntity->IsAmmoPack())
-            return;
-        if (!buildings && pEntity->IsBuilding())
-            return;
-        if (!stickies && pEntity->IsStickieBomb())
-            return;
-        if (!teammate_buildings && pEntity->IsTeammateBuilding())
-            return;
-        if (!show_powerups && pEntity->IsPowerup())
-            return;
-        if (!pEntity->IsVisibleTo(g_LocalPlayer))
-            return;
-
-        int r, g, b;
-        r = g_Settings.esp_glow_color_r;
-        g = g_Settings.esp_glow_color_g;
-        b = g_Settings.esp_glow_color_b;
-
-        float fAlpha = 1.0f;
-
-        g_RenderGlowObject.SetAlpha(fAlpha);
-        g_RenderGlowObject.SetColor(r, g, b);
-
-        if (pEntity->GetClassId() == ClassId::CTFMedigun)
-        {
-            g_RenderGlowObject.SetAlpha(0.5f);
-            g_RenderGlowObject.SetColor(255, 0, 0);
-        }
-
-        g_RenderGlowObject.RenderGlow(pEntity);
+            return colors::Health_dimgreen(ent->m_iHealth(), ent->m_iMaxHealth());
+        break;
+    case ENTITY_PLAYER:
+        if (!ent->player_info)
+            break;
+        if (health && playerlist::IsDefault(ent->player_info->friendsID))
+            return colors::Health_dimgreen(ent->m_iHealth(), ent->m_iMaxHealth());
+        else if (!playerlist::IsDefault(ent->player_info->friendsID))
+            return playerlist::Color(ent);
+    default:
+        break;
     }
-#endif
+
+    return colors::EntityF(ent);
 }
 
-void EffectGlow::DrawToStencil(IClientEntity *pEntity)
+bool EffectGlow::ShouldRenderGlow(IClientEntity *entity)
 {
-#if !ENFORCE_STREAM_SAFETY
-    g_RenderGlowObject.RenderGlowToStencil(pEntity);
+#if ENFORCE_STREAM_SAFETY
+    return false;
 #endif
+    static CachedEntity *ent;
+    if (entity->entindex() < 0)
+        return false;
+    ent = ENTITY(entity->entindex());
+    if (CE_BAD(ent))
+        return false;
+    if (ent->m_IDX == LOCAL_E->m_IDX && !glowself)
+        return false;
+    switch (ent->m_Type())
+    {
+    case ENTITY_BUILDING:
+        if (!buildings)
+            return false;
+        if (!ent->m_bEnemy() && !teammate_buildings)
+            return false;
+        if (CE_BYTE(LOCAL_E, netvar.m_bCarryingObject) && ent->m_IDX == HandleToIDX(CE_INT(LOCAL_E, netvar.m_hCarriedObject)))
+            return false;
+        return true;
+    case ENTITY_PLAYER:
+        if (!players)
+            return false;
+        if (!disguised && IsPlayerDisguised(ent))
+            return false;
+        if (!teammates && !ent->m_bEnemy() && ent->player_info && playerlist::IsDefault(ent->player_info->friendsID))
+            return false;
+        if (CE_BYTE(ent, netvar.iLifeState) != LIFE_ALIVE)
+            return false;
+        return true;
+    case ENTITY_PROJECTILE:
+        if (!ent->m_bEnemy())
+            return false;
+        if (stickies && ent->m_iClassID() == CL_CLASS(CTFGrenadePipebombProjectile))
+            return true;
+        break;
+    case ENTITY_GENERIC:
+        const model_t *model = RAW_ENT(ent)->GetModel();
+        if (model)
+        {
+            const auto szName = g_IModelInfo->GetModelName(model);
+            if (Hash::IsHealth(szName))
+                return *medkits;
+            else if (Hash::IsAmmo(szName))
+                return *ammobox;
+            else if (Hash::IsPowerup(szName))
+                return *show_powerups;
+        }
+        break;
+    }
+    return false;
 }
 
 void EffectGlow::BeginRenderGlow()
 {
 #if !ENFORCE_STREAM_SAFETY
+    drawing = true;
     CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
-    // Save the current stencil state
-    ptr->GetStencilState(&stencil_state);
-    SS_NeverSolid.SetStencilState(ptr); // Set stencil state to SS_NeverSolid
-    // Set the depth and color write masks to false to avoid writing to the depth buffer and color buffer
-    ptr->SetDepthWriteEnable(false);
-    ptr->SetColorWriteEnable(false, false, false, false);
+    ptr->ClearColor4ub(0, 0, 0, 0);
+    ptr->PushRenderTargetAndViewport();
+    ptr->SetRenderTarget(GetBuffer(1));
+    ptr->OverrideAlphaWriteEnable(true, true);
+    g_IVRenderView->SetBlend(0.99f);
+    ptr->ClearBuffers(true, false);
+    mat_unlit_z->AlphaModulate(1.0f);
+    ptr->DepthRange(0.0f, 0.01f);
 #endif
 }
 
 void EffectGlow::EndRenderGlow()
 {
 #if !ENFORCE_STREAM_SAFETY
+    drawing = false;
     CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
-    ptr->SetStencilState(&stencil_state); // Restore the original stencil state
-    ptr->SetDepthWriteEnable(true);
-    ptr->SetColorWriteEnable(true, true, true, true);
+    ptr->DepthRange(0.0f, 1.0f);
+    g_IVModelRender->ForcedMaterialOverride(nullptr);
+    ptr->PopRenderTargetAndViewport();
 #endif
 }
 
 void EffectGlow::StartStenciling()
 {
 #if !ENFORCE_STREAM_SAFETY
+    static ShaderStencilState_t state;
+    state.Reset();
+    state.m_bEnable = true;
     CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
-    // Save the current stencil state
-    ptr->GetStencilState(&stencil_state);
-    SS_SolidInvisible.SetStencilState(ptr); // Set stencil state to SS_SolidInvisible
+    switch (*solid_when)
+    {
+    case 0:
+        SS_NeverSolid.SetStencilState(ptr);
+        break;
+    case 2:
+        SS_SolidInvisible.SetStencilState(ptr);
+        break;
+        /*case 3: https://puu.sh/vobH4/5da8367aef.png*/
+    default:
+        break;
+    }
+    if (!*solid_when)
+    {
+        ptr->DepthRange(0.0f, 0.01f);
+    }
+    else
+    {
+        ptr->DepthRange(0.0f, 1.0f);
+    }
+    g_IVRenderView->SetBlend(0.0f);
+    mat_unlit->AlphaModulate(1.0f);
+    g_IVModelRender->ForcedMaterialOverride(*solid_when ? mat_unlit : mat_unlit_z);
 #endif
 }
 
 void EffectGlow::EndStenciling()
-{/home/boat/Desktop/cathook/src/visual/EffectGlow.cpp: In member function ‘virtual void effect_glow::EffectGlow::Render(int, int, int, int)’:
-/home/boat/Desktop/cathook/src/visual/EffectGlow.cpp:84:25: error: ‘GetBuffer’ was not declared in this scope; did you mean ‘setbuffer’?
-   84 |     ITexture *buffer2 = GetBuffer(2); // Add this line to declare 'buffer2'
-      |                         ^~~~~~~~~
-      |                         setbuffer
-/home/boat/Desktop/cathook/src/visual/EffectGlow.cpp:98:9: error: ‘SS_Drawing’ was not declared in this scope; did you mean ‘drawing’?
-   98 |         SS_Drawing.SetStencilState(ptr);
-      |         ^~~~~~~~~~
-      |         drawing
-/home/boat/Desktop/cathook/src/visual/EffectGlow.cpp:101:9: error: ‘SS_Null’ was not declared in this scope
-  101 |         SS_Null.SetStencilState(ptr);
+{
+#if !ENFORCE_STREAM_SAFETY
+    static ShaderStencilState_t state;
+    state.Reset();
+    g_IVModelRender->ForcedMaterialOverride(nullptr);
+    CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
+    state.SetStencilState(ptr);
+    ptr->DepthRange(0.0f, 1.0f);
+    g_IVRenderView->SetBlend(1.0f);
+#endif
+}
 
+void EffectGlow::DrawToStencil(IClientEntity *entity)
+{
+#if !ENFORCE_STREAM_SAFETY
+    DrawEntity(entity);
+#endif
+}
+
+void EffectGlow::DrawToBuffer(IClientEntity *entity)
+{
+}
+
+void EffectGlow::DrawEntity(IClientEntity *entity)
+{
+#if !ENFORCE_STREAM_SAFETY
+    static IClientEntity *attach;
+    static int passes;
+    passes = 0;
+
+    entity->DrawModel(1);
+    attach = g_IEntityList->GetClientEntity(HandleToIDX(*(int *) ((uintptr_t) entity + netvar.m_Collision - 24)));
+    while (attach && passes++ < 32)
+    {
+        if (attach->ShouldDraw())
+        {
+            if (weapons_white && entity->GetClientClass()->m_ClassID == RCC_PLAYER && re::C_BaseCombatWeapon::IsBaseCombatWeapon(attach))
+            {
+                rgba_t mod_original;
+                g_IVRenderView->GetColorModulation(mod_original.rgba);
+                g_IVRenderView->SetColorModulation(colors::white);
+                attach->DrawModel(1);
+                g_IVRenderView->SetColorModulation(mod_original.rgba);
+            }
+            else
+            {
+                attach->DrawModel(1);
+            }
+        }
+        attach = g_IEntityList->GetClientEntity(HandleToIDX(*(int *) ((uintptr_t) attach + netvar.m_Collision - 20)));
+    }
+#endif
+}
+
+void EffectGlow::RenderGlow(IClientEntity *entity)
+{
 #if !ENFORCE_STREAM_SAFETY
     CMatRenderContextPtr ptr(GET_RENDER_CONTEXT);
-    ptr->SetStencilState(&stencil_state); // Restore the original stencil state
+    g_IVRenderView->SetColorModulation(GlowColor(entity));
+    g_IVModelRender->ForcedMaterialOverride(mat_unlit_z);
+    DrawEntity(entity);
 #endif
 }
 
@@ -330,8 +435,6 @@ void EffectGlow::Render(int x, int y, int w, int h)
 {
 #if !ENFORCE_STREAM_SAFETY
     if (!enable)
-        return;
-    if (!isHackActive() || (clean_screenshots && g_IEngine->IsTakingScreenshot()) || g_Settings.bInvalid || disable_visuals)
         return;
     static ITexture *orig;
     static IMaterialVar *blury_bloomamount;
@@ -359,50 +462,37 @@ void EffectGlow::Render(int x, int y, int w, int h)
         }
         EndStenciling();
     }
-    ITexture *buffer1 = GetBuffer(1);
-    ITexture *buffer2 = GetBuffer(2); // Add this line to declare 'buffer2'
-    ptr->CopyRenderTargetToTexture(buffer1); // Copy the contents of the frame buffer to buffer1
-
-    ShaderStencilState_t SS_Null{};
-    ptr->SetStencilState(&SS_Null); // Disable the stencil test
-
-    int width = w / *blur_scale;
-    int height = h / *blur_scale;
-
-    mat_blur_x->Refresh();
-    mat_blur_y->Refresh();
-
-    IMaterial *m = mat_blur_x;
-    ptr->DrawScreenSpaceRectangle(m, 0, 0, w, h, x, y, x + w, y + h, w, h);
-
-    m = mat_blur_y;
-    ptr->DrawScreenSpaceRectangle(m, 0, 0, w, h, x, y, x + w, y + h, w, h);
-
-    m = mat_blit;
-    ptr->DrawScreenSpaceRectangle(m, 0, 0, w, h, x, y, x + w, y + h, w, h);
-
-    ptr->SetStencilState(&stencil_state); // Restore the original stencil state
-
-    ptr->SetRenderTarget(orig); // Restore the original render target
-    ptr->CopyRenderTargetToTexture(buffer2); // Copy the contents of the frame buffer to buffer2
-
-    if (*blur_scale != 1)
-    {
-        ptr->DrawScreenSpaceRectangle(mat_blit, 0, 0, w, h, x, y, x + w, y + h, w, h);
-    }
-
-    CTextureReference blurRef;
-    blurRef.Init(buffer2);
-    if (blurRef.IsValid())
-    {
-        ptr->SetRenderTarget(orig);
-        IMaterial *mat = materials->FindMaterial("dev/glow_blur_x", TEXTURE_GROUP_OTHER, true);
-        if (!mat)
-            return;
-        mat->Refresh();
-        ptr->DrawScreenSpaceRectangle(mat, 0, 0, w, h, x, y, x + w, y + h, w, h);
-    }
+    ptr->SetRenderTarget(GetBuffer(2));
+    ptr->Viewport(x, y, w, h);
+    ptr->ClearBuffers(true, false);
+    ptr->DrawScreenSpaceRectangle(mat_blur_x, x, y, w, h, 0, 0, w - 1, h - 1, w, h);
+    ptr->SetRenderTarget(GetBuffer(1));
+    blury_bloomamount = mat_blur_y->FindVar("$bloomamount", nullptr);
+    blury_bloomamount->SetIntValue(*blur_scale);
+    ptr->DrawScreenSpaceRectangle(mat_blur_y, x, y, w, h, 0, 0, w - 1, h - 1, w, h);
+    ptr->Viewport(x, y, w, h);
+    ptr->SetRenderTarget(orig);
+    g_IVRenderView->SetBlend(0.0f);
+    if (*solid_when != 1)
+        SS_Drawing.SetStencilState(ptr);
+    ptr->DrawScreenSpaceRectangle(mat_blit, x, y, w, h, 0, 0, w - 1, h - 1, w, h);
+    if (*solid_when != -1)
+        SS_Null.SetStencilState(ptr);
 #endif
 }
 
 EffectGlow g_EffectGlow;
+CScreenSpaceEffectRegistration *g_pEffectGlow = nullptr;
+
+static InitRoutine init(
+    []()
+    {
+        EC::Register(
+            EC::LevelShutdown, []() { g_EffectGlow.Shutdown(); }, "glow");
+        if (g_ppScreenSpaceRegistrationHead && g_pScreenSpaceEffects)
+        {
+            effect_glow::g_pEffectGlow = new CScreenSpaceEffectRegistration("_cathook_glow", &effect_glow::g_EffectGlow);
+            g_pScreenSpaceEffects->EnableScreenSpaceEffect("_cathook_glow");
+        }
+    });
+} // namespace effect_glow

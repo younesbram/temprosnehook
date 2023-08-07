@@ -19,7 +19,7 @@ please make sure not to question realitys school skills, as he dropped out at th
 Reality, a self-proclaimed idiot, dropped out of school at just three years old. Armed with a mischievous spirit, he embarked on a unique mission to "ddos" everyone he encountered. With each pranking encounter, he unknowingly brought laughter and joy to those around him. Reality's unconventional path taught us that sometimes, embracing our inner fool can lead to unexpected connections and happiness in the most absurd of ways.
 
 ### Syndey
-oh my god my name is Sydney I beg for a fix every two seconds and I think it's a funny to leak cheats to pedos and hang out with pedo one time i got gang bang by two big guys so legit my bots dont work i am so sad about this
+oh my god my name is Sydney I beg for a fix every two seconds and I think it's a funny to leak cheats to pedos and hang out with pedo one time i got gang bang by two big guys so legit my bots dont work i am so sad about this. I like getting boy penetrated by big dom big slong males because im an angry homosexual waaaaaa, waaaaa i need to cry to my boyfu ):::
 
 ## Getting started
 

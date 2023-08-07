@@ -8,7 +8,8 @@
 #include "localplayer.hpp"
 #include "core/netvars.hpp"
 
-namespace hacks::anti_anti_aim {
+namespace hacks::anti_anti_aim 
+{
 
 static settings::Boolean enable{ "anti-anti-aim.enable", "false" };
 static settings::Boolean debug{ "anti-anti-aim.debug.enable", "false" };
@@ -28,12 +29,14 @@ static inline void modifyAngles() {
     }
 }
 
-static inline void CreateMove() {
+static inline void CreateMove() 
+{
     // Empty the array
     sniperdot_array.fill(nullptr);
 
     // Find sniper dots
-    for (int i = g_GlobalVars->maxClients + 1; i <= HIGHEST_ENTITY; i++) {
+    for (int i = g_GlobalVars->maxClients + 1; i <= HIGHEST_ENTITY; i++) 
+    {
         CachedEntity* dot_ent = ENTITY(i);
 
         // Not a sniper dot
@@ -64,7 +67,7 @@ void frameStageNotify(ClientFrameStage_t stage)
 #endif
 }
 
-static std::array<float, 8> yaw_resolves{ 0.0f, 180.0f, 65.0f, 90.0f, -180.0f, 260.0f, 30.0f, 20.0f };
+static std::array<float, 8> yaw_resolves{ 0.0f, 180.0f, 50.0f, 90.0f, -180.0f, 271.0f, -271.0f, -0.0f };
 
 static float resolveAngleYaw(float angle, brutedata &brute)
 {
@@ -77,7 +80,7 @@ static float resolveAngleYaw(float angle, brutedata &brute)
 
     // Yaw Resolving
     // Find out which angle we should try
-    int entry = (int) std::floor((brute.brutenum / 5.0f)) % yaw_resolves.size();
+    int entry = (int) std::floor((brute.brutenum / 4.0f)) % yaw_resolves.size();
     angle += yaw_resolves[entry];
 
     while (angle > 180)
@@ -86,7 +89,7 @@ static float resolveAngleYaw(float angle, brutedata &brute)
     while (angle < -180)
         angle += 360;
     brute.new_angle.y = angle;
-
+    
     return angle;
 }
 
@@ -172,7 +175,7 @@ void increaseBruteNum(int idx)
 static void pitchHook(const CRecvProxyData *pData, void *pStruct, void *pOut)
 {
     float flPitch      = pData->m_Value.m_Float;
-    float *flPitch_out = (float *) pOut;
+    float *flPitch_out = (float*) pOut;
 
     if (!enable)
     {
@@ -189,7 +192,7 @@ static void pitchHook(const CRecvProxyData *pData, void *pStruct, void *pOut)
 static void yawHook(const CRecvProxyData *pData, void *pStruct, void *pOut)
 {
     float flYaw      = pData->m_Value.m_Float;
-    float *flYaw_out = (float *) pOut;
+    float *flYaw_out = (float*) pOut;
 
     if (!enable)
     {
@@ -197,7 +200,7 @@ static void yawHook(const CRecvProxyData *pData, void *pStruct, void *pOut)
         return;
     }
 
-    auto client_ent   = (IClientEntity *) (pStruct);
+    auto client_ent   = (IClientEntity*) (pStruct);
     CachedEntity *ent = ENTITY(client_ent->entindex());
     if (CE_GOOD(ent))
         *flYaw_out = resolveAngleYaw(flYaw, resolver_map[ent->player_info->friendsID]);

@@ -47,6 +47,7 @@ static settings::Int blur_scale{ "glow.blur-scale", "5" };
 static settings::Int solid_when{ "glow.solid-when", "0" };
 settings::Boolean enable{ "glow.enable", "false" };
 
+
 void EffectGlow::Render(int x, int y, int w, int h)
 {
 #if !ENFORCE_STREAM_SAFETY
@@ -80,11 +81,13 @@ void EffectGlow::Render(int x, int y, int w, int h)
         }
         EndStenciling();
     }
-    ptr->SetRenderTarget(GetBuffer(2));
+    ITexture *buffer2 = GetBuffer(2); // Add this line to declare 'buffer2'
+    ptr->SetRenderTarget(buffer2); // Change 'GetBuffer(2)' to 'buffer2'
     ptr->Viewport(x, y, w, h);
     ptr->ClearBuffers(true, false);
     ptr->DrawScreenSpaceRectangle(mat_blur_x, x, y, w, h, 0, 0, w - 1, h - 1, w, h);
-    ptr->SetRenderTarget(GetBuffer(1));
+    ITexture *buffer1 = GetBuffer(1); // Add this line to declare 'buffer1'
+    ptr->SetRenderTarget(buffer1); // Change 'GetBuffer(1)' to 'buffer1'
     blury_bloomamount = mat_blur_y->FindVar("$bloomamount", nullptr);
     blury_bloomamount->SetIntValue(*blur_scale);
     ptr->DrawScreenSpaceRectangle(mat_blur_y, x, y, w, h, 0, 0, w - 1, h - 1, w, h);

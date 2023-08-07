@@ -26,8 +26,8 @@ static settings::Boolean snipe_sentries_shortrange("navbot.snipe-sentries.shortr
 static settings::Boolean escape_danger("navbot.escape-danger", "true");
 static settings::Boolean escape_danger_ctf_cap("navbot.escape-danger.ctf-cap", "false");
 static settings::Boolean enable_slight_danger_when_capping("navbot.escape-danger.slight-danger.capping", "false");
-static settings::Int force_slot("navbot.force-slot", "0");
-static settings::Boolean primary_only("navbot.primary-only", "true");
+static settings::Int force_slot("navbot.force-slot", "1");
+static settings::Boolean primary_only("navbot.primary-only", "false");
 static settings::Int blacklist_delay("navbot.proximity-blacklist.delay", "500");
 static settings::Boolean blacklist_dormat("navbot.proximity-blacklist.dormant", "false");
 static settings::Int blacklist_delay_dormat("navbot.proximity-blacklist.delay-dormant", "1000");

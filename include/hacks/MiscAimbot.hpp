@@ -1,3 +1,9 @@
+/*
+
+MiscAimbot.hpp
+
+*/
+
 #pragma once
 #include "common.hpp"
 namespace hacks::misc_aimbot

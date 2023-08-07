@@ -1,5 +1,5 @@
 /*
- * Spam.h
+ * Spam.hpp
  *
  *  Created on: Jan 21, 2017
  *      Author: nullifiedcat

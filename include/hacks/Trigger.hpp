@@ -1,5 +1,5 @@
 /*
- * HTrigger.h
+ * Trigger.hpp
  *
  *  Created on: Oct 5, 2016
  *      Author: nullifiedcat

@@ -1,3 +1,9 @@
+/*
+
+NavBot.hpp
+
+*/
+
 #pragma once
 
 namespace hacks::NavBot

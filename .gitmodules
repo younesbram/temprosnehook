@@ -3,10 +3,10 @@
 	url = https://github.com/nullworks/libglez
 [submodule "libxoverlay"]
 	path = external/libxoverlay
-	url = https://github.com/rosneburgerworks/libxoverlay
+	url = https://github.com/ReallyBadNullworksreal-not-rosne/libxoverlay
 [submodule "simple-ipc"]
 	path = external/simple-ipc
-	url = https://github.com/rosne-gamingyt/simple-ipc
+	url = https://github.com/ReallyBadNullworksreal-not-rosne/simple-ipc
 [submodule "external/TF2_NavFile_Reader"]
 	path = external/TF2_NavFile_Reader
 	url = https://github.com/nullworks/TF2_NavFile_Reader
@@ -21,4 +21,4 @@
 	url = https://github.com/STEVE4git/boost-cmake
 [submodule "external/MicroPather"]
 	path = external/MicroPather
-	url = https://github.com/explowz/MicroPather.git
+	url = https://github.com/explowz/MicroPather

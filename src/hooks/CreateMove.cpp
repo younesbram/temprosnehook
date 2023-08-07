@@ -250,8 +250,6 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
     if (firstcm)
     {
         DelayTimer.update();
-        if (identify)
-            sendIdentifyMessage(false);
         EC::run(EC::FirstCM);
         firstcm = false;
     }
@@ -259,7 +257,7 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
 
     if (CE_GOOD(LOCAL_E))
     {
-        if (!g_pLocalPlayer->alive && CE_GOOD(LOCAL_W))
+        if (!g_pLocalPlayer->life_state && CE_GOOD(LOCAL_W))
         {
             // Walkbot can leave game.
             if (!g_IEngine->IsInGame())

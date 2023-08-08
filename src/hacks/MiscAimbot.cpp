@@ -24,7 +24,7 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
     float bestscr                                     = FLT_MAX;
     Vector predicted{};
     // Too long since we focused it
-    if (previous_entity_delay.check(150))
+    if (previous_entity_delay.check(-1))
         prevent = -1;
 
     for (int i = 0; i < 1; ++i)

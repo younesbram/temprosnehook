@@ -9,7 +9,7 @@
 #include "tier0/dbg.h"
 #include "mathlib/mathlib.h"
 #include "bone_setup.h"
-#include <string.h>
+#include <cstring>
 
 #include "collisionutils.h"
 #include "vstdlib/random.h"

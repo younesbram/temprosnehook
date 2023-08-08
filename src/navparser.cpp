@@ -203,7 +203,7 @@ public:
 
     float LeastCostEstimate(void *start, void *end) override
     {
-        return reinterpret_cast<CNavArea *>(start)->m_center.DistTo(reinterpret_cast<CNavArea *>(end)->m_center);
+        return reinterpret_cast<CNavArea *>(start)->m_center.DistToSqr(reinterpret_cast<CNavArea *>(end)->m_center);
     }
 
     void AdjacentCost(void *main, std::vector<micropather::StateCost> *adjacent) override
@@ -216,22 +216,11 @@ public:
             auto cached_connection = vischeck_cache.find(connection_key);
 
             // Entered and marked bad?
-            if (cached_connection != vischeck_cache.end())
-                if (!cached_connection->second.vischeck_state)
-                    continue;
+            if (cached_connection != vischeck_cache.end() && !cached_connection->second.vischeck_state)
+                continue;
 
             // If the extern blacklist is running, ensure we don't try to use a bad area
-            bool is_blacklisted = false;
-            if (!free_blacklist_blocked)
-                for (const auto &entry : free_blacklist)
-                {
-                    if (entry.first == connection.area)
-                    {
-                        is_blacklisted = true;
-                        break;
-                    }
-                }
-            if (is_blacklisted)
+            if (!free_blacklist_blocked && std::any_of(free_blacklist.begin(), free_blacklist.end(), [&](const auto &entry) { return entry.first == connection.area; }))
                 continue;
 
             auto points = determinePoints(&area, connection.area);

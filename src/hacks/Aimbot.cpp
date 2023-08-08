@@ -48,7 +48,7 @@ static settings::Boolean auto_spin_up{ "aimbot.auto.spin-up", "false" };
 static settings::Boolean minigun_tapfire{ "aimbot.auto.tapfire", "false" };
 static settings::Boolean auto_zoom{ "aimbot.auto.zoom", "true" };
 static settings::Boolean auto_unzoom{ "aimbot.auto.unzoom", "true" };
-static settings::Float zoom_distance{ "aimbot.zoom.distance", "1250.0" };
+static settings::Float zoom_distance{ "aimbot.zoom.distance", "2000.0" };
 
 static settings::Boolean backtrack_aimbot{ "aimbot.backtrack", "false" };
 static settings::Boolean backtrack_last_tick_only("aimbot.backtrack.only-last-tick", "false");

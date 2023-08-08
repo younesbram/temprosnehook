@@ -9,7 +9,7 @@
 // (check the GetClientSignature() and GetEngineSignature() for an example)
 Elf32_Shdr *getSectionHeader(void *module, const char *sectionName)
 {
-    // we need to get the modules actual address from the handle
+    // we need to get the modules actual address from the handle-
 
     auto *ehdr = (Elf32_Ehdr *) module;
     auto *shdr = (Elf32_Shdr *) ((unsigned) module + ehdr->e_shoff);
@@ -23,8 +23,8 @@ Elf32_Shdr *getSectionHeader(void *module, const char *sectionName)
         strtab = (char *) ((unsigned) module + strhdr->sh_offset);
 
         if (strtab == nullptr)
-            // Log::Fatal("String table was NULL!");
-            logging::Info("String table was NULL!");
+            // Log::Fatal("String table was nullptr!");
+            logging::Info("String table was nullptr!");
         strtabSize = strhdr->sh_size;
     }
     else
@@ -51,7 +51,7 @@ bool InRange(char x, char a, char b)
 
 int GetBits(char x)
 {
-    if (InRange((char) (x & (~0x20)), 'A', 'F'))
+    if (InRange((char) (x & (~0x20)), 'A', 'F'))  // dogshit code but it does the job
         return (x & (~0x20)) - 'A' + 0xa;
     else if (InRange(x, '0', '9'))
         return x - '0';
@@ -116,7 +116,7 @@ uintptr_t CSignature::dwFindPattern(uintptr_t dwAddress, uintptr_t dwLength, con
                                     const char *szPattern)
 {
     const char *pat      = szPattern;
-    uintptr_t firstMatch = NULL;
+    uintptr_t firstMatch = nullptr;
     for (uintptr_t pCur = dwAddress; pCur < dwLength; pCur++)
     {
         if (!*pat)
@@ -143,7 +143,7 @@ uintptr_t CSignature::dwFindPattern(uintptr_t dwAddress, uintptr_t dwLength, con
                   "\n============\n\"%s\"\n============",
                   szPattern);
 
-    return NULL;
+    return nullptr;
 }*/
 //===================================================================================
 void *CSignature::GetModuleHandleSafe(const char *pszModuleName)

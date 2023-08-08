@@ -244,7 +244,7 @@ public:
             {
                 if (cached->second.vischeck_state)
                 {
-                    float cost = connection.area->m_center.DistTo(area.m_center);
+                    float cost = connection.area->m_center.DistToSqr(area.m_center);
                     adjacent->push_back(micropather::StateCost{ reinterpret_cast<void *>(connection.area), cost });
                 }
             }
@@ -255,7 +255,7 @@ public:
                 {
                     vischeck_cache[key] = { TICKCOUNT_TIMESTAMP(60), true };
 
-                    float cost = points.next.DistTo(points.current);
+                    float cost = points.next.DistToSqr(points.current);
                     adjacent->push_back(micropather::StateCost{ reinterpret_cast<void *>(connection.area), cost });
                 }
                 else
@@ -401,7 +401,7 @@ public:
                     Vector area = i.m_center;
                     area.z += PLAYER_JUMP_HEIGHT;
                     // Out of range
-                    if (sticky_origin.DistToSqr(area) > (130.0f + HALF_PLAYER_WIDTH) * (130.0f + HALF_PLAYER_WIDTH))
+                    if (sticky_origin.DistToSqr(area) > Sqr(130.0f + HALF_PLAYER_WIDTH))
                         continue;
                     // Check if Sticky can see the reason
                     if (!IsVectorVisibleNavigation(sticky_origin, area))

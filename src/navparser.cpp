@@ -23,7 +23,7 @@
 #if ENABLE_VISUALS
 #include "drawing.hpp"
 #endif
-
+#include "MiscAimbot.hpp"
 #include <memory>
 #include <boost/container_hash/hash.hpp>
 
@@ -709,6 +709,7 @@ static void followCrumbs()
         Vector next{ crumbs[0].vec.x, crumbs[0].vec.y, g_pLocalPlayer->v_Eye.z };
         next = GetAimAtAngles(g_pLocalPlayer->v_Eye, next);
 
+        hacks::misc_aimbot::DoSlowAim(next);
         current_user_cmd->viewangles = next;
     }
 

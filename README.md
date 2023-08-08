@@ -30,9 +30,7 @@ oh my god my name is Sydney I beg for a fix every two seconds and I think it's a
 
 ### Dependencies
 
-The `dialog` package is not mandatory, yet highly recommended.
-
-Dependencies are handled automatically by the [dependencycheck](https://github.com/rosneburgerworks/cathook/blob/master/scripts/dependencycheck) script.
+Dependencies are handled automatically by the [dependencycheck](https://github.com/RosneBurgerworks/cathook/blob/master/scripts/dependencycheck) script.
 
 ### Downloading
 

@@ -219,7 +219,17 @@ public:
                 continue;
 
             // If the extern blacklist is running, ensure we don't try to use a bad area
-            if (!free_blacklist_blocked && std::any_of(free_blacklist.begin(), free_blacklist.end(), [&](const auto &entry) { return entry.first == connection.area; }))
+            bool is_blacklisted = false;
+            if (!free_blacklist_blocked)
+                for (const auto &entry : free_blacklist)
+                {
+                    if (entry.first == connection.area)
+                    {
+                        is_blacklisted = true;
+                        break;
+                    }
+                }
+            if (is_blacklisted)
                 continue;
 
             auto points = determinePoints(&area, connection.area);
@@ -458,10 +468,7 @@ bool isReady()
 
     std::string level_name = GetLevelName();
     return *enabled && map && map->state == NavState::Active &&
-           (level_name == "plr_pipeline" || TFGameRules()->State_Get() > CGameRules::GR_STATE_PREROUND) &&
-           !(g_pLocalPlayer->team == TEAM_BLU && (TFGameRules()->InSetup() ||
-                                                  // FIXME: If we're on a control point map, and blue is the attacking team, then the gates are closed, so we shouldn't path
-                                                  (TFGameRules()->IsInWaitingForPlayers() && (level_name.starts_with("pl_") || level_name.starts_with("cp_")))));
+           (level_name == "plr_pipeline" || TFGameRules()->State_Get() > CGameRules::GR_STATE_PREROUND);
 }
 
 bool isPathing()

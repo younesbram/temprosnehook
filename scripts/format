@@ -5,3 +5,5 @@
 echo Formatting sources... This may take a while.
 ./clang-format-all ../src
 ./clang-format-all ../include
+
+echo "./scripts/format ran!"

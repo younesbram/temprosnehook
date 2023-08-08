@@ -7,3 +7,5 @@ set -e
 #
 
 ./scripts/updater false true true
+
+echo "./install-all completed!"

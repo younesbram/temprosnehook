@@ -16,3 +16,5 @@ rsync -avh "data/" "$DATA_PATH"
 rsync -avh --ignore-existing "config_data/" "$DATA_PATH"
 chown -R "$user" "$DATA_PATH"
 chmod -R 774 "$DATA_PATH"
+
+echo "./install-data completed!"

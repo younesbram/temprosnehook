@@ -82,3 +82,5 @@ for dir in "$@"; do
     -exec "${FMT}" -i '{}' \;
   popd &>/dev/null || exit
 done
+
+echo "./scripts/clang-formate-all ran!"

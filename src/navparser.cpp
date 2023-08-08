@@ -746,11 +746,11 @@ static void followCrumbs()
                     choose_new_point.update();
                 looked_at_point = true;
                 wait_time       = 20 + UniformRandomInt(0, 2);
-                aim_speed       = 20 + UniformRandomInt(0, 2);
+                aim_speed       = 20 + UniformRandomInt(0, 2); // maybe 15 later
             }
 
             Vector next_slow = next;
-            // ACTUAL NAV SMOOTHEN
+            // spin toggle
             hacks::misc_aimbot::DoSlowAim(next_slow, aim_speed);
             current_user_cmd->viewangles = next_slow;
         }

@@ -17,6 +17,7 @@
 #include "common.hpp"
 #include "micropather.h"
 #include "CNavFile.h"
+#include "teamroundtimer.hpp"
 #include "Aimbot.hpp"
 #include "navparser.hpp"
 #if ENABLE_VISUALS
@@ -202,7 +203,7 @@ public:
 
     float LeastCostEstimate(void *start, void *end) override
     {
-        return reinterpret_cast<CNavArea *>(start)->m_center.DistToSqr(reinterpret_cast<CNavArea *>(end)->m_center);
+        return reinterpret_cast<CNavArea *>(start)->m_center.DistTo(reinterpret_cast<CNavArea *>(end)->m_center);
     }
 
     void AdjacentCost(void *main, std::vector<micropather::StateCost> *adjacent) override
@@ -215,11 +216,22 @@ public:
             auto cached_connection = vischeck_cache.find(connection_key);
 
             // Entered and marked bad?
-            if (cached_connection != vischeck_cache.end() && !cached_connection->second.vischeck_state)
-                continue;
+            if (cached_connection != vischeck_cache.end())
+                if (!cached_connection->second.vischeck_state)
+                    continue;
 
             // If the extern blacklist is running, ensure we don't try to use a bad area
-            if (!free_blacklist_blocked && std::any_of(free_blacklist.begin(), free_blacklist.end(), [&](const auto &entry) { return entry.first == connection.area; }))
+            bool is_blacklisted = false;
+            if (!free_blacklist_blocked)
+                for (const auto &entry : free_blacklist)
+                {
+                    if (entry.first == connection.area)
+                    {
+                        is_blacklisted = true;
+                        break;
+                    }
+                }
+            if (is_blacklisted)
                 continue;
 
             auto points = determinePoints(&area, connection.area);
@@ -243,7 +255,7 @@ public:
             {
                 if (cached->second.vischeck_state)
                 {
-                    float cost = connection.area->m_center.DistToSqr(area.m_center);
+                    float cost = connection.area->m_center.DistTo(area.m_center);
                     adjacent->push_back(micropather::StateCost{ reinterpret_cast<void *>(connection.area), cost });
                 }
             }
@@ -254,7 +266,7 @@ public:
                 {
                     vischeck_cache[key] = { TICKCOUNT_TIMESTAMP(60), true };
 
-                    float cost = points.next.DistToSqr(points.current);
+                    float cost = points.next.DistTo(points.current);
                     adjacent->push_back(micropather::StateCost{ reinterpret_cast<void *>(connection.area), cost });
                 }
                 else
@@ -400,7 +412,7 @@ public:
                     Vector area = i.m_center;
                     area.z += PLAYER_JUMP_HEIGHT;
                     // Out of range
-                    if (sticky_origin.DistToSqr(area) > Sqr(130.0f + HALF_PLAYER_WIDTH))
+                    if (sticky_origin.DistToSqr(area) > (130.0f + HALF_PLAYER_WIDTH) * (130.0f + HALF_PLAYER_WIDTH))
                         continue;
                     // Check if Sticky can see the reason
                     if (!IsVectorVisibleNavigation(sticky_origin, area))
@@ -640,7 +652,7 @@ static void followCrumbs()
         current_vec.z = g_pLocalPlayer->v_Origin.z;
 
     // We are close enough to the second crumb, Skip both (This is especially helpful with drop-downs)
-    if (crumbs.size() > 1 && crumbs[1].vec.DistToSqr(g_pLocalPlayer->v_Origin) < Sqr(50.0f))
+    if (crumbs.size() > 1 && crumbs[1].vec.DistTo(g_pLocalPlayer->v_Origin) < 50)
     {
         last_crumb = crumbs[1];
         crumbs.erase(crumbs.begin(), std::next(crumbs.begin()));
@@ -951,12 +963,11 @@ void Draw()
         Vector start_screen, end_screen;
         if (draw::WorldToScreen(start_pos, start_screen))
         {
-
             if (i < crumbs.size() - 1)
             {
                 Vector end_pos = crumbs[i + 1].vec;
                 if (draw::WorldToScreen(end_pos, end_screen))
-                    draw::Line(start_screen.x, start_screen.y, end_screen.x - start_screen.x, end_screen.y - start_screen.y, colors::RainbowCurrent(), 2.0f);
+                  draw::Line(start_screen.x, start_screen.y, end_screen.x - start_screen.x, end_screen.y - start_screen.y, colors::RainbowCurrent(), 2.0f);
             }
         }
     }

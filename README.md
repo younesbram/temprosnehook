@@ -5,6 +5,9 @@
 
 ## Slander (very important)
 
+## AntiCowHook Policy
+### ALL COMMITS MADE BY CINORTAXEH (HEXATRONIC) ARE PROTECTED BY ANTICOWHOOK POLICY, IF ANY COWHOOK USERS / ONE TF2 (COWHOOK) WISHES TO CRYS ABOUT ANY COMMITS BY CINORTAXEH (HEXATRONIC) WILL BE IGNORED. IF REVERTED BY COWHOOK/ONETF2 OR COWHOOK USERS THE REVERT(S) MADE BY THE COWHOOK PARTY WILL BE REVERTED BACK. THIS POLICY ONLY APPLIES TO COWHOOK USERS / ONETF2 (COWHOOK) PARTY.
+
 ### Reality!
 Cathook, but without bloat, pasting ddodddssing methods, and calling everyone a literal gay slur, because any critism is higghly illgal. 
 this cheat should be renamed REALITYHOOK!

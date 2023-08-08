@@ -685,7 +685,7 @@ static void followCrumbs()
             ticks_since_jump++;
 
             // Update jump timer now since we are back on ground
-            if (crouch && g_pLocalPlayer->flags & FL_ONGROUND && ticks_since_jump > 3)
+            if (crouch && CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND && ticks_since_jump > 3)
             {
                 // Reset
                 crouch = false;

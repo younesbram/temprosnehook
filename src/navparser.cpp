@@ -641,7 +641,7 @@ static void followCrumbs()
         current_vec.z = g_pLocalPlayer->v_Origin.z;
 
     // We are close enough to the second crumb, Skip both (This is especially helpful with drop-downs)
-    if (crumbs.size() > 1 && crumbs[1].vec.DistTo(g_pLocalPlayer->v_Origin) < 50)
+    if (crumbs.size() > 1 && crumbs[1].vec.DistToSqr(g_pLocalPlayer->v_Origin) < Sqr(50.0f))
     {
         last_crumb = crumbs[1];
         crumbs.erase(crumbs.begin(), std::next(crumbs.begin()));
@@ -668,7 +668,7 @@ static void followCrumbs()
     // 1. No jumping if zoomed (or revved)
     // 2. Jump if it's necessary to do so based on z values
     // 3. Jump if stuck (not getting closer) for more than stuck_time/2
-    if ((!(g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed) && !(g_pLocalPlayer->bRevved || g_pLocalPlayer->bRevving) && (crouch || crumbs[0].vec.z - g_pLocalPlayer->v_Origin.z > 18) && last_jump.check(200)) || (last_jump.check(200) && inactivity.check(*stuck_time / 2)))
+    if ((!(g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed) && !(g_pLocalPlayer->bRevved || g_pLocalPlayer->bRevving) && (crouch || crumbs[0].vec.z - g_pLocalPlayer->v_Origin.z > 18.0f) && last_jump.check(200)) || (last_jump.check(200) && inactivity.check(*stuck_time / 2)))
     {
         auto local = map->findClosestNavSquare(g_pLocalPlayer->v_Origin);
         // Check if current area allows jumping
@@ -686,7 +686,7 @@ static void followCrumbs()
             ticks_since_jump++;
 
             // Update jump timer now since we are back on ground
-            if (crouch && CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND && ticks_since_jump > 3)
+            if (crouch && g_pLocalPlayer->flags & FL_ONGROUND && ticks_since_jump > 3)
             {
                 // Reset
                 crouch = false;

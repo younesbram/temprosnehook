@@ -38,7 +38,7 @@ Dependencies are handled automatically by the [dependencycheck](https://github.c
 
 Open a terminal window and enter the following command:
 
-    git clone https://github.com/rosneburgerworks/cathook; cd cathook; ./install-all
+    git clone https://github.com/RosneBurgerworks/cathook; cd cathook; ./install-all
 
 The `cathook` folder should have been created successfully, containing all source files.
 
@@ -48,14 +48,14 @@ Run the following command while inside the source folder:
 
     sudo ./attach
 
-This will inject `libcathook.so` into the `hl2_linux` process.
+This will inject `libcathook.so` into the `hl2_linux` (Team Fortress 2) process.
 
-When injected, the menu can be opened using the `INSERT` key.
+When injected, the menu can be opened using the default `Insert` key.
 
 ## FAQ
 
 ### How do I open the menu?
-Press <kbd>INSERT</kbd> while focused on the TF2 window.
+Press <kbd>Insert</kbd> while focused on the TF2 window.
 
 ### Where is my config file saved?
-Configuration files are saved inside the `cathook` folder located in your `opt` folder (`/opt/cathook/data`). The config is in human-readable format and can be edited via your text editor of choice.
+Configuration files are saved inside the `config` folder located in your `opt/cathook` folder (`/opt/cathook/data/configs`). The config is in human-readable format and can be edited via your text editor of choice.

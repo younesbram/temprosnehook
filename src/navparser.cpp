@@ -17,7 +17,6 @@
 #include "common.hpp"
 #include "micropather.h"
 #include "CNavFile.h"
-#include "teamroundtimer.hpp"
 #include "Aimbot.hpp"
 #include "navparser.hpp"
 #if ENABLE_VISUALS

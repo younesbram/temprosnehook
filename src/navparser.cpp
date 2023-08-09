@@ -737,11 +737,12 @@ static void followCrumbs()
     }*/
 
     // Look at path
-    if (look && !hacks::aimbot::isAiming())
+    if (look && !hacks::aimbot::IsAiming())
     {
         Vector next{ crumbs[0].vec.x, crumbs[0].vec.y, g_pLocalPlayer->v_Eye.z };
         next = GetAimAtAngles(g_pLocalPlayer->v_Eye, next);
-
+        static int wait_time = 10;
+        static int aim_speed = 20;
         // Slow aim to smoothen
         hacks::misc_aimbot::DoSlowAim(next, aim_speed);
         current_user_cmd->viewangles = next, aim_speed;

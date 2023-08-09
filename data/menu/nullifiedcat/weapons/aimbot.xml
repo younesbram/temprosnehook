@@ -20,6 +20,8 @@
                           tooltip="Restricts the aimbot to a certain FOV from your crosshair."/>
             <AutoVariable width="fill" target="aimbot.fov-circle.enable" label="FOV circle"
                           tooltip="Shows the Aimbot's FOV."/>
+            <AutoVariable width="fill" target="aimbot.fov-circle.enable" label="FOV circle"
+                          tooltip="Shows the Aimbot's FOV."/>
             <AutoVariable width="fill" target="aimbot.fov-circle.opacity" label="FOV opacity"
                           tooltip="Controls the FOV circle's opacity." min="0" max="1" step="0.05"/>
             <AutoVariable width="fill" target="aimbot.can-shoot-only" label="Fix Deathstare"/>

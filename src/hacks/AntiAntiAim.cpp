@@ -67,7 +67,7 @@ void frameStageNotify(ClientFrameStage_t stage)
 #endif
 }
 
-static std::array<float, 8> yaw_resolves{ 0.0f, 180.0f, 50.0f, 90.0f, -180.0f, 271.0f, -271.0f, -0.0f };
+static std::array<float, 8> yaw_resolves{ 0.0f, 180.0f, 65.0f, 90.0f, -180.0f, 260.0f, 30.0f, 20.0f };
 
 static float resolveAngleYaw(float angle, brutedata &brute)
 {

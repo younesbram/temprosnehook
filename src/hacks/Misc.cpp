@@ -59,7 +59,7 @@ int cowhook()
 {
     if (*NIGHOOK_AKA_COWHOOK_DETECT_WTF) 
     {
-        g_IEngine->ClientCmd_Unrestricted("quit cowhooking");
+        g_IEngine->ClientCmd_Unrestricted("quit"); // lol
     }
 }
 

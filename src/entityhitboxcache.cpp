@@ -67,7 +67,7 @@ bool EntityHitboxCache::VisibilityCheck(int id)
     return m_VisCheck >> id & 1;
 }
 
-static settings::Int setupbones_time{ "source.setupbones-time", "2" }; // 2 will make it hit p
+static settings::Int setupbones_time{ "source.setupbones-time", "4" }; // 2 will make it hit p
 
 void EntityHitboxCache::UpdateBones()
 {

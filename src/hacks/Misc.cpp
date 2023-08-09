@@ -55,8 +55,13 @@ static settings::Int rich_presence_party_size{ "misc.rich-presence.party_size", 
 static settings::Int rich_presence_change_delay{ "misc.rich-presence.delay", "5000" };
 #endif
 
-if (*NIGHOOK_AKA_COWHOOK_DETECT_WTF)
-    g_IEngine->ClientCmd_Unrestricted("quit cowhooking");
+int cowhook
+{
+    if (*NIGHOOK_AKA_COWHOOK_DETECT_WTF) 
+    {
+        g_IEngine->ClientCmd_Unrestricted("quit cowhooking");
+    }
+}
 
 // Need our own Text drawing
 static std::array<std::string, 32> spectator_strings;

@@ -37,6 +37,7 @@ static settings::Boolean silent{ "aimbot.silent", "true" };
 static settings::Boolean target_lock{ "aimbot.lock-target", "false" };
 #if ENABLE_VISUALS
 static settings::Boolean fov_draw{ "aimbot.fov-circle.enable", "0" };
+static settings::Float fovcircle_opacity{ "aimbot.fov-circle.opacity", "0.7" };
 static settings::Boolean assistance_only{ "aimbot.assistance.only", "false" };
 #endif
 static settings::Int hitbox{ "aimbot.hitbox", "0" };
@@ -1146,9 +1147,6 @@ static void DrawText()
             }
         }
     }
-    // Debug stuff
-    if (!*aimbot_debug)
-        return;
     for (const auto &ent : entity_cache::player_cache)
     {
         Vector screen;

@@ -946,7 +946,7 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest)
     // If we are close enough, don't even bother with using the navparser to get there
     if (nearest.second < 400.0f && hacks::NavBot::isVisible)
     {
-        AimAt(g_pLocalPlayer->v_Eye, nearest.first->hitboxes.GetHitbox(head)->center, current_user_cmd);
+        AimAt(g_pLocalPlayer->v_Eye, nearest.first->hitboxes.GetHitbox(head)->center, current_user_cmd); // i dont understand how this is viable, but it makes melee warp rlly good, so yeah.
         WalkTo(nearest.first->m_vecOrigin());
         navparser::NavEngine::cancelPath();
         return true;

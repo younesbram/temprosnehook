@@ -55,7 +55,7 @@ static settings::Int rich_presence_party_size{ "misc.rich-presence.party_size", 
 static settings::Int rich_presence_change_delay{ "misc.rich-presence.delay", "5000" };
 #endif
 
-int cowhook
+int cowhook()
 {
     if (*NIGHOOK_AKA_COWHOOK_DETECT_WTF) 
     {

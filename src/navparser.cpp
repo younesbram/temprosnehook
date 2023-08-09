@@ -53,9 +53,6 @@ static bool CastRay(Vector origin, Vector endpos, unsigned mask, ITraceFilter *f
 
     ray.Init(origin, endpos);
 
-    // This was found to be So inefficient that it is literally unusable for our purposes. it is almost 1000x slower than the above.
-    // ray.Init(origin, target, -right * HALF_PLAYER_WIDTH, right * HALF_PLAYER_WIDTH);
-
     PROF_SECTION(IEVV_TraceRay)
     g_ITrace->TraceRay(ray, mask, filter, &trace);
 
@@ -182,7 +179,7 @@ class Map : public micropather::Graph
 public:
     CNavFile navfile;
     NavState state;
-    micropather::MicroPather pather{ this, 3000, 6, true };
+    micropather::MicroPather pather{ this, 1500, 6, true };
     std::string mapname;
     std::unordered_map<std::pair<CNavArea *, CNavArea *>, CachedConnection, boost::hash<std::pair<CNavArea *, CNavArea *>>> vischeck_cache;
     std::unordered_map<std::pair<CNavArea *, CNavArea *>, CachedStucktime, boost::hash<std::pair<CNavArea *, CNavArea *>>> connection_stuck_time;
@@ -703,57 +700,16 @@ static void followCrumbs()
         return;
     }*/
 
-    // Look at path
+     // Look at path
     if (*look && !hacks::aimbot::IsAiming())
     {
-        float best_dist                = FLT_MAX;
-        std::optional<Vector> look_vec = std::nullopt;
-        for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
-        {
-            CachedEntity *ent = ENTITY(i);
-            if (i == g_pLocalPlayer->entity_idx || CE_INVALID(ent) || !ent->m_bEnemy())
-                continue;
-        }
-        if (look_vec)
-        {
-            Vector aim_ang = GetAimAtAngles(g_pLocalPlayer->v_Eye, *look_vec);
-            hacks::misc_aimbot::DoSlowAim(aim_ang, 20);
-            current_user_cmd->viewangles = aim_ang;
-        }
-        else
-        {
-            static Vector next{ crumbs[0].vec.x, crumbs[0].vec.y, g_pLocalPlayer->v_Eye.z };
-            static bool looked_at_point = true;
-            static Timer choose_new_point;
-
-            static int wait_time = 20;
-            static int aim_speed = 20;
-
-            if (looked_at_point && choose_new_point.test_and_set(wait_time))
-            {
-                next = { crumbs[0].vec.x, crumbs[0].vec.y, g_pLocalPlayer->v_Eye.z };
-                next = GetAimAtAngles(g_pLocalPlayer->v_Eye, next);
-                next.x += UniformRandomInt(0, 0);
-                next.y += UniformRandomInt(0, 0);
-                fClampAngle(next);
-                looked_at_point = false;
-            }
-
-            // Pick a new point, we're looking at our current one closely enough
-            if ((current_user_cmd->viewangles - next).IsZero(5.0f))
-            {
-                if (!looked_at_point)
-                    choose_new_point.update();
-                looked_at_point = true;
-                wait_time       = 20 + UniformRandomInt(0, 2);
-                aim_speed       = 20 + UniformRandomInt(0, 2); // maybe 15 later
-            }
-
-            Vector next_slow = next;
-            // spin toggle
-            hacks::misc_aimbot::DoSlowAim(next_slow, aim_speed);
-            current_user_cmd->viewangles = next_slow;
-        }
+        Vector next{ crumbs[0].vec.x, crumbs[0].vec.y, g_pLocalPlayer->v_Eye.z };
+        next = GetAimAtAngles(g_pLocalPlayer->v_Eye, next);
+        static int wait_time = 10;
+        static int aim_speed = 20;
+         // Slow aim to smoothen
+        hacks::misc_aimbot::DoSlowAim(next, aim_speed);
+        current_user_cmd->viewangles = next, aim_speed;
     }
     WalkTo(crumbs[0].vec);
 }

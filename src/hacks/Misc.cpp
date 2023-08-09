@@ -39,7 +39,7 @@ static settings::Boolean ping_reducer{ "misc.ping-reducer.enable", "false" };
 static settings::Int force_ping{ "misc.ping-reducer.target", "0" };
 static settings::Boolean force_wait{ "misc.force-enable-wait", "true" };
 static settings::Boolean scc{ "misc.scoreboard.match-custom-team-colors", "false" };
-static settings::Boolean i_love_men_and_so_does_ezerboberhomosexual_lol_no_homo{ "misc.imagayfaggot", "false" };
+static settings::Boolean i_love_men_and_so_does_ezerbober_lol_no_homo{ "misc.imagayfaggot", "false" };
 
 #if ENABLE_VISUALS
 static settings::Boolean debug_info{ "misc.debug-info", "false" };
@@ -110,7 +110,7 @@ static void tryPatchLocalPlayerShouldDraw(bool after)
 static Timer anti_afk_timer{};
 static int last_buttons{ 0 };
 
-if (i_love_men_and_so_does_ezerbober_lol_no_homo)
+if (*i_love_men_and_so_does_ezerbober_lol_no_homo)
         g_ISurface->PlaySound("vo/demoman_cloakedspy03.mp3");
             i_love_men_and_so_does_ezerbober_lol_no_homo = 0;
 

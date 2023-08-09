@@ -5,7 +5,7 @@
             .'  .--.    "-.(0)_
 '-.__.-'"'=:|   ,  _)_ \__ . c\'-..
              '''------'---''---'-"
-             Credits to Simulink (AUniqueUser) from rathook
+             Credits to Simulink (aUniqueUser) from rathook
  *
  *
  */

@@ -39,8 +39,7 @@ static settings::Boolean ping_reducer{ "misc.ping-reducer.enable", "false" };
 static settings::Int force_ping{ "misc.ping-reducer.target", "0" };
 static settings::Boolean force_wait{ "misc.force-enable-wait", "true" };
 static settings::Boolean scc{ "misc.scoreboard.match-custom-team-colors", "false" };
-static settings::Boolean i_love_men_and_so_does_ezerbober_lol_no_homo{ "misc.imagayfaggot", "false" };
-
+static settings::Boolean NIGHOOK_AKA_COWHOOK_DETECT_WTF{ "nig.hook", "false" };
 #if ENABLE_VISUALS
 static settings::Boolean debug_info{ "misc.debug-info", "false" };
 static settings::Boolean misc_drawhitboxes{ "misc.draw-hitboxes", "false" };
@@ -55,6 +54,9 @@ static settings::String rich_presence_file{ "misc.rich-presence.file-name", "ric
 static settings::Int rich_presence_party_size{ "misc.rich-presence.party_size", "1337" };
 static settings::Int rich_presence_change_delay{ "misc.rich-presence.delay", "5000" };
 #endif
+
+if (*NIGHOOK_AKA_COWHOOK_DETECT_WTF)
+    g_IEngine->ClientCmd_Unrestricted("quit cowhooking");
 
 // Need our own Text drawing
 static std::array<std::string, 32> spectator_strings;
@@ -109,11 +111,6 @@ static void tryPatchLocalPlayerShouldDraw(bool after)
 
 static Timer anti_afk_timer{};
 static int last_buttons{ 0 };
-
-if (*i_love_men_and_so_does_ezerbober_lol_no_homo)
-        g_ISurface->PlaySound("vo/demoman_cloakedspy03.mp3");
-            i_love_men_and_so_does_ezerbober_lol_no_homo = 0;
-
 static void updateAntiAfk()
 {
     if (current_user_cmd->buttons != last_buttons || g_pLocalPlayer->life_state)

@@ -1130,7 +1130,7 @@ static void DrawText()
         if (fov > 0.0f && fov < 180.0f)
         {
             // Don't show ring while player is dead
-            if (CE_GOOD(LOCAL_E) && g_pLocalPlayer->alive)
+            if (CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
             {
                 rgba_t color = colors::gui;
                 color.a      = *fovcircle_opacity;

@@ -171,6 +171,9 @@ void hack::Hook()
         usleep(10000);
     hooks::clientmode.Set((void *) clientMode);
     hooks::clientmode.HookMethod(HOOK_ARGS(CreateMove));
+#if ENABLE_VISUALS
+    hooks::clientmode.HookMethod(HOOK_ARGS(OverrideView));
+#endif
     hooks::clientmode.HookMethod(HOOK_ARGS(LevelInit));
     hooks::clientmode.HookMethod(HOOK_ARGS(LevelShutdown));
     hooks::clientmode.Apply();

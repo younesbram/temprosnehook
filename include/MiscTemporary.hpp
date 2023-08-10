@@ -28,7 +28,6 @@ extern int prevflowticks;
 #if ENABLE_VISUALS
 extern int spectator_target;
 extern CLC_VoiceData *voicecrash;
-extern bool freecam_is_toggled;
 #endif
 extern settings::Boolean clean_chat;
 

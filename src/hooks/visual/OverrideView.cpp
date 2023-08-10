@@ -8,11 +8,8 @@
 #include "HookedMethods.hpp"
 
 static settings::Float override_fov{ "visual.fov", "0" };
-static settings::Float freecam_speed{ "visual.freecam-speed", "800.0f" };
-static settings::Button freecam{ "visual.freecam-button", "<none>" };
 static settings::Button zoom_key{ "visual.zoom-key", "<null>" };
 static settings::Int zoom_fov{ "visual.zoom-key.fov", "20" };
-bool freecam_is_toggled{ false };
 bool zoomed_last_tick{ false };
 bool user_sensitivity_ratio_set{ true };
 float zoom_sensitivity_ratio_user;
@@ -66,53 +63,6 @@ DEFINE_HOOKED_METHOD(OverrideView, void, void *this_, CViewSetup *setup)
         if (g_IInputSystem->IsButtonDown(ButtonCode_t::KEY_SPACE))
             spectator_target = 0;
     }
-
-    if (freecam && current_user_cmd)
-    {
-        static Vector freecam_origin{ 0 };
-        static bool freecam_last{ false };
-        static bool first_toggle{ true };
-
-        if (freecam.isKeyDown() && !freecam_last)
-        {
-            freecam_is_toggled = !freecam_is_toggled;
-            first_toggle       = true;
-        }
-        if (freecam_is_toggled)
-        {
-            if (first_toggle)
-            {
-                freecam_origin = setup->origin;
-                first_toggle   = false;
-            }
-            QAngle ang;
-            Vector angle;
-
-            float speed = *freecam_speed * g_GlobalVars->absoluteframetime;
-            g_IEngine->GetViewAngles(ang);
-            angle = QAngleToVector(ang);
-            if (stored_buttons & IN_FORWARD)
-                freecam_origin += GetForwardVector({ 0.0f, 0.0f, 0.0f }, angle, speed);
-            if (stored_buttons & IN_BACK)
-                freecam_origin -= GetForwardVector({ 0.0f, 0.0f, 0.0f }, angle, speed);
-            if (stored_buttons & IN_MOVELEFT || stored_buttons & IN_MOVERIGHT)
-            {
-                Vector new_angle = angle;
-                new_angle.y += 90.0f;
-                new_angle.x = 0.0f;
-                fClampAngle(new_angle);
-                Vector touse = GetForwardVector({ 0.0f, 0.0f, 0.0f }, new_angle, speed);
-                if (stored_buttons & IN_MOVELEFT)
-                    freecam_origin += touse;
-                if (stored_buttons & IN_MOVERIGHT)
-                    freecam_origin -= touse;
-            }
-            setup->origin = freecam_origin;
-        }
-        freecam_last = freecam.isKeyDown();
-    }
-    else if (current_user_cmd)
-        freecam_is_toggled = false;
 
     draw::fov = setup->fov;
 

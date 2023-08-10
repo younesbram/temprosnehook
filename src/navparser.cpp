@@ -699,7 +699,7 @@ static void followCrumbs()
         return;
     }*/
 
-     // Look at path
+    // Look at path
     if (*look && !hacks::aimbot::IsAiming())
     {
         Vector next{ crumbs[0].vec.x, crumbs[0].vec.y, g_pLocalPlayer->v_Eye.z };

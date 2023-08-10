@@ -1,6 +1,6 @@
 [submodule "libglez"]
 	path = external/libglez
-	url = https://github.com/nullworks/libglez
+	url = https://github.com/ReallyBadNullworksreal-not-rosne/libglez
 [submodule "libxoverlay"]
 	path = external/libxoverlay
 	url = https://github.com/ReallyBadNullworksreal-not-rosne/libxoverlay

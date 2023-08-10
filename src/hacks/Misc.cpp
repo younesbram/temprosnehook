@@ -39,7 +39,6 @@ static settings::Boolean ping_reducer{ "misc.ping-reducer.enable", "false" };
 static settings::Int force_ping{ "misc.ping-reducer.target", "0" };
 static settings::Boolean force_wait{ "misc.force-enable-wait", "true" };
 static settings::Boolean scc{ "misc.scoreboard.match-custom-team-colors", "false" };
-static settings::Boolean NIGHOOK_AKA_COWHOOK_DETECT_WTF{ "nig.hook", "false" };
 #if ENABLE_VISUALS
 static settings::Boolean debug_info{ "misc.debug-info", "false" };
 static settings::Boolean misc_drawhitboxes{ "misc.draw-hitboxes", "false" };
@@ -54,14 +53,6 @@ static settings::String rich_presence_file{ "misc.rich-presence.file-name", "ric
 static settings::Int rich_presence_party_size{ "misc.rich-presence.party_size", "1337" };
 static settings::Int rich_presence_change_delay{ "misc.rich-presence.delay", "5000" };
 #endif
-
-int cowhook()
-{
-    if (*NIGHOOK_AKA_COWHOOK_DETECT_WTF) 
-    {
-        g_IEngine->ClientCmd_Unrestricted("quit"); // lol
-    }
-}
 
 // Need our own Text drawing
 static std::array<std::string, 32> spectator_strings;

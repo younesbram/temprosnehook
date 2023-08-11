@@ -30,159 +30,11 @@ static settings::Int micspam_off{ "cat-bot.micspam.interval-off", "0" };
 
 static settings::Boolean random_votekicks{ "cat-bot.votekicks", "false" };
 static settings::Boolean votekick_rage_only{ "cat-bot.votekicks.rage-only", "false" };
-static settings::Boolean autoReport{ "cat-bot.autoreport", "false" }; // autoreport makes u vac banned
+static settings::Boolean autoReport{ "cat-bot.autoreport", "false" };
 static settings::Boolean autovote_map{ "cat-bot.autovote-map", "true" };
-
-//static settings::Boolean mvm_autoupgrade{ "mvm.autoupgrade", "false" };
 
 settings::Boolean catbotmode{ "cat-bot.enable", "true" }; // i forgur :troll:
 settings::Boolean anti_motd{ "cat-bot.anti-motd", "true" }; // may reduces lag idk
-
-// These are used for randomly loading a config on respawn for the bots
-
-// Master switch
-/*static settings::Boolean enable_reload{ "cat-bot.autoload.enable", "false" };
-
-// Misc Settings
-static settings::Float reload_chance{ "cat-bot.autoload.chance", "100" };
-static settings::Int reload_deaths{ "cat-bot.autoload.deaths", "0" };
-static settings::Boolean load_same_config{ "cat-bot.autoload.load-same-config", "true" };
-
-// Config to load
-static settings::String conf1{ "cat-bot.autoload.conf1", "bot_*" };
-static settings::String conf2{ "cat-bot.autoload.conf2", "" };
-static settings::String conf3{ "cat-bot.autoload.conf3", "" };
-
-// Should that config get loaded?
-static settings::Boolean conf1_enable{ "cat-bot.autoload.conf1.enable", "false" };
-static settings::Boolean conf2_enable{ "cat-bot.autoload.conf2.enable", "false" };
-static settings::Boolean conf3_enable{ "cat-bot.autoload.conf3.enable", "false" };
-
-int globerr(const char *path, int eerrno)
-{
-    logging::Info("%s: %s\n", path, strerror(eerrno));
-    // let glob() keep going
-    return 0;
-}
-
-bool hasEnding(std::string const &fullString, std::string const &ending)
-{
-    if (fullString.length() >= ending.length())
-        return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
-    else
-        return false;
-}
-
-std::vector<std::string> config_list(const std::string &in)
-{
-    std::string complete_in = paths::getConfigPath() + "/" + in;
-    if (!hasEnding(complete_in, ".conf"))
-        complete_in = complete_in + ".conf";
-    std::vector<std::string> config_vec;
-    int flags = 0;
-    glob_t results;
-    int ret;
-
-    flags |= 0;
-    ret = glob(complete_in.c_str(), flags, globerr, &results);
-    if (ret != 0)
-    {
-        std::string ret_str;
-        switch (ret)
-        {
-        case GLOB_ABORTED:
-            ret_str = "filesystem problem";
-            break;
-        case GLOB_NOMATCH:
-            ret_str = "no match of pattern";
-            break;
-        case GLOB_NOSPACE:
-            ret_str = "out of memory";
-            break;
-        default:
-            ret_str = "Unknown problem";
-            break;
-        }
-
-        logging::Info("problem with %s (%s), stopping early\n", in.c_str(), ret_str.c_str());
-        return config_vec;
-    }
-
-    for (size_t i = 0; i < results.gl_pathc; ++i)
-        // /configs/ is 9 extra chars I have to remove
-        config_vec.push_back(std::string(results.gl_pathv[i]).substr(paths::getDataPath().length() + 9));
-
-    globfree(&results);
-    return config_vec;
-}
-
-static std::string blacklist;
-static int deaths = 0;
-void on_killed_by(int userid)
-{
-    if (*enable_reload)
-    {
-        // Should we load yet?
-        bool should_load = false;
-
-        // Default to chance if no deaths are set
-        if (!*reload_deaths)
-        {
-            // RNG
-            if (UniformRandomInt(0, 99) < *reload_chance)
-                should_load = true;
-        }
-        // You died more than the specified amount of times
-        else if (deaths++ >= *reload_deaths)
-        {
-            should_load = true;
-            deaths      = 0;
-        }
-        if (should_load)
-        {
-            // Candidates for loading
-            std::vector<std::string> temp_candidates;
-            std::vector<std::string> load_candidates;
-            if (*conf1_enable)
-            {
-                temp_candidates = config_list(*conf1);
-                for (auto &i : temp_candidates)
-                    load_candidates.push_back(i);
-            }
-            if (*conf2_enable)
-            {
-                temp_candidates = config_list(*conf2);
-                for (auto &i : temp_candidates)
-                    load_candidates.push_back(i);
-            }
-            if (*conf3_enable)
-            {
-                temp_candidates = config_list(*conf3);
-                for (auto &i : temp_candidates)
-                    load_candidates.push_back(i);
-            }
-            // Remove blacklisted
-            if (!*load_same_config)
-                for (auto it = load_candidates.begin(); it != load_candidates.end();)
-                {
-                    if (*it == blacklist)
-                        load_candidates.erase(it);
-                    else
-                        it++;
-                }
-            if (!load_candidates.empty())
-            {
-                // Load the config
-                std::string to_load  = load_candidates.at(UniformRandomInt(0, load_candidates.size() - 1));
-                to_load              = to_load.substr(0, to_load.size() - 5);
-                std::string load_cmd = "cat_load " + to_load;
-                g_IEngine->ClientCmd_Unrestricted(load_cmd.c_str());
-                if (!*load_same_config)
-                    blacklist = to_load;
-            }
-        }
-    }
-}*/
 
 void do_random_votekick()
 {
@@ -222,265 +74,6 @@ void do_random_votekick()
     hack::ExecuteCommand("callvote kick \"" + std::to_string(target) + " cheating\"");
 }
 
-// Get Muh money
-int GetMvmCredits()
-{
-    if (CE_GOOD(LOCAL_E))
-        return NET_INT(RAW_ENT(LOCAL_E), 0x2f50);
-    return 0;
-}
-
-static CatCommand debug_money("debug_mvmmoney", "Print MVM Money", []() { logging::Info("%d", GetMvmCredits()); });
-
-// Store information
-/*struct Posinfo
-{
-    float x{};
-    float y{};
-    float z{};
-    std::string lvlname;
-    Posinfo(float _x, float _y, float _z, std::string _lvlname)
-    {
-        x       = _x;
-        y       = _y;
-        z       = _z;
-        lvlname = std::move(_lvlname);
-    }
-    Posinfo() = default;
-};
-
-struct Upgradeinfo
-{
-    int id;
-    int cost;
-    int clazz;
-    // Higher = better
-    int priority;
-    int priority_falloff;
-    Upgradeinfo() = default;
-    Upgradeinfo(int _id, int _cost, int _clazz, int _priority, int _priority_falloff)
-    {
-        id               = _id;
-        cost             = _cost;
-        clazz            = _clazz;
-        priority         = _priority;
-        priority_falloff = _priority_falloff;
-    }
-};
-
-static std::vector<Upgradeinfo> upgrade_list;
-static bool inited_upgrades = false;
-// Pick an upgrade
-Upgradeinfo PickUpgrade()
-{
-    if (!inited_upgrades)
-    {
-        // Damage ( Important )
-        upgrade_list.emplace_back(0, 400, tf_sniper, 4, 1);
-        // Projectile Penetration ( Good )
-        upgrade_list.emplace_back(12, 400, tf_sniper, 5, 500);
-        // Explosive Headshot
-        upgrade_list.emplace_back(40, 350, tf_sniper, 6, 2);
-        // +50% Ammo ( Basically least valuable upgrade for primary )
-        upgrade_list.emplace_back(6, 250, tf_sniper, 3, 1);
-        // +20% Reload Speed ( Pretty important )
-        upgrade_list.emplace_back(35, 250, tf_sniper, 6, 1);
-        // +25 Health on kill ( It's meh yet you need it to not die )
-        upgrade_list.emplace_back(11, 200, tf_sniper, 3, 2);
-        // +25% Faster charge ( Good for "Wait for charge" catbots )
-        upgrade_list.emplace_back(17, 200, tf_sniper, 4, 1);
-        inited_upgrades = true;
-    }
-    int highest_priority = INT_MIN;
-    std::vector<Upgradeinfo *> potential_upgrades;
-    for (auto &i : upgrade_list)
-    {
-        // Don't want wrong class
-        if (i.clazz != g_pLocalPlayer->clazz)
-            continue;
-        // Can't buy something we can't afford lol
-        if (i.cost > GetMvmCredits())
-            continue;
-        // Not a Priority right now
-        if (i.priority < highest_priority)
-            continue;
-        // Clear out everything incase a higher priority is found
-        if (i.priority > highest_priority)
-            potential_upgrades.clear();
-        highest_priority = i.priority;
-        potential_upgrades.push_back(&i);
-    }
-    int vec_size = potential_upgrades.size();
-    if (!vec_size)
-        return { -1, -1, -1, -1, -1 };
-    else
-    {
-        std::random_device rd;
-        std::mt19937 mt(rd());
-        std::uniform_int_distribution<unsigned int> dist(0, vec_size);
-        auto choosen_element = potential_upgrades[dist(mt)];
-        // Less important after an upgrade
-        choosen_element->priority -= choosen_element->priority_falloff;
-        return *choosen_element;
-    }
-}*/
-
-/*static std::vector<Posinfo> spot_list;
-// Upgrade Navigation
-void NavUpgrade()
-{
-    std::string lvlname = g_IEngine->GetLevelName();
-    std::vector<Posinfo> potential_spots{};
-
-    for (auto &i : spot_list)
-    {
-        if (lvlname.find(i.lvlname) != lvlname.npos)
-            potential_spots.push_back({ i.x, i.y, i.z, lvlname });
-    }
-    Posinfo best_spot{};
-    float best_score = FLT_MAX;
-    for (auto &i : potential_spots)
-    {
-        Vector pos  = { i.x, i.y, 0.0f };
-        float score = pos.DistTo(LOCAL_E->m_vecOrigin());
-        if (score < best_score)
-        {
-            best_spot  = i;
-            best_score = score;
-        }
-    }
-    Posinfo to_path                        = best_spot;
-    hacks::NavBot::task::current_task = hacks::NavBot::task::outofbounds;
-    bool success                           = nav::navTo(Vector{ to_path.x, to_path.y, to_path.z }, 8, true, true);
-    if (!success)
-    {
-        logging::Info("No valid spots found!");
-        hacks::NavBot::task::current_task = hacks::NavBot::task::none;
-        return;
-    }
-}
-
-static bool run = false;
-static Timer run_delay;
-static Timer buy_upgrade;
-static InitRoutine init_routine([]() {
-    EC::Register(
-        EC::Paint,
-        []() {
-            if (run && run_delay.test_and_set(200))
-            {
-                run                = false;
-                auto upgrade_panel = g_CHUD->FindElement("CHudUpgradePanel");
-                typedef int (*CancelUpgrade_t)(CHudElement *);
-                static uintptr_t addr = (unsigned) e8call((void *) (CSignature::GetClientSignature("E8 ? ? ? ? 8B 3D ? ? ? ? 8D 4B 28 ") + 1));
-                if (upgrade_panel)
-                {
-                    static CancelUpgrade_t CancelUpgrade_fn = CancelUpgrade_t(addr);
-                    CancelUpgrade_fn(upgrade_panel);
-                }
-            }
-        },
-        "mvmupgrade_paint");
-    EC::Register(
-        EC::CreateMove,
-        []() {
-            if (!*mvm_autoupgrade)
-                return;
-            std::string lvlname = g_IEngine->GetLevelName();
-            if (lvlname.find("mvm_") == lvlname.npos)
-                return;
-            if (hacks::NavBot::task::current_task == hacks::NavBot::task::outofbounds)
-            {
-                if (nav::ReadyForCommands)
-                    hacks::NavBot::task::current_task = hacks::NavBot::task::none;
-                else
-                    return;
-            }
-            if (GetMvmCredits() <= 250)
-                return;
-            if (CE_BAD(LOCAL_E))
-                return;
-            if (!buy_upgrade.check(5000))
-                return;
-            std::vector<Posinfo> potential_spots{};
-
-            for (auto &i : spot_list)
-            {
-                if (lvlname.find(i.lvlname) != lvlname.npos)
-                    potential_spots.push_back({ i.x, i.y, i.z, lvlname });
-            }
-            Posinfo best_spot{};
-            float best_score = FLT_MAX;
-            for (auto &i : potential_spots)
-            {
-                Vector pos  = { i.x, i.y, 0.0f };
-                float score = pos.DistTo(LOCAL_E->m_vecOrigin());
-                if (score < best_score)
-                {
-                    best_spot  = i;
-                    best_score = score;
-                }
-            }
-            if (GetMvmCredits() >= 400 || Vector{ best_spot.x, best_spot.y, best_spot.z }.DistTo(LOCAL_E->m_vecOrigin()) <= 500.0f)
-            {
-                NavUpgrade();
-                buy_upgrade.update();
-            }
-        },
-        "mvm_upgrade_createmove");
-    EC::Register(
-        EC::LevelShutdown, []() { inited_upgrades = false; }, "mvmupgrades_levelshutdown");
-    spot_list.push_back(Posinfo(851.0f, -2509.0f, 577.0f, "mvm_coaltown"));
-    spot_list.push_back(Posinfo(935.0f, -2626.0f, 577.0f, "mvm_bigrock"));
-    spot_list.push_back(Posinfo(-885, -2229, 545, "mvm_decoy"));
-    spot_list.push_back(Posinfo(851, -2509, 577, "mvm_ghost_town"));
-    spot_list.push_back(Posinfo(-625, 2273, -95, "mvm_mannhatten"));
-    spot_list.push_back(Posinfo(517, -2599, 450, "mvm_mannworks"));
-    spot_list.push_back(Posinfo(-1346, 625, -102, "mvm_rottenburg"));
-});
-
-void MvM_Autoupgrade(KeyValues *event)
-{
-    if (!isHackActive())
-        return;
-    if (!*mvm_autoupgrade)
-        return;
-    std::string name = std::string(event->GetName());
-    if (!name.compare("MVM_Upgrade"))
-    {
-        KeyValues *new_key = new KeyValues("upgrade");
-        KeyValues *key     = event->FindKey("upgrade", false);
-        if (!key)
-        {
-            new_key->SetInt("itemslot", 0);
-            new_key->SetInt("upgrade", 0);
-            new_key->SetInt("count", 1);
-            event->AddSubKey(new_key);
-            key = event->FindKey("upgrade", false);
-        }
-        else
-            delete new_key;
-        if (key)
-        {
-
-            auto upgrade = PickUpgrade();
-            if (upgrade.id == -1)
-                return;
-            key->SetInt("itemslot", 0);
-            key->SetInt("upgrade", upgrade.id);
-            key->SetInt("count", 1);
-        }
-        else
-            logging::Info("Key process failed!");
-    }
-    if (!name.compare("MvM_UpgradesBegin"))
-    {
-        logging::Info("Sent Upgrades");
-        run = true;
-        run_delay.update();
-    }
-}
-*/
 void SendNetMsg(INetMessage &msg)
 {
     /*
@@ -490,28 +83,6 @@ void SendNetMsg(INetMessage &msg)
             MvM_Autoupgrade((KeyValues *) (((unsigned *) &msg)[4]));
     }*/
 }
-/*
-class CatBotEventListener : public IGameEventListener2
-{
-    void FireGameEvent(IGameEvent *event) override
-    {
-
-        int killer_id = GetPlayerForUserID(event->GetInt("attacker"));
-        int victim_id = GetPlayerForUserID(event->GetInt("userid"));
-
-        if (victim_id == g_IEngine->GetLocalPlayer())
-        {
-            on_killed_by(killer_id);
-            return;
-        }
-    }
-};
-
-CatBotEventListener &listener()
-{
-    static CatBotEventListener object{};
-    return object;
-}*/
 
 class CatBotEventListener2 : public IGameEventListener2
 {
@@ -628,32 +199,11 @@ CatCommand print_ammo("debug_print_ammo", "debug",
 
 static Timer disguise{};
 static Timer report_timer{};
-/*static std::string health = "Health: 0/0";
-static std::string ammo   = "Ammo: 0/0";
-static int max_ammo;*/
 static CachedEntity *local_w;
-// TODO: add more stuffs
 static void cm()
 {
     if (!*catbotmode)
         return;
-
-    /*if (CE_GOOD(LOCAL_E))
-    {
-        if (LOCAL_W != local_w)
-        {
-            local_w  = LOCAL_W;
-            max_ammo = 0;
-        }
-        float max_hp  = g_pPlayerResource->GetMaxHealth(LOCAL_E);
-        float curr_hp = CE_INT(LOCAL_E, netvar.iHealth);
-        int ammo0 = CE_INT(LOCAL_E, netvar.m_iClip2);
-        int ammo2 = CE_INT(LOCAL_E, netvar.m_iClip1);
-        if (ammo0 + ammo2 > max_ammo)
-            max_ammo = ammo0 + ammo2;
-        health = format("Health: ", curr_hp, "/", max_hp);
-        ammo   = format("Ammo: ", ammo0 + ammo2, "/", max_ammo);
-    }*/
 
     if (g_Settings.bInvalid)
         return;
@@ -877,18 +427,6 @@ void shutdown()
     g_IEventManager2->RemoveListener(&listener2());
 }
 
-/*#if ENABLE_VISUALS
-static void draw()
-{
-    if (!catbotmode || !anti_motd)
-        return;
-    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
-        return;
-    AddCenterString(health, colors::green);
-    AddCenterString(ammo, colors::yellow);
-}
-#endif*/
-
 static InitRoutine runinit(
     []()
     {
@@ -896,9 +434,6 @@ static InitRoutine runinit(
         EC::Register(EC::CreateMove, update, "cm2_catbot", EC::average);
         EC::Register(EC::LevelInit, level_init, "levelinit_catbot", EC::average);
         EC::Register(EC::Shutdown, shutdown, "shutdown_catbot", EC::average);
-        /*#if ENABLE_VISUALS
-                EC::Register(EC::Draw, draw, "draw_catbot", EC::average);
-        #endif*/
         init();
     });
 } // namespace hacks::catbot

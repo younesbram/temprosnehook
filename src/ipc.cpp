@@ -19,6 +19,7 @@
 #if ENABLE_IPC
 
 static settings::Boolean ipc_update_list{ "ipc.update-player-list", "true" };
+
 static settings::Int bot_chunks("ipc.bot-chunks", "1");
 
 namespace ipc

@@ -145,33 +145,6 @@ inline int BestHitbox(CachedEntity *target)
     return -1;
 }
 
-inline float ProjectileHitboxSize(int projectile_size)
-{
-    float projectile_hitbox_size = 6.3f;
-    switch (projectile_size)
-    {
-    case CL_CLASS(CTFRocketLauncher):
-    case CL_CLASS(CTFRocketLauncher_Mortar):
-    case CL_CLASS(CTFRocketLauncher_AirStrike):
-    case CL_CLASS(CTFRocketLauncher_DirectHit):
-    case CL_CLASS(CTFPipebombLauncher):
-    case CL_CLASS(CTFGrenadeLauncher):
-    case CL_CLASS(CTFCannon):
-        break;
-    case CL_CLASS(CTFFlareGun):
-    case CL_CLASS(CTFFlareGun_Revenge):
-    case CL_CLASS(CTFDRGPomson):
-        projectile_hitbox_size = 3;
-        break;
-    case CL_CLASS(CTFSyringeGun):
-    case CL_CLASS(CTFCompoundBow):
-        projectile_hitbox_size = 1;
-    default:
-        break;
-    }
-    return projectile_hitbox_size;
-}
-
 inline void UpdateShouldBacktrack()
 {
     if (hacks::backtrack::hasData() || !(*backtrack_aimbot || force_backtrack_aimbot))
@@ -915,7 +888,7 @@ Vector PredictEntity(CachedEntity *entity)
     Vector &result            = cd.aim_position;
     const short int curr_type = entity->m_Type();
 
-    // If using projectiles, predict a vector
+    // If using projectiles, predict a vector - we dont need this shit :skull: 
     switch (curr_type)
     {
     // Player
@@ -1005,7 +978,6 @@ int AutoHitbox(CachedEntity *target)
             preferred = hitbox_t::spine_1;
             return preferred;
         }
-
         return hitbox_t::head;
     }
     return preferred;

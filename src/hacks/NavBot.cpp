@@ -26,7 +26,6 @@ static settings::Boolean snipe_sentries_shortrange("navbot.snipe-sentries.shortr
 static settings::Boolean escape_danger("navbot.escape-danger", "true");
 static settings::Boolean escape_danger_ctf_cap("navbot.escape-danger.ctf-cap", "false");
 static settings::Boolean enable_slight_danger_when_capping("navbot.escape-danger.slight-danger.capping", "false");
-static settings::Boolean run_to_reload("navbot.run-to-reload", "false");
 static settings::Boolean autojump("navbot.autojump.enabled", "false");
 static settings::Boolean primary_only("navbot.primary-only", "true");
 static settings::Int force_slot("navbot.force-slot", "0");
@@ -566,74 +565,6 @@ std::optional<std::pair<CNavArea *, int>> findClosestHidingSpot(CNavArea *area, 
         return std::nullopt;
 }
 
-// Try to avoid enemy sightlines and reload in peace
-// TODO: As Sniper, only run away if reloading your secondary weapon
-bool runReload()
-{
-    if (!*run_to_reload)
-        return false;
-
-    PROF_SECTION(runReload)
-    static Timer reloadrun_cooldown{};
-
-    // Not reloading, do not run
-    if (!(CE_GOOD(LOCAL_E) && !HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E) && CE_GOOD(LOCAL_W) && re::C_BaseCombatWeapon::GetSlot(RAW_ENT(LOCAL_W)) + 1 != melee && !CanShoot()))
-        return false;
-
-    if (!*stay_near)
-        return false;
-
-    // Re-calc only every once in a while
-    if (!reloadrun_cooldown.test_and_set(1000))
-        return navparser::NavEngine::current_priority == run_reload;
-
-    // Too high priority, so don't try
-    if (navparser::NavEngine::current_priority > run_reload)
-        return false;
-
-    // Get our area and start recursing the neighbours
-    CNavArea *local_area = navparser::NavEngine::findClosestNavSquare(g_pLocalPlayer->v_Origin);
-    if (!local_area)
-        return false;
-
-    // Get the closest enemy to vischeck
-    CachedEntity *closest_visible_enemy = nullptr;
-    float best_distance                 = FLT_MAX;
-    for (const auto &ent : entity_cache::player_cache)
-    {
-        if (CE_BAD(ent))
-            continue;
-        if (!ent->m_bAlivePlayer() || !ent->m_bEnemy())
-            continue;
-        if (ent->m_flDistance() > best_distance)
-            continue;
-        if (!ent->IsVisible())
-            continue;
-        if (!player_tools::shouldTarget(ent))
-            continue;
-
-        best_distance         = ent->m_flDistance();
-        closest_visible_enemy = ent;
-    }
-
-    if (!closest_visible_enemy)
-        return false;
-
-    Vector vischeck_point = closest_visible_enemy->m_vecOrigin();
-    vischeck_point.z += navparser::PLAYER_JUMP_HEIGHT;
-
-    // Get the best non-visible area
-    auto best_area = findClosestHidingSpot(local_area, vischeck_point, 5);
-    if (!best_area)
-        return false;
-
-    // If we can, path
-    if (navparser::NavEngine::navTo((*best_area).first->m_center, run_reload, true, false, false))
-        return true;
-    else
-        return false;
-}
-
 // Try to stay near enemies and stalk them (or in case of sniper, try to stay far from them
 // and snipe them)
 bool stayNear()
@@ -767,7 +698,7 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest) // also kn
     // If we are close enough, don't even bother with using the navparser to get there
     if (nearest.second < 400.0f && hacks::NavBot::isVisible)
     {
-        AimAt(g_pLocalPlayer->v_Eye, nearest.first->hitboxes.GetHitbox(head)->center, current_user_cmd); // rosne todo: make this aim for the front spine
+        AimAt(g_pLocalPlayer->v_Eye, nearest.first->hitboxes.GetHitbox(spine_0)->center, current_user_cmd);
         WalkTo(nearest.first->m_vecOrigin());
         navparser::NavEngine::cancelPath();
         return true;
@@ -1030,7 +961,7 @@ bool doRoam()
 {
     static Timer roam_timer;
     // Don't path constantly
-    if (!roam_timer.test_and_set(2000))
+    if (!roam_timer.test_and_set(4000))
         return false;
 
     // Defend our objective if possible
@@ -1057,8 +988,8 @@ bool doRoam()
     // Don't overwrite current roam
     if (navparser::NavEngine::current_priority == patrol)
         return false;
-    // Max 10 attempts
-    for (int attempts = 0; attempts < 10; ++attempts)
+    // 5 times max
+    for (int attempts = 0; attempts < 5; ++attempts)
     {
         // Get a random sniper spot
         auto random = select_randomly(sniper_spots.begin(), sniper_spots.end());
@@ -1278,9 +1209,6 @@ static void CreateMove()
         return;
     // Try to snipe sentries
     if (snipeSentries())
-        return;
-    // Try to hide if reloading
-    if (runReload())
         return;
     // Try to stalk enemies
     if (stayNear())

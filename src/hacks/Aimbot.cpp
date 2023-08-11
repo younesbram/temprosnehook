@@ -70,7 +70,7 @@ struct AimbotCalculatedData_s
     bool predict_type{ false };
     Vector aim_position{ 0 };
     unsigned long vcheck_tick{ 0 };
-    bool visible{ false };
+    bool visible{ true };
     float fov{ 0 };
     int hitbox{ 0 };
 } static cd;
@@ -536,7 +536,7 @@ bool MouseMoving()
 // The first check to see if the player should aim in the first place
 bool ShouldAim()
 {
-    // Checks should be in order: cheap -> expensive
+    // Checks should be in order: cheap -> expensive + dont need weapon checks lol 
     // Check for +use
     if (current_user_cmd->buttons & IN_USE)
         return false;
@@ -545,9 +545,6 @@ bool ShouldAim()
         return false;
     // Our team lost, so we can't hurt the enemy team
     if (TFGameRules()->RoundHasBeenWon() && TFGameRules()->GetWinningTeam() != g_pLocalPlayer->team)
-        return false;
-    // Using a forbidden weapon?
-    if (!LOCAL_W || LOCAL_W->m_iClassID() == CL_CLASS(CTFKnife) || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 237 || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 265)
         return false;
     // Carrying A building?
     if (CE_BYTE(LOCAL_E, netvar.m_bCarryingObject))

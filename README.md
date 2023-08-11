@@ -22,6 +22,7 @@ everyone here should should leave this repo and neg for realityhook because it w
 please make sure not to question realitys school skills, as he dropped out at the age of -1.
 Reality, a self-proclaimed idiot, dropped out of school at just three years old. Armed with a mischievous spirit, he embarked on a unique mission to "ddos" everyone he encountered. With each pranking encounter, he unknowingly brought laughter and joy to those around him. Reality's unconventional path taught us that sometimes, embracing our inner fool can lead to unexpected connections and happiness in the most absurd of ways.
 also, reality's "rosnehook-leak" is gonna be outdated in a month or so! have fun with that, XD!
+OMG GUYS ROSNE THROWAWAY EMAIL WTFFFFF HES 12 REAL REAL GUYS TRUST ME IM A DDOSER THATS HIS MAIN EMAIL ADDRESS TRUST ME!
 
 ### Sulkan
 HELLO GUYS I AM 19 AND TALK VERY SUBMISSIVE TOWARDS MINORS LIKE REALITY WHO'S 15. MY NAME IS JAMES TOO IM A BRIT PEDO! also sulkan is 100% a pedo just that the faggots in "i love tf2" dont see it.
@@ -35,7 +36,7 @@ also, onetf2 keeps adding const char to drawmgr.cpp, when he just had to remove 
 plus, THE FAGGOT COWHOOKER LEAKED ROSNEHOOK! WTF I WORKED FOR YOUR GAY OBESE WALKING ASS, JUST YOU WOULD LEAK IT! WHAT A FAG!
 
 ### Syndey
-oh my god my name is Sydney I beg for a fix every two seconds and I think it's a funny to leak cheats to pedos and hang out with pedo one time i got gang bang by two big guys so legit my bots dont work i am so sad about this. I like getting boy penetrated by big dom big slong males because I'm an angry homosexual waaaaaa, waaaaa i need to cry to my boyfu
+oh my god my name is Sydney I beg for a fix every two seconds and I think it's a funny to leak cheats to pedos and hang out with pedo one time i got gang bang by two big guys so legit my bots dont work i am so sad about this. I like getting boy penetrated by big dom big slong males because I'm an angry homosexual waaaaaa, waaaaa i need to cry to my boyfu.
 i like to believe reality/nigsec because im a very smart individual!
 
 

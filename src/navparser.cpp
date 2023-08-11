@@ -751,15 +751,7 @@ void checkBlacklist()
     // Only check every 500ms
     if (!blacklist_check_timer.test_and_set(500))
         return;
-
-    // Local player is ubered and does not care about the blacklist
-    // TODO: Only for damage type things
-    if (IsPlayerInvulnerable(LOCAL_E))
-    {
-        map->free_blacklist_blocked = true;
-        map->pather.Reset();
-        return;
-    }
+        
     CNavArea *local_area = map->findClosestNavSquare(g_pLocalPlayer->v_Origin);
     for (const auto &entry : map->free_blacklist)
     {

@@ -902,8 +902,8 @@ bool stayNear()
 }
 
 bool isVisible;
-// Try to attack people using melee if we are in a situation where this is viable
-bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest)
+// if melee aimbot/navbot crashes, this is where the problem is.
+bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest) // also known as "melee AI"
 {
     // There is no point in engaging the melee AI if we are not using melee
     if (slot != melee || !nearest.first)
@@ -946,7 +946,7 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest)
     // If we are close enough, don't even bother with using the navparser to get there
     if (nearest.second < 400.0f && hacks::NavBot::isVisible)
     {
-        AimAt(g_pLocalPlayer->v_Eye, nearest.first->hitboxes.GetHitbox(head)->center, current_user_cmd); // i dont understand how this is viable, but it makes melee warp rlly good, so yeah.
+        AimAt(g_pLocalPlayer->v_Eye, nearest.first->hitboxes.GetHitbox(head)->center, current_user_cmd); // rosne todo: make this aim for the front spine
         WalkTo(nearest.first->m_vecOrigin());
         navparser::NavEngine::cancelPath();
         return true;

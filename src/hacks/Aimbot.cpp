@@ -53,7 +53,7 @@ static settings::Boolean auto_unzoom{ "aimbot.auto.unzoom", "true" };
 static settings::Float zoom_distance{ "aimbot.zoom.distance", "2000.0" };
 
 static settings::Boolean backtrack_aimbot{ "aimbot.backtrack", "false" };
-static settings::Boolean backtrack_last_tick_only("aimbot.backtrack.only-last-tick", "false");
+static settings::Boolean backtrack_last_tick_only("aimbot.backtrack.only-last-tick", "true");
 static bool force_backtrack_aimbot = false;
 // wtf is this above
 static settings::Float max_range{ "aimbot.target.max-range", "4096" };

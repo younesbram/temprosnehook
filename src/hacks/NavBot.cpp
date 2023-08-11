@@ -35,7 +35,6 @@ static settings::Int blacklist_delay("navbot.proximity-blacklist.delay", "500");
 static settings::Boolean blacklist_dormat("navbot.proximity-blacklist.dormant", "false");
 static settings::Int blacklist_delay_dormat("navbot.proximity-blacklist.delay-dormant", "1000");
 static settings::Int blacklist_slightdanger_limit("navbot.proximity-blacklist.slight-danger.amount", "2");
-// static settings::Boolean engie_mode("navbot.engineer-mode", "true");
 #if ENABLE_VISUALS
 static settings::Boolean draw_danger("navbot.draw-danger", "false");
 #endif
@@ -59,8 +58,6 @@ struct bot_class_config
 constexpr bot_class_config CONFIG_SHORT_RANGE = { 140.0f, 400.0f, 600.0f, false };
 constexpr bot_class_config CONFIG_MID_RANGE   = { 200.0f, 500.0f, 3000.0f, true };
 constexpr bot_class_config CONFIG_LONG_RANGE  = { 300.0f, 500.0f, 4000.0f, true };
-/*constexpr bot_class_config CONFIG_ENGINEER            = { 200.0f, 500.0f, 3000.0f, false };
-constexpr bot_class_config CONFIG_GUNSLINGER_ENGINEER = { 50.0f, 300.0f, 2000.0f, false };*/
 bot_class_config selected_config;
 
 static Timer health_cooldown{};
@@ -298,182 +295,6 @@ std::pair<CachedEntity *, float> getNearestPlayerDistance()
     }
     return { best_ent, distance };
 }
-
-// static std::vector<Vector> building_spots;
-
-/*inline bool HasGunslinger(CachedEntity *ent)
-{
-    return HasWeapon(ent, 142);
-}*/
-
-/*inline bool isEngieMode()
-{
-    return *engie_mode && g_pLocalPlayer->clazz == tf_engineer;
-}*/
-
-/*bool BlacklistedFromBuilding(CNavArea *area)
-{
-    // FIXME: Better way of doing this ?
-    for (auto blacklisted_area : *navparser::NavEngine::getFreeBlacklist())
-    {
-        if (blacklisted_area.first == area && blacklisted_area.second.value == navparser::BlacklistReason_enum::BAD_BUILDING_SPOT)
-            return true;
-    }
-    return false;
-}*/
-
-/*static Timer refresh_buildingspots_timer;
-void refreshBuildingSpots(bool force = false)
-{
-    if (!isEngieMode())
-        return;
-    if (force || refresh_buildingspots_timer.test_and_set(HasGunslinger(LOCAL_E) ? 1000 : 5000))
-    {
-        building_spots.clear();
-        std::optional<Vector> target;
-
-        auto our_flag = flagcontroller::getFlag(g_pLocalPlayer->team);
-        target        = our_flag.spawn_pos;
-
-        if (!target)
-        {
-            auto nearest = getNearestPlayerDistance();
-            if (CE_GOOD(nearest.first))
-                target = *nearest.first->m_vecDormantOrigin();
-            if (!target)
-                target = LOCAL_E->m_vecOrigin();
-        }
-        if (target)
-        {
-            // Search all nav areas for valid spots
-            for (auto &area : navparser::NavEngine::getNavFile()->m_areas)
-            {
-                // Blacklisted :(
-                if (BlacklistedFromBuilding(&area))
-                    continue;
-                // BUG Ahead, these flag checks dont seem to work for me :/
-                // Don't try to build in spawn lol
-                if ((area.m_TFattributeFlags & TF_NAV_SPAWN_ROOM_RED) != 0 || (area.m_TFattributeFlags & TF_NAV_SPAWN_ROOM_BLUE) != 0 || (area.m_TFattributeFlags & TF_NAV_SPAWN_ROOM_EXIT) != 0)
-                    continue;
-                if ((area.m_TFattributeFlags & TF_NAV_SENTRY_SPOT) != 0)
-                    building_spots.emplace_back(area.m_center);
-                else
-                {
-                    for (auto &hiding_spot : area.m_hidingSpots)
-                        if (hiding_spot.HasGoodCover())
-                            building_spots.emplace_back(hiding_spot.m_pos);
-                }
-            }
-            // Sort by distance to nearest, lower is better
-            // TODO: This isn't really optimal, need a dif way to where it is a good distance from enemies but also bots dont build in the same spot
-            std::sort(building_spots.begin(), building_spots.end(),
-                      [target](Vector a, Vector b)
-                      {
-                          if (!HasGunslinger(LOCAL_E))
-                          {
-                              auto a_dist = a.DistTo(*target);
-                              auto b_dist = b.DistTo(*target);
-
-                              // Penalty for being in danger ranges
-                              if (a_dist + 100.0f < selected_config.min_full_danger)
-                                  a_dist += 4000.0f;
-                              if (b_dist + 100.0f < selected_config.min_full_danger)
-                                  b_dist += 4000.0f;
-
-                              if (a_dist + 1000.0f < selected_config.min_slight_danger)
-                                  a_dist += 1500.0f;
-                              if (b_dist + 1000.0f < selected_config.min_slight_danger)
-                                  b_dist += 1500.0f;
-
-                              return a_dist < b_dist;
-                          }
-                          else
-                              return a.DistTo(*target) < b.DistTo(*target);
-                      });
-        }
-    }
-}*/
-
-/*static CachedEntity *mySentry    = nullptr;
-static CachedEntity *myDispenser = nullptr;*/
-
-/*void refreshLocalBuildings()
-{
-    if (isEngieMode())
-    {
-        mySentry    = nullptr;
-        myDispenser = nullptr;
-        if (CE_GOOD(LOCAL_E))
-        {
-            for (const auto &ent : entity_cache::valid_ents)
-            {
-                if (ent->m_bEnemy() || !ent->m_bAlivePlayer())
-                    continue;
-                auto cid = ent->m_iClassID();
-                if (cid != CL_CLASS(CObjectSentrygun) && cid != CL_CLASS(CObjectDispenser))
-                    continue;
-                if (HandleToIDX(CE_INT(ent, netvar.m_hBuilder)) != LOCAL_E->m_IDX)
-                    continue;
-                if (CE_INT(ent, netvar.m_bPlacing))
-                    continue;
-                if (cid == CL_CLASS(CObjectSentrygun))
-                    mySentry = ent;
-                else if (cid == CL_CLASS(CObjectDispenser))
-                    myDispenser = ent;
-            }
-        }
-    }
-}*/
-
-/*static Vector current_building_spot;
-static bool navToSentrySpot()
-{
-    static Timer wait_until_path_sentry;
-    // Wait a bit before pathing again
-    if (!wait_until_path_sentry.test_and_set(300))
-        return false;
-    // Try to nav to our existing sentry spot
-    if (CE_GOOD(mySentry) && mySentry->m_bAlivePlayer() && mySentry->m_vecDormantOrigin())
-    {
-        // Don't overwrite current nav
-        if (navparser::NavEngine::current_priority == engineer)
-            return true;
-        if (navparser::NavEngine::navTo(*mySentry->m_vecDormantOrigin(), engineer))
-            return true;
-    }
-    else
-        mySentry = nullptr;
-
-    // No building spots
-    if (building_spots.empty())
-        return false;
-    // Don't overwrite current nav
-    if (navparser::NavEngine::current_priority == engineer)
-        return false;
-    // Max 10 attempts
-    for (int attempts = 0; attempts < 10 && attempts < building_spots.size(); ++attempts)
-    {
-        // Get a semi-random building spot to still keep distance preferrance
-        auto random_offset = RandomInt(0, std::min(3, (int) building_spots.size()));
-
-        Vector random;
-
-        // Wrap around
-        if (attempts - random_offset < 0)
-            random = building_spots[building_spots.size() + (attempts - random_offset)];
-        else
-            random = building_spots[attempts - random_offset];
-
-        // Try to nav there
-        if (navparser::NavEngine::navTo(random, engineer))
-        {
-            current_building_spot = random;
-            return true;
-        }
-    }
-
-    return false;
-}*/
 
 enum slots
 {
@@ -1064,146 +885,6 @@ bool snipeSentries()
     return false;
 }
 
-/*enum building
-{
-    dispenser = 0,
-    sentry    = 2
-};*/
-
-/*static int build_attempts = 0;
-static bool buildBuilding(int building)
-{
-    // Blacklist this spot and refresh the building spots
-    if (build_attempts >= 15)
-    {
-        (*navparser::NavEngine::getFreeBlacklist())[navparser::NavEngine::findClosestNavSquare(g_pLocalPlayer->v_Origin)] = navparser::BlacklistReason_enum::BAD_BUILDING_SPOT;
-        refreshBuildingSpots(true);
-        current_building_spot.Invalidate();
-        build_attempts = 0;
-        return false;
-    }
-    // Make sure we have right amount of ammo
-    int required = (HasGunslinger(LOCAL_E) || building == dispenser) ? 100 : 130;
-    if (CE_INT(LOCAL_E, netvar.m_iAmmo + 12) < required)
-        return getAmmo(true);
-
-    // Try to build! we are close enough
-    if (current_building_spot.IsValid() && current_building_spot.DistTo(g_pLocalPlayer->v_Origin) <= (building == dispenser ? 500.0f : 200.0f))
-    {
-        // TODO: Rotate our angle to a valid building spot ? also rotate building itself to face enemies ?
-        current_user_cmd->viewangles.x = 20.0f;
-        current_user_cmd->viewangles.y += 2.0f;
-
-        // Gives us 4 1/2 seconds to build
-        static Timer attempt_timer;
-        if (attempt_timer.test_and_set(300))
-            build_attempts++;
-
-        if (hacks::misc::getCarriedBuilding() == -1)
-        {
-            static Timer command_timer;
-            if (command_timer.test_and_set(100))
-                g_IEngine->ClientCmd_Unrestricted(strfmt("build %d", building).get());
-        }
-        else if (CE_INT(ENTITY(hacks::misc::getCarriedBuilding()), netvar.m_bCanPlace))
-            current_user_cmd->buttons |= IN_ATTACK;
-        return true;
-    }
-    else
-        return navToSentrySpot();
-
-    return false;
-}*/
-
-/*static bool buildingNeedsToBeSmacked(CachedEntity *ent)
-{
-    if (CE_BAD(ent))
-        return false;
-
-    if (CE_INT(ent, netvar.iUpgradeLevel) != 3 || ent->m_iHealth() / ent->m_iMaxHealth() <= 0.80f)
-        return true;
-    if (ent->m_iClassID() == CL_CLASS(CObjectSentrygun))
-    {
-        int max_ammo = 0;
-        switch (CE_INT(ent, netvar.iUpgradeLevel))
-        {
-        case 1:
-            max_ammo = 150;
-            break;
-        case 2:
-        case 3:
-            max_ammo = 200;
-            break;
-        }
-
-        return CE_INT(ent, netvar.m_iAmmoShells) / max_ammo <= 0.50f;
-    }
-    return false;
-}*/
-
-/*static bool smackBuilding(CachedEntity *ent)
-{
-    if (CE_BAD(ent))
-        return false;
-    if (!CE_INT(LOCAL_E, netvar.m_iAmmo + 12))
-        return getAmmo(true);
-
-    if (ent->m_flDistance() <= 100.0f && GetWeaponMode() == weapon_melee)
-    {
-        AimAt(g_pLocalPlayer->v_Eye, GetBuildingPosition(ent), current_user_cmd);
-        current_user_cmd->buttons |= IN_ATTACK;
-    }
-    else if (navparser::NavEngine::current_priority != engineer)
-        return navparser::NavEngine::navTo(*ent->m_vecDormantOrigin(), engineer);
-    return true;
-}*/
-
-/*static bool runEngineerLogic()
-{
-    if (!isEngieMode())
-        return false;
-
-    // Already have a sentry
-    if (CE_VALID(mySentry) && mySentry->m_bAlivePlayer())
-    {
-        if (HasGunslinger(LOCAL_E))
-        {
-            // Too far away, destroy it
-            // BUG Ahead, building isnt destroyed lol
-            if (mySentry->m_flDistance() >= 1800.0f)
-            {
-                // If we have a valid building
-                if (mySentry->m_Type() == CL_CLASS(CObjectSentrygun))
-                    g_IEngine->ClientCmd_Unrestricted("destroy 2");
-            }
-            // Return false so we run another task
-            return false;
-        }
-        else
-        {
-            // Try to smack sentry first
-            if (buildingNeedsToBeSmacked(mySentry))
-                return smackBuilding(mySentry);
-            else
-            {
-                // We put dispenser by sentry
-                if (CE_BAD(myDispenser))
-                    return buildBuilding(dispenser);
-                else
-                {
-                    // We already have a dispenser, see if it needs to be smacked
-                    if (buildingNeedsToBeSmacked(myDispenser))
-                        return smackBuilding(myDispenser);
-                }
-            }
-        }
-    }
-    else
-        // Try to build a sentry
-        return buildBuilding(sentry);
-    return false;
-}*/
-
 enum capture_type
 {
     no_capture,
@@ -1517,20 +1198,6 @@ static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &ne
         else
             return primary;
     }
-    /*case tf_engineer:
-    {
-        if (((CE_GOOD(mySentry) && mySentry->m_flDistance() <= 300.0f) || (CE_GOOD(myDispenser) && myDispenser->m_flDistance() <= 500.0f)) || (current_building_spot.IsValid() && current_building_spot.DistToSqr(g_pLocalPlayer->v_Origin) <= Sqr(500.0f)))
-        {
-            if (active_slot >= melee && navparser::NavEngine::current_priority != prio_melee)
-                return active_slot;
-            else
-                return melee;
-        }
-        else if (nearest.second <= 500.0f)
-            return primary;
-        else
-            return secondary;
-    }*/
     default:
     {
         if (nearest.second <= 400.0f)
@@ -1568,8 +1235,6 @@ static void CreateMove()
     if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E))
         return;
     refreshSniperSpots();
-    /*refreshLocalBuildings();
-    refreshBuildingSpots();*/
 
     if (*danger_config_custom)
         selected_config = { *danger_config_custom_min_full_danger, *danger_config_custom_min_slight_danger, *danger_config_custom_max_slight_danger, *danger_config_custom_prefer_far };
@@ -1582,9 +1247,6 @@ static void CreateMove()
         case tf_heavy:
             selected_config = CONFIG_SHORT_RANGE;
             break;
-        /*case tf_engineer:
-            selected_config = isEngieMode() ? HasGunslinger(LOCAL_E) ? CONFIG_GUNSLINGER_ENGINEER : CONFIG_ENGINEER : CONFIG_SHORT_RANGE;
-            break;*/
         case tf_sniper:
             selected_config = LOCAL_W->m_iClassID() == CL_CLASS(CTFCompoundBow) ? CONFIG_MID_RANGE : CONFIG_LONG_RANGE;
             break;
@@ -1608,9 +1270,7 @@ static void CreateMove()
     // If we aren't getting health, get ammo
     if (getAmmo())
         return;
-    // Try to run engineer logic
-    /*if (runEngineerLogic())
-        return;*/
+    // run the melee AI
     if (meleeAttack(slot, nearest))
         return;
     // Try to capture objectives

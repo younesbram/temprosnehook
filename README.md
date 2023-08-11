@@ -1,9 +1,7 @@
-# my discord account is currently disabled (current alt is fallrobot_queue)
-
-# Important Notice
-## I won't be dedicating as much time to Rosnehook from now on. I've been yearning for a more manageable life, as every day seems to blend into the same monotonous routine, gradually wearing down my mental health and well-being. My priority is to restore stability to my mental and physical health, rather than focusing on Rosnehook. Don't worry! I will still work on it, but not as often.
 
 # Rosnehook: We Love Bones!
+
+## License: [https://github.com/RosneBurgerworks/cathook/blob/master/LICENSE](https://github.com/RosneBurgerworks/cathook/blob/master/LICENSE)
 
 ## The hall/list/board of retards (very important)
 

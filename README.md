@@ -5,7 +5,7 @@
 
 # Rosnehook: We Love Bones!
 
-## Slander (very important)
+## The hall/list/board of retards (very important)
 
 ### Reality!
 Cathook, but without bloat, pasting ddodddssing methods, and calling everyone a literal gay slur, because any critism is higghly illgal. 

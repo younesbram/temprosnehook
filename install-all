@@ -8,4 +8,6 @@ set -e
 
 ./scripts/updater false true true
 
+echo
 echo "./install-all completed!"
+echo

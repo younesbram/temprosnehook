@@ -9,7 +9,7 @@
 // (check the GetClientSignature() and GetEngineSignature() for an example)
 Elf32_Shdr *getSectionHeader(void *module, const char *sectionName)
 {
-    // we need to get the modules actual address from the handle-
+    // we need to get the modules actual address from the handle
 
     auto *ehdr = (Elf32_Ehdr *) module;
     auto *shdr = (Elf32_Shdr *) ((unsigned) module + ehdr->e_shoff);
@@ -51,7 +51,7 @@ bool InRange(char x, char a, char b)
 
 int GetBits(char x)
 {
-    if (InRange((char) (x & (~0x20)), 'A', 'F'))  // dogshit code but it does the job
+    if (InRange((char) (x & (~0x20)), 'A', 'F'))
         return (x & (~0x20)) - 'A' + 0xa;
     else if (InRange(x, '0', '9'))
         return x - '0';

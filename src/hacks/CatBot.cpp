@@ -76,12 +76,7 @@ void do_random_votekick()
 
 void SendNetMsg(INetMessage &msg)
 {
-    /*
-    if (!strcmp(msg.GetName(), "clc_CmdKeyValues"))
-    {
-        if ((KeyValues *) (((unsigned *) &msg)[4]))
-            MvM_Autoupgrade((KeyValues *) (((unsigned *) &msg)[4]));
-    }*/
+
 }
 
 class CatBotEventListener2 : public IGameEventListener2

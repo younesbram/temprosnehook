@@ -31,7 +31,6 @@ static settings::Int sightlines{ "esp.sightlines", "0" };
 static settings::Int esp_text_position{ "esp.text-position", "0" };
 static settings::Int esp_expand{ "esp.expand", "0" };
 static settings::Boolean vischeck{ "esp.vischeck", "true" };
-static settings::Boolean hide_invis{ "esp.hide-invis", "false" };
 
 static settings::Boolean local_esp{ "esp.show.local", "true" };
 static settings::Boolean buildings{ "esp.show.buildings", "true" };
@@ -41,23 +40,15 @@ static settings::Boolean npc{ "esp.show.npc", "true" };
 
 static settings::Boolean show_weapon{ "esp.info.weapon", "false" };
 static settings::Boolean show_distance{ "esp.info.distance", "true" };
-static settings::Boolean show_buster_radius{ "esp.info.buster-radius", "true" };
 static settings::Boolean show_health{ "esp.info.health", "true" };
 static settings::Boolean show_name{ "esp.info.name", "true" };
 static settings::Boolean show_class{ "esp.info.class", "true" };
 static settings::Boolean show_conditions{ "esp.info.conditions", "true" };
 static settings::Boolean show_ubercharge{ "esp.info.ubercharge", "true" };
-static settings::Boolean powerup_esp{ "esp.info.powerup", "true" };
 
 static settings::Boolean item_esp{ "esp.item.enable", "true" };
 static settings::Boolean item_ammo_packs{ "esp.item.ammo", "false" };
 static settings::Boolean item_health_packs{ "esp.item.health", "true" };
-// static settings::Boolean item_powerups{ "esp.item.powerup", "true" };
-static settings::Boolean item_money{ "esp.item.money", "true" };
-static settings::Boolean item_spellbooks{ "esp.item.spellbook", "true" };
-static settings::Boolean item_explosive{ "esp.item.explosive", "true" };
-static settings::Boolean item_crumpkin{ "esp.item.crumpkin", "true" };
-static settings::Boolean item_gargoyle{ "esp.item.gargoyle", "true" };
 static settings::Boolean item_objectives{ "esp.item.objectives", "false" };
 
 static settings::Boolean proj_esp{ "esp.projectile.enable", "false" };
@@ -118,15 +109,6 @@ inline void RepaintEnt(CachedEntity *ent, float distance)
     // If show distance, add string here
     if (show_distance)
         AddEntityString(ent, format(int(distance / 64 * 1.22f), 'm'));
-    if (show_buster_radius && IsSentryBuster(ent))
-    {
-        // range check with a bit extra just to be safe
-        if (distance < 310)
-            AddEntityString(ent, "DANGER ZONE!", colors::FromRGBA8(255.0f, 0.0f, 0.0f, 255.0f));
-        else
-            AddEntityString(ent, "SAFE ZONE", colors::FromRGBA8(0.0f, 255.0f, 0.0f, 255.0f));
-    }
-    SetEntityColor(ent, color);
 }
 
 void ResetEntityStrings(bool full_clear);
@@ -980,8 +962,6 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             // Local player handling
             if (!(local_esp && g_IInput->CAM_IsThirdPerson()) && ent->m_IDX == g_IEngine->GetLocalPlayer())
                 return;
-            if (hide_invis && IsPlayerInvisible(ent))
-                return;
 
             // Get player class
             int pclass = CE_INT(ent, netvar.iClass);
@@ -990,14 +970,6 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             player_info_s info{};
             if (!GetPlayerInfo(ent->m_IDX, &info))
                 return;
-
-            // Powerup handling
-            if (powerup_esp)
-            {
-                powerup_type power = GetPowerupOnPlayer(ent);
-                if (power != not_powerup)
-                    AddEntityString(ent, std::string("^ ") + powerups[power] + " ^");
-            }
 
             if (ent->m_bEnemy() || teammates || player_tools::shouldAlwaysRenderEsp(ent))
             {
@@ -1192,22 +1164,6 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
             if (model)
             {
                 const auto szName = g_IModelInfo->GetModelName(model);
-                // Gargoyle esp
-                if (item_gargoyle && classid == CL_CLASS(CHalloweenGiftPickup))
-                {
-                    if (HandleToIDX(CE_INT(ent, netvar.m_hTargetPlayer)) == g_pLocalPlayer->entity_idx)
-                        AddEntityString(ent, gargoyle_str, colors::FromRGBA8(199, 21, 133, 255));
-                    return;
-                }
-                // Explosive/Environmental hazard esp
-                else if (item_explosive && (classid == CL_CLASS(CTFPumpkinBomb) || Hash::IsHazard(szName)))
-                {
-                    if (classid == CL_CLASS(CTFPumpkinBomb))
-                        AddEntityString(ent, pumpkinbomb_str, colors::FromRGBA8(255, 162, 0, 255));
-                    else
-                        AddEntityString(ent, explosive_str, colors::FromRGBA8(255, 162, 0, 255));
-                    return;
-                }
                 if (item_objectives && (classid == CL_CLASS(CCaptureFlag) || (Hash::IsFlag(szName) || Hash::IsBombCart(szName) || Hash::IsBombCartRed(szName))))
                 {
                     rgba_t color = ent->m_iTeam() == TEAM_BLU ? colors::blu : (ent->m_iTeam() == TEAM_RED ? colors::red : colors::white);
@@ -1233,24 +1189,7 @@ void _FASTCALL ProcessEntity(CachedEntity *ent)
                 // Ammo esp
                 else if (item_ammo_packs && Hash::IsAmmo(szName))
                     AddEntityString(ent, ammopack_str);
-                // Powerup esp
-                // else if (item_powerups && (Hash::IsPowerup(szName)))
-                // AddEntityString(ent, powerups[itemtype - ITEM_POWERUP_FIRST]);
-                // Halloween spell esp
-                else if (item_spellbooks && (Hash::IsSpellbook(szName) || Hash::IsSpellbookRare(szName)))
-                {
-                    if (Hash::IsSpellbookRare(szName))
-                        AddEntityString(ent, rare_spell_str, colors::FromRGBA8(139, 31, 221, 255));
-                    else
-                        AddEntityString(ent, spell_str, colors::green);
-                }
-                // Crumpkin esp https://wiki.teamfortress.com/wiki/Halloween_pumpkin
-                else if (item_crumpkin && Hash::IsCrumpkin(szName))
-                    AddEntityString(ent, crumpkin_str, colors::FromRGBA8(253, 203, 88, 255));
             }
-            // MVM Money esp
-            if (item_money && classid == CL_CLASS(CCurrencyPack) && !CE_BYTE(ent, netvar.bDistributed))
-                AddEntityString(ent, mvm_money_str);
         }
     }
 }

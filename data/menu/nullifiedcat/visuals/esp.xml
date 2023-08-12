@@ -22,11 +22,8 @@
                               tooltip="Master switch for all below items."/>
                 <AutoVariable width="fill" target="esp.item.health" label="Health packs"/>
                 <AutoVariable width="fill" target="esp.item.ammo" label="Ammo packs"/>
-                <AutoVariable width="fill" target="esp.item.powerup" label="Powerup"/>
                 <AutoVariable width="fill" target="esp.item.objectives" label="Objective"
                               tooltip="Intel, carts and mvm bombs."/>
-                <AutoVariable width="fill" target="esp.item.crumpkin" label="Crumpkin"
-                              tooltip="Ammo box that also gives crits."/>
             </List>
         </Box>
     </Box>
@@ -85,7 +82,6 @@
                     <Option name="Vertical" value="3"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="esp.hide-invis" label="Hide invisible"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Player Info" x="165" y="280">
@@ -104,7 +100,6 @@
             <AutoVariable width="fill" target="esp.info.class" label="Class"/>
             <AutoVariable width="fill" target="esp.info.conditions" label="Conditions"/>
             <AutoVariable width="fill" target="esp.info.ubercharge" label="UberCharge %"/>
-            <AutoVariable width="fill" target="esp.info.powerup" label="Powerup"/>
             <AutoVariable width="fill" target="esp.info.weapon" label="Weapon"/>
         </List>
     </Box>

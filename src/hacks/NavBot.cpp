@@ -27,7 +27,7 @@ static settings::Boolean escape_danger("navbot.escape-danger", "true");
 static settings::Boolean escape_danger_ctf_cap("navbot.escape-danger.ctf-cap", "false");
 static settings::Boolean enable_slight_danger_when_capping("navbot.escape-danger.slight-danger.capping", "false");
 static settings::Boolean autojump("navbot.autojump.enabled", "false");
-static settings::Boolean primary_only("navbot.primary-only", "true");
+static settings::Boolean primary_only("navbot.primary-only", "false");
 static settings::Int force_slot("navbot.force-slot", "0");
 static settings::Float jump_distance("navbot.autojump.trigger-distance", "300");
 static settings::Int blacklist_delay("navbot.proximity-blacklist.delay", "500");
@@ -299,9 +299,7 @@ enum slots
 {
     primary   = 1,
     secondary = 2,
-    melee     = 3 /*,
-     pda1      = 4,
-     pda2      = 5*/
+    melee     = 3 
 };
 
 #if ENABLE_VISUALS
@@ -961,7 +959,7 @@ bool doRoam()
 {
     static Timer roam_timer;
     // Don't path constantly
-    if (!roam_timer.test_and_set(4000))
+    if (!roam_timer.test_and_set(6000))
         return false;
 
     // Defend our objective if possible

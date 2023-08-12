@@ -2,7 +2,7 @@
 
 ## License: [https://github.com/RosneBurgerworks/cathook/blob/master/LICENSE](https://github.com/RosneBurgerworks/cathook/blob/master/LICENSE)
 
-## The hall/list/board of retards (very important)
+## The Hall of Retards
 
 ### Reality!
 Cathook, but without bloat, pasting ddodddssing methods, and calling everyone a literal gay slur, because any critism is higghly illgal. 
@@ -39,7 +39,7 @@ oh my god my name is Sydney I beg for a fix every two seconds and I think it's a
 i like to believe reality/nigsec because im a very smart individual!
 i like child porno
 
-### Ezer
+### Ezer (not a retard)
 wants to kill himself very badly.
 should accept rosne's element invite.
 

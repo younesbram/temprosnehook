@@ -39,3 +39,5 @@ static InitRoutine EC(
         EC::Register(EC::CreateMoveWarp, CreateMove, "antidisguise_w", EC::average);
     });
 } // namespace hacks::antidisguise
+
+// test

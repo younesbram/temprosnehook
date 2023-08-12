@@ -19,6 +19,15 @@ void angle_data_s::push(const Vector &angle)
     angles[angle_index] = angle;
     if (++angle_index >= count)
         angle_index = 0;
+    /*if (angle_count > 0)
+    {
+        int ai = angle_index - 2;
+        if (ai < 0) ai = count - 1;
+        float dx = std::abs(angles[ai].x - angle.x);
+        float dy = std::abs(angles[ai].y - angle.y);
+        if (FastSqrt(SQR(dx) + SQR(dy)) > 45.0f)
+            //logging::Info("%.2f %.2f %.2f", dx, dy, FastSqrt(SQR(dx) + SQR(dy)));
+    }*/
     if (angle_count < count)
         angle_count++;
 }
@@ -41,6 +50,9 @@ float angle_data_s::deviation(int steps) const
             hx = dev_x;
         if (dev_y > hy)
             hy = dev_y;
+
+        // logging::Info("1: %.2f %.2f | 2: %.2f %.2f | dev: %.2f", angles[k].x, angles[k].y, angles[j].x, angles[j].y, FastSqrt(SQR(dev_x) + SQR(dev_y)));
+
         --j;
         --k;
     }

@@ -11,7 +11,6 @@
 #elif ENABLE_GLEZ_DRAWING
 #include <glez/draw.hpp>
 #include <glez/glez.hpp>
-
 #elif ENABLE_ENGINE_DRAWING
 #include "picopng.hpp"
 #endif

@@ -26,13 +26,13 @@ namespace hacks::misc
 #if !ENFORCE_STREAM_SAFETY && ENABLE_VISUALS
 static settings::Boolean render_zoomed{ "visual.render-local-zoomed", "true" };
 #endif
-static settings::Boolean anti_afk{ "misc.anti-afk", "false" };
-static settings::Boolean auto_jump{ "misc.auto-jump", "false" };
-static settings::Int auto_jump_chance{ "misc.auto-jump.chance", "100" };
+static settings::Boolean anti_afk{ "misc.anti-afk", "true" };
+static settings::Boolean auto_jump{ "misc.auto-jump", "false" }; // bhop
+static settings::Int auto_jump_chance{ "misc.auto-jump.chance", "100" }; // 100 is always
 static settings::Int auto_strafe{ "misc.autostrafe", "0" };
-static settings::Boolean accurate_movement{ "misc.accurate-movement", "false" };
-settings::Boolean tauntslide{ "misc.tauntslide", "false" };
-static settings::Boolean nopush_enabled{ "misc.no-push", "false" };
+static settings::Boolean accurate_movement{ "misc.accurate-movement", "true" };
+settings::Boolean tauntslide{ "misc.tauntslide", "true" };
+static settings::Boolean nopush_enabled{ "misc.no-push", "true" };
 static settings::Boolean dont_hide_stealth_kills{ "misc.dont-hide-stealth-kills", "true" };
 static settings::Boolean unlimit_bumpercart_movement{ "misc.bumpercarthax.enable", "true" };
 static settings::Boolean ping_reducer{ "misc.ping-reducer.enable", "false" };

@@ -51,7 +51,6 @@ static settings::Boolean rich_presence{ "misc.rich-presence", "false" };
 static settings::String rich_presence_file{ "misc.rich-presence.file-name", "rich_presence.txt" };
 static settings::Int rich_presence_party_size{ "misc.rich-presence.party_size", "1337" };
 static settings::Int rich_presence_change_delay{ "misc.rich-presence.delay", "5000" };
-#endif
 
 // Need our own Text drawing
 static std::array<std::string, 32> spectator_strings;

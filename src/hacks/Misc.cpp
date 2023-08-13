@@ -30,11 +30,11 @@ static settings::Boolean anti_afk{ "misc.anti-afk", "true" };
 static settings::Boolean auto_jump{ "misc.auto-jump", "false" }; // bhop
 static settings::Int auto_jump_chance{ "misc.auto-jump.chance", "100" }; // 100 is always
 static settings::Int auto_strafe{ "misc.autostrafe", "0" };
-static settings::Boolean accurate_movement{ "misc.accurate-movement", "true" };
-settings::Boolean tauntslide{ "misc.tauntslide", "true" };
+static settings::Boolean accurate_movement{ "misc.accurate-movement", "true" }; // this is only used for exploits catbots dont need it
+settings::Boolean tauntslide{ "misc.tauntslide", "false" }; // keep this off its rubbish
 static settings::Boolean nopush_enabled{ "misc.no-push", "true" };
 static settings::Boolean dont_hide_stealth_kills{ "misc.dont-hide-stealth-kills", "true" };
-static settings::Boolean unlimit_bumpercart_movement{ "misc.bumpercarthax.enable", "true" };
+static settings::Boolean unlimit_bumpercart_movement{ "misc.bumpercarthax.enable", "false" };
 static settings::Boolean ping_reducer{ "misc.ping-reducer.enable", "false" };
 static settings::Int force_ping{ "misc.ping-reducer.target", "0" };
 static settings::Boolean force_wait{ "misc.force-enable-wait", "true" };
@@ -46,7 +46,6 @@ static settings::Boolean misc_drawhitboxes{ "misc.draw-hitboxes", "false" };
 static settings::Boolean misc_drawhitboxes_dead{ "misc.draw-hitboxes.dead-players", "false" };
 static settings::Boolean show_spectators{ "misc.show-spectators", "false" };
 
-#if ENABLE_VISUALS
 /* Allows editing of the rich presence info in steam's friends UI */
 static settings::Boolean rich_presence{ "misc.rich-presence", "false" };
 static settings::String rich_presence_file{ "misc.rich-presence.file-name", "rich_presence.txt" };

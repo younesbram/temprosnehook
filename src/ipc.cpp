@@ -435,7 +435,7 @@ static int cat_completionCallback(const char *c_partial, char commands[COMMAND_C
                 if (s != parts.at(0))
                     snprintf(commands[count++], COMMAND_COMPLETION_ITEM_LENGTH - 1, "cat_ipc_sync_all %s", s.c_str());
                 else
-                    snprintf(commands[count++], COMMAND_COMPLETION_ITEM_LENGTH - 1, "cat_ipc_sync_all %s %s", s.c_str(), variable->toString().c_str());]
+                    snprintf(commands[count++], COMMAND_COMPLETION_ITEM_LENGTH - 1, "cat_ipc_sync_all %s %s", s.c_str(), variable->toString().c_str());
 
                 if (count == COMMAND_COMPLETION_MAXITEMS)
                     break;

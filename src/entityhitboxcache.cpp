@@ -32,7 +32,6 @@ void EntityHitboxCache::Init()
         if (!set)
             return;
         m_pLastModel   = const_cast<model_t *>(model);
-        m_nNumHitboxes = 0;
         m_nNumHitboxes = set->numhitboxes;
 
         if (m_nNumHitboxes > CACHE_MAX_HITBOXES)
@@ -62,12 +61,12 @@ bool EntityHitboxCache::VisibilityCheck(int id)
     // Bitmask works sort of like an index in our case. 1 would be the first bit, and we are shifting this by id to get our index
     uint_fast64_t mask = 1ULL << id;
     // No branch conditional set https://graphics.stanford.edu/~seander/bithacks.html#ConditionalSetOrClearBitsWithoutBranching
-    m_VisCheck = m_VisCheck & ~mask | -validation & mask;
+    m_VisCheck = (m_VisCheck & ~mask) | (-validation & mask);
     m_VisCheckValidationFlags |= 1ULL << id;
     return m_VisCheck >> id & 1;
 }
 
-static settings::Int setupbones_time{ "source.setupbones-time", "4" }; // 2 will make it hit p
+static settings::Int setupbones_time{ "source.setupbones-time", "4" };
 
 void EntityHitboxCache::UpdateBones()
 {
@@ -143,6 +142,10 @@ matrix3x4_t *EntityHitboxCache::GetBones(int numbones)
         {
             PROF_SECTION(bone_setup)
 
+            // Only use reconstructed setupbones on players
+            /*if (parent_ref->m_Type() == ENTITY_PLAYER)
+                bones_setup = setupbones_reconst::SetupBones(RAW_ENT(parent_ref), bones.data(), 0x7FF00);
+            else*/
             bones_setup = RAW_ENT(parent_ref)->SetupBones(bones.data(), numbones, BONE_USED_BY_HITBOX, bones_setup_time);
         }
     }

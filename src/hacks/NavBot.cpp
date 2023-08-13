@@ -98,7 +98,7 @@ bool shouldSearchAmmo()
     {
         int handle = weapon_list[i];
         int eid    = HandleToIDX(handle);
-        if (eid > MAX_PLAYERS && eid <= HIGHEST_ENTITY)
+        if (eid > g_GlobalVars->maxClients && eid <= HIGHEST_ENTITY)
         {
             IClientEntity *weapon = g_IEntityList->GetClientEntity(eid);
             if (weapon && re::C_BaseCombatWeapon::IsBaseCombatWeapon(weapon) && re::C_TFWeaponBase::UsesPrimaryAmmo(weapon) && !re::C_TFWeaponBase::HasPrimaryAmmo(weapon))
@@ -126,7 +126,7 @@ std::vector<CachedEntity *> getDispensers()
         entities.push_back(ent);
     }
     // Sort by distance, closer is better
-    std::sort(entities.begin(), entities.end(), [](CachedEntity *a, CachedEntity *b) { return a->m_flDistance() < b->m_flDistance(); });
+    std::sort(entities.begin(), entities.end(), [](CachedEntity *a, CachedEntity *b) { return a->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) < b->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin); });
     return entities;
 }
 
@@ -149,7 +149,7 @@ std::vector<CachedEntity *> getEntities(bool find_health)
         }
     }
     // Sort by distance, closer is better
-    std::sort(entities.begin(), entities.end(), [](CachedEntity *a, CachedEntity *b) { return a->m_flDistance() < b->m_flDistance(); });
+    std::sort(entities.begin(), entities.end(), [](CachedEntity *a, CachedEntity *b) { return a->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) < b->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin); });
     return entities;
 }
 
@@ -178,7 +178,7 @@ bool getHealth(bool low_priority = false)
         {
             total_ents.reserve(healthpacks.size() + dispensers.size());
             total_ents.insert(total_ents.end(), dispensers.begin(), dispensers.end());
-            std::sort(total_ents.begin(), total_ents.end(), [](CachedEntity *a, CachedEntity *b) { return a->m_flDistance() < b->m_flDistance(); });
+            std::sort(total_ents.begin(), total_ents.end(), [](CachedEntity *a, CachedEntity *b) { return a->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) < b->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin); });
         }
 
         for (const auto healthpack : total_ents)
@@ -219,12 +219,12 @@ bool getAmmo(bool force = false)
         {
             total_ents.reserve(ammopacks.size() + dispensers.size());
             total_ents.insert(total_ents.end(), dispensers.begin(), dispensers.end());
-            std::sort(total_ents.begin(), total_ents.end(), [](CachedEntity *a, CachedEntity *b) { return a->m_flDistance() < b->m_flDistance(); });
+            std::sort(total_ents.begin(), total_ents.end(), [](CachedEntity *a, CachedEntity *b) { return a->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) < b->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin); });
         }
         for (const auto ammopack : total_ents)
         {
             // If we succeeed, don't try to path to other packs
-            if (navparser::NavEngine::navTo(ammopack->m_vecOrigin(), ammo, true, ammopack->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) > 200.0f * 200.0f))
+            if (navparser::NavEngine::navTo(ammopack->m_vecOrigin(), ammo, true, ammopack->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) > Sqr(200.0f)))
             {
                 was_force = force;
                 return true;
@@ -286,13 +286,13 @@ std::pair<CachedEntity *, float> getNearestPlayerDistance()
         const auto ent_origin = *ent->m_vecDormantOrigin();
         const auto dist_sq    = g_pLocalPlayer->v_Origin.DistToSqr(ent_origin);
 
-        if (dist_sq >= Sqr(distance))
+        if (dist_sq >= (distance))
             continue;
 
-        distance = FastSqrt(dist_sq);
+        distance = (dist_sq);
         best_ent = ent;
     }
-    return { best_ent, distance };
+    return { best_ent, FastSqrt(distance) };
 }
 
 enum slots
@@ -724,7 +724,7 @@ bool isAreaValidForSnipe(Vector ent_origin, Vector area_origin, bool fix_sentry_
 
     float distance = ent_origin.DistToSqr(area_origin);
     // Too close to be valid
-    if (distance <= (1100.0f + navparser::HALF_PLAYER_WIDTH) * (1100.0f + navparser::HALF_PLAYER_WIDTH))
+    if (distance <= Sqr(1100.0f + navparser::HALF_PLAYER_WIDTH))
         return false;
     // Fails vischeck, bad
     if (!IsVectorVisibleNavigation(area_origin, ent_origin))
@@ -1018,14 +1018,14 @@ bool escapeDanger()
     auto blacklist  = navparser::NavEngine::getFreeBlacklist();
 
     // In danger, try to run (besides if it's a building spot, don't run away from that)
-    if (blacklist->find(local_nav) != blacklist->end())
+    if (blacklist->contains(local_nav))
     {
-        if ((*blacklist)[local_nav].value == navparser::BlacklistReason_enum::BAD_BUILDING_SPOT)
-            return false;
+        /*if ((*blacklist)[local_nav].value == navparser::BlacklistReason_enum::BAD_BUILDING_SPOT)
+            return false;*/
 
         static CNavArea *target_area = nullptr;
         // Already running and our target is still valid
-        if (navparser::NavEngine::current_priority == danger && blacklist->find(target_area) == blacklist->end())
+        if (navparser::NavEngine::current_priority == danger && !blacklist->contains(target_area))
             return true;
 
         std::vector<CNavArea *> nav_areas_ptr;
@@ -1040,7 +1040,7 @@ bool escapeDanger()
         // Try to path away
         for (auto area : nav_areas_ptr)
         {
-            if (blacklist->find(area) == blacklist->end())
+            if (!blacklist->contains(area))
             {
                 // only try the 5 closest valid areas though, something is wrong if this fails
                 calls++;

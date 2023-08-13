@@ -45,6 +45,8 @@ static settings::Boolean misc_drawhitboxes{ "misc.draw-hitboxes", "false" };
 // Useful for debugging with showlagcompensation
 static settings::Boolean misc_drawhitboxes_dead{ "misc.draw-hitboxes.dead-players", "false" };
 static settings::Boolean show_spectators{ "misc.show-spectators", "false" };
+
+#if ENABLE_VISUALS
 /* Allows editing of the rich presence info in steam's friends UI */
 static settings::Boolean rich_presence{ "misc.rich-presence", "false" };
 static settings::String rich_presence_file{ "misc.rich-presence.file-name", "rich_presence.txt" };

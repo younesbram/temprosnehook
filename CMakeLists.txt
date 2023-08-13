@@ -17,8 +17,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
+set(Force_CXX_23B 0 CACHE BOOL "Force 23B as the CXX Standard, useful for discrepancies in compiler and IDE")
+
 project(cathook VERSION 0.0.1)
-set(CMAKE_CXX_STANDARD 23)
+if (NOT Force_CXX_23B)
+    set(CMAKE_CXX_STANDARD 23)
+endif()
 add_library(cathook SHARED "")
 
 set(Visuals_DrawType "IMGUI" CACHE STRING "Target drawing api")
@@ -87,9 +91,8 @@ if (EnableVisuals)
         target_link_libraries(cathook ${FREETYPE_LIBRARIES})
     endif()
 endif()
-
-find_package(Git REQUIRED)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/external")
+find_package(Git REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(Boost 1.81.0 EXACT)
 if (NOT ${Boost_FOUND})
@@ -154,6 +157,9 @@ if (Internal_Symbolized)
 else()
     set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -s -flto -fprefetch-loop-arrays -fno-stack-protector -funroll-loops -fwhole-program -fipa-pta -fmerge-all-constants -fdevirtualize-at-ltrans -fsched-pressure -fvisibility=hidden -fvisibility-inlines-hidden")
 endif()
+if (Force_CXX_23B)
+    set(CMAKE_CXX_FLAGS "-std=gnu++2b ${CMAKE_CXX_FLAGS}")
+endif()
 
 target_compile_definitions(cathook PRIVATE
         _GLIBCXX_USE_CXX11_ABI=0
@@ -201,7 +207,6 @@ set_target_properties(cathook PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY
 add_subdirectory(src)
 add_subdirectory(include)
 add_subdirectory(external)
-add_subdirectory(modules)
 
 target_precompile_headers(cathook PRIVATE "${CMAKE_SOURCE_DIR}/include/common.hpp")
 

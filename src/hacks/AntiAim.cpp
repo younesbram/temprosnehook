@@ -467,6 +467,14 @@ void ProcessUserCmd(CUserCmd *cmd)
     case 12: // Random Clamped
         y = RandFloatRange(-180.0f, 180.0f);
         break;
+    case 13: // testaa (hexatronic certified real)
+        if (g_pLocalPlayer->isFakeAngleCM)
+        {
+            randyaw += RandFloatRange(-30.0f, 30.0f);
+            y = randyaw;
+        }
+        else
+            y = randyaw - 180.0f + RandFloatRange(-40.0f, 40.0f);
     default:
         break;
     }

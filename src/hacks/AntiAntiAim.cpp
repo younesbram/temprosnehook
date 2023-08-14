@@ -68,7 +68,7 @@ void frameStageNotify(ClientFrameStage_t stage)
 }
 
 static std::array<float, 8> yaw_resolves{ 0.0f, 180.0f, 65.0f, 90.0f, -180.0f, 260.0f, 30.0f, 20.0f };
-int target_health       = target->m_iHealth();
+
 static float resolveAngleYaw(float angle, brutedata &brute)
 {
     brute.original_angle.y = angle;
@@ -78,27 +78,18 @@ static float resolveAngleYaw(float angle, brutedata &brute)
     while (angle < -180)
         angle += 360;
 
-    // try yaw corrections until the desired angle is reached
-    while (true) {
-        // go through yaw resolve angles
-        for (const float resolveAngle : yaw_resolves) {
-            float newAngle = angle + resolveAngle;
-            while (newAngle > 180)
-                newAngle -= 360;
+    // Yaw Resolving
+    // Find out which angle we should try
+    int entry = (int) std::floor((brute.brutenum / 4.0f)) % yaw_resolves.size();
+    angle += yaw_resolves[entry];
 
-            while (newAngle < -180)
-                newAngle += 360;
+    while (angle > 180)
+        angle -= 360;
 
-            brute.new_angle.y = newAngle;
-
-            // check if the pitch correction resolves the issue
-            if (target_health = 0) {
-                return newAngle; // return the resolved angle
-            }
-        }
-    }
-
-    // this point should never be reached in normal circumstances
+    while (angle < -180)
+        angle += 360;
+    brute.new_angle.y = angle;
+    
     return angle;
 }
 

@@ -9,8 +9,6 @@
 #include <settings/Bool.hpp>
 #include <hacks/AntiAim.hpp>
 
-// TODO: add "TestAA"
-
 #include "common.hpp"
 
 namespace hacks::antiaim

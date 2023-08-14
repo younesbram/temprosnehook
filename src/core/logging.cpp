@@ -25,7 +25,7 @@ void logging::Initialize()
 {
     // FIXME other method of naming the file?
     static passwd *pwd = getpwuid(getuid());
-    logging::handle.open(strfmt("/tmp/cathook-%s-%d.log", pwd->pw_name, getpid()).get(), std::ios::out | std::ios::app);
+    logging::handle.open(strfmt("/tmp/rosnehook-%s-%d.log", pwd->pw_name, getpid()).get(), std::ios::out | std::ios::app);
 }
 #endif
 

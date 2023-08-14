@@ -15,6 +15,7 @@
 //#include "e8call.hpp"
 #include "SettingCommands.hpp"
 //#include "glob.h"
+#include "votelogger.hpp"
 
 namespace hacks::catbot
 {
@@ -23,6 +24,7 @@ static settings::Boolean auto_disguise{ "misc.autodisguise", "true" };
 settings::Int requeue_if_ipc_bots_gte{ "cat-bot.requeue-if.ipc-bots-gte", "0" };
 static settings::Int requeue_if_humans_lte{ "cat-bot.requeue-if.humans-lte", "0" };
 static settings::Int requeue_if_players_lte{ "cat-bot.requeue-if.players-lte", "0" };
+static settings::Int requeue_if_being_kicked{ "cat-bot.requeue-if.kicked", "false" };
 
 static settings::Boolean micspam{ "cat-bot.micspam.enable", "false" };
 static settings::Int micspam_on{ "cat-bot.micspam.interval-on", "1" };
@@ -308,6 +310,11 @@ void update()
             }
         }
 
+        if (*requeue_if_being_kicked)
+        {
+            if (hacks::votelogger::was_local_player())
+                tfmn::StartQueue()
+        }
         if (*requeue_if_ipc_bots_gte)
         {
             if (count_ipc >= *requeue_if_ipc_bots_gte)

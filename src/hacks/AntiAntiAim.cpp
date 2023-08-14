@@ -7,7 +7,6 @@
 #include "sdk/dt_recv_redef.h"
 #include "localplayer.hpp"
 #include "core/netvars.hpp"
-#include "Aimbot.hpp"
 
 namespace hacks::anti_anti_aim 
 {
@@ -69,7 +68,7 @@ void frameStageNotify(ClientFrameStage_t stage)
 }
 
 static std::array<float, 8> yaw_resolves{ 0.0f, 180.0f, 65.0f, 90.0f, -180.0f, 260.0f, 30.0f, 20.0f };
-int target_health       = hacks::aimbot::target->m_iHealth();
+int target_health       = target->m_iHealth();
 static float resolveAngleYaw(float angle, brutedata &brute)
 {
     brute.original_angle.y = angle;

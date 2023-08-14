@@ -27,6 +27,7 @@ static settings::Boolean mimic_slot{ "follow-bot.mimic-slot", "false" };
 static settings::Boolean always_medigun{ "follow-bot.always-medigun", "false" };
 static settings::Boolean sync_taunt{ "follow-bot.taunt-sync", "false" };
 static settings::Boolean change{ "follow-bot.change-roaming-target", "false" };
+static settings::Boolean autojump{ "follow-bot.jump-if-stuck", "true" };
 static settings::Boolean afk{ "follow-bot.switch-afk", "true" };
 static settings::Int afktime{ "follow-bot.afk-time", "15000" };
 static settings::Boolean corneractivate{ "follow-bot.corners", "true" };
@@ -501,7 +502,7 @@ static void cm()
             navtarget     = false;
         }
 
-        if (!CE_GOOD(ent) || !startFollow(ent, false))
+        if (CE_BAD(ent) || !startFollow(ent, false))
         {
             breadcrumbs.clear();
             static Timer navtimer{};
@@ -604,6 +605,8 @@ static void cm()
     if (dist_to_target > *follow_distance)
 #endif
     {
+        // Check for jump
+        if (autojump && lastJump.check(1000) && (idle_time.check(2000) || DistanceToGround({ breadcrumbs[0].x, breadcrumbs[0].y, breadcrumbs[0].z + 5 }) > 47))
         {
             current_user_cmd->buttons |= IN_JUMP;
             lastJump.update();
@@ -626,7 +629,6 @@ static void cm()
             last_slot_check = 0.0f;
         if (follow_target && ((always_medigun && g_pPlayerResource->GetClass(LOCAL_E) == tf_medic) || mimic_slot) && (g_GlobalVars->curtime - last_slot_check > 1.0f) && !g_pLocalPlayer->life_state && !CE_BYTE(ENTITY(follow_target), netvar.iLifeState))
         {
-
             // We are checking our slot so reset the timer
             last_slot_check = g_GlobalVars->curtime;
 

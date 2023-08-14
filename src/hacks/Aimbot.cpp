@@ -370,6 +370,7 @@ void DoAutoZoom(bool target_found, CachedEntity *target)
         return;
     }
 
+    // zoom distance
     auto nearest = hacks::NavBot::getNearestPlayerDistance();
     if (g_pLocalPlayer->holding_sniper_rifle && !AllowNoScope(target) && (target_found || nearest.second <= *zoom_distance || idle))
     {

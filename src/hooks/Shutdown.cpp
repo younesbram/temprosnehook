@@ -9,7 +9,6 @@
 #include "MiscTemporary.hpp"
 #include "votelogger.hpp"
 
-static settings::Boolean auto_abandon{ "misc.auto-abandon", "false" };
 static settings::String custom_disconnect_reason{ "misc.disconnect-reason", "" };
 
 namespace hooked_methods
@@ -26,7 +25,7 @@ DEFINE_HOOKED_METHOD(Shutdown, void, INetChannel *this_, const char *reason)
         original::Shutdown(this_, (*custom_disconnect_reason).c_str());
     else
         original::Shutdown(this_, reason);
-    if (*auto_abandon && !ignoredc)
+    if (!ignoredc)
         tfmm::DisconnectAndAbandon();
     ignoredc = false;
     hacks::autojoin::OnShutdown();

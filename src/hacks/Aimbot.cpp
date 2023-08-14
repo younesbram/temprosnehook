@@ -16,6 +16,7 @@
 #include "hitrate.hpp"
 #include "FollowBot.hpp"
 #include "Warp.hpp"
+#include "AntiCheatBypass.hpp"
 #include "NavBot.hpp"
 
 namespace hacks::aimbot
@@ -412,6 +413,8 @@ static void CreateMove()
 
     DoAutoZoom(false, nullptr);
 
+    if (*hacks::antianticheat::enabled)
+        fov = std::min(fov > 0.0f ? fov : FLT_MAX, 10.0f);
     bool should_backtrack    = hacks::backtrack::backtrackEnabled();
     int weapon_mode          = GetWeaponMode();
     bool should_zoom         = *auto_zoom;

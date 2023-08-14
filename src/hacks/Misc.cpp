@@ -13,6 +13,7 @@
 #include <fcntl.h>
 #include <hacks/AntiAim.hpp>
 #include <settings/Bool.hpp>
+#include "AntiCheatBypass.hpp"
 #include "core/sharedobj.hpp"
 #include "filesystem.h"
 #include "DetourHook.hpp"
@@ -348,7 +349,7 @@ static void CreateMove()
     g_ICvar->FindVar("tf_avoidteammates_pushaway")->SetValue(!*nopush_enabled);
 
     // Ping Reducer
-    if (*ping_reducer)
+    if (*ping_reducer && !*hacks::antianticheat::enabled)
     {
         static ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
         if (cmdrate == nullptr)

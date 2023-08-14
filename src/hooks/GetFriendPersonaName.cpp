@@ -8,9 +8,6 @@
 #include "PlayerTools.hpp"
 
 static settings::String ipc_name{ "name.ipc", "" };
-std::string name_forced;
-
-static std::string stolen_name;
 
 int getRng(int min, int max)
 {

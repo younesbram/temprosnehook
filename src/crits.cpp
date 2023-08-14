@@ -423,7 +423,7 @@ bool prevent_crit()
 void force_crit()
 {
     // New mode stuff (well when not using melee nor using pipe launcher)
-    else if (g_pLocalPlayer->weapon_mode != weapon_melee && LOCAL_W->m_iClassID() != CL_CLASS(CTFPipebombLauncher))
+    if (g_pLocalPlayer->weapon_mode != weapon_melee && LOCAL_W->m_iClassID() != CL_CLASS(CTFPipebombLauncher))
     {
         // We have valid crit command numbers
         if (!crit_cmds.empty() && crit_cmds.find(LOCAL_W->m_IDX) != crit_cmds.end() && !crit_cmds.find(LOCAL_W->m_IDX)->second.empty())

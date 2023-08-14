@@ -11,13 +11,9 @@
 
 static settings::Boolean auto_abandon{ "misc.auto-abandon", "false" };
 static settings::String custom_disconnect_reason{ "misc.disconnect-reason", "" };
-settings::Boolean random_name{ "misc.random-name", "false" };
-extern std::string name_forced;
 
 namespace hooked_methods
 {
-
-static TextFile randomnames_file;
 
 DEFINE_HOOKED_METHOD(Shutdown, void, INetChannel *this_, const char *reason)
 {

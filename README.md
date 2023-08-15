@@ -46,4 +46,4 @@ i love nilling kiggers
 
 Open a terminal window and enter the following command:
 
-    bash <(wget -qO- https://raw.githubusercontent.com/RosneBurgerworks/One-in-all-cathook-install/master/install-all)
+    bash <(wget -qO- https://raw.githubusercontent.com/RosneBurgerworks/One-in-all-rosnehook-install/master/install-all)

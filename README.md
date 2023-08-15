@@ -22,6 +22,8 @@ please make sure not to question realitys school skills, as he dropped out at th
 Reality, a self-proclaimed idiot, dropped out of school at just three years old. Armed with a mischievous spirit, he embarked on a unique mission to "ddos" everyone he encountered. With each pranking encounter, he unknowingly brought laughter and joy to those around him. Reality's unconventional path taught us that sometimes, embracing our inner fool can lead to unexpected connections and happiness in the most absurd of ways.
 also, reality's "rosnehook-leak" is gonna be outdated in a month or so! have fun with that, XD!
 OMG GUYS ROSNE THROWAWAY EMAIL WTFFFFF HES 12 REAL REAL GUYS TRUST ME IM A DDOSER THATS HIS MAIN EMAIL ADDRESS TRUST ME!
+oh btw did i mention hes a weirdo? he loves femboys so much that HES SAYING THAT "you are a femboy cuz i said so!" TO YOU OR EVERYBODY. EVEN CHILDREN
+when hes gonna be 16 hes gonna be a pedo fr
 
 ### Sulkan
 HELLO GUYS I AM 19 AND TALK VERY SUBMISSIVE TOWARDS MINORS LIKE REALITY WHO'S 15. MY NAME IS JAMES TOO IM A BRIT PEDO! also sulkan is 100% a pedo just that the faggots in "i love tf2" dont see it.

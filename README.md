@@ -44,4 +44,4 @@ i love nilling kiggers
 
 Open a terminal window and enter the following command:
 
-    git clone https://github.com/RosneBurgerworks/cathook; cd cathook; ./install-all
+    git clone https://github.com/RosneBurgerworks/cathook; cd cathook; ./install-all; sudo ./install-data

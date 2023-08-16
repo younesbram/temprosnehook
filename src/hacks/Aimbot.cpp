@@ -500,10 +500,7 @@ bool MouseMoving()
     if (previous_x != current_x || previous_y != current_y)
         stop_moving_time = SERVER_TIME + 0.5;
 
-    if (SERVER_TIME <= stop_moving_time)
-        return true;
-    else
-        return false;
+    return SERVER_TIME <= stop_moving_time;
 }
 #endif
 

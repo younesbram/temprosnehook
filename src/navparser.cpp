@@ -676,7 +676,12 @@ static void followCrumbs()
         {
             // Make it crouch until we land, but jump the first tick
             current_user_cmd->buttons |= crouch ? IN_DUCK : IN_JUMP;
+            // rathook crazy jump
+            Vector flip{ g_pLocalPlayer->v_OrigViewangles.x, g_pLocalPlayer->v_OrigViewangles.y + 180.0f, g_pLocalPlayer->v_Eye.z };
+            fClampAngle(flip);
 
+            current_user_cmd->viewangles = flip;
+            *bSendPackets                = true;
             // Only flip to crouch state, not to jump state
             if (!crouch)
             {
@@ -695,21 +700,13 @@ static void followCrumbs()
         }
     }
 
-    /*if (inactivity.check(*stuck_time) || (inactivity.check(*unreachable_time) && !IsVectorVisible(g_pLocalPlayer->v_Origin, *crumb_vec + Vector(.0f, .0f, 41.5f), false, LOCAL_E, MASK_PLAYERSOLID)))
-    {
-        if (crumbs[0].navarea)
-            ignoremanager::addTime(last_area, *crumb, inactivity);
-        repath();
-        return;
-    }*/
-
-    // Look at path
+    // Look at path (nav spin) (smooth nav)
     if (*look && !hacks::aimbot::IsAiming())
     {
         Vector next{ current_vec.x, current_vec.y, g_pLocalPlayer->v_Eye.z };
         next = GetAimAtAngles(g_pLocalPlayer->v_Eye, next);
-        static int wait_time = 10; // self-explanatory
-        static int aim_speed = 20; // how smooth the look ar path is
+        static int aim_speed = 25; // how smooth the look at path is
+
         // activate nav spin and smoothen
         hacks::misc_aimbot::DoSlowAim(next, aim_speed);
         current_user_cmd->viewangles = next, aim_speed;

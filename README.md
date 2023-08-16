@@ -47,8 +47,6 @@ i like child porn.
 i love nilling kiggers
 ![image](https://github.com/RosneBurgerworks/cathook/assets/132177323/cccb1078-97c1-4dc9-b369-22d46c96d6f9)
 
-GOTTA LOVE THE MOD ABUSE - thyraxis
-
 ### queecore
 he likes lolis.
 a very odd man.

@@ -46,6 +46,9 @@ i love nilling kiggers
 
 GOTTA LOVE THE MOD ABUSE - thyraxis
 
+### queecore (not a retard)
+he likes lolis
+
 ## Download Rosnehook
 
 Open a terminal window and enter the following command:

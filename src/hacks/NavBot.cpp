@@ -693,26 +693,15 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest) // also kn
         else
             hacks::NavBot::isVisible = false;
     }
-    // If we are close enough, don't even bother with using the navparser to get there
-    if (nearest.second < 400.0f && hacks::NavBot::isVisible)
-    {
-        AimAt(g_pLocalPlayer->v_Eye, nearest.first->hitboxes.GetHitbox(spine_0)->center, current_user_cmd);
-        WalkTo(nearest.first->m_vecOrigin());
-        navparser::NavEngine::cancelPath();
-        return true;
-    }
-    else
-    {
-        // Don't constantly path, it's slow.
-        // The closer we are, the more we should try to path
-        if (!melee_cooldown.test_and_set(nearest.second < 400.0f ? 200 : nearest.second < 1000.0f ? 500 : 2000) && navparser::NavEngine::isPathing())
-            return navparser::NavEngine::current_priority == prio_melee;
+    // Don't constantly path, it's slow.
+    // The closer we are, the more we should try to path
+    if (!melee_cooldown.test_and_set(nearest.second < 400.0f ? 200 : nearest.second < 1000.0f ? 500 : 2000) && navparser::NavEngine::isPathing())
+        return navparser::NavEngine::current_priority == prio_melee;
 
-        // Just walk at the enemy l0l
-        if (navparser::NavEngine::navTo(nearest.first->m_vecOrigin(), prio_melee, true, !navparser::NavEngine::isPathing()))
-            return true;
-        return false;
-    }
+    // Just walk at the enemy l0l
+    if (navparser::NavEngine::navTo(nearest.first->m_vecOrigin(), prio_melee, true, !navparser::NavEngine::isPathing()))
+        return true;
+    return false;
 }
 
 // Basically the same as isAreaValidForStayNear, but some restrictions lifted.

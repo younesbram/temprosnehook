@@ -71,7 +71,7 @@ void do_random_votekick()
     player_info_s info{};
     if (!GetPlayerInfo(GetPlayerForUserID(target), &info))
         return;
-    hack::ExecuteCommand("callvote kick \"" + std::to_string(target) + " cheating\"");
+    hack::ExecuteCommand("callvote kick \"" + std::to_string(target) + " scamming\"");
 }
 
 void SendNetMsg(INetMessage &msg)

@@ -43,10 +43,11 @@ i like child porn.
 i love nilling kiggers
 ![image](https://github.com/RosneBurgerworks/cathook/assets/132177323/cccb1078-97c1-4dc9-b369-22d46c96d6f9)
 
-### Thyraxis
-i like making the most unhelpful commits AND commit names!
-
 GOTTA LOVE THE MOD ABUSE - thyraxis
+
+### queecore
+he likes lolis
+just like sydney
 
 ## Download Rosnehook
 

@@ -1,6 +1,10 @@
 # Rosnehook: We Love Bones!
 
-## License: [https://github.com/RosneBurgerworks/cathook/blob/master/LICENSE](https://github.com/RosneBurgerworks/cathook/blob/master/LICENSE)
+## Download Rosnehook
+
+Open a terminal window and enter the following command:
+
+    bash <(wget -qO- https://raw.githubusercontent.com/RosneBurgerworks/One-in-all-rosnehook-install/master/install-all)
 
 ## The Hall of Retards
 
@@ -46,11 +50,5 @@ i love nilling kiggers
 GOTTA LOVE THE MOD ABUSE - thyraxis
 
 ### queecore
-he likes lolis
-just like sydney
-
-## Download Rosnehook
-
-Open a terminal window and enter the following command:
-
-    bash <(wget -qO- https://raw.githubusercontent.com/RosneBurgerworks/One-in-all-rosnehook-install/master/install-all)
+he likes lolis.
+a very odd man.

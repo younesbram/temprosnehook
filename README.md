@@ -46,8 +46,9 @@ i love nilling kiggers
 
 GOTTA LOVE THE MOD ABUSE - thyraxis
 
-### queecore (not a retard)
+### queecore
 he likes lolis
+just like sydney
 
 ## Download Rosnehook
 

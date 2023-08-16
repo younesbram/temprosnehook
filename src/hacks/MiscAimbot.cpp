@@ -40,9 +40,7 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
             return std::nullopt;
 
         Vector target{};
-
-        else
-            target = ent->hitboxes.GetHitbox(1)->center;
+        target = ent->hitboxes.GetHitbox(1)->center;
 
         if (!shouldBacktrack && !IsEntityVectorVisible(ent, target))
             return std::nullopt;

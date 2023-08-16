@@ -41,6 +41,9 @@ oh my god my name is Sydney I beg for a fix every two seconds and I think it's a
 i like to believe reality/nigsec because im a very smart individual!
 i like child porn.
 i love nilling kiggers
+![image](https://github.com/RosneBurgerworks/cathook/assets/132177323/4796caf1-c600-48f8-a655-33933c58d38a)
+
+GOTTA LOVE THE MOD ABUSE - thyraxis
 
 ## Download Rosnehook
 

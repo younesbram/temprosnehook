@@ -4,11 +4,10 @@
 
 #include "common.hpp"
 #include "settings/Bool.hpp"
-#include "settings/Int.hpp"
-#include "settings/Key.hpp"
 #include "PlayerTools.hpp"
 #include "MiscAimbot.hpp"
 #include "DetourHook.hpp"
+#include "Backtrack.hpp"
 
 namespace hacks::misc_aimbot
 {
@@ -17,74 +16,65 @@ constexpr float initial_vel    = 200.0f;
 int prevent                    = -1;
 static Timer previous_entity_delay{};
 
-// TODO: Refactor this jank
 std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool zcheck,  float range)
 {
     CachedEntity *bestent                             = nullptr;
     float bestscr                                     = FLT_MAX;
+    std::optional<backtrack::BacktrackData> best_data = std::nullopt;
     Vector predicted{};
     // Too long since we focused it
     if (previous_entity_delay.check(100))
         prevent = -1;
 
-    for (int i = 0; i < 1; ++i)
+    bool shouldBacktrack = backtrack::backtrackEnabled() && !backtrack::hasData();
+
+    auto calculateEntity = [&](CachedEntity *ent) -> std::optional<std::tuple<float, Vector, std::optional<backtrack::BacktrackData>>>
+    {
+        if (CE_BAD(ent) || !ent->m_bAlivePlayer() || (teammate && ent->m_iTeam() != g_pLocalPlayer->team) || ent == LOCAL_E)
+            return std::nullopt;
+        if (!teammate && ent->m_iTeam() == g_pLocalPlayer->team)
+            return std::nullopt;
+        if (!ent->hitboxes.GetHitbox(1))
+            return std::nullopt;
+        if (!teammate && !player_tools::shouldTarget(ent))
+            return std::nullopt;
+
+        Vector target{};
+
+        else
+            target = ent->hitboxes.GetHitbox(1)->center;
+
+        if (!shouldBacktrack && !IsEntityVectorVisible(ent, target))
+            return std::nullopt;
+
+        if (zcheck && (ent->m_vecOrigin().z - g_pLocalPlayer->v_Origin.z) > 200.0f)
+            return std::nullopt;
+
+        float scr = ent->m_flDistance();
+
+        std::optional<backtrack::BacktrackData> data = std::nullopt;
+
+        if (g_pPlayerResource->GetClass(ent) == tf_medic)
+            scr *= 0.5f;
+
+        return { { scr, target, data } };
+    };
+
+    for (const auto &ent : entity_cache::player_cache)
     {
         if (prevent != -1)
         {
-            auto ent = ENTITY(prevent);
-            if (CE_BAD(ent) || !ent->m_bAlivePlayer() || (teammate && ent->m_iTeam() != LOCAL_E->m_iTeam()) || ent == LOCAL_E)
-                continue;
-            if (!teammate && ent->m_iTeam() == LOCAL_E->m_iTeam())
-                continue;
-            if (!ent->hitboxes.GetHitbox(1))
-                continue;
-            if (!teammate && !player_tools::shouldTarget(ent))
-                continue;
-            Vector target{};
-            if (!IsEntityVectorVisible(ent, target))
-                continue;
-            if (zcheck && (ent->m_vecOrigin().z - LOCAL_E->m_vecOrigin().z) > 200.0f)
-                continue;
-            float scr                                    = ent->m_flDistance();
-            if (g_pPlayerResource->GetClass(ent) == tf_medic)
-                scr *= 0.5f;
-            if (scr < bestscr)
+            auto result = calculateEntity(ent);
+            if (result && std::get<0>(*result) < bestscr)
             {
                 bestent   = ent;
-                predicted = target;
-                bestscr   = scr;
+                predicted = std::get<1>(*result);
+                bestscr   = std::get<0>(*result);
                 prevent   = ent->m_IDX;
+                if (shouldBacktrack)
+                    best_data = std::get<2>(*result);
             }
-        }
-        if (bestent && predicted.z)
-        {
             previous_entity_delay.update();
-            return { bestent, predicted };
-        }
-    }
-    prevent = -1;
-    for (auto const &ent : entity_cache::player_cache)
-    {
-        if (CE_BAD(ent) || !(ent->m_bAlivePlayer()) || (teammate && ent->m_iTeam() != LOCAL_E->m_iTeam()) || ent == LOCAL_E)
-            continue;
-        if (!teammate && ent->m_iTeam() == LOCAL_E->m_iTeam())
-            continue;
-        if (!ent->hitboxes.GetHitbox(1))
-            continue;
-        Vector target{};
-        if (!IsEntityVectorVisible(ent, target))
-            continue;
-        if (zcheck && (ent->m_vecOrigin().z - LOCAL_E->m_vecOrigin().z) > 200.0f)
-            continue;
-        float scr                                    = ent->m_flDistance();
-        if (g_pPlayerResource->GetClass(ent) == tf_medic)
-            scr *= 0.5f;
-        if (scr < bestscr)
-        {
-            bestent   = ent;
-            predicted = target;
-            bestscr   = scr;
-            prevent   = ent->m_IDX;
         }
     }
     return { bestent, predicted };

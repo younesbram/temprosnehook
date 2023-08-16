@@ -160,6 +160,10 @@ bool ShouldShoot()
     if (CE_BYTE(LOCAL_E, netvar.m_bCarryingObject))
         return false;
 
+    // Check if deadringer out
+    if (CE_BYTE(LOCAL_E, netvar.m_bFeignDeathReady))
+        return false;
+
     // If zoomed only is on, check if zoomed
     if (*zoomed_only && g_pLocalPlayer->holding_sniper_rifle && !g_pLocalPlayer->bZoomed && !(current_user_cmd->buttons & IN_ATTACK))
         return false;
@@ -184,6 +188,8 @@ bool ShouldShoot()
     case weapon_hitscan:
     case weapon_melee:
         break;
+    // Check if player is using a projectile based weapon
+    case weapon_projectile:
     // Check if player doesn't have a weapon usable by aimbot
     default:
         return false;

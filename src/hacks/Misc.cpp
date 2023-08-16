@@ -6,18 +6,14 @@
  */
 
 #include "common.hpp"
-#include <unistd.h>
 #include <regex>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <hacks/AntiAim.hpp>
 #include <settings/Bool.hpp>
-#include "AntiCheatBypass.hpp"
+
 #include "core/sharedobj.hpp"
 #include "filesystem.h"
 #include "DetourHook.hpp"
-
+#include "AntiCheatBypass.hpp"
 #include "hack.hpp"
 #include <thread>
 
@@ -27,11 +23,11 @@ namespace hacks::misc
 static settings::Boolean render_zoomed{ "visual.render-local-zoomed", "true" };
 #endif
 static settings::Boolean anti_afk{ "misc.anti-afk", "true" };
-static settings::Boolean auto_jump{ "misc.auto-jump", "false" }; // bhop
-static settings::Int auto_jump_chance{ "misc.auto-jump.chance", "100" }; // 100 is always
+static settings::Boolean auto_jump{ "misc.auto-jump", "false" };
+static settings::Int auto_jump_chance{ "misc.auto-jump.chance", "100" };
 static settings::Int auto_strafe{ "misc.autostrafe", "0" };
-static settings::Boolean accurate_movement{ "misc.accurate-movement", "true" }; // this is only used for exploits catbots dont need it
-settings::Boolean tauntslide{ "misc.tauntslide", "false" }; // keep this off its rubbish
+static settings::Boolean accurate_movement{ "misc.accurate-movement", "false" };
+settings::Boolean tauntslide{ "misc.tauntslide", "true" };
 static settings::Boolean nopush_enabled{ "misc.no-push", "true" };
 static settings::Boolean dont_hide_stealth_kills{ "misc.dont-hide-stealth-kills", "true" };
 static settings::Boolean unlimit_bumpercart_movement{ "misc.bumpercarthax.enable", "false" };
@@ -101,6 +97,7 @@ static void tryPatchLocalPlayerShouldDraw(bool after)
 
 static Timer anti_afk_timer{};
 static int last_buttons{ 0 };
+
 static void updateAntiAfk()
 {
     if (current_user_cmd->buttons != last_buttons || g_pLocalPlayer->life_state)
@@ -234,7 +231,7 @@ static void CreateMove()
         if (UniformRandomInt(0, 99) > *auto_jump_chance)
             return;
 
-        bool ground = CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND;
+        bool ground = g_pLocalPlayer->flags & FL_ONGROUND;
         bool jump   = current_user_cmd->buttons & IN_JUMP;
 
         if (!ground && jump && ticks_last_jump++ >= 9)
@@ -252,7 +249,7 @@ static void CreateMove()
         if (movetype == MoveType_t::MOVETYPE_NOCLIP || movetype == MoveType_t::MOVETYPE_LADDER)
             return;
 
-        auto flags              = CE_INT(LOCAL_E, netvar.iFlags);
+        auto flags              = g_pLocalPlayer->flags;
         static bool was_jumping = false;
         bool is_jumping         = current_user_cmd->buttons & IN_JUMP;
 
@@ -316,7 +313,7 @@ static void CreateMove()
 
     if (*accurate_movement && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
     {
-        if (!(CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND))
+        if (!(g_pLocalPlayer->flags & FL_ONGROUND))
             return;
 
         if (current_user_cmd->buttons & (IN_MOVELEFT | IN_MOVERIGHT | IN_FORWARD | IN_BACK))

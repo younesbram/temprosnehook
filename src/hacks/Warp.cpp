@@ -163,7 +163,7 @@ float getFireDelay()
 
 bool canInstaZoom()
 {
-    return in_rapidfire_zoom || (g_pLocalPlayer->holding_sniper_rifle && CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND && current_user_cmd->buttons & IN_ATTACK2 && !HasCondition<TFCond_Zoomed>(LOCAL_E) && CE_FLOAT(LOCAL_W, netvar.flNextSecondaryAttack) <= SERVER_TIME);
+    return in_rapidfire_zoom || (g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->flags & FL_ONGROUND && current_user_cmd->buttons & IN_ATTACK2 && !HasCondition<TFCond_Zoomed>(LOCAL_E) && CE_FLOAT(LOCAL_W, netvar.flNextSecondaryAttack) <= SERVER_TIME);
 }
 
 // This is needed in order to make zoom/unzoom smooth even with insta zoom
@@ -210,7 +210,8 @@ bool shouldRapidfire()
         return false;
 
     // Ignore throwables/consumables/etc
-    if (g_pLocalPlayer->weapon_mode == weapon_throwable || g_pLocalPlayer->weapon_mode == weapon_consumable || g_pLocalPlayer->weapon_mode == weapon_pda)
+    auto weapon_mode = GetWeaponMode();
+    if (weapon_mode == weapon_throwable || weapon_mode == weapon_consumable || weapon_mode == weapon_pda)
         return false;
 
     // Unrevved minigun cannot rapidfire
@@ -276,15 +277,16 @@ bool shouldRapidfire()
     case 0: // Always on
         return buttons_pressed;
     case 1: // Disable on projectile
-        if (g_pLocalPlayer->weapon_mode == weapon_projectile)
+        if (GetWeaponMode() == weapon_projectile)
             return false;
         break;
     case 2: // Disable on melee
-        if (g_pLocalPlayer->weapon_mode == weapon_melee)
+        if (GetWeaponMode() == weapon_melee)
             return false;
         break;
     case 3: // Disable on projectile and melee
-        if (g_pLocalPlayer->weapon_mode == weapon_projectile || g_pLocalPlayer->weapon_mode == weapon_melee)
+        auto weapon_mode = GetWeaponMode();
+        if (weapon_mode == weapon_projectile || weapon_mode == weapon_melee)
             return false;
         break;
     }
@@ -806,7 +808,7 @@ void warpLogic()
 
         if (!charge_in_jump)
         {
-            if (CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND)
+            if (g_pLocalPlayer->flags & FL_ONGROUND)
                 ground_ticks++;
             else
                 ground_ticks = 0;
@@ -1001,7 +1003,7 @@ void warpLogic()
             velocity::EstimateAbsVelocity(RAW_ENT(LOCAL_E), vel);
 
             // if we move more than 1.0 HU/s and buttons are pressed, and we are grounded, go to move towards statement...
-            if (CE_INT(LOCAL_E, netvar.iFlags) & FL_ONGROUND && !vel.IsZero(1.0f) && current_user_cmd->buttons & (IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT))
+            if (g_pLocalPlayer->flags & FL_ONGROUND && !vel.IsZero(1.0f) && current_user_cmd->buttons & (IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT))
                 current_peek_state = MOVE_TOWARDS;
             // ...else don't warp
             else

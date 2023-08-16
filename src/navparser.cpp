@@ -705,7 +705,7 @@ static void followCrumbs()
     {
         Vector next{ current_vec.x, current_vec.y, g_pLocalPlayer->v_Eye.z };
         next = GetAimAtAngles(g_pLocalPlayer->v_Eye, next);
-        static int aim_speed = 25; // how smooth the look at path is
+        static int aim_speed = 20; // how smooth the look at path is
 
         // activate nav spin and smoothen
         hacks::misc_aimbot::DoSlowAim(next, aim_speed);

@@ -47,7 +47,7 @@ static settings::Boolean warp_forward{ "warp.on-hit.forward", "false" };
 static settings::Boolean warp_backwards{ "warp.on-hit.backwards", "false" };
 static settings::Boolean warp_left{ "warp.on-hit.left", "false" };
 static settings::Boolean warp_right{ "warp.on-hit.right", "false" };
-static settings::Boolean warp_melee{ "warp.to.enemy", "false" };
+static settings::Boolean warp_melee{ "warp.to.enemy", "true" };
 
 static std::vector<std::tuple<Vector, CachedEntity *>> proj_map;
 

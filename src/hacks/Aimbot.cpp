@@ -359,6 +359,7 @@ void DoAutoZoom(bool target_found, CachedEntity *target)
 
     // Keep track of our zoom time
     static Timer zoom_time{};
+    auto nearest = hacks::NavBot::getNearestPlayerDistance();
 
     // Minigun Rev Distance (credits to sydney)
     if (LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun) && (target_found || nearest.second <= *rev_distance || idle))
@@ -371,7 +372,6 @@ void DoAutoZoom(bool target_found, CachedEntity *target)
     }
 
     // zoom distance
-    auto nearest = hacks::NavBot::getNearestPlayerDistance();
     if (g_pLocalPlayer->holding_sniper_rifle && !AllowNoScope(target) && (target_found || nearest.second <= *zoom_distance || idle))
     {
         if (target_found)

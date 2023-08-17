@@ -46,7 +46,7 @@ static settings::Boolean only_can_shoot{ "aimbot.can-shoot-only", "true" };
 
 static settings::Int normal_slow_aim{ "aimbot.slow", "0" };
 
-static settings::Boolean auto_spin_up{ "aimbot.auto.spin-up", "false" };
+static settings::Float rev_distance{ "aimbot.rev.distance", "300.0" };
 static settings::Boolean minigun_tapfire{ "aimbot.auto.tapfire", "false" };
 static settings::Boolean auto_zoom{ "aimbot.auto.zoom", "true" };
 static settings::Boolean auto_unzoom{ "aimbot.auto.unzoom", "true" };
@@ -360,14 +360,14 @@ void DoAutoZoom(bool target_found, CachedEntity *target)
     // Keep track of our zoom time
     static Timer zoom_time{};
 
-    // Minigun spun up handler + doesnt work properly. 
-    if (*auto_spin_up && LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun))
+    // Minigun Rev Distance (credits to sydney)
+    if (LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun) && (target_found || nearest.second <= *rev_distance || idle))
     {
         if (target_found)
+        {
             zoom_time.update();
-        if (idle || !zoom_time.check(3000))
             current_user_cmd->buttons |= IN_ATTACK2;
-        return;
+        }
     }
 
     // zoom distance
@@ -379,8 +379,8 @@ void DoAutoZoom(bool target_found, CachedEntity *target)
         if (!g_pLocalPlayer->bZoomed)
             current_user_cmd->buttons |= IN_ATTACK2;
     }
-    // Auto-Unzoom
-    else if (*auto_unzoom && zoom_time.check(3000) && !target_found && g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed && nearest.second > *zoom_distance)
+    // Auto-Unzoom + auto-unrev
+    else if (*auto_unzoom && zoom_time.check(3000) && !target_found && g_pLocalPlayer->holding_sniper_rifle || LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun) && g_pLocalPlayer->bZoomed || g_pLocalPlayer->bRevving && nearest.second > *zoom_distance || nearest.second > *rev_distance)
         current_user_cmd->buttons |= IN_ATTACK2;
 }
 

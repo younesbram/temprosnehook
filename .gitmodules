@@ -21,4 +21,4 @@
 	url = https://github.com/RosneBurgerworks/boost-cmake
 [submodule "external/MicroPather"]
 	path = external/MicroPather
-	url = https://github.com/explowz/MicroPather.git
+	url = https://github.com/RosneBurgerworks/MicroPather.git

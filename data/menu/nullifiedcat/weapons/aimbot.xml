@@ -104,8 +104,8 @@
                           tooltip="Make the aimbot automatically fire your weapon."/>
             <AutoVariable width="fill" target="aimbot.wait-for-charge" label="Wait for charge"
                           tooltip="Hold fire until a single shot is enough to kill the target."/>
-            <AutoVariable width="fill" target="aimbot.rev.distance" label="Minigun Rev Distance"
-                          tooltip="Distance to the nearest enemy in HMU for which the bot will always rev"/>
+            <AutoVariable width="fill" target="aimbot.auto.spin-up" label="Auto spin-up"
+                          tooltip="Spin up the minigun automatically if an enemy is found."/>
             <AutoVariable width="fill" target="aimbot.auto.zoom" label="Auto zoom"
                           tooltip="Intelligently zoom if applicable to current weapon type."/>
             <AutoVariable width="fill" target="aimbot.zoom.distance" label="Zoom distance"

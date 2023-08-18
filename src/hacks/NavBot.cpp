@@ -183,7 +183,7 @@ bool getHealth(bool low_priority = false)
 
         for (const auto healthpack : total_ents)
             // If we succeed, don't try to path to other packs
-            if (navparser::NavEngine::navTo(healthpack->m_vecOrigin(), priority, true, healthpack->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) > 200.0f * 200.0f))
+            if (navparser::NavEngine::navTo(healthpack->m_vecOrigin(), priority, true, healthpack->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) > Sqr(200.0f)))
                 return true;
         health_cooldown.update();
     }
@@ -286,10 +286,10 @@ std::pair<CachedEntity *, float> getNearestPlayerDistance()
         const auto ent_origin = *ent->m_vecDormantOrigin();
         const auto dist_sq    = g_pLocalPlayer->v_Origin.DistToSqr(ent_origin);
 
-        if (dist_sq >= (distance))
+        if (dist_sq >= distance)
             continue;
 
-        distance = (dist_sq);
+        distance = dist_sq;
         best_ent = ent;
     }
     return { best_ent, FastSqrt(distance) };
@@ -669,13 +669,6 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest) // also kn
 
     auto raw_local = RAW_ENT(LOCAL_E);
 
-    // We are charging, let the charge aimbot do its job
-    if (HasCondition<TFCond_Charging>(LOCAL_E))
-    {
-        navparser::NavEngine::cancelPath();
-        return true;
-    }
-
     static Timer melee_cooldown{};
 
     {
@@ -948,7 +941,7 @@ bool doRoam()
 {
     static Timer roam_timer;
     // Don't path constantly
-    if (!roam_timer.test_and_set(6000))
+    if (!roam_timer.test_and_set(2000))
         return false;
 
     // Defend our objective if possible

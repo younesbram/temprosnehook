@@ -886,7 +886,7 @@ Vector PredictEntity(CachedEntity *entity)
     Vector &result            = cd.aim_position;
     const short int curr_type = entity->m_Type();
 
-    // If using projectiles, predict a vector - we dont need this shit :skull: 
+    // If using projectiles, predict a vector
     switch (curr_type)
     {
     // Player

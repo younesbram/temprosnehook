@@ -112,7 +112,7 @@ ConVar *CreateConVar(const std::string &name, const std::string &value, const st
     strncpy(valuec, value.c_str(), 255);
     strncpy(helpc, help.c_str(), 255);
     // logging::Info("Creating ConVar: %s %s %s", namec, valuec, helpc);
-    auto ret = new ConVar(const_cast<const char *>(namec), const_cast<const char *>(valuec), 0, const_cast<const char *>(helpc));
+    auto *ret = new ConVar(const_cast<const char *>(namec), const_cast<const char *>(valuec), 0, const_cast<const char *>(helpc));
     g_ICvar->RegisterConCommand(ret);
     RegisteredVarsList().push_back(ret);
     return ret;
@@ -330,7 +330,7 @@ std::pair<Vector, Vector> VischeckWall(CachedEntity *player, CachedEntity *targe
     return { { 0, 0, 0 }, { 0, 0, 0 } };
 }
 
-// Returns a vectors max value. For example: {123,-150, 125} = 125
+// Returns a vector's max value. For example: {123,-150, 125} = 125
 float vectorMax(Vector i)
 {
     __m128 vec = _mm_set_ps(i.z, i.y, i.x, -FLT_MAX);
@@ -508,7 +508,7 @@ Vector ComputeMove(const Vector &a, const Vector &b)
 
 ConCommand *CreateConCommand(const char *name, FnCommandCallback_t callback, const char *help)
 {
-    auto *ret = new ConCommand(name, callback, help);
+    auto ret = new ConCommand(name, callback, help);
     g_ICvar->RegisterConCommand(ret);
     RegisteredCommandsList().push_back(ret);
     return ret;
@@ -971,7 +971,7 @@ void FixMovement(CUserCmd &cmd, Vector &viewangles)
     movement.x = cmd.forwardmove;
     movement.y = cmd.sidemove;
     movement.z = cmd.upmove;
-    speed = std::hypot(movement.x, movement.y);
+    speed      = std::hypot(movement.x, movement.y);
     VectorAngles(movement, ang);
     yaw             = DEG2RAD(ang.y - viewangles.y + cmd.viewangles.y);
     cmd.forwardmove = cos(yaw) * speed;
@@ -1746,7 +1746,7 @@ void PrintChat(const char *fmt, ...)
 Vector getShootPos(Vector angle)
 {
     Vector eye = g_pLocalPlayer->v_Eye;
-    if (g_pLocalPlayer->weapon_mode != weapon_projectile || CE_BAD(LOCAL_W))
+    if (GetWeaponMode() != weapon_projectile || CE_BAD(LOCAL_W))
         return eye;
 
     Vector forward, right, up;
@@ -1763,7 +1763,7 @@ Vector getShootPos(Vector angle)
         vecOffset = Vector(23.5f, 12.0f, -3.0f);
         if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 513) // The Original
             vecOffset->y = 0.0f;
-        if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) != 513 && CE_INT(LOCAL_E, netvar.iFlags) & FL_DUCKING)
+        if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) != 513 && g_pLocalPlayer->flags & FL_DUCKING)
             vecOffset->z = 8.0f;
         break;
     case CL_CLASS(CTFParticleCannon): // Cow Mangler 5000
@@ -1778,7 +1778,7 @@ Vector getShootPos(Vector angle)
         {
         case CL_CLASS(CTFParticleCannon): // Cow Mangler 5000
         case CL_CLASS(CTFRaygun):         // Righteous Bison
-            if (CE_INT(LOCAL_E, netvar.iFlags) & FL_DUCKING)
+            if (g_pLocalPlayer->flags & FL_DUCKING)
                 vecOffset->z = 8.0f;
             break;
         case CL_CLASS(CTFCompoundBow):

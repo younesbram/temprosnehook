@@ -16,7 +16,7 @@ extern settings::Boolean engine_projpred;
 static settings::Boolean debug_pp_extrapolate{ "debug.pp-extrapolate", "false" };
 static settings::Boolean debug_pp_draw{ "debug.pp-draw", "false" };
 static settings::Boolean debug_pp_draw_engine{ "debug.pp-draw.engine", "false" };
-static settings::Int debug_pp_steps{ "debug.pp-steps", "100" };
+static settings::Int debug_pp_steps{ "debug.pp-steps", "66" };
 // The higher the sample size, the more previous positions we will take into account to calculate the next position. Lower = Faster reaction Higher = Stability
 static settings::Int sample_size("debug.strafepred.samplesize", "10");
 // TODO there is a Vector() object created each call.

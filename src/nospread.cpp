@@ -87,7 +87,7 @@ static void CreateMove()
         RandomFloat();
 
     // Projectile/Huntsman check
-    if (g_pLocalPlayer->weapon_mode != weapon_projectile && LOCAL_W->m_iClassID() != CL_CLASS(CTFCompoundBow))
+    if (GetWeaponMode() != weapon_projectile && LOCAL_W->m_iClassID() != CL_CLASS(CTFCompoundBow))
         return;
 
     // Beggars check
@@ -681,7 +681,7 @@ void CL_SendMove_hook()
     }
 
     // Bad weapon
-    if ((g_pLocalPlayer->weapon_mode != weapon_hitscan && LOCAL_W->m_iClassID() != CL_CLASS(CTFCompoundBow)))
+    if ((GetWeaponMode() != weapon_hitscan && LOCAL_W->m_iClassID() != CL_CLASS(CTFCompoundBow)))
     {
         auto original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
         original();

@@ -100,7 +100,7 @@ void on_spawn(IGameEvent *event)
     apply_killstreaks();
 }
 
-void fire_event(IGameEvent *event)
+void fire_event(IGameEvent *event) // GOD I HATE CATHOOK WHY DID THEY PUT THIS HERE???
 {
     if (enable)
     {

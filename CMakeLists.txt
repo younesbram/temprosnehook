@@ -17,8 +17,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
+set(Force_CXX_23B 0 CACHE BOOL "Force 23B as the CXX Standard, useful for discrepancies in compiler and IDE")
+
 project(cathook VERSION 0.0.1)
-set(CMAKE_CXX_STANDARD 23)
+if (NOT Force_CXX_23B)
+    set(CMAKE_CXX_STANDARD 23)
+endif()
 add_library(cathook SHARED "")
 
 set(Visuals_DrawType "IMGUI" CACHE STRING "Target drawing api")
@@ -87,15 +91,17 @@ if (EnableVisuals)
         target_link_libraries(cathook ${FREETYPE_LIBRARIES})
     endif()
 endif()
-
-find_package(Git REQUIRED)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/external")
+find_package(Git REQUIRED)
 find_package(SDL2 REQUIRED)
-set(BOOST_LIBS_OPTIONAL "" CACHE STRING "Boost libs to be compiled")
-add_subdirectory(external/boost-cmake)
-set(BOOST_ROOT ${CMAKE_BINARY_DIR}/_deps/boost-src)
-find_package(Boost REQUIRED PATHS ${CMAKE_BINARY_DIR}/_deps/boost-src/tools/boost_install/ NO_DEFAULT_PATH)
-include_directories(${CMAKE_BINARY_DIR}/_deps/boost-src)
+find_package(Boost 1.81.0 EXACT)
+if (NOT ${Boost_FOUND})
+    set(BOOST_LIBS_OPTIONAL "" CACHE STRING "Boost libs to be compiled")
+    add_subdirectory(external/boost-cmake)
+    SET (BOOST_ROOT ${CMAKE_BINARY_DIR}/_deps/boost-src)
+    find_package(Boost 1.81.0 EXACT)
+    include_directories(${Boost_INCLUDE_DIRS})
+endif()
 
 execute_process(COMMAND
         "${GIT_EXECUTABLE}" log -1 --pretty=\"%h\"
@@ -142,20 +148,17 @@ configure_file(include/config.h.in ${CMAKE_SOURCE_DIR}/include/config.h @ONLY)
 configure_file(include/version.h.in ${CMAKE_SOURCE_DIR}/include/version.h @ONLY)
 
 set(CMAKE_CXX_FLAGS "-m32 -march=native -mtune=native -fexceptions -DNDEBUG")
-
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -lc++ -lc++abi")
-endif()
-
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-gnu-unique -fno-builtin")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-gnu-unique")
 endif()
-
 set(CMAKE_CXX_FLAGS_DEBUG "-Og -m32 -march=native -mtune=native -rdynamic -ggdb")
 if (Internal_Symbolized)
     set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -ggdb -fvisibility=hidden -fvisibility-inlines-hidden")
 else()
     set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -s -flto -fprefetch-loop-arrays -fno-stack-protector -funroll-loops -fwhole-program -fipa-pta -fmerge-all-constants -fdevirtualize-at-ltrans -fsched-pressure -fvisibility=hidden -fvisibility-inlines-hidden")
+endif()
+if (Force_CXX_23B)
+    set(CMAKE_CXX_FLAGS "-std=gnu++2b ${CMAKE_CXX_FLAGS}")
 endif()
 
 target_compile_definitions(cathook PRIVATE

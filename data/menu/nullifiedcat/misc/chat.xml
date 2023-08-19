@@ -59,11 +59,11 @@
                           tooltip="Don't save your chat spam to the log."/>
         </List>
     </Box>
-    <Box name="GAYTRONIC I AM NOT A BOT" width="content" height="content" padding="12 6 6 6" y="200">
+    <Box name="OMEGATRONIC I AM NOT A BOT" width="content" height="content" padding="12 6 6 6" y="200">
         <List width="150">
-            <AutoVariable width="fill" target="chat.censor.enable" label="IANB chat censor"
+            <AutoVariable width="fill" target="chat.censor.enable" label="Enable"
                           tooltip="SAYS 'I am not a bot' in chat when called out"/>
-            <AutoVariable width="fill" target="chat.censor.filter" label="add more works"/>
+            <AutoVariable width="fill" target="chat.censor.filter" label="add more words"/>
         </List>
     </Box>
     <Box name="Killsay" width="177" height="content" padding="12 6 6 6" x="170">

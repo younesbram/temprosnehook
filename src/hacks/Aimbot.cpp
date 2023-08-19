@@ -4,6 +4,7 @@
  *  Created on: Oct 9, 2016
  *      Author: nullifiedcat
  */
+
 #include <hacks/Aimbot.hpp>
 #include <hacks/AntiAim.hpp>
 #include <hacks/ESP.hpp>
@@ -56,6 +57,7 @@ static settings::Boolean backtrack_aimbot{ "aimbot.backtrack", "false" };
 static settings::Boolean backtrack_last_tick_only("aimbot.backtrack.only-last-tick", "true");
 static bool force_backtrack_aimbot = false;
 // wtf is this above
+static settings::Boolean target_hazards{ "aimbot.target.hazards", "true" };
 static settings::Float max_range{ "aimbot.target.max-range", "4096" };
 static settings::Boolean ignore_vaccinator{ "aimbot.target.ignore-vaccinator", "false" };
 static settings::Boolean buildings_sentry{ "aimbot.target.sentry", "true" };
@@ -71,7 +73,7 @@ struct AimbotCalculatedData_s
     bool predict_type{ false };
     Vector aim_position{ 0 };
     unsigned long vcheck_tick{ 0 };
-    bool visible{ true };
+    bool visible{ false };
     float fov{ 0 };
     int hitbox{ 0 };
 } static cd;
@@ -235,6 +237,7 @@ std::vector<Vector> GetValidHitpoints(CachedEntity *ent, int hitbox)
             ++i;
         }
     }
+
     return hitpoints;
 }
 
@@ -361,7 +364,7 @@ void DoAutoZoom(bool target_found, CachedEntity *target)
     // Keep track of our zoom time
     static Timer zoom_time{};
 
-    // Minigun spun up handler + doesnt work properly. 
+    // Minigun spun up handler
     if (*auto_spin_up && LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun))
     {
         if (target_found)
@@ -508,7 +511,7 @@ bool MouseMoving()
 // The first check to see if the player should aim in the first place
 bool ShouldAim()
 {
-    // Checks should be in order: cheap -> expensive + dont need weapon checks lol 
+    // Checks should be in order: cheap -> expensive
     // Check for +use
     if (current_user_cmd->buttons & IN_USE)
         return false;
@@ -574,9 +577,38 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
     // No last_target found, reset the timer.
     last_target_ignore_timer = 0;
 
+    // Do not attempt to target hazards using melee weapons
+    if (*target_hazards && GetWeaponMode() != weapon_melee)
+    {
+        for (const auto &hazard_entity : entity_cache::valid_ents)
+        {
+            const model_t *model = RAW_ENT(hazard_entity)->GetModel();
+            if (model)
+            {
+                const auto szName = g_IModelInfo->GetModelName(model);
+                if (Hash::IsHazard(szName))
+                {
+                    for (const auto &ent : entity_cache::valid_ents)
+                    {
+                        const auto hazard_origin = hazard_entity->m_vecOrigin();
+                        if (IsTargetStateGood(ent) && IsVectorVisible(hazard_origin, ent->m_vecOrigin(), true))
+                        {
+                            const float dist_hazard_to_enemy        = hazard_origin.DistTo(ent->m_vecOrigin());
+                            const float dist_hazard_to_local_player = hazard_entity->m_flDistance();
+                            const float damage_to_enemy             = 150.0f - 0.25f * dist_hazard_to_enemy;
+                            // Hazards cannot deal less than 75 damage
+                            if (damage_to_enemy >= 75.0f && dist_hazard_to_local_player > 350.0f && Aim(hazard_entity))
+                                return hazard_entity;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     float target_highest_score, score = 0.0f;
     CachedEntity *target_highest_ent                       = nullptr;
-    target_highest_score                                   = -256;
+    target_highest_score                                   = -256.0f;
     std::optional<hacks::backtrack::BacktrackData> bt_tick = std::nullopt;
     for (const auto &ent : entity_cache::valid_ents)
     {
@@ -688,7 +720,7 @@ bool IsTargetStateGood(CachedEntity *entity)
             return false;
         // Distance
         float targeting_range = EffectiveTargetingRange();
-        if (entity->m_flDistance() - 40 > targeting_range && tickcount > last_target_ignore_timer) // m_flDistance includes the collision box. You have to subtract it (Should be the same for every model)
+        if (entity->m_flDistance() - 40.0f > targeting_range && tickcount > last_target_ignore_timer) // m_flDistance includes the collision box. You have to subtract it (Should be the same for every model)
             return false;
 
         // Wait for charge
@@ -816,6 +848,7 @@ bool Aim(CachedEntity *entity)
     Vector is_it_good = PredictEntity(entity);
     if (!IsEntityVectorVisible(entity, is_it_good, true, MASK_SHOT_HULL, nullptr, true))
         return false;
+
     Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, is_it_good, LOCAL_E);
     if (fov > 0.0f && cd.fov > fov)
         return false;
@@ -977,6 +1010,7 @@ int AutoHitbox(CachedEntity *target)
             preferred = hitbox_t::spine_1;
             return preferred;
         }
+
         return hitbox_t::head;
     }
     return preferred;
@@ -1083,7 +1117,6 @@ void Reset()
     target_last     = nullptr;
 }
 
-
 #if ENABLE_VISUALS
 static void DrawText()
 {
@@ -1109,7 +1142,7 @@ static void DrawText()
                 // Math
                 float mon_fov  = static_cast<float>(width) / static_cast<float>(height) / (4.0f / 3.0f);
                 float fov_real = RAD2DEG(2.0f * atanf(mon_fov * tanf(DEG2RAD(draw::fov / 2.0f))));
-                float radius   = tan(DEG2RAD(static_cast<float>(fov)) / 2.0f) / tan(DEG2RAD(fov_real) / 2.0f) * static_cast<float>(width);
+                float radius   = tan(DEG2RAD(fov) / 2.0f) / tan(DEG2RAD(fov_real) / 2.0f) * static_cast<float>(width);
 
                 draw::Circle(static_cast<float>(width) / 2, static_cast<float>(height) / 2, radius, color, 1, 100);
             }

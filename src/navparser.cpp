@@ -20,6 +20,7 @@
 #include "Aimbot.hpp"
 #include "navparser.hpp"
 #include "MiscTemporary.hpp"
+#include "AntiAim.hpp"
 #if ENABLE_VISUALS
 #include "drawing.hpp"
 #endif
@@ -677,11 +678,14 @@ static void followCrumbs()
             // Make it crouch until we land, but jump the first tick
             current_user_cmd->buttons |= crouch ? IN_DUCK : IN_JUMP;
             // rathook crazy jump
-            Vector flip{ g_pLocalPlayer->v_OrigViewangles.x, g_pLocalPlayer->v_OrigViewangles.y + 180.0f, g_pLocalPlayer->v_Eye.z };
-            fClampAngle(flip);
-
-            current_user_cmd->viewangles = flip;
-            *bSendPackets                = true;
+            if (!hacks::antiaim::isEnabled())
+            {
+	            Vector flip{ g_pLocalPlayer->v_OrigViewangles.x, g_pLocalPlayer->v_OrigViewangles.y + 180.0f, g_pLocalPlayer->v_Eye.z };
+	            fClampAngle(flip);
+	
+	            current_user_cmd->viewangles = flip;
+	            *bSendPackets                = true;
+	        }
             // Only flip to crouch state, not to jump state
             if (!crouch)
             {

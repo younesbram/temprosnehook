@@ -31,12 +31,7 @@
             <AutoVariable width="fill" target="visual.night-mode.gui-color" label="Nightmode color (GUI)"/>
             <AutoVariable width="fill" target="visual.night-mode.world-color" label="Nightmode color (world)"/>
             <AutoVariable width="fill" target="visual.night-mode.skybox-color" label="Nightmode color (skybox)"/>
-            <LabeledObject width="fill" label="Ragdoll override">
-                <Select target="visual.ragdoll-mode">
-                    <Option name="Auto" value="0"/>
-                </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="visual.ragdoll-only-local" label="Only override local player kills"/>
             <LabeledObject width="fill" label="Pyrovision" tooltip="Can be used to force Pyrovision on or off.">
                 <Select target="visual.force-pyrovision">
                     <Option name="Auto" value="0"/>
@@ -44,8 +39,6 @@
                     <Option name="Off" value="2"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="visual.killfeedcolor.enable" label="Enable killfeed coloring"
-                          tooltip="Colors names in killfeed to reflect player states eg: RAGE"/>
         </List>
     </Box>
 </Tab>

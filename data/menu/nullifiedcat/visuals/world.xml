@@ -31,7 +31,6 @@
             <AutoVariable width="fill" target="visual.night-mode.gui-color" label="Nightmode color (GUI)"/>
             <AutoVariable width="fill" target="visual.night-mode.world-color" label="Nightmode color (world)"/>
             <AutoVariable width="fill" target="visual.night-mode.skybox-color" label="Nightmode color (skybox)"/>
-            </LabeledObject>
             <LabeledObject width="fill" label="Pyrovision" tooltip="Can be used to force Pyrovision on or off.">
                 <Select target="visual.force-pyrovision">
                     <Option name="Auto" value="0"/>

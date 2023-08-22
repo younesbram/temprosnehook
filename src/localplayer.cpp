@@ -158,7 +158,7 @@ void LocalPlayer::Update()
     }
     team                   = entity->m_iTeam();
     flags                  = CE_INT(LOCAL_E, netvar.iFlags);
-    alive                  = entity->m_bAlivePlayer();
+    alive                  = CE_BYTE(entity, netvar.iLifeState)
     v_ViewOffset           = CE_VECTOR(entity, netvar.vViewOffset);
     v_Origin               = entity->m_vecOrigin();
     v_OrigViewangles       = current_user_cmd->viewangles;

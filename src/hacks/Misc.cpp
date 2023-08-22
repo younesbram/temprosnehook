@@ -100,7 +100,7 @@ static int last_buttons{ 0 };
 
 static void updateAntiAfk()
 {
-    if (current_user_cmd->buttons != last_buttons || g_pLocalPlayer->life_state)
+    if (current_user_cmd->buttons != last_buttons || g_pLocalPlayer->alive)
     {
         anti_afk_timer.update();
         last_buttons = current_user_cmd->buttons;
@@ -224,7 +224,7 @@ static void CreateMove()
     if (*anti_afk)
         updateAntiAfk();
 
-    if (*auto_jump && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
+    if (*auto_jump && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->alive)
     {
         static int ticks_last_jump = 0;
 
@@ -242,7 +242,7 @@ static void CreateMove()
     }
 
     // Automatically strafes in the air
-    if (*auto_strafe && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
+    if (*auto_strafe && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->alive)
     {
         auto movetype = (unsigned) CE_VAR(LOCAL_E, 0x194, unsigned char);
 
@@ -311,7 +311,7 @@ static void CreateMove()
         }
     }
 
-    if (*accurate_movement && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
+    if (*accurate_movement && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->alive)
     {
         if (!(g_pLocalPlayer->flags & FL_ONGROUND))
             return;

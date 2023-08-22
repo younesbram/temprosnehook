@@ -202,7 +202,7 @@ bool shouldRapidfire()
         return false;
 
     // Dead player
-    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
+    if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive || CE_BAD(LOCAL_W))
         return false;
 
     // Weapon specific ignores, knives, Thermal Thruster, Huntsman, Mediguns, and the grappling hook
@@ -341,7 +341,7 @@ void dodgeProj(CachedEntity *proj_ptr)
 
 static void dodgeProj_cm()
 {
-    if (!LOCAL_E->m_bAlivePlayer() || proj_map.empty() || !dodge_projectile)
+    if (!g_pLocalPlayer->alive || proj_map.empty() || !dodge_projectile)
         return;
     Vector player_pos  = RAW_ENT(LOCAL_E)->GetAbsOrigin();
     const int max_size = proj_map.size();
@@ -570,7 +570,7 @@ int approximateTicksForDist(float distance, float initial_speed, int max_ticks)
 {
     bool is_skullcutter = false;
     bool has_booties    = false;
-    if (CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer() && CE_GOOD(LOCAL_W))
+    if (CE_GOOD(LOCAL_E) && g_pLocalPlayer->alive && CE_GOOD(LOCAL_W))
     {
         // We have a skullcutter, mark as such
         if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 172)
@@ -781,7 +781,7 @@ void warpLogic()
 {
     if (!enabled)
         return;
-    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
+    if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive || CE_BAD(LOCAL_W))
         return;
 
     // Handle minigun in rapidfire
@@ -816,7 +816,7 @@ void warpLogic()
 
         bool button_block = (current_user_cmd->buttons & (IN_ATTACK | IN_ATTACK2));
         // Charge on minigun even with m2 held
-        if (LOCAL_E->m_bAlivePlayer() && CE_GOOD(LOCAL_W) && LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun))
+        if (g_pLocalPlayer->alive && CE_GOOD(LOCAL_W) && LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun))
             button_block = current_user_cmd->buttons & IN_ATTACK;
 
         // Bunch of checks, if they all pass we are standing still
@@ -1152,7 +1152,7 @@ void Draw()
         return;
     if (CE_BAD(LOCAL_E))
         return;
-    if (!LOCAL_E->m_bAlivePlayer())
+    if (!g_pLocalPlayer->alive)
         return;
 
     if (draw)
@@ -1221,7 +1221,7 @@ public:
         CachedEntity *att = ENTITY(attacker_idx);
 
         // Don't run if we (the victim) are invalid
-        if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
+        if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive)
             return;
         // Ignore projectile damage for now
         if (CE_VALID(att) && att->m_bAlivePlayer() && GetWeaponMode(att) == weapon_projectile)

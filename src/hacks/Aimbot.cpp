@@ -406,7 +406,7 @@ static void CreateMove()
 
     bool aimkey_status = UpdateAimkey();
 
-    if (!enable || !LOCAL_E || !LOCAL_E->m_bAlivePlayer() || !aimkey_status || !ShouldAim())
+    if (!enable || !LOCAL_E || !g_pLocalPlayer->alive || !aimkey_status || !ShouldAim())
     {
         target_last = nullptr;
         return;
@@ -578,7 +578,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
     last_target_ignore_timer = 0;
 
     // Do not attempt to target hazards using melee weapons
-    if (*target_hazards && GetWeaponMode() != weapon_melee)
+    if (*target_hazards && GetWeaponMode() != weapon_melee && !TFGameRules()->m_bCompetitiveMode)
     {
         for (const auto &hazard_entity : entity_cache::valid_ents)
         {
@@ -1131,7 +1131,7 @@ static void DrawText()
         if (fov > 0.0f && fov < 180.0f)
         {
             // Don't show ring while player is dead
-            if (CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
+            if (CE_GOOD(LOCAL_E) && g_pLocalPlayer->alive)
             {
                 rgba_t color = colors::gui;
                 color.a      = *fovcircle_opacity;

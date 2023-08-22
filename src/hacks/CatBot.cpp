@@ -18,7 +18,6 @@
 
 namespace hacks::catbot
 {
-static settings::Boolean auto_disguise{ "misc.autodisguise", "true" };
 
 settings::Int requeue_if_ipc_bots_gte{ "cat-bot.requeue-if.ipc-bots-gte", "0" };
 static settings::Int requeue_if_humans_lte{ "cat-bot.requeue-if.humans-lte", "0" };
@@ -29,8 +28,6 @@ static settings::Int micspam_on{ "cat-bot.micspam.interval-on", "1" };
 static settings::Int micspam_off{ "cat-bot.micspam.interval-off", "0" };
 
 static settings::Boolean random_votekicks{ "cat-bot.votekicks", "false" };
-static settings::Boolean votekick_rage_only{ "cat-bot.votekicks.rage-only", "false" };
-static settings::Boolean autoReport{ "cat-bot.autoreport", "false" };
 static settings::Boolean autovote_map{ "cat-bot.autovote-map", "true" };
 
 settings::Boolean catbotmode{ "cat-bot.enable", "true" }; // i forgur :troll:
@@ -53,8 +50,6 @@ void do_random_votekick()
         if (info.friendsID == local_info.friendsID)
             continue;
         auto &pl = playerlist::AccessData(info.friendsID);
-        if (*votekick_rage_only && pl.state != playerlist::k_EState::RAGE)
-            continue;
         if (pl.state != playerlist::k_EState::RAGE && pl.state != playerlist::k_EState::DEFAULT)
             continue;
 
@@ -117,75 +112,13 @@ Timer level_init_timer{};
 
 Timer micspam_on_timer{};
 Timer micspam_off_timer{};
-static bool patched_report;
-static std::atomic_bool can_report = false;
-static std::vector<unsigned> to_report;
-void reportall()
-{
-    if (!patched_report)
-    {
-        static BytePatch patch(CSignature::GetClientSignature, "73 ? 80 7D ? ? 74 ? F3 0F 10 0D", 0x2F, { 0x89, 0xe0 });
-        patch.Patch();
-        patched_report = true;
-    }
-    for (const auto &ent : entity_cache::player_cache)
-    {
-        // We only want a nullptr check since dormant entities are still on the
-        // server
-        if (!ent)
-            continue;
-
-        // Pointer comparison is fine
-        if (ent == LOCAL_E)
-            continue;
-        player_info_s info{};
-        if (GetPlayerInfo(ent->m_IDX, &info) && info.friendsID)
-        {
-            if (!player_tools::shouldTargetSteamId(info.friendsID))
-                continue;
-            to_report.push_back(info.friendsID);
-        }
-    }
-    can_report = true;
-}
-
-CatCommand report("report_all", "Report all players", []() { reportall(); });
-
-CatCommand report_uid("report_steamid", "Report with steamid",
-                      [](const CCommand &args)
-                      {
-                          if (args.ArgC() < 2)
-                              return;
-                          unsigned steamid;
-                          try
-                          {
-                              steamid = std::stoi(args.Arg(1));
-                          }
-                          catch (const std::invalid_argument &)
-                          {
-                              logging::Info("Report machine broke");
-                              return;
-                          }
-                          if (!steamid)
-                          {
-                              logging::Info("Report machine broke");
-                              return;
-                          }
-                          typedef uint64_t (*ReportPlayer_t)(uint64_t, int);
-                          static uintptr_t addr1      = CSignature::GetClientSignature("55 89 E5 57 56 53 81 EC ? ? ? ? 8B 5D ? 8B 7D ? 89 D8");
-                          static auto ReportPlayer_fn = ReportPlayer_t(addr1);
-                          if (!addr1)
-                              return;
-                          CSteamID id(steamid, EUniverse::k_EUniversePublic, EAccountType::k_EAccountTypeIndividual);
-                          ReportPlayer_fn(id.ConvertToUint64(), 1);
-                      });
 
 Timer crouchcdr{};
 
 CatCommand print_ammo("debug_print_ammo", "debug",
                       []()
                       {
-                          if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
+                          if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive || CE_BAD(LOCAL_W))
                               return;
                           logging::Info("Current slot: %d", re::C_BaseCombatWeapon::GetSlot(RAW_ENT(LOCAL_W)));
                           for (int i = 0; i < 10; ++i)
@@ -193,7 +126,6 @@ CatCommand print_ammo("debug_print_ammo", "debug",
                       });
 
 static Timer disguise{};
-static Timer report_timer{};
 static CachedEntity *local_w;
 static void cm()
 {
@@ -207,54 +139,22 @@ static void cm()
         return;
 
     static const int classes[3]{ tf_spy, tf_sniper, tf_pyro };
-    if (*auto_disguise && g_pPlayerResource->GetClass(LOCAL_E) == tf_spy && !IsPlayerDisguised(LOCAL_E) && disguise.test_and_set(3000))
-    {
-        int teamtodisguise = (LOCAL_E->m_iTeam() == TEAM_RED) ? TEAM_RED - 1 : TEAM_BLU - 1;
-        std::random_device rd;
-        std::mt19937 mt(rd());
-        std::uniform_int_distribution<uint8> dist(0, 3);
-        int classtojoin = classes[dist(mt)];
-        g_IEngine->ClientCmd_Unrestricted(format("disguise ", classtojoin, " ", teamtodisguise).c_str());
-    }
-    if (*autoReport && report_timer.test_and_set(60000))
-        reportall();
 }
 
 static Timer unstuck{};
 static int unstucks;
-static Timer report_timer2{};
 void update()
 {
     if (g_Settings.bInvalid)
         return;
 
-    if (can_report)
-    {
-        typedef uint64_t (*ReportPlayer_t)(uint64_t, int);
-        static uintptr_t addr1      = CSignature::GetClientSignature("55 89 E5 57 56 53 81 EC ? ? ? ? 8B 5D ? 8B 7D ? 89 D8");
-        static auto ReportPlayer_fn = ReportPlayer_t(addr1);
-        if (!addr1)
-            return;
-        if (report_timer2.test_and_set(400))
-        {
-            if (to_report.empty())
-                can_report = false;
-            else
-            {
-                auto rep = to_report.back();
-                to_report.pop_back();
-                CSteamID id(rep, EUniverse::k_EUniversePublic, EAccountType::k_EAccountTypeIndividual);
-                ReportPlayer_fn(id.ConvertToUint64(), 1);
-            }
-        }
-    }
     if (!*catbotmode)
         return;
 
     if (CE_BAD(LOCAL_E))
         return;
 
-    if (LOCAL_E->m_bAlivePlayer())
+    if (g_pLocalPlayer->alive)
     {
         unstuck.update();
         unstucks = 0;

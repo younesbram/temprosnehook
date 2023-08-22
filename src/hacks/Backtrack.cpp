@@ -334,7 +334,7 @@ static void CreateMoveLate()
     red_position = std::nullopt;
 
     // Bad player
-    if (CE_BAD(LOCAL_E) || HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E) || !g_pLocalPlayer->alive)
+    if (CE_BAD(LOCAL_E) || HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
         return;
 
     // No data set yet, try to get nearest to cursor

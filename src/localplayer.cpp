@@ -158,7 +158,7 @@ void LocalPlayer::Update()
     }
     team                   = entity->m_iTeam();
     flags                  = CE_INT(LOCAL_E, netvar.iFlags);
-    alive                  = CE_BYTE(entity, netvar.iLifeState);
+    life_state             = CE_BYTE(entity, netvar.iLifeState);
     v_ViewOffset           = CE_VECTOR(entity, netvar.vViewOffset);
     v_Origin               = entity->m_vecOrigin();
     v_OrigViewangles       = current_user_cmd->viewangles;
@@ -176,7 +176,7 @@ void LocalPlayer::Update()
         flZoomBegin = 0.0f;
 
     // Alive
-    if (!alive)
+    if (!life_state)
     {
         spectator_state = NONE;
         for (const auto &ent: entity_cache::player_cache)

@@ -118,7 +118,7 @@ Timer crouchcdr{};
 CatCommand print_ammo("debug_print_ammo", "debug",
                       []()
                       {
-                          if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive || CE_BAD(LOCAL_W))
+                          if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))
                               return;
                           logging::Info("Current slot: %d", re::C_BaseCombatWeapon::GetSlot(RAW_ENT(LOCAL_W)));
                           for (int i = 0; i < 10; ++i)
@@ -154,7 +154,7 @@ void update()
     if (CE_BAD(LOCAL_E))
         return;
 
-    if (g_pLocalPlayer->alive)
+    if (LOCAL_E->m_bAlivePlayer())
     {
         unstuck.update();
         unstucks = 0;

@@ -1126,7 +1126,7 @@ static void updateSlot(std::pair<CachedEntity *, float> &nearest)
     static Timer slot_timer{};
     if (!*force_slot && !*primary_only || !slot_timer.test_and_set(300))
         return;
-    if (CE_GOOD(LOCAL_E) && !HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E) && CE_GOOD(LOCAL_W) && g_pLocalPlayer->alive)
+    if (CE_GOOD(LOCAL_E) && !HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E) && CE_GOOD(LOCAL_W) && LOCAL_E->m_bAlivePlayer())
     {
         IClientEntity *weapon = RAW_ENT(LOCAL_W);
         if (re::C_BaseCombatWeapon::IsBaseCombatWeapon(weapon))
@@ -1143,7 +1143,7 @@ static void CreateMove()
 {
     if (!*enabled || !navparser::NavEngine::isReady())
         return;
-    if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive || HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E))
+    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E))
         return;
     refreshSniperSpots();
 

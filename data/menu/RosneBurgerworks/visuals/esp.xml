@@ -84,12 +84,6 @@
             </LabeledObject>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Player Info" x="165" y="280">
-        <List width="150">
-            <AutoVariable width="fill" target="misc.playerinfo.draw-kda" label="Draw K/D over head"/>
-            <AutoVariable width="fill" target="misc.playerinfo.draw-level" label="That's how Mafia works"/>
-        </List>
-    </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Strings" x="330">
         <List width="150">
             <AutoVariable width="fill" target="esp.info.name" label="Name"/>

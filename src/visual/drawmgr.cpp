@@ -109,7 +109,6 @@ void DrawCheatVisuals()
             fonts::center_screen->stringSize(result, &w, &h);
 
             // draw
-            draw::Rectangle(*info_x - 5, *info_y - 5, w + 10, h + 10, colors::Transparent(colors::black, *info_alpha));
             draw::Line(*info_x - 5, *info_y - 5, w + 10, 0, colors::gui, 2.0f);
             draw::String(*info_x, *info_y, colors::gui, result.c_str(), *fonts::center_screen);
         }

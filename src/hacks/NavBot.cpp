@@ -686,15 +686,26 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest) // also kn
         else
             hacks::NavBot::isVisible = false;
     }
-    // Don't constantly path, it's slow.
-    // The closer we are, the more we should try to path
-    if (!melee_cooldown.test_and_set(nearest.second < 400.0f ? 200 : nearest.second < 1000.0f ? 500 : 2000) && navparser::NavEngine::isPathing())
-        return navparser::NavEngine::current_priority == prio_melee;
-
-    // Just walk at the enemy l0l
-    if (navparser::NavEngine::navTo(nearest.first->m_vecOrigin(), prio_melee, true, !navparser::NavEngine::isPathing()))
+    // If we are close enough, don't even bother with using the navparser to get there
+    if (nearest.second < 400.0f && hacks::NavBot::isVisible)
+    {
+        AimAt(g_pLocalPlayer->v_Eye, nearest.first->hitboxes.GetHitbox(head)->center, current_user_cmd);
+        WalkTo(nearest.first->m_vecOrigin());
+        navparser::NavEngine::cancelPath();
         return true;
-    return false;
+    }
+    else
+    {
+        // Don't constantly path, it's slow.
+        // The closer we are, the more we should try to path
+        if (!melee_cooldown.test_and_set(nearest.second < 400.0f ? 200 : nearest.second < 1000.0f ? 500 : 2000) && navparser::NavEngine::isPathing())
+            return navparser::NavEngine::current_priority == prio_melee;
+
+        // Just walk at the enemy l0l
+        if (navparser::NavEngine::navTo(nearest.first->m_vecOrigin(), prio_melee, true, !navparser::NavEngine::isPathing()))
+            return true;
+        return false;
+    }
 }
 
 // Basically the same as isAreaValidForStayNear, but some restrictions lifted.
@@ -968,8 +979,8 @@ bool doRoam()
     // Don't overwrite current roam
     if (navparser::NavEngine::current_priority == patrol)
         return false;
-    // 5 times max
-    for (int attempts = 0; attempts < 5; ++attempts)
+    // Max 10 attempts
+    for (int attempts = 0; attempts < 10; ++attempts)
     {
         // Get a random sniper spot
         auto random = select_randomly(sniper_spots.begin(), sniper_spots.end());

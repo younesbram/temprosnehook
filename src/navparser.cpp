@@ -183,7 +183,7 @@ class Map : public micropather::Graph
 public:
     CNavFile navfile;
     NavState state;
-    micropather::MicroPather pather{ this, 1500, 6, true };
+    micropather::MicroPather pather{ this, 3000, 6, true };
     std::string mapname;
     std::unordered_map<std::pair<CNavArea *, CNavArea *>, CachedConnection, boost::hash<std::pair<CNavArea *, CNavArea *>>> vischeck_cache;
     std::unordered_map<std::pair<CNavArea *, CNavArea *>, CachedStucktime, boost::hash<std::pair<CNavArea *, CNavArea *>>> connection_stuck_time;
@@ -669,7 +669,7 @@ static void followCrumbs()
     // 1. No jumping if zoomed (or revved)
     // 2. Jump if it's necessary to do so based on z values
     // 3. Jump if stuck (not getting closer) for more than stuck_time/2
-    if ((!(g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed) && !(g_pLocalPlayer->bRevved || g_pLocalPlayer->bRevving) && (crouch || current_vec.z - g_pLocalPlayer->v_Origin.z > 18.0f) && last_jump.check(200)) || (last_jump.check(200) && inactivity.check(*stuck_time / 2)))
+    if ((!(g_pLocalPlayer->holding_sniper_rifle && g_pLocalPlayer->bZoomed) && !(g_pLocalPlayer->bRevved || g_pLocalPlayer->bRevving) && (crouch || crumbs[0].vec.z - g_pLocalPlayer->v_Origin.z > 18.0f) && last_jump.check(200)) || (last_jump.check(200) && inactivity.check(*stuck_time / 2)))
     {
         auto local = map->findClosestNavSquare(g_pLocalPlayer->v_Origin);
         // Check if current area allows jumping
@@ -707,7 +707,7 @@ static void followCrumbs()
     // Look at path (nav spin) (smooth nav)
     if (*look && !hacks::aimbot::IsAiming())
     {
-        Vector next{ current_vec.x, current_vec.y, g_pLocalPlayer->v_Eye.z };
+        Vector next{ crumbs[0].vec.x, crumbs[0].vec.y, g_pLocalPlayer->v_Eye.z };
         next = GetAimAtAngles(g_pLocalPlayer->v_Eye, next);
         static int aim_speed = 20; // how smooth the look at path is
 

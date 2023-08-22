@@ -102,7 +102,7 @@ void DrawCheatVisuals()
                 server_info = " | " + std::to_string((int)(avgLatency*1000.0f)) + " ms";
             }
 
-            std::string result = std::string(format_cstr("Rosnehook InDev | %s%s", timeString, server_info.c_str()).get());
+            std::string result = std::string(strfmt("Rosnehook InDev | %s%s", timeString, server_info.c_str()).get());
 
             // size for rectangle and line
             float w, h;

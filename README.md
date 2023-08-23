@@ -44,6 +44,9 @@ i like child porn.
 i love nilling kiggers!
 im also known as skidney.
 
+### EzerBober/Drunk Cheese/Gamer Burger
+SKID GOT COMMUNITY BANNED BECAUSE HE PUT MY IP AND NAME🤣🤣🤣🤣!
+
 ### queecore
 he likes lolis.
 a very odd man.

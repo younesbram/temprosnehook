@@ -33,6 +33,7 @@ namespace navparser
 static settings::Boolean enabled("nav.enabled", "false");
 static settings::Boolean draw("nav.draw", "false");
 static settings::Boolean look{ "nav.look-at-path", "false" };
+static settings::Boolean rathookspin{ "nav.rathook-spin", "true" };
 static settings::Boolean draw_debug_areas("nav.draw.debug-areas", "false");
 static settings::Boolean log_pathing{ "nav.log", "false" };
 static settings::Int stuck_time{ "nav.stuck-time", "1000" };
@@ -709,11 +710,17 @@ static void followCrumbs()
     {
         Vector next{ crumbs[0].vec.x, crumbs[0].vec.y, g_pLocalPlayer->v_Eye.z };
         next = GetAimAtAngles(g_pLocalPlayer->v_Eye, next);
-        static int aim_speed = 20; // how smooth the look at path is
-
-        // activate nav spin and smoothen
-        hacks::misc_aimbot::DoSlowAim(next, aim_speed);
-        current_user_cmd->viewangles = next, aim_speed;
+        if (*rathookspin)
+        {
+            static int aim_speed = 20; // how smooth nav is
+            // activate nav spin and smoothen
+            hacks::misc_aimbot::DoSlowAim(next, aim_speed);
+            current_user_cmd->viewangles = next, aim_speed;
+        }
+        else
+        {
+            current_user_cmd->viewangles = next;
+        }
     }
 
     WalkTo(current_vec);

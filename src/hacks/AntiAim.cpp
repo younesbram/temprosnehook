@@ -394,7 +394,7 @@ void ProcessUserCmd(CUserCmd *cmd)
         swap           = true;
         ticksUntilSwap = 0;
     }
-    switch ((int) yaw_mode)
+    switch (*yaw_mode)
     {
     case 1: // FIXED
         y = (float) yaw;
@@ -539,7 +539,7 @@ void ProcessUserCmd(CUserCmd *cmd)
     default:
         break;
     }
-    switch (int(pitch_mode))
+    switch (*(pitch_mode))
     {
     case 1:
         p = float(pitch);

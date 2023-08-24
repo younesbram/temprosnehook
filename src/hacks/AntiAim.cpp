@@ -605,4 +605,4 @@ bool isEnabled()
 }
 
 static InitRoutine fakelag_check([]() { yaw_mode.installChangeCallback([](settings::VariableBase<int> &, int after) { force_fakelag = after >= 9 ? true : false; }); });
-} // namespace hacks::shared::antiaim
+} // namespace hacks::antiaim

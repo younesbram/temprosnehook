@@ -314,7 +314,7 @@ bool findEdge(float edgeOrigYaw)
     {
         edgeToEdgeOn = 1;
         // Correction for pitches to keep the head behind walls
-        if (((int) pitch_mode == 7) || ((int) pitch_mode == 2) || ((int) pitch_mode == 8))
+        if ((*pitch_mode == 7) || (*pitch_mode == 2) || (*pitch_mode == 8))
             edgeToEdgeOn = 2;
         return true;
     }
@@ -322,7 +322,7 @@ bool findEdge(float edgeOrigYaw)
     {
         edgeToEdgeOn = 2;
         // Same as above
-        if (((int) pitch_mode == 7) || ((int) pitch_mode == 2) || ((int) pitch_mode == 8))
+        if ((*pitch_mode == 7) || (*pitch_mode == 2) || (*pitch_mode == 8))
             edgeToEdgeOn = 1;
         return true;
     }

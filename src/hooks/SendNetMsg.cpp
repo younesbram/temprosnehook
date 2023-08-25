@@ -10,7 +10,6 @@
 #include "nospread.hpp"
 #include "AntiCheatBypass.hpp"
 
-static settings::Int newlines_msg{ "chat.prefix-newlines", "0" };
 static settings::Boolean log_sent{ "debug.log-sent-chat", "false" };
 
 namespace hacks::catbot
@@ -122,29 +121,6 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, boo
 
     hacks::antianticheat::SendNetMsg(msg);
 
-    // net_StringCmd
-    if (msg.GetType() == 4 && (newlines_msg || crypt_chat))
-    {
-        std::string str(msg.ToString());
-        say_idx      = str.find("net_StringCmd: \"say \"");
-        say_team_idx = str.find("net_StringCmd: \"say_team \"");
-        if (!say_idx || !say_team_idx)
-        {
-            offset    = say_idx ? 26 : 21;
-            
-            if (*newlines_msg > 0)
-            {
-                // TODO move out? update in a value change callback?
-                newlines = std::string(*newlines_msg, '\n');
-                str.insert(offset, newlines);
-            }
-            str = str.substr(16, str.length() - 17);
-            // if (queue_messages && !chat_stack::CanSend()) {
-            stringcmd.m_szCommand = str.c_str();
-            return original::SendNetMsg(this_, stringcmd, force_reliable, voice);
-            //}
-        }
-    }
     static float lastcmd = 0.0f;
     if (lastcmd > g_GlobalVars->absoluteframetime)
     {

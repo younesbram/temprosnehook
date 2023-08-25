@@ -3,7 +3,7 @@
  *
  *  Created on: Oct 26, 2016
  *      Author: nullifiedcat
- */
+*/
 
 #include <hacks/hacklist.hpp>
 #include <settings/Bool.hpp>

@@ -1,5 +1,5 @@
 /*
- * localplayer.h
+ * localplayer.hpp
  *
  *  Created on: Oct 15, 2016
  *      Author: nullifiedcat

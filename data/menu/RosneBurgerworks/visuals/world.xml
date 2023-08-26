@@ -22,15 +22,6 @@
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Misc" x="195" y="135">
         <List width="180">
-            <AutoVariable width="fill" target="visual.night-mode.gui" label="Nightmode (GUI)" min="0" max="100"
-                          step="0.1"/>
-            <AutoVariable width="fill" target="visual.night-mode.world" label="Nightmode (world)" min="0" max="100"
-                          step="0.1"/>
-            <AutoVariable width="fill" target="visual.night-mode.skybox" label="Nightmode (skybox)" min="0" max="100"
-                          step="0.1"/>
-            <AutoVariable width="fill" target="visual.night-mode.gui-color" label="Nightmode color (GUI)"/>
-            <AutoVariable width="fill" target="visual.night-mode.world-color" label="Nightmode color (world)"/>
-            <AutoVariable width="fill" target="visual.night-mode.skybox-color" label="Nightmode color (skybox)"/>
             <LabeledObject width="fill" label="Pyrovision" tooltip="Can be used to force Pyrovision on or off.">
                 <Select target="visual.force-pyrovision">
                     <Option name="Auto" value="0"/>

@@ -26,6 +26,7 @@ static settings::Boolean anti_afk{ "misc.anti-afk", "true" };
 static settings::Boolean auto_jump{ "misc.auto-jump", "false" };
 static settings::Int auto_jump_chance{ "misc.auto-jump.chance", "100" };
 static settings::Int auto_strafe{ "misc.autostrafe", "0" };
+static settings::Boolean dont_hide_stealth_kills{ "misc.dont-hide-stealth-kills", "false" };
 settings::Boolean tauntslide{ "misc.tauntslide", "true" };
 static settings::Boolean nopush_enabled{ "misc.no-push", "true" };
 static settings::Boolean ping_reducer{ "misc.ping-reducer.enable", "false" };
@@ -1007,15 +1008,27 @@ static InitRoutine init(
         patch_scoreboard1->Patch();
         patch_scoreboard2->Patch();
         patch_scoreboard3->Patch();
+        static BytePatch stealth_kill{ CSignature::GetClientSignature, "84 C0 75 28 A1", 2, { 0x90, 0x90 } }; // stealth kill patch
+        stealth_kill.Patch();
         static BytePatch cyoa_patch{ CSignature::GetClientSignature, "75 ? 80 BB ? ? ? ? 00 74 ? A1 ? ? ? ? 8B 10 C7 44 24", 0, { 0xEB } };
         cyoa_patch.Patch();
         EC::Register(
             EC::Shutdown,
             []()
             {
+                stealth_kill.Shutdown();
                 cyoa_patch.Shutdown();
                 tryPatchLocalPlayerShouldDraw(false);
                 force_wait_func(false);
+            },
+            "shutdown_stealthkill");
+        dont_hide_stealth_kills.installChangeCallback(
+            [](settings::VariableBase<bool> &, bool after)
+            {
+                if (after)
+                    stealth_kill.Patch();
+                else
+                    stealth_kill.Shutdown();
             });
 #endif
 #endif

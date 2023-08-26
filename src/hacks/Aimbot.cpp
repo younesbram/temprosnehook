@@ -29,7 +29,7 @@ static settings::Boolean autoshoot{ "aimbot.autoshoot", "true" };
 static settings::Boolean autoreload{ "aimbot.autoshoot.activate-heatmaker", "true" };
 static settings::Boolean multipoint{ "aimbot.multipoint", "0" };
 static settings::Int vischeck_hitboxes{ "aimbot.vischeck-hitboxes", "0" };
-static settings::Int hitbox_mode{ "aimbot.hitbox-mode", "0" };
+static settings::Int hitbox_mode{ "aimbot.hitbox-mode", "2" }; // This makes aimbot fucking hit p
 static settings::Float normal_fov{ "aimbot.fov", "0" };
 static settings::Int priority_mode{ "aimbot.priority-mode", "0" };
 static settings::Boolean wait_for_charge{ "aimbot.wait-for-charge", "false" };

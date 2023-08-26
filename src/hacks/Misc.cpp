@@ -26,8 +26,11 @@ static settings::Boolean anti_afk{ "misc.anti-afk", "true" };
 static settings::Boolean auto_jump{ "misc.auto-jump", "false" };
 static settings::Int auto_jump_chance{ "misc.auto-jump.chance", "100" };
 static settings::Int auto_strafe{ "misc.autostrafe", "0" };
+static settings::Boolean accurate_movement{ "misc.accurate-movement", "false" };
 settings::Boolean tauntslide{ "misc.tauntslide", "true" };
 static settings::Boolean nopush_enabled{ "misc.no-push", "true" };
+static settings::Boolean dont_hide_stealth_kills{ "misc.dont-hide-stealth-kills", "true" };
+static settings::Boolean unlimit_bumpercart_movement{ "misc.bumpercarthax.enable", "false" };
 static settings::Boolean ping_reducer{ "misc.ping-reducer.enable", "false" };
 static settings::Int force_ping{ "misc.ping-reducer.target", "0" };
 static settings::Boolean force_wait{ "misc.force-enable-wait", "true" };
@@ -37,6 +40,7 @@ static settings::Boolean debug_info{ "misc.debug-info", "false" };
 static settings::Boolean misc_drawhitboxes{ "misc.draw-hitboxes", "false" };
 // Useful for debugging with showlagcompensation
 static settings::Boolean misc_drawhitboxes_dead{ "misc.draw-hitboxes.dead-players", "false" };
+static settings::Boolean show_spectators{ "misc.show-spectators", "false" };
 
 /* Allows editing of the rich presence info in steam's friends UI */
 static settings::Boolean rich_presence{ "misc.rich-presence", "false" };
@@ -307,6 +311,33 @@ static void CreateMove()
         }
     }
 
+    if (*accurate_movement && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
+    {
+        if (!(g_pLocalPlayer->flags & FL_ONGROUND))
+            return;
+
+        if (current_user_cmd->buttons & (IN_MOVELEFT | IN_MOVERIGHT | IN_FORWARD | IN_BACK))
+            return;
+
+        auto vel         = CE_VECTOR(LOCAL_E, netvar.vVelocity);
+        const auto Speed = vel.Length2D();
+        if (Speed <= 10.5f)
+            return;
+
+        Vector direction;
+        VectorAngles(vel, direction);
+        float speed = vel.Length();
+
+        direction.y = current_user_cmd->viewangles.y - direction.y;
+
+        Vector forward;
+        AngleVectors2(VectorToQAngle(direction), &forward);
+        Vector negated_direction = forward * -speed;
+
+        current_user_cmd->forwardmove = negated_direction.x;
+        current_user_cmd->sidemove    = negated_direction.y;
+    }
+
     // Tauntslide needs improvement for movement, but it mostly works
     if (*tauntslide && CE_GOOD(LOCAL_E) && HasCondition<TFCond_Taunting>(LOCAL_E))
         current_user_cmd->viewangles.x = (current_user_cmd->buttons & IN_BACK) ? 91.0f : (current_user_cmd->buttons & IN_FORWARD) ? 0.0f : 90.0f;
@@ -349,6 +380,61 @@ void Draw()
         for (const auto &entry : wireframe_queue)
             DrawWireframeHitbox(entry);
         wireframe_queue.clear();
+    }
+    if (*show_spectators)
+    {
+        for (const auto &ent : entity_cache::valid_ents)
+        {
+            player_info_s info{};
+            if (ent != LOCAL_E && ent->m_Type() == ENTITY_PLAYER && HandleToIDX(CE_INT(ent, netvar.hObserverTarget)) == LOCAL_E->m_IDX && GetPlayerInfo(ent->m_IDX, &info))
+            {
+                auto observermode = "N/A";
+                rgba_t color      = ent->m_iTeam() == TEAM_BLU ? colors::blu : (ent->m_iTeam() == TEAM_RED ? colors::red : colors::white);
+
+                switch (CE_INT(ent, netvar.iObserverMode))
+                {
+                case OBS_MODE_DEATHCAM:
+                {
+                    observermode = "DeathCam";
+                    break;
+                }
+                case OBS_MODE_FREEZECAM:
+                {
+                    observermode = "FreezeCam";
+                    break;
+                }
+                case OBS_MODE_FIXED:
+                {
+                    observermode = "Fixed";
+                    break;
+                }
+                case OBS_MODE_IN_EYE:
+                {
+                    observermode = "1st";
+                    break;
+                }
+                case OBS_MODE_CHASE:
+                {
+                    observermode = "3rd";
+                    break;
+                }
+                case OBS_MODE_POI:
+                {
+                    observermode = "POI";
+                    break;
+                }
+                case OBS_MODE_ROAMING:
+                {
+                    observermode = "Roaming";
+                    break;
+                }
+                default:
+                    continue;
+                }
+                AddSpectatorString(format("[", observermode, "]", " ", info.name), color);
+            }
+        }
+        DrawSpectatorStrings();
     }
     if (!*debug_info)
         return;
@@ -847,9 +933,23 @@ int *g_nLocalPlayerVisionFlagsWeaponsCheck;
 // If you wish then change this to some other flag you want to apply/remove
 constexpr int PYROVISION = 1;
 
+static settings::Int force_pyrovision("visual.force-pyrovision", "0");
+
 void UpdateLocalPlayerVisionFlags()
 {
-    UpdateLocalPlayerVisionFlags_fn(); // rosne can you remove this i forgor
+    UpdateLocalPlayerVisionFlags_fn();
+    if (!force_pyrovision)
+        return;
+    if (*force_pyrovision == 2)
+    {
+        *g_nLocalPlayerVisionFlags &= ~PYROVISION;
+        *g_nLocalPlayerVisionFlagsWeaponsCheck &= ~PYROVISION;
+    }
+    else
+    {
+        *g_nLocalPlayerVisionFlags |= PYROVISION;
+        *g_nLocalPlayerVisionFlagsWeaponsCheck |= PYROVISION;
+    }
 }
 
 #define access_ptr(p, i) ((uint8_t *) &(p))[i]
@@ -881,6 +981,35 @@ static InitRoutine init_pyrovision(
                     RemoveCondition<TFCond_HalloweenKartNoTurn>(LOCAL_E);
             },
             "remove_cart_cond");
+        static BytePatch cart_patch1(CSignature::GetClientSignature, "0F 84 ? ? ? ? F3 0F 10 A2", 0x0, { 0x90, 0xE9 });
+        static BytePatch cart_patch2(CSignature::GetClientSignature, "0F 85 ? ? ? ? 89 F8 84 C0 75 72", 0x0, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+        if (unlimit_bumpercart_movement)
+        {
+            cart_patch1.Patch();
+            cart_patch2.Patch();
+        }
+        unlimit_bumpercart_movement.installChangeCallback(
+            [](settings::VariableBase<bool> &, bool after)
+            {
+                if (after)
+                {
+                    cart_patch1.Patch();
+                    cart_patch2.Patch();
+                }
+                else
+                {
+                    cart_patch1.Shutdown();
+                    cart_patch2.Shutdown();
+                }
+            });
+        EC::Register(
+            EC::Shutdown,
+            []()
+            {
+                cart_patch1.Shutdown();
+                cart_patch2.Shutdown();
+            },
+            "cartpatch_shutdown");
         ping_reducer.installChangeCallback(
             [](settings::VariableBase<bool> &, bool)
             {
@@ -1007,17 +1136,76 @@ static InitRoutine init(
         patch_scoreboard1->Patch();
         patch_scoreboard2->Patch();
         patch_scoreboard3->Patch();
+
+        static BytePatch stealth_kill{ CSignature::GetClientSignature, "84 C0 75 28 A1", 2, { 0x90, 0x90 } }; // stealth kill patch
+        stealth_kill.Patch();
         static BytePatch cyoa_patch{ CSignature::GetClientSignature, "75 ? 80 BB ? ? ? ? 00 74 ? A1 ? ? ? ? 8B 10 C7 44 24", 0, { 0xEB } };
         cyoa_patch.Patch();
         EC::Register(
             EC::Shutdown,
             []()
             {
+                stealth_kill.Shutdown();
                 cyoa_patch.Shutdown();
                 tryPatchLocalPlayerShouldDraw(false);
                 force_wait_func(false);
+            },
+            "shutdown_stealthkill");
+        dont_hide_stealth_kills.installChangeCallback(
+            [](settings::VariableBase<bool> &, bool after)
+            {
+                if (after)
+                    stealth_kill.Patch();
+                else
+                    stealth_kill.Shutdown();
             });
 #endif
 #endif
     });
 } // namespace hacks::misc
+
+/*void DumpRecvTable(CachedEntity* ent, RecvTable* table, int depth, const char*
+ft, unsigned acc_offset) { bool forcetable = ft && strlen(ft); if (!forcetable
+|| !strcmp(ft, table->GetName())) logging::Info("==== TABLE: %s",
+table->GetName()); for (int i = 0; i < table->GetNumProps(); ++i) { RecvProp*
+prop = table->GetProp(i); if (!prop) continue; if (prop->GetDataTable()) {
+            DumpRecvTable(ent, prop->GetDataTable(), depth + 1, ft, acc_offset +
+prop->GetOffset());
+        }
+        if (forcetable && strcmp(ft, table->GetName())) continue;
+        switch (prop->GetType()) {
+        case SendPropType::DPT_Float:
+            logging::Info("%s [0x%04x] = %f", prop->GetName(),
+prop->GetOffset(), CE_FLOAT(ent, acc_offset + prop->GetOffset())); break; case
+SendPropType::DPT_Int: logging::Info("%s [0x%04x] = %i | %u | %hd | %hu",
+prop->GetName(), prop->GetOffset(), CE_INT(ent, acc_offset + prop->GetOffset()),
+CE_VAR(ent, acc_offset +  prop->GetOffset(), unsigned int), CE_VAR(ent,
+acc_offset + prop->GetOffset(), short), CE_VAR(ent, acc_offset +
+prop->GetOffset(), unsigned short)); break; case SendPropType::DPT_String:
+            logging::Info("%s [0x%04x] = %s", prop->GetName(),
+prop->GetOffset(), CE_VAR(ent, prop->GetOffset(), char*)); break; case
+SendPropType::DPT_Vector: logging::Info("%s [0x%04x] = (%f, %f, %f)",
+prop->GetName(), prop->GetOffset(), CE_FLOAT(ent, acc_offset +
+prop->GetOffset()), CE_FLOAT(ent, acc_offset + prop->GetOffset() + 4),
+CE_FLOAT(ent, acc_offset + prop->GetOffset() + 8)); break; case
+SendPropType::DPT_VectorXY: logging::Info("%s [0x%04x] = (%f, %f)",
+prop->GetName(), prop->GetOffset(), CE_FLOAT(ent, acc_offset +
+prop->GetOffset()), CE_FLOAT(ent,acc_offset +  prop->GetOffset() + 4)); break;
+        }
+
+    }
+    if (!ft || !strcmp(ft, table->GetName()))
+        logging::Info("==== END OF TABLE: %s", table->GetName());
+}
+
+void CC_DumpVars(const CCommand& args) {
+    if (args.ArgC() < 1) return;
+    if (!atoi(args[1])) return;
+    int idx = atoi(args[1]);
+    CachedEntity* ent = ENTITY(idx);
+    if (CE_BAD(ent)) return;
+    ClientClass* clz = RAW_ENT(ent)->GetClientClass();
+    logging::Info("Entity %i: %s", ent->m_IDX, clz->GetName());
+    const char* ft = (args.ArgC() > 1 ? args[2] : 0);
+    DumpRecvTable(ent, clz->m_pRecvTable, 0, ft, 0);
+}*/

@@ -16,14 +16,19 @@
             <AutoVariable width="fill" target="remove.disguise" label="Remove disguise"/>
             <AutoVariable width="fill" target="remove.contracker" label="Remove contracker"/>
             <AutoVariable width="fill" target="remove.scope" label="Remove scope"/>
-            <AutoVariable width="fill" target="remove.scope" label="Remove hats"/>
-            <AutoVariable width="fill" target="remove.scope" label="Remove arms"/>
             <AutoVariable width="fill" target="remove.zoom" label="Remove zoom/keep rifle"
                           tooltip="Disables scope zoom and keeps the sniper rifle. Enabling Remove scope as well will set zoom_sensitivity_ratio to 4 when zooming in."/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Misc" x="195" y="135">
         <List width="180">
+            <LabeledObject width="fill" label="Pyrovision" tooltip="Can be used to force Pyrovision on or off.">
+                <Select target="visual.force-pyrovision">
+                    <Option name="Auto" value="0"/>
+                    <Option name="On" value="1"/>
+                    <Option name="Off" value="2"/>
+                </Select>
+            </LabeledObject>
             <AutoVariable width="fill" target="visual.killfeedcolor.enable" label="Enable killfeed coloring"
                           tooltip="Colors names in killfeed to reflect player states eg: RAGE"/>
         </List>

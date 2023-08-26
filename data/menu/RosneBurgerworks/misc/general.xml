@@ -11,10 +11,16 @@
                     <Option name="Multidir" value="2"/>
                 </Select>
             </LabeledObject>
+            <AutoVariable width="fill" target="misc.accurate-movement" label="Accurate movement"/>
             <AutoVariable width="fill" target="misc.tauntslide" label="Taunt slide"/>
             <AutoVariable width="fill" target="misc.no-push" label="No push"/>
             <AutoVariable width="fill" target="misc.anti-afk" label="Anti AFK"/>
             <AutoVariable width="fill" target="misc.no-lerp" label="No lerp"/>
+            <AutoVariable width="fill" target="misc.roll-speedhack" label="Moonwalk"
+                          tooltip="Increase crouched movement speed."/>
+            <AutoVariable width="fill" target="misc.roll-speedhack.forward" label="Moonwalk forwards"/>
+            <AutoVariable width="fill" target="misc.show-spectators" label="Show spectators"/>
+            <AutoVariable width="fill" target="misc.auto-abandon" label="Auto abandon"/>
         </List>
     </Box>
     <Box height="content" width="content" padding="12 6 6 6" name="Exploits" x="166">

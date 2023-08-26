@@ -17,8 +17,6 @@
 #include "nospread.hpp"
 #include "Warp.hpp"
 
-static settings::Boolean roll_speedhack{ "misc.roll-speedhack", "false" };
-static settings::Boolean forward_speedhack{ "misc.roll-speedhack.forward", "false" };
 settings::Boolean engine_pred{ "misc.engine-prediction", "true" };
 static settings::Boolean debug_projectiles{ "debug.projectiles", "false" };
 
@@ -119,44 +117,7 @@ void PrecalculateCanShoot()
 
 namespace hooked_methods
 {
-void speedHack(CUserCmd *cmd)
-{
-    float speed;
-    if (cmd->buttons & IN_DUCK && (g_pLocalPlayer->flags & FL_ONGROUND) && !(cmd->buttons & IN_ATTACK) && !HasCondition<TFCond_Charging>(LOCAL_E))
-    {
-        speed                     = Vector{ cmd->forwardmove, cmd->sidemove, 0.0f }.Length();
-        static float prevspeedang = 0.0f;
-        if (fabs(speed) > 0.0f)
-        {
-
-            if (forward_speedhack)
-            {
-                cmd->forwardmove *= -1.0f;
-                cmd->sidemove *= -1.0f;
-                cmd->viewangles.x = 91;
-            }
-            Vector vecMove(cmd->forwardmove, cmd->sidemove, 0.0f);
-
-            vecMove *= -1;
-            float flLength = vecMove.Length();
-            Vector angMoveReverse{};
-            VectorAngles(vecMove, angMoveReverse);
-            cmd->forwardmove = -flLength;
-            cmd->sidemove    = 0.0f; // Move only backwards, no sidemove
-            float res        = g_pLocalPlayer->v_OrigViewangles.y - angMoveReverse.y;
-            while (res > 180)
-                res -= 360;
-            while (res < -180)
-                res += 360;
-            if (res - prevspeedang > 90.0f)
-                res = (res + prevspeedang) / 2;
-            prevspeedang                     = res;
-            cmd->viewangles.y                = res;
-            cmd->viewangles.z                = 90.0f;
-            g_pLocalPlayer->bUseSilentAngles = true;
-        }
-    }
-}
+} // TODO: find a way to remove this without causing build issues
 
 DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUserCmd *cmd)
 {
@@ -342,34 +303,6 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
             ipc::UpdatePlayerlist();
     }
 #endif
-    if (CE_GOOD(LOCAL_E))
-    {
-        if (roll_speedhack)
-            speedHack(cmd);
-        else
-        {
-            if (g_pLocalPlayer->bUseSilentAngles)
-            {
-
-                float speed, yaw;
-                Vector ang, vsilent;
-                vsilent.x = cmd->forwardmove;
-                vsilent.y = cmd->sidemove;
-                vsilent.z = cmd->upmove;
-                speed     = std::hypot(vsilent.x, vsilent.y);
-                VectorAngles(vsilent, ang);
-                yaw                 = DEG2RAD(ang.y - g_pLocalPlayer->v_OrigViewangles.y + cmd->viewangles.y);
-                cmd->forwardmove    = cos(yaw) * speed;
-                cmd->sidemove       = sin(yaw) * speed;
-                float clamped_pitch = fabsf(fmodf(cmd->viewangles.x, 360.0f));
-                if (clamped_pitch >= 90 && clamped_pitch <= 270)
-                    cmd->forwardmove = -cmd->forwardmove;
-
-                ret = false;
-            }
-        }
-        g_pLocalPlayer->UpdateEnd();
-    }
 
     g_Settings.is_create_move = false;
     if (nolerp)

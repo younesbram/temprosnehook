@@ -690,7 +690,7 @@ static void followCrumbs()
 		            current_user_cmd->viewangles = flip;
 		            *bSendPackets                = true;
 		        }
-		    }
+            }
             // Only flip to crouch state, not to jump state
             if (!crouch)
             {

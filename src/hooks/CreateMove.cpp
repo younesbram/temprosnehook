@@ -117,8 +117,6 @@ void PrecalculateCanShoot()
 
 namespace hooked_methods
 {
-} // TODO: find a way to remove this without causing build issues
-
 DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUserCmd *cmd)
 {
     g_Settings.is_create_move = true;

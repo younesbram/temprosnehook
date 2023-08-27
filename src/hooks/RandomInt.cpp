@@ -6,7 +6,11 @@
 #include <settings/Bool.hpp>
 #include "HookedMethods.hpp"
 
+#if ENABLE_TEXTMODE
 static settings::Boolean medal_flip{ "visual.medal-flip", "false" };
+#else
+static settings::Boolean medal_flip{ "visual.medal-flip", "true" };
+#endif // trollage
 
 namespace hooked_methods
 {

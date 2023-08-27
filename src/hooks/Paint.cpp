@@ -64,10 +64,6 @@ DEFINE_HOOKED_METHOD(Paint, void, IEngineVGui *this_, PaintMode_t mode)
             g_IEngine->ClientCmd_Unrestricted(hack::command_stack().top().c_str());
             hack::command_stack().pop();
         }
-#if !ENABLE_VISUALS
-        if (check_mm_ban.test_and_set(1000) && tfmm::IsMMBanned())
-            *(int *) 0 = 0;
-#endif
 
 #if ENABLE_TEXTMODE_STDIN
         static auto last_stdin = std::chrono::system_clock::from_time_t(0);

@@ -6,6 +6,7 @@
 #include <MiscTemporary.hpp>
 #include <settings/Int.hpp>
 #include "AntiAim.hpp"
+#include "HookedMethods.hpp"
 #include "Warp.hpp"
 #include "nospread.hpp"
 #include "AntiCheatBypass.hpp"
@@ -24,11 +25,11 @@ std::vector<KeyValues *> Iterate(KeyValues *event, int depth)
     for (int i = 0; i < depth; i++)
     {
         for (auto ev : peer_list)
-            for (KeyValues *dat2 = ev; dat2 != NULL; dat2 = dat2->m_pPeer)
+            for (KeyValues *dat2 = ev; dat2 != nullptr; dat2 = dat2->m_pPeer)
                 if (std::find(peer_list.begin(), peer_list.end(), dat2) == peer_list.end())
                     peer_list.push_back(dat2);
         for (auto ev : peer_list)
-            for (KeyValues *dat2 = ev; dat2 != NULL; dat2 = dat2->m_pSub)
+            for (KeyValues *dat2 = ev; dat2 != nullptr; dat2 = dat2->m_pSub)
                 if (std::find(peer_list.begin(), peer_list.end(), dat2) == peer_list.end())
                     peer_list.push_back(dat2);
     }

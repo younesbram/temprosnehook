@@ -1,6 +1,4 @@
-//
-// Created by bencat07 on 28.09.18.
-//
+// rewritten by rosne-gamingyt
 
 #include "common.hpp"
 #include "settings/Bool.hpp"

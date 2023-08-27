@@ -1,8 +1,8 @@
 <Tab name="Rosnebot">
     <TabContainer width="fill" height="fill">
-        <Include path="RosneBurgerworks/catbot/general.xml"/>
-        <Include path="RosneBurgerworks/catbot/movement.xml"/>
-        <Include path="RosneBurgerworks/catbot/followbot.xml"/>
-        <Include path="RosneBurgerworks/catbot/misc.xml"/>
+        <Include path="RosneBurgerworks/rosnebot/general.xml"/>
+        <Include path="RosneBurgerworks/rosnebot/movement.xml"/>
+        <Include path="RosneBurgerworks/rosnebot/followbot.xml"/>
+        <Include path="RosneBurgerworks/rosnebot/misc.xml"/>
     </TabContainer>
 </Tab>

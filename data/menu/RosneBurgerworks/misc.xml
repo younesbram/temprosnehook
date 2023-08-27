@@ -2,7 +2,6 @@
     <TabContainer width="fill" height="fill">
         <Include path="RosneBurgerworks/misc/general.xml"/>
         <Include path="RosneBurgerworks/misc/chat.xml"/>
-        <Include path="RosneBurgerworks/misc/gaypresence.xml"/>
         <Include path="RosneBurgerworks/misc/regions.xml"/>
     </TabContainer>
 </Tab>

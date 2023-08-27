@@ -6,6 +6,7 @@
  */
 
 #include <MiscTemporary.hpp>
+#include <hacks/Aimbot.hpp>
 #include <hacks/hacklist.hpp>
 #if ENABLE_IMGUI_DRAWING
 #include "imgui/imrenderer.hpp"
@@ -15,14 +16,21 @@
 #include <glez/draw.hpp>
 #endif
 #include <settings/Bool.hpp>
+#include <settings/Float.hpp>
+#include <settings/Rgba.hpp>
 #include <menu/GuiInterface.hpp>
 #include "common.hpp"
 #include "visual/drawing.hpp"
 #include "hack.hpp"
+#include "menu/menu/Menu.hpp"
 #include "drawmgr.hpp"
 
 static settings::Boolean info_text{ "hack-info.enable", "true" };
-static settings::Boolean info_text_min{ "hack-info.minimal", "false" };
+static settings::Int info_style{ "hack-info.style", "0" };
+static settings::Rgba info_background_color{"hack-info.background", "00000b3"};
+static settings::Rgba info_foreground_color{"hack-info.foreground", "ffffff"};
+static settings::Int info_x{"hack-info.x", "10"};
+static settings::Int info_y{"hack-info.y", "10"};
 
 void RenderCheatVisuals()
 {
@@ -57,41 +65,56 @@ void BeginCheatVisuals()
     ResetStrings();
 }
 
+double getRandom(double lower_bound, double upper_bound)
+{
+    std::uniform_real_distribution<double> unif(lower_bound, upper_bound);
+    static std::mt19937 rand_engine(std::time(nullptr));
+
+    double x = unif(rand_engine);
+    return x;
+}
+
 void DrawCheatVisuals()
 {
     {
-        PROF_SECTION(DRAW_info)
+        PROF_SECTION(DRAW_info);
         std::string name_s, reason_s;
-        if (*info_text && (!g_IEngine->IsConnected() || g_IEngine->Con_IsVisible()))
+        PROF_SECTION(PT_info_text);
+        if (info_text)
         {
-            auto color = colors::RainbowCurrent();
-            color.a    = 1.0f;
-            AddSideString("Rosnehook | TF2", color);
-            if (!*info_text_min)
-            {
-#if ENABLE_GUI
-                AddSideString("Press '" + open_gui_button.toString() + "' key to open/close cheat menu.", colors::gui);
-#endif
+            float w, h;
+            std::string hack_info_text;
+            if (*info_style == 0) {
+                hack_info_text = "Rosnehook InDev " + hack::GetVersion();
+                fonts::center_screen->stringSize(hack_info_text, &w, &h);
+                draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
             }
         }
-    }
+    }   
     if (spectator_target)
-        AddCenterString("Press SPACE to stop spectating");
     {
-        PROF_SECTION(DRAW_WRAPPER)
+        AddCenterString("Press SPACE to stop spectating");
+    }
+    {
+        PROF_SECTION(DRAW_WRAPPER);
         EC::run(EC::Draw);
     }
+    if (CE_GOOD(g_pLocalPlayer->entity) && !g_Settings.bInvalid)
     {
-        PROF_SECTION(DRAW_strings)
+        Prediction_PaintTraverse();
+    }
+    {
+        PROF_SECTION(DRAW_strings);
         DrawStrings();
     }
 #if ENABLE_GUI
     {
-        PROF_SECTION(DRAW_GUI)
+        PROF_SECTION(DRAW_GUI);
         gui::draw();
     }
 #endif
 }
+
 
 void EndCheatVisuals()
 {

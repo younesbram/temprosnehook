@@ -47,8 +47,3 @@ im also known as skidney.
 
 ### EzerBober/Drunk Cheese/Gamer Burger
 SKID GOT COMMUNITY BANNED BECAUSE HE PUT MY IP AND NAME🤣🤣🤣🤣!
-
-### queecore
-he likes lolis.
-a very odd man.
-takes 1 hour to join a match??

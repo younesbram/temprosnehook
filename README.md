@@ -27,7 +27,8 @@ Reality, a self-proclaimed idiot, dropped out of school at just three years old.
 also, reality's "rosnehook-leak" is gonna be outdated in a month or so! have fun with that, XD!
 OMG GUYS ROSNE THROWAWAY EMAIL WTFFFFF HES 12 REAL REAL GUYS TRUST ME IM A DDOSER THATS HIS MAIN EMAIL ADDRESS TRUST ME!
 oh btw did i mention hes a weirdo? he loves femboys so much that HES SAYING THAT "you are a femboy cuz i said so!" TO YOU OR EVERYBODY. EVEN CHILDREN
-when hes gonna be 16 hes gonna be a pedo fr
+when hes gonna be 16 hes gonna be a pedo fr.
+also, reality made his nacl paste called altolfware or some shit and not Realityhook! WTFF!
 
 ### Sulkan
 HELLO GUYS I AM 19 AND TALK VERY SUBMISSIVE TOWARDS MINORS LIKE REALITY WHO'S 15. MY NAME IS JAMES TOO IM A BRIT PEDO! also sulkan is 100% a pedo just that the faggots in "i love tf2" dont see it.

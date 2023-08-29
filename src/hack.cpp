@@ -372,8 +372,10 @@ free(logname);*/
 #if ENABLE_TEXTMODE
     hack::command_stack().emplace("exec cat_autoexec_textmode");
     hack::command_stack().emplace("exec betrayals");
+    hack::command_stack().emplace("exec trusted");
 #else
     hack::command_stack().emplace("exec cat_autoexec");
+    hack::command_stack().emplace("exec trusted");
 #endif
     auto extra_exec = std::getenv("CH_EXEC");
     if (extra_exec)

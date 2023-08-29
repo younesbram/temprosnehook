@@ -14,7 +14,11 @@
 #if !ENFORCE_STREAM_SAFETY
 namespace hacks::killfeed
 {
+#if ENABLE_VISUALS
 static settings::Boolean enable{ "visual.killfeedcolor.enable", "true" };
+#else
+static settings::Boolean enable{ "visual.killfeedcolor.enable", "false" };
+#endif
 static settings::Boolean sort_names{ "visual.killfeedcolor.sort-names", "false" };
 
 static DetourHook drawtext_detour;

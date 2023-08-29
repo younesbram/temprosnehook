@@ -14,8 +14,7 @@ namespace player_tools
 static settings::Int betrayal_limit{ "player-tools.betrayal-limit", "2" };
 static settings::Boolean betrayal_sync{ "player-tools.betrayal-ipc-sync", "true" };
 
-static settings::Boolean taunting{ "player-tools.ignore.taunting", "false" };
-static settings::Boolean ignoreCathook{ "player-tools.ignore.cathook", "true" };
+static settings::Boolean ignoreRosnehook{ "player-tools.ignore.rosnehook", "true" };
 
 static boost::unordered_flat_map<unsigned, unsigned> betrayal_list{};
 
@@ -27,7 +26,7 @@ bool shouldTargetSteamId(unsigned id)
         return true;
 
     auto &pl = playerlist::AccessData(id);
-    if (playerlist::IsFriendly(pl.state) || (pl.state == playerlist::k_EState::CAT && *ignoreCathook))
+    if (playerlist::IsFriendly(pl.state) || (pl.state == playerlist::k_EState::CAT && *ignoreRosnehook))
         return false;
     return true;
 }
@@ -36,8 +35,6 @@ bool shouldTarget(CachedEntity *entity)
 {
     if (entity->m_Type() == ENTITY_PLAYER)
     {
-        if (taunting && HasCondition<TFCond_Taunting>(entity) && CE_INT(entity, netvar.m_iTauntIndex) == 3)
-            return false;
         if (HasCondition<TFCond_HalloweenGhostMode>(entity))
             return false;
         // Don't shoot players in truce

@@ -10,8 +10,13 @@
 
 namespace hacks::antidisguise
 {
+#if ENABLE_TEXTMODE
 static settings::Boolean enable{ "remove.disguise", "true" };
 static settings::Boolean no_invisibility{ "remove.cloak", "true" };
+#else
+static settings::Boolean enable{ "remove.disguise", "false" };
+static settings::Boolean no_invisibility{ "remove.cloak", "false" };
+#endif
 
 static void CreateMove()
 {

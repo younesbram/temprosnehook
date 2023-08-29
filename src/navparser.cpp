@@ -21,7 +21,7 @@ static settings::Boolean rathookspin{ "nav.rathook-spin", "true" };
 static settings::Boolean rathookcrazyjump{ "nav.rathook-jump", "true" };
 static settings::Boolean draw_debug_areas("nav.draw.debug-areas", "false");
 static settings::Boolean log_pathing{ "nav.log", "false" };
-static settings::Int stuck_time{ "nav.stuck-time", "1000" };
+static settings::Int stuck_time{ "nav.stuck-time", "800" };
 static settings::Int vischeck_cache_time{ "nav.vischeck-cache.time", "240" };
 static settings::Boolean vischeck_runtime{ "nav.vischeck-runtime.enabled", "true" };
 static settings::Int vischeck_time{ "nav.vischeck-runtime.delay", "2000" };

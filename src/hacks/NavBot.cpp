@@ -9,6 +9,7 @@
 #include "entitycache.hpp"
 #include "CaptureLogic.hpp"
 #include "PlayerTools.hpp"
+#include "AntiAim.hpp"
 #include "Aimbot.hpp"
 #include "MiscAimbot.hpp"
 #include "Misc.hpp"
@@ -687,12 +688,15 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest) // also kn
             hacks::NavBot::isVisible = false;
     }
     // If we are close enough, don't even bother with using the navparser to get there
-    if (nearest.second < 400.0f && hacks::NavBot::isVisible)
+    if (!hacks::antiaim::isEnabled())
     {
-        AimAt(g_pLocalPlayer->v_Eye, nearest.first->hitboxes.GetHitbox(head)->center, current_user_cmd);
-        WalkTo(nearest.first->m_vecOrigin());
-        navparser::NavEngine::cancelPath();
-        return true;
+        if (nearest.second < 400.0f && hacks::NavBot::isVisible)
+        {
+            AimAt(g_pLocalPlayer->v_Eye, nearest.first->hitboxes.GetHitbox(head)->center, current_user_cmd);
+            WalkTo(nearest.first->m_vecOrigin());
+            navparser::NavEngine::cancelPath();
+            return true;
+        }
     }
     else
     {

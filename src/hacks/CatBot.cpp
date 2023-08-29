@@ -24,14 +24,14 @@ static settings::Int requeue_if_humans_lte{ "cat-bot.requeue-if.humans-lte", "0"
 static settings::Int requeue_if_players_lte{ "cat-bot.requeue-if.players-lte", "0" };
 
 static settings::Boolean micspam{ "cat-bot.micspam.enable", "false" };
-static settings::Int micspam_on{ "cat-bot.micspam.interval-on", "3" };
-static settings::Int micspam_off{ "cat-bot.micspam.interval-off", "60" };
+static settings::Int micspam_on{ "cat-bot.micspam.interval-on", "1" };
+static settings::Int micspam_off{ "cat-bot.micspam.interval-off", "0" };
 
 static settings::Boolean random_votekicks{ "cat-bot.votekicks", "false" };
 static settings::Boolean autovote_map{ "cat-bot.autovote-map", "true" };
 
-settings::Boolean catbotmode{ "cat-bot.enable", "true" };
-settings::Boolean anti_motd{ "cat-bot.anti-motd", "true" };
+settings::Boolean catbotmode{ "cat-bot.enable", "true" }; // i forgur :troll:
+settings::Boolean anti_motd{ "cat-bot.anti-motd", "true" }; // may reduces lag idk
 
 void do_random_votekick()
 {
@@ -66,7 +66,7 @@ void do_random_votekick()
     player_info_s info{};
     if (!GetPlayerInfo(GetPlayerForUserID(target), &info))
         return;
-    hack::ExecuteCommand("callvote kick \"" + std::to_string(target) + " cheating\"");
+    hack::ExecuteCommand("callvote kick \"" + std::to_string(target) + " scamming\"");
 }
 
 void SendNetMsg(INetMessage &msg)

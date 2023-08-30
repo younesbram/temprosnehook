@@ -107,7 +107,7 @@ void critical_error_handler(int signum)
         std::abort();
     }
 
-    std::ofstream out(strfmt("/tmp/cathook-%s-%d-segfault.log", pwd->pw_name, getpid()).get());
+    std::ofstream out(strfmt("/tmp/rosnehook-%s-%d-segfault.log", pwd->pw_name, getpid()).get());
     if (!out)
     {
         std::cerr << "Critical error: cannot open log file\n";
@@ -275,11 +275,11 @@ void hack::Initialize()
 #endif
     time_injected = time(nullptr);
 /*passwd *pwd   = getpwuid(getuid());
-char *logname = strfmt("/tmp/cathook-game-stdout-%s-%u.log", pwd->pw_name,
+char *logname = strfmt("/tmp/rosnehook-game-stdout-%s-%u.log", pwd->pw_name,
 time_injected);
 freopen(logname, "w", stdout);
 free(logname);
-logname = strfmt("/tmp/cathook-game-stderr-%s-%u.log", pwd->pw_name,
+logname = strfmt("/tmp/rosnehook-game-stderr-%s-%u.log", pwd->pw_name,
 time_injected);
 freopen(logname, "w", stderr);
 free(logname);*/

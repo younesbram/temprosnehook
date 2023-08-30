@@ -69,7 +69,7 @@ static float resolveAngleYaw(float angle, brutedata &brute)
 
     // Yaw Resolving
     // Find out which angle we should try
-    int entry = (int) std::floor((brute.brutenum / 2.0f)) % yaw_resolves.size();
+    int entry = (int) std::floor((brute.brutenum / 4.0f)) % yaw_resolves.size();
     angle += yaw_resolves[entry];
 
     while (angle > 180)
@@ -108,7 +108,7 @@ static float resolveAnglePitch(float angle, brutedata &brute, CachedEntity *ent)
     // No sniper dot/not using a sniperrifle.
     if (sniper_dot == nullptr)
     {
-        if (brute.brutenum % 2)
+        if (brute.brutenum % 3)
         {
             // Pitch resolver
             if (angle >= 90)

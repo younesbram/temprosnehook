@@ -1,5 +1,9 @@
 # Rosnehook: We Love Bones!
 
+## Shoppy!
+
+https://shoppy.gg/@RosneGaming
+
 ## Download Rosnehook
 
 Open a terminal window and enter the following command:

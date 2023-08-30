@@ -29,9 +29,7 @@ OMG GUYS ROSNE THROWAWAY EMAIL WTFFFFF HES 12 REAL REAL GUYS TRUST ME IM A DDOSE
 oh btw did i mention hes a weirdo? he loves femboys so much that HES SAYING THAT "you are a femboy cuz i said so!" TO YOU OR EVERYBODY. EVEN CHILDREN
 when hes gonna be 16 hes gonna be a pedo fr.
 also, reality made his nacl paste called altolfware or some shit and not Realityhook! WTFF!
-
-### Sulkan
-HELLO GUYS I AM 19 AND TALK VERY SUBMISSIVE TOWARDS MINORS LIKE REALITY WHO'S 15. MY NAME IS JAMES TOO IM A BRIT PEDO! also sulkan is 100% a pedo just that the faggots in "i love tf2" dont see it.
+reality blocked me on steam, discord, and github. WTTFF!
 
 ### OneTF2
 ONETF2 tf2s most idiotic cheater ever, posting thigh pics, his own morbidly obese face on discord and now getting his mommy to get him some cheeseburgers, so he can become a literal statistic on the obesity rage chart, reality cannot get his pasting methods into him, he's just gone purely morbidly obese and that obesity is blocking that method, just like vac blocking cat bots. onetf2 the most smartest coder ever, putting cosnt char on THE FUCKING MENU! let's give a round of applause, yippie more McDonald's! here onetf2 eat up you fatty 🍔 🍔 🍔.

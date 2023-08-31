@@ -51,3 +51,6 @@ sudo $gdbbin -n -q \
 
 sleep 3
 rm "$FILENAME"
+
+echo
+echo "have fun pwning n00bs with rosnehook!"

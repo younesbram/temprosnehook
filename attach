@@ -44,3 +44,6 @@ $gdbbin -n -q -batch \
 -ex "quit"
 
 rm "$FILENAME"
+
+echo
+echo "have fun pwning n00bs with rosnehook!"

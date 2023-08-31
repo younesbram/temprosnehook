@@ -38,3 +38,6 @@ $gdbbin -n -q -batch \
 -ex "backtrace"
 
 rm "$FILENAME"
+
+echo
+echo "have fun pwning n00bs with rosnehook!"

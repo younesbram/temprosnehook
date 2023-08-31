@@ -913,7 +913,7 @@ void DoAutoshoot(CachedEntity *target_entity)
         current_user_cmd->buttons |= IN_ATTACK2;
 }
 
-// Grab a vector for a specific ent
+// this is important
 Vector PredictEntity(CachedEntity *entity)
 {
     // Pull out predicted data

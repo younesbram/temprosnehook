@@ -17,12 +17,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
-set(Force_CXX_23B 0 CACHE BOOL "Force 23B as the CXX Standard, useful for discrepancies in compiler and IDE")
-
 project(cathook VERSION 0.0.1)
-if (NOT Force_CXX_23B)
-    set(CMAKE_CXX_STANDARD 23)
-endif()
+set(CMAKE_CXX_STANDARD 23)
 add_library(cathook SHARED "")
 
 set(Visuals_DrawType "IMGUI" CACHE STRING "Target drawing api")
@@ -148,9 +144,15 @@ configure_file(include/config.h.in ${CMAKE_SOURCE_DIR}/include/config.h @ONLY)
 configure_file(include/version.h.in ${CMAKE_SOURCE_DIR}/include/version.h @ONLY)
 
 set(CMAKE_CXX_FLAGS "-m32 -march=native -mtune=native -fexceptions -DNDEBUG")
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-gnu-unique")
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -lc++ -lc++abi")
 endif()
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-gnu-unique -fno-builtin")
+endif()
+
 set(CMAKE_CXX_FLAGS_DEBUG "-Og -m32 -march=native -mtune=native -rdynamic -ggdb")
 if (Internal_Symbolized)
     set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -ggdb -fvisibility=hidden -fvisibility-inlines-hidden")

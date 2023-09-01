@@ -56,10 +56,6 @@ struct offsets
     {
         return PlatformOffset(136, undefined, undefined);
     }
-    static constexpr uint32_t DrawModelExecute()
-    {
-        return PlatformOffset(19, undefined, undefined);
-    }
     static constexpr uint32_t GetClientName()
     {
         return PlatformOffset(44, undefined, undefined);

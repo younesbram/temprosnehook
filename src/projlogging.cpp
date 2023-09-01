@@ -10,7 +10,8 @@
 
 namespace projectile_logging
 {
-boost::unordered_flat_map<u_int16_t, Vector> prevloc;
+// haha bye bye boost
+std::unordered_map<u_int16_t, Vector> prevloc;
 
 void Update()
 {

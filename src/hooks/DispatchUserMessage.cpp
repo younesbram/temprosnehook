@@ -4,7 +4,6 @@
 */
 
 #include <chatlog.hpp>
-#include <boost/algorithm/string.hpp>
 #include <MiscTemporary.hpp>
 #include <hacks/AntiAim.hpp>
 #include <settings/Bool.hpp>
@@ -217,29 +216,40 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
             SplitName(res, name1, 3);
 
             std::string message2(message);
-            boost::to_lower(message2);
+            // Convert message2 to lowercase
+            std::transform(message2.begin(), message2.end(), message2.begin(), [](unsigned char c) {
+                return std::tolower(c);
+            });
 
-            const char *toreplace[]   = { " ", "4", "3", "0", "6", "5", "7", "@", ".", ",", "-" };
+            const char *toreplace[] = { " ", "4", "3", "0", "6", "5", "7", "@", ".", ",", "-" };
             const char *replacewith[] = { "", "a", "e", "o", "g", "s", "t", "a", "", "", "" };
 
-            for (int i = 0; i < 7; i++)
-                boost::replace_all(message2, toreplace[i], replacewith[i]);
+            for (int i = 0; i < 7; i++) {
+                size_t pos = 0;
+                while ((pos = message2.find(toreplace[i], pos)) != std::string::npos) {
+                    message2.replace(pos, strlen(toreplace[i]), replacewith[i]);
+                    pos += strlen(replacewith[i]);
+                }
+            }
 
-            for (const auto &filter : res)
-                if (boost::contains(message2, filter))
-                {
-                    chat_stack::Say("I am not a bot.", true); // omega tonic
-                    retrun     = true;
+            bool found_filter = false;
+            for (const auto &filter : res) {
+                if (message2.find(filter) != std::string::npos) {
+                    chat_stack::Say("I am not a bot.", true);
+                    retrun = true;
                     lastfilter = message;
-                    lastname   = format(name);
+                    lastname = format(name);
                     gitgud.update();
+                    found_filter = true;
                     break;
                 }
-        }
-        chatlog::LogMessage(data[0], message);
-        buf = bf_read(data.c_str(), data.size());
-        buf.Seek(0);
-        break;
+            }
+
+            if (!found_filter) {
+                chatlog::LogMessage(data[0], message);
+                buf = bf_read(data.c_str(), data.size());
+                buf.Seek(0);
+            }
     }
     }
 

@@ -6,7 +6,7 @@
  */
 #include "common.hpp"
 #include <settings/Bool.hpp>
-#include <boost/circular_buffer.hpp>
+#include <deque>
 
 namespace hacks::aimbot
 {
@@ -17,9 +17,7 @@ static settings::Boolean debug_pp_extrapolate{ "debug.pp-extrapolate", "false" }
 static settings::Boolean debug_pp_draw{ "debug.pp-draw", "false" };
 static settings::Boolean debug_pp_draw_engine{ "debug.pp-draw.engine", "false" };
 static settings::Int debug_pp_steps{ "debug.pp-steps", "66" };
-// The higher the sample size, the more previous positions we will take into account to calculate the next position. Lower = Faster reaction Higher = Stability
 static settings::Int sample_size("debug.strafepred.samplesize", "10");
-// TODO there is a Vector() object created each call.
 
 Vector SimpleLatencyPrediction(CachedEntity *ent, int hb)
 {
@@ -52,7 +50,7 @@ struct StrafePredictionData
 };
 
 // StrafePredictionData strafepred_data;
-static std::array<boost::circular_buffer<Vector>, MAX_PLAYERS> previous_positions;
+static std::array<std::deque<Vector>, MAX_PLAYERS> previous_positions;
 static ConVar *sv_gravity = nullptr;
 
 // Function for calculating the center and radius of a circle that is supposed to represent a players starfing pattern
@@ -603,8 +601,8 @@ float DistanceToGround(Vector origin)
 static InitRoutine init(
     []()
     {
-        previous_positions.fill(boost::circular_buffer<Vector>(*sample_size));
-        sample_size.installChangeCallback([](settings::VariableBase<int> &, int after) { previous_positions.fill(boost::circular_buffer<Vector>(after)); });
+        previous_positions.fill(std::deque<Vector>());
+        sample_size.installChangeCallback([](settings::VariableBase<int> &, int after) { previous_positions.fill(std::deque<Vector>(after)); });
         EC::Register(
             EC::CreateMove,
             []()
@@ -630,6 +628,9 @@ static InitRoutine init(
                     }
 
                     buffer.push_front(ent->m_vecOrigin());
+                    while (buffer.size() > *sample_size) {
+                        buffer.pop_back();
+                    }
                 }
             },
             "cm_prediction", EC::very_early);

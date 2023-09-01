@@ -10,15 +10,18 @@
 
 #include <cstdint>
 #include <dirent.h>
-#include <boost/algorithm/string.hpp>
+#include <algorithm>
+#include <unordered_map>
+#include <array>
+#include <fstream>
 
 namespace playerlist
 {
-boost::unordered_flat_map<unsigned, userdata> data{};
+std::unordered_map<unsigned, userdata> data{};
 
 const std::string k_Names[]                                     = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "ABUSE", "PARTY" };
 const char *const k_pszNames[]                                  = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "ABUSE", "PARTY" };
-const std::array<std::pair<k_EState, size_t>, 5> k_arrGUIStates = { std::pair(k_EState::DEFAULT, 0), { k_EState::FRIEND, 1 }, { k_EState::RAGE, 2 } };
+const std::array<std::pair<k_EState, size_t>, 5> k_arrGUIStates = { std::make_pair(k_EState::DEFAULT, 0), { k_EState::FRIEND, 1 }, { k_EState::RAGE, 2 } };
 #if ENABLE_VISUALS
 std::array<rgba_t, 8> k_Colors = { colors::empty, colors::FromRGBA8(99, 226, 161, 255), colors::FromRGBA8(226, 204, 99, 255), colors::FromRGBA8(232, 134, 6, 255), colors::FromRGBA8(232, 134, 6, 255), colors::empty, colors::FromRGBA8(150, 75, 0, 255), colors::FromRGBA8(99, 226, 161, 255) };
 #endif
@@ -312,7 +315,7 @@ CatCommand pl_set_state("pl_set_state", "cat_pl_set_state [playername] [state] (
                                 return;
                             }
                             std::string state = args.Arg(2);
-                            boost::to_upper(state);
+                            std::transform(state.begin(), state.end(), state.begin(), ::toupper);
                             player_info_s info{};
                             GetPlayerInfo(id, &info);
 
@@ -338,7 +341,7 @@ static int cat_pl_set_state_completionCallback(const char *c_partial, char comma
 
     for (auto i = 0u; i < partial.size() && j < 3; ++i)
     {
-        auto space = (bool) isspace(partial[i]);
+        auto space = (bool)isspace(partial[i]);
         if (!space)
         {
             if (j)
@@ -371,21 +374,24 @@ static int cat_pl_set_state_completionCallback(const char *c_partial, char comma
 
     if (parts[0].empty() || (parts[1].empty() && (!parts[0].empty() && partial.back() != ' ')))
     {
-        boost::to_lower(parts[0]);
+        std::transform(parts[0].begin(), parts[0].end(), parts[0].begin(), ::tolower);
         for (const auto &s : names)
         {
-            // if (s.find(parts[0]) == 0)
-            if (boost::to_lower_copy(s).find(parts[0]) == 0)
+            if (std::equal(s.begin(), s.end(), parts[0].begin(), parts[0].end(), [](char a, char b) {
+                return std::tolower(a) == b;
+            }))
             {
                 snprintf(commands[count++], COMMAND_COMPLETION_ITEM_LENGTH - 1, "cat_pl_set_state %s", s.c_str());
             }
         }
         return count;
     }
-    boost::to_lower(parts[1]);
+    std::transform(parts[1].begin(), parts[1].end(), parts[1].begin(), ::tolower);
     for (const auto &s : k_Names)
     {
-        if (boost::to_lower_copy(s).find(parts[1]) == 0)
+        if (std::equal(s.begin(), s.end(), parts[1].begin(), parts[1].end(), [](char a, char b) {
+            return std::tolower(a) == b;
+        }))
         {
             snprintf(commands[count++], COMMAND_COMPLETION_ITEM_LENGTH - 1, "cat_pl_set_state %s %s", parts[0].c_str(), s.c_str());
             if (count == COMMAND_COMPLETION_MAXITEMS)

@@ -5,7 +5,6 @@
 #include "common.hpp"
 #include "DetourHook.hpp"
 #include "PlayerTools.hpp"
-#include <boost/algorithm/string.hpp>
 #include <regex>
 #include <locale>
 #include <codecvt>
@@ -35,19 +34,24 @@ void DrawText_hook(int *_this, int x, int y, vgui::HFont hFont, Color clr, const
 
         std::vector<std::string> names_array;
 
-        // Since we have no access to boost's regex split, we need to replace our sequence
+        // Since we have no access to regex split, we need to replace our sequence
         // With a single character.
-        // Luckily names can never have a % in them, so i will use that as the delimeter.
+        // Luckily names can never have a % in them, so i will use that as the delimiter.
 
         static std::regex r("( \\+ |, )");
         normal_string = std::regex_replace(normal_string, r, "%");
 
         // Split at assists
-        boost::algorithm::split(names_array, normal_string, boost::is_any_of("%"));
+        std::istringstream iss(normal_string);
+        std::string name;
+        while (std::getline(iss, name, '%'))
+        {
+            names_array.push_back(name);
+        }
 
         // Sort all player names by priority
         static int last_sort_tickcount = 0;
-        static boost::unordered_flat_map<std::string, int> player_names;
+        static std::unordered_map<std::string, int> player_names;
         // Cache names for every tick
         if (last_sort_tickcount != tickcount)
         {
@@ -120,12 +124,12 @@ void DrawText_hook(int *_this, int x, int y, vgui::HFont hFont, Color clr, const
                 g_ISurface->GetTextSize(hFont, wide.c_str(), width, height);
                 x += width;
 
-                // Draw seperator if this is not the last entry
+                // Draw separator if this is not the last entry
                 if (&player != &displayed_players.back())
                 {
-                    static std::wstring seperator = L", ";
-                    original(_this, x, y, hFont, clr, seperator.c_str());
-                    g_ISurface->GetTextSize(hFont, seperator.c_str(), width, height);
+                    static std::wstring separator = L", ";
+                    original(_this, x, y, hFont, clr, separator.c_str());
+                    g_ISurface->GetTextSize(hFont, separator.c_str(), width, height);
                     x += width;
                 }
             }

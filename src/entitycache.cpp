@@ -1,6 +1,9 @@
 #include "common.hpp"
 #include <settings/Float.hpp>
 #include "soundcache.hpp"
+#include <unordered_map>
+#include <vector>
+#include <cstring>
 
 inline void CachedEntity::Update()
 {
@@ -53,7 +56,7 @@ bool CachedEntity::IsVisible()
 
 namespace entity_cache
 {
-    boost::unordered_flat_map<int, CachedEntity> array;
+    std::unordered_map<int, CachedEntity> array;
     std::vector<CachedEntity *> valid_ents;
     std::vector<CachedEntity *> player_cache;
     int previous_max = 0;
@@ -88,7 +91,7 @@ namespace entity_cache
                         auto val_type = val.m_Type();
                         if (val_type == ENTITY_PLAYER || val_type == ENTITY_BUILDING || val_type == ENTITY_NPC)
                         {
-                            if (val.m_bAlivePlayer()) [[likely]]
+                            if (val.m_bAlivePlayer()) // Use [[likely]] hint here if available
                             {
                                 val.hitboxes.UpdateBones();
                                 if (val_type == ENTITY_PLAYER)
@@ -121,7 +124,7 @@ namespace entity_cache
                         valid_ents.emplace_back(&ent);
                         if (ent_type == ENTITY_PLAYER || ent_type == ENTITY_BUILDING || ent_type == ENTITY_NPC)
                         {
-                            if (ent.m_bAlivePlayer()) [[likely]]
+                            if (ent.m_bAlivePlayer()) // Use [[likely]] hint here if available
                             {
                                 ent.hitboxes.UpdateBones();
                                 if (ent_type == ENTITY_PLAYER)

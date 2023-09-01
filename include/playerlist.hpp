@@ -8,10 +8,6 @@
 #pragma once
 
 #include "common.hpp"
-#include <unordered_map>
-#include <string>
-#include <array>
-#include <utility>
 
 namespace playerlist
 {
@@ -52,7 +48,7 @@ struct userdata
     unsigned kills{ 0 };
 };
 
-extern std::unordered_map<unsigned, userdata> data;
+extern boost::unordered_flat_map<unsigned, userdata> data;
 
 void Save();
 void Load();

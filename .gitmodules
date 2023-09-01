@@ -16,6 +16,9 @@
 [submodule "external/source-sdk-2013-headers"]
 	path = external/source-sdk-2013-headers
 	url = https://github.com/RosneBurgerworks/source-sdk-2013-headers.git
+[submodule "external/boost-cmake"]
+	path = external/boost-cmake
+	url = https://github.com/RosneBurgerworks/boost-cmake
 [submodule "external/MicroPather"]
 	path = external/MicroPather
 	url = https://github.com/explowz/MicroPather.git

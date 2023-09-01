@@ -22,11 +22,9 @@
 
 #include "DetourHook.hpp"
 #include <regex>
+#include <boost/algorithm/string.hpp>
 #include "usercmd.hpp"
 #include "MiscTemporary.hpp"
-#include <string>
-#include <vector>
-#include <algorithm>
 #include "AntiAim.hpp"
 #include "WeaponData.hpp"
 
@@ -440,27 +438,7 @@ bool DispatchUserMessage(bf_read *buf, int type)
     buf->Seek(0);
 
     std::vector<std::string> lines;
-    // Split a string into lines
-    std::vector<std::string> SplitIntoLines(const std::string& input) {
-        std::vector<std::string> lines;
-        std::size_t startPos = 0;
-        std::size_t endPos;
-
-        while ((endPos = input.find('\n', startPos)) != std::string::npos) {
-            lines.push_back(input.substr(startPos, endPos - startPos));
-            startPos = endPos + 1;
-        }
-
-        if (startPos < input.size()) {
-            lines.push_back(input.substr(startPos));
-        }
-
-        return lines;
-    }
-
-    // Usage
-    std::string msg_str = "Line 1\nLine 2\nLine 3";
-    std::vector<std::string> lines = SplitIntoLines(msg_str);
+    boost::split(lines, msg_str, boost::is_any_of("\n"), boost::token_compress_on);
 
     // Regex to find the playerperf data we want/need
     static std::regex primary_regex("^(([0-9]+\\.[0-9]+) ([0-9]{1,2}) ([0-9]{1,2}))$");

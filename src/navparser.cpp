@@ -10,6 +10,7 @@
 #endif
 #include "MiscAimbot.hpp"
 #include <memory>
+#include <boost/container_hash/hash.hpp>
 
 namespace navparser
 {

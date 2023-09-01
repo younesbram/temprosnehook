@@ -7,7 +7,6 @@
 #include <optional>
 #include "mathlib/vector.h"
 #include "cdll_int.h"
-#include <unordered_map>
 
 #pragma once
 class IClientEntity;
@@ -22,7 +21,7 @@ struct brutedata
 
 namespace hacks::anti_anti_aim
 {
-extern std::unordered_map<unsigned, brutedata> resolver_map;
+extern boost::unordered_flat_map<unsigned, brutedata> resolver_map;
 void increaseBruteNum(int idx);
 void frameStageNotify(ClientFrameStage_t stage);
 // void resolveEnt(int IDX, IClientEntity *entity = nullptr);

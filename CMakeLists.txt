@@ -84,11 +84,20 @@ if (EnableVisuals)
     if (EnableImGuiDrawing)
         find_package(Freetype REQUIRED)
         target_include_directories(cathook PRIVATE "${FREETYPE_INCLUDE_DIRS}")
+        target_link_libraries(cathook ${FREETYPE_LIBRARIES})
     endif()
 endif()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/external")
 find_package(Git REQUIRED)
 find_package(SDL2 REQUIRED)
+find_package(Boost 1.81.0 EXACT)
+if (NOT ${Boost_FOUND})
+    set(BOOST_LIBS_OPTIONAL "" CACHE STRING "Boost libs to be compiled")
+    add_subdirectory(external/boost-cmake)
+    SET (BOOST_ROOT ${CMAKE_BINARY_DIR}/_deps/boost-src)
+    find_package(Boost 1.81.0 EXACT)
+    include_directories(${Boost_INCLUDE_DIRS})
+endif()
 
 execute_process(COMMAND
         "${GIT_EXECUTABLE}" log -1 --pretty=\"%h\"
@@ -184,6 +193,7 @@ endif()
 if (Internal_Binarymode)
     target_compile_options(cathook PRIVATE -march=x86-64)
 endif()
+
 
 target_include_directories(cathook PRIVATE include include/hooks)
 

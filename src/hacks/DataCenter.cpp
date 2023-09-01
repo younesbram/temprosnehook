@@ -11,7 +11,10 @@
 /* e8call_direct */
 #include <e8call.hpp>
 #include <set>
+/* For Textmode */
 #include <map>
+/* Splitting strings nicely */
+#include <boost/algorithm/string.hpp>
 #include <utility>
 
 /* Global switch for DataCenter hooks */
@@ -33,6 +36,7 @@ typedef std::array<char, 5> CidStr_t;
 struct SteamNetworkingPOPID_decl
 {
     unsigned v;
+    /* 'out' must point to array with capacity at least 5 */
     void ToString(char *out) const
     {
         out[0] = char(v >> 16);
@@ -47,7 +51,8 @@ static std::set<CidStr_t> regionsSet;
 
 static void *g_ISteamNetworkingUtils;
 
-static std::map<std::string, std::string> dc_name_map{
+// clang-format off
+static boost::unordered_flat_map<std::string, std::string> dc_name_map{
     {"ams", "Amsterdam"},
     {"atl", "Atlanta"},
     {"bom", "Mumbai"},
@@ -123,6 +128,7 @@ static void Refresh()
     auto gc = (bool *) re::CTFGCClientSystem::GTFGCClientSystem();
     if (!gc)
         return;
+    /* GC's flag to force ping refresh */
     gc[0x374] = true;
 }
 
@@ -185,18 +191,12 @@ static void Hook(bool on)
     Refresh();
 }
 
+// if add is false it will remove instead
 void manageRegions(const std::vector<std::string> &regions_vec, bool add)
 {
     std::set<std::string> regions_split;
     if ((*regions).length())
-    {
-        std::istringstream iss(*regions);
-        std::string region;
-        while (std::getline(iss, region, ','))
-        {
-            regions_split.insert(region);
-        }
-    }
+        boost::split(regions_split, *regions, boost::is_any_of(","));
 
     std::set<std::string> new_regions = regions_split;
 
@@ -218,16 +218,7 @@ void manageRegions(const std::vector<std::string> &regions_vec, bool add)
                 new_regions.erase(position);
         }
     }
-
-    std::stringstream new_regions_str;
-    for (const auto &region : new_regions)
-    {
-        if (!new_regions_str.str().empty())
-            new_regions_str << ",";
-        new_regions_str << region;
-    }
-
-    regions = new_regions_str.str();
+    regions = boost::join(new_regions, ",");
 }
 
 static void Init()

@@ -10,6 +10,9 @@
  *
  */
 
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <utility>
 #include "common.hpp"
 
 namespace hacks::autoitem
@@ -54,7 +57,7 @@ struct AchivementItem
 };
 
 // A map that allows us to map item ids to achievement names and achievement ids
-static std::unordered_map<int /*item_id*/, AchivementItem> ach_items;
+static boost::unordered_flat_map<int /*item_id*/, AchivementItem> ach_items;
 static std::array<std::vector<std::string>, 3> craft_groups;
 
 bool checkAchMgr()
@@ -174,7 +177,7 @@ void getAndEquipWeapon(std::string str, int clazz, int slot)
         {
             if (str.find('/') != std::string::npos)
             {
-                split(ids_split_str, str, is_any_of("/"));
+                boost::split(ids_split_str, str, boost::is_any_of("/"));
                 for (auto &id : ids_split_str)
                 {
                     ids_split.emplace_back(std::stoi(id));
@@ -244,7 +247,7 @@ void getAndEquipWeapon(std::string str, int clazz, int slot)
                     continue;
 
                 // Split this crafting group into IDs
-                split(ids_rec_str, group_str, is_any_of(","));
+                boost::split(ids_rec_str, group_str, boost::is_any_of(","));
 
                 try
                 {
@@ -381,6 +384,7 @@ CatCommand unlock_single("achievement_unlock_single", "Unlocks single achievemen
                              unlockSingle(id);
                          });
 
+// For some reason it SEGV's when I try to GetAchievementByID();
 CatCommand lock_single("achievement_lock_single", "Locks single achievement by INDEX!",
                        [](const CCommand &args)
                        {
@@ -443,7 +447,7 @@ CatCommand unlock("achievement_unlock", "Unlock all achievements", Unlock);
 void rvarCallback(std::string after, int idx)
 {
     craft_groups[idx].clear();
-    split(craft_groups[idx], after, is_any_of(";-"));
+    boost::split(craft_groups[idx], after, boost::is_any_of(";-"));
 }
 
 static InitRoutine init(

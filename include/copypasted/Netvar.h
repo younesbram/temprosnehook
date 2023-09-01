@@ -5,6 +5,8 @@
 #include <memory>
 #include "core/logging.hpp"
 
+// this and the cpp are creds to "Altimor"
+
 class RecvTable;
 class RecvProp;
 
@@ -35,7 +37,7 @@ public:
 class netvar_tree
 {
     struct node;
-    using map_type = std::unordered_map<const char *, std::shared_ptr<node>, hash_char, equal_char>;
+    using map_type = boost::unordered_flat_map<const char *, std::shared_ptr<node>, hash_char, equal_char>;
 
     struct node
     {
@@ -51,11 +53,22 @@ class netvar_tree
     map_type nodes;
 
 public:
+    // netvar_tree ( );
+
     void init();
 
 private:
     void populate_nodes(class RecvTable *recv_table, map_type *map);
 
+    /**
+     * get_offset_recursive - Return the offset of the final node
+     * @map:	Node map to scan
+     * @acc:	Offset accumulator
+     * @name:	Netvar name to search for
+     *
+     * Get the offset of the last netvar from map and return the sum of it and
+     * accum
+     */
     static int get_offset_recursive(map_type &map, int acc, const char *name)
     {
         if (!map.count(name))
@@ -66,6 +79,16 @@ private:
         return acc + map[name]->offset;
     }
 
+    /**
+     * get_offset_recursive - Recursively grab an offset from the tree
+     * @map:	Node map to scan
+     * @acc:	Offset accumulator
+     * @name:	Netvar name to search for
+     * @args:	Remaining netvar names
+     *
+     * Perform tail recursion with the nodes of the specified branch of the tree
+     * passed for map and the offset of that branch added to acc
+     */
     template <typename... args_t> int get_offset_recursive(map_type &map, int acc, const char *name, args_t... args)
     {
         if (!map.count(name))
@@ -89,6 +112,14 @@ private:
     }
 
 public:
+    /**
+     * get_offset - Get the offset of a netvar given a list of branch names
+     * @name:	Top level datatable name
+     * @args:	Remaining netvar names
+     *
+     * Initiate a recursive search down the branch corresponding to the
+     * specified datable name
+     */
     template <typename... args_t> int get_offset(const char *name, args_t... args)
     {
         const auto &node = nodes[name];

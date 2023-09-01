@@ -3,7 +3,6 @@
 #include <map>
 #include "public/mathlib/vector.h"
 #include <optional>
-#include <unordered_map>
 
 namespace soundcache
 {
@@ -18,7 +17,7 @@ struct SoundStruct
     Timer last_update;
 };
 
-extern std::unordered_map<int, SoundStruct> sound_cache;
+extern boost::unordered_flat_map<int, SoundStruct> sound_cache;
 inline void cache_sound(const Vector *Origin, int source)
 {
     // Just in case

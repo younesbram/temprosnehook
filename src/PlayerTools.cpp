@@ -16,7 +16,7 @@ static settings::Boolean betrayal_sync{ "player-tools.betrayal-ipc-sync", "true"
 
 static settings::Boolean ignoreRosnehook{ "player-tools.ignore.rosnehook", "true" };
 
-static std::unordered_map<unsigned, unsigned> betrayal_list{};
+static boost::unordered_flat_map<unsigned, unsigned> betrayal_list{};
 
 static CatCommand forgive_all("pt_forgive_all", "Clear betrayal list", []() { betrayal_list.clear(); });
 

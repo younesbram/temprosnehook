@@ -7,8 +7,6 @@
 
 #include <settings/Int.hpp>
 #include "common.hpp"
-#include <vector>
-#include <random>
 
 namespace hacks::killsay
 {
@@ -23,8 +21,9 @@ struct KillsayStorage
     std::string message{};
 };
 
-static std::unordered_map<int, KillsayStorage> killsay_storage{};
+static boost::unordered_flat_map<int, KillsayStorage> killsay_storage{};
 
+// Thanks HellJustFroze for linking me http://daviseford.com/shittalk/ -- not anymore
 const std::vector<std::string> builtin_default = { "Did i miss my shot on '%name%'? if i didnt then oh well he got rekt", "'%name%' got fucked and raped by a bot. should've quit the game entirely", "I would insult %name%, but nature did a better job.", "Some people get paid to suck, you do it for free, '%name%'.", "'%name%' bro if u had BEST AIM on fps games and still dies to me ur a noob and give me all of ur unusuals.", "Hey '%name%' If your main is %class%, you should give up.", "Hey %name%, i see you can't play %class%. Try quitting the game.", "%name% : Wow my cheat sucks i should get rosnehook", "☐ Not rekt ☑ Rekt ☑ Really Rekt ☑ Tyrannosaurus Rekt" };
 const std::vector<std::string> withthataim = { "'%name%' had to use aim labs just to be able to hit the install button", "With that aim if you were one of the terrorist on 9/11 you would've flew between the towers", "With that aim youre the reason there's bots in every lobby", "If ur aim had that aim. you wouldnt exists"}; //SO COLD BRUH
 const std::vector<std::string> builtin_nonecore_mlg = { "GET REKT U SCRUB", "GET REKT M8", "U GOT NOSCOPED M8", "U GOT QUICKSCOPED M8", "2 FAST 4 U, SCRUB", "U GOT REKT, M8" };
@@ -67,7 +66,7 @@ std::string ComposeKillSay(IGameEvent *event)
 
     std::random_device rd;
     std::mt19937 mt(rd());
-    std::uniform_int_distribution<unsigned int> dist(0, source->size() - 1);
+    std::uniform_int_distribution<unsigned int> dist(0, source->size());
     std::string msg = source->at(dist(mt));
     //	checks if the killsays.txt file is not 1 line. 100% sure it's going
     // to crash if it is.

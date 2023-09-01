@@ -11,6 +11,7 @@
 #include "hitrate.hpp"
 #include "chatlog.hpp"
 #include "sdk/netmessage.hpp"
+#include <boost/algorithm/string.hpp>
 #include <MiscTemporary.hpp>
 #include "HookedMethods.hpp"
 #if ENABLE_VISUALS

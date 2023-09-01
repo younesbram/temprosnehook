@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstring>
 #include <dlfcn.h>
+#include <boost/stacktrace.hpp>
 #include <visual/SDLHooks.hpp>
 
 #ifdef __RDSEED__ // Used for InitRandom()
@@ -16,7 +17,6 @@
 #else /* __RDSEED__ */
 #include <random>
 #include <fstream>
-#include <execinfo.h>
 #include <chrono>
 #include <sys/types.h>
 #include <unistd.h>
@@ -37,19 +37,6 @@
 
 #include "copypasted/CDumper.hpp"
 #include "version.h"
-
-void PrintBacktrace() {
-    void* backtraceBuffer[100];
-    int backtraceSize = backtrace(backtraceBuffer, 100);
-
-    char** backtraceSymbols = backtrace_symbols(backtraceBuffer, backtraceSize);
-    if (backtraceSymbols) {
-        for (int i = 0; i < backtraceSize; ++i) {
-            std::cout << backtraceSymbols[i] << std::endl;
-        }
-        free(backtraceSymbols);
-    }
-}
 
 /*
  *  Credits to josh33901 aka F1ssi0N for butifel F1Public and Darkstorm 2015
@@ -134,7 +121,7 @@ void critical_error_handler(int signum)
         std::abort();
     }
 
-    for (auto i : PrintBacktrace())
+    for (auto i : boost::stacktrace::stacktrace())
     {
         Dl_info info2;
         if (dladdr(i.address(), &info2))

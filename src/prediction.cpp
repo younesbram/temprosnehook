@@ -7,6 +7,7 @@
 #include "common.hpp"
 #include <settings/Bool.hpp>
 #include <deque>
+#include <execinfo.h>
 
 namespace hacks::aimbot
 {

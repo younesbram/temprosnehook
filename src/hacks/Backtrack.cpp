@@ -10,15 +10,6 @@ static settings::Int bt_slots("backtrack.slots", "0");
 
 #if ENABLE_VISUALS
 static settings::Boolean draw("backtrack.draw", "false");
-settings::Boolean chams{ "backtrack.chams", "false" };
-settings::Boolean chams_wireframe{ "backtrack.chams.wireframe", "false" };
-settings::Int chams_ticks{ "backtrack.chams.ticks", "1" };
-settings::Rgba chams_color{ "backtrack.chams.color", "ff00ff10" };
-settings::Boolean chams_overlay{ "backtrack.chams.overlay", "true" };
-settings::Rgba chams_color_overlay{ "backtrack.chams.color.overlay", "000000ff" };
-settings::Float chams_envmap_tint_r{ "backtrack.chams.envmap.tint.r", "1" };
-settings::Float chams_envmap_tint_g{ "backtrack.chams.envmap.tint.g", "0" };
-settings::Float chams_envmap_tint_b{ "backtrack.chams.envmap.tint.b", "1" };
 #endif
 
 static bool isEnabled();
@@ -301,8 +292,6 @@ static void CreateMoveEarly()
         data.sequence = CE_INT(ent, netvar.m_nSequence);
 
         ent->hitboxes.GetHitbox(0);
-        // Copy bones (for chams/glow)
-        data.bones = ent->hitboxes.bones;
 
         for (int i = head; i <= foot_R; ++i)
             data.hitboxes.at(i) = *ent->hitboxes.GetHitbox(i);

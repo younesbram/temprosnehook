@@ -15,7 +15,6 @@
 #include <targethelper.hpp>
 #include "MiscTemporary.hpp"
 #include "hitrate.hpp"
-#include "FollowBot.hpp"
 #include "Warp.hpp"
 #include "AntiCheatBypass.hpp"
 #include "NavBot.hpp"
@@ -359,8 +358,6 @@ bool AllowNoScope(CachedEntity *target)
 
 void DoAutoZoom(bool target_found, CachedEntity *target)
 {
-    bool idle = hacks::followbot::IsIdle();
-
     // Keep track of our zoom time
     static Timer zoom_time{};
 
@@ -369,14 +366,14 @@ void DoAutoZoom(bool target_found, CachedEntity *target)
     {
         if (target_found)
             zoom_time.update();
-        if (idle || !zoom_time.check(3000))
+        if (!zoom_time.check(3000))
             current_user_cmd->buttons |= IN_ATTACK2;
         return;
     }
 
     // zoom distance
     auto nearest = hacks::NavBot::getNearestPlayerDistance();
-    if (g_pLocalPlayer->holding_sniper_rifle && !AllowNoScope(target) && (target_found || nearest.second <= *zoom_distance || idle))
+    if (g_pLocalPlayer->holding_sniper_rifle && !AllowNoScope(target) && (target_found || nearest.second <= *zoom_distance))
     {
         if (target_found)
             zoom_time.update();

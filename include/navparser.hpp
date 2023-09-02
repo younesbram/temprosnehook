@@ -14,7 +14,6 @@ enum Priority_list
     staynear,
     run_reload,
     snipe_sentry,
-    followbot,
     ammo,
     capture,
     prio_melee,

@@ -9,7 +9,6 @@
 #include <settings/Bool.hpp>
 #include "interfaces.hpp"
 #include "ipc.hpp"
-
 #include "common.hpp"
 #include "hack.hpp"
 #include "hitrate.hpp"

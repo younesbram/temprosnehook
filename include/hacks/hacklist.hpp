@@ -18,7 +18,6 @@
 #include "AntiAim.hpp"
 #include "navparser.hpp"
 #include "AutoJoin.hpp"
-#include "Trigger.hpp"
 #include "Spam.hpp"
 #include "NavBot.hpp"
 #include "CatBot.hpp"

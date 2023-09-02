@@ -1,6 +1,7 @@
 <Tab name="Weapons">
     <TabContainer width="fill" height="fill">
         <Include path="RosneBurgerworks/weapons/aimbot.xml"/>
+        <Include path="RosneBurgerworks/weapons/triggerbot.xml"/>
         <Include path="RosneBurgerworks/weapons/exploits.xml"/>
     </TabContainer>
 </Tab>

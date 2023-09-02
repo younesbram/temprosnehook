@@ -1,10 +1,3 @@
-/*
- * nographics.cpp
- *
- *  Created on: Aug 1, 2017
- *      Author: nullifiedcat
- */
-
 #include "common.hpp"
 
 #if !ENABLE_TEXTMODE
@@ -15,7 +8,6 @@ static settings::Boolean null_graphics("hack.nullgraphics", "true");
 typedef ITexture *(*FindTexture_t)(void *, const char *, const char *, bool, int);
 typedef IMaterial *(*FindMaterialEx_t)(void *, const char *, const char *, int, bool, const char *);
 typedef IMaterial *(*FindMaterial_t)(void *, const char *, const char *, bool, const char *);
-// 81
 FindTexture_t FindTexture_Original;
 FindMaterialEx_t FindMaterialEx_Original;
 FindMaterial_t FindMaterial_Original;
@@ -26,14 +18,12 @@ ITexture *FindTexture_null_hook(void *this_, char const *pTextureName, const cha
     return st;
 }
 
-// 123
 IMaterial *FindMaterialEx_null_hook(void *this_, char const *pMaterialName, const char *pTextureGroupName, int nContext, bool complain, const char *pComplainPrefix)
 {
     static IMaterial *st = FindMaterialEx_Original(this_, pMaterialName, pTextureGroupName, nContext, complain, pComplainPrefix);
     return st;
 }
 
-// 73
 IMaterial *FindMaterial_null_hook(void *this_, char const *pMaterialName, const char *pTextureGroupName, bool complain, const char *pComplainPrefix)
 {
     static IMaterial *st = FindMaterial_Original(this_, pMaterialName, pTextureGroupName, complain, pComplainPrefix);
@@ -97,10 +87,8 @@ static bool blacklist_file(const char *&filename)
 
     if (!std::strcmp(ext_p, ".vmt"))
     {
-        /* Not loading it causes extreme console spam */
         if (std::strstr(filename, "corner"))
             return false;
-        /* minor console spam */
         if (std::strstr(filename, "hud") || std::strstr(filename, "vgui"))
             return false;
 
@@ -124,7 +112,6 @@ static bool blacklist_file(const char *&filename)
 static void *(*FSorig_Open)(void *, const char *, const char *, const char *);
 static void *FSHook_Open(void *this_, const char *pFileName, const char *pOptions, const char *pathID)
 {
-    // fprintf(stderr, "Open: %s\n", pFileName);
     if (blacklist_file(pFileName))
         return nullptr;
 
@@ -134,7 +121,6 @@ static void *FSHook_Open(void *this_, const char *pFileName, const char *pOption
 static bool (*FSorig_ReadFile)(void *, const char *, const char *, void *, int, int, void *);
 static bool FSHook_ReadFile(void *this_, const char *pFileName, const char *pPath, void *buf, int nMaxBytes, int nStartingByte, void *pfnAlloc)
 {
-    // fprintf(stderr, "ReadFile: %s\n", pFileName);
     if (blacklist_file(pFileName))
         return false;
 
@@ -144,7 +130,6 @@ static bool FSHook_ReadFile(void *this_, const char *pFileName, const char *pPat
 static void *(*FSorig_OpenEx)(void *, const char *, const char *, unsigned, const char *, char **);
 static void *FSHook_OpenEx(void *this_, const char *pFileName, const char *pOptions, unsigned flags, const char *pathID, char **ppszResolvedFilename)
 {
-    // fprintf(stderr, "OpenEx: %s\n", pFileName);
     if (pFileName && blacklist_file(pFileName))
         return nullptr;
 
@@ -154,7 +139,6 @@ static void *FSHook_OpenEx(void *this_, const char *pFileName, const char *pOpti
 static int (*FSorig_ReadFileEx)(void *, const char *, const char *, void **, bool, bool, int, int, void *);
 static int FSHook_ReadFileEx(void *this_, const char *pFileName, const char *pPath, void **ppBuf, bool bNullTerminate, bool bOptimalAlloc, int nMaxBytes, int nStartingByte, void *pfnAlloc)
 {
-    // fprintf(stderr, "ReadFileEx: %s\n", pFileName);
     if (blacklist_file(pFileName))
         return 0;
 
@@ -174,12 +158,10 @@ static int FSHook_AsyncReadMultiple(void *this_, const char **pRequests, int nRe
 {
     for (int i = 0; pRequests && i < nRequests; ++i)
     {
-        // fprintf(stderr, "AsyncReadMultiple %d %s\n", nRequests, pRequests[i]);
         if (blacklist_file(pRequests[i]))
         {
             if (nRequests > 1)
                 fprintf(stderr, "FIXME: blocked AsyncReadMultiple for %d requests due to some filename being blacklisted\n", nRequests);
-            /* FSASYNC_ERR_FILEOPEN */
             return -1;
         }
     }
@@ -221,11 +203,6 @@ static void ReduceRamUsage()
 {
     if (!hooked_fs)
     {
-        /* TO DO: Improves load speeds but doesn't reduce memory usage a lot
-         * It seems engine still allocates significant parts without them
-         * being really used
-         * Plan B: null subsystems (Particle, Material, Model partially, Sound and etc.)
-         */
         hooked_fs = true;
         fs_hook.Set(reinterpret_cast<void *>(g_IFileSystem));
         fs_hook.HookMethod(FSHook_FindFirst, 27, &FSorig_FindFirst);
@@ -241,10 +218,6 @@ static void ReduceRamUsage()
         fs_hook2.HookMethod(FSHook_Precache, 9, &FSorig_Precache);
         fs_hook2.HookMethod(FSHook_ReadFile, 14, &FSorig_ReadFile);
         fs_hook2.Apply();
-        /* Might give performance benefit, but mostly fixes annoying console
-         * spam related to mdl not being able to play sequence that it
-         * cannot play on error.mdl
-         */
     }
 
     if (g_IBaseClient)
@@ -252,7 +225,6 @@ static void ReduceRamUsage()
         static BytePatch playSequence{ CSignature::GetClientSignature, "55 89 E5 57 56 53 83 EC ? 8B 75 0C 8B 5D 08 85 F6 74 ? 83 BB", 0x00, { 0xC3 } };
         playSequence.Patch();
 
-        /* Same explanation as above, but spams about certain particles not loaded */
         static BytePatch particleCreate{ CSignature::GetClientSignature, "55 89 E5 56 53 83 EC ? 8B 5D 0C 8B 75 08 85 DB 74 ? A1", 0x00, { 0x31, 0xC0, 0xC3 } };
         static BytePatch particlePrecache{ CSignature::GetClientSignature, "55 89 E5 53 83 EC ? 8B 5D 0C 8B 45 08 85 DB 74 ? 80 3B 00 75 ? 83 C4 ? 5B 5D C3 ? ? ? ? 89 5C 24", 0x00, { 0x31, 0xC0, 0xC3 } };
         static BytePatch particleCreating{ CSignature::GetClientSignature, "55 89 E5 57 56 53 83 EC ? A1 ? ? ? ? 8B 75 08 85 C0 74 ? 8B 4D", 0x00, { 0x31, 0xC0, 0xC3 } };
@@ -275,11 +247,7 @@ static void UnHookFs()
 static InitRoutineEarly nullify_textmode(
     []()
     {
-        // SDL_CreateWindow has a "flag" parameter. We simply give it HIDDEN as a flag
-        // 0x8 = SDL_HIDDEN
         static BytePatch patch1(CSignature::GetLauncherSignature, "C7 43 ? ? ? ? ? C7 44 24 ? ? ? ? ? C7 44 24", 0xb, { 0x8 });
-
-        // all are the same size so use same patch for all
         std::vector<unsigned char> patch_arr = { 0x90, 0x90, 0x90, 0x90, 0x90 };
 
         // Hide the SDL window
@@ -288,13 +256,9 @@ static InitRoutineEarly nullify_textmode(
         static BytePatch patch4(CSignature::GetLauncherSignature, "89 14 24 E8 ? ? ? ? 8B 45 B4", 0x3, patch_arr);
 
         ReduceRamUsage();
-        // CVideoMode_Common::Init  SetupStartupGraphic
-        // Make SetupStartupGraphic instantly return
         auto setup_graphic_addr = e8call_direct(CSignature::GetEngineSignature("E8 ? ? ? ? 8B 93 ? ? ? ? 85 D2 0F 84")) + 0x18;
         static BytePatch patch5(setup_graphic_addr, { 0x81, 0xC4, 0x6C, 0x20, 0x00, 0x00, 0x5B, 0x5E, 0x5F, 0x5D, 0xC3 });
-        // CMaterialSystem::SwapBuffers
         static BytePatch patch6(sharedobj::materialsystem().Pointer(0x3ed70), { 0x31, 0xC0, 0x40, 0xC3 });
-        // V_RenderView
         static BytePatch patch7(CSignature::GetEngineSignature, "55 89 E5 56 53 83 C4 80 C7 45 ? 00 00 00 00 A1 ? ? ? ? C7 45 ? 00 00 00 00 85 C0", 0x1d3, { 0x90, 0x90, 0x90, 0x90, 0x90 });
 
         patch1.Patch();

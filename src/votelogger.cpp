@@ -11,14 +11,14 @@
 #include "CatBot.hpp"
 #include "votelogger.hpp"
 
-static settings::Boolean vote_kicky{ "votelogger.autovote.yes", "false" };
-static settings::Boolean vote_kickn{ "votelogger.autovote.no", "false" };
+static settings::Boolean vote_kicky{ "votelogger.autovote.yes", "true" };
+static settings::Boolean vote_kickn{ "votelogger.autovote.no", "true" };
 static settings::Boolean vote_rage_vote{ "votelogger.autovote.no.rage", "false" };
 static settings::Boolean chat{ "votelogger.chat", "true" };
 static settings::Boolean chat_partysay{ "votelogger.chat.partysay", "false" };
 static settings::Boolean chat_casts{ "votelogger.chat.casts", "false" };
 static settings::Boolean chat_casts_f1_only{ "votelogger.chat.casts.f1-only", "true" };
-// Leave party and crash, useful for personal party bots
+// Leave party and crash, useful VAC hosting
 static settings::Boolean abandon_and_crash_on_kick{ "votelogger.restart-on-kick", "false" };
 
 namespace votelogger

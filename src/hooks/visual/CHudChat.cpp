@@ -4,6 +4,8 @@
 namespace hooked_methods
 {
 
+static settings::Boolean anti_spam{ "chat.anti-spam", "false" };
+
 DEFINE_HOOKED_METHOD(StartMessageMode, int, CHudBaseChat *_this, int mode)
 {
     ignoreKeys = true;

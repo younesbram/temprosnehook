@@ -20,7 +20,6 @@ set(files "${CMAKE_CURRENT_LIST_DIR}/AutoJoin.cpp"
 target_sources(cathook PRIVATE ${files})
 
 if (EnableVisuals)
-    set(files "${CMAKE_CURRENT_LIST_DIR}/ESP.cpp"
-            "${CMAKE_CURRENT_LIST_DIR}/Thirdperson.cpp")
+    set(files "${CMAKE_CURRENT_LIST_DIR}/ESP.cpp")
     target_sources(cathook PRIVATE ${files})
 endif()

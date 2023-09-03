@@ -1,16 +1,5 @@
 <Tab name="World" padding="4 4 4 4">
-    <Box padding="12 6 6 6" width="content" height="content" name="Thirdperson" y="110">
-        <List width="180">
-            <AutoVariable width="fill" target="visual.thirdperson.enable" label="Enable thirdperson"/>
-            <AutoVariable width="fill" target="visual.thirdperson-button" label="Thirdperson button"
-                          tooltip="Set a button to toggle thirdperson."/>
-            <AutoVariable width="fill" target="visual.thirdperson.real-angles" label="Show angles in thirdperson"
-                          tooltip="Show real antiaim angles in third person."/>
-            <AutoVariable width="fill" target="visual.thirdperson.disable-zoomed" label="Disable when zoomed"
-                          tooltip="Disables thirdperson when zoomed in."/>
-        </List>
-    </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Remove" x="195">
+    <Box padding="12 6 6 6" width="content" height="content" name="Remove">
         <List width="180">
             <AutoVariable width="fill" target="remove.cloak" label="Remove cloak"/>
             <AutoVariable width="fill" target="remove.disguise" label="Remove disguise"/>
@@ -19,7 +8,7 @@
             <AutoVariable width="fill" target="remove.zoom" label="Remove zoom/keep rifle"/>
         </List>
     </Box>
-    <Box padding="12 6 6 6" width="content" height="content" name="Misc" x="195" y="135">
+    <Box padding="12 6 6 6" width="content" height="content" name="Misc" y="135">
         <List width="180">
             <LabeledObject width="fill" label="Pyrovision" tooltip="Can be used to force Pyrovision on or off.">
                 <Select target="visual.force-pyrovision">
@@ -28,8 +17,6 @@
                     <Option name="Off" value="2"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="visual.killfeedcolor.enable" label="Enable killfeed coloring"
-                          tooltip="Colors names in killfeed to reflect player states eg: RAGE"/>
         </List>
     </Box>
 </Tab>

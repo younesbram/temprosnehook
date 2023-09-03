@@ -9,7 +9,6 @@
 #include "HookedMethods.hpp"
 #include "Warp.hpp"
 #include "nospread.hpp"
-#include "AntiCheatBypass.hpp"
 
 static settings::Boolean log_sent{ "debug.log-sent-chat", "false" };
 
@@ -119,8 +118,6 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, boo
     // Don't use warp with nospread
     else
         hacks::warp::SendNetMessage(msg);
-
-    hacks::antianticheat::SendNetMsg(msg);
 
     static float lastcmd = 0.0f;
     if (lastcmd > g_GlobalVars->absoluteframetime)

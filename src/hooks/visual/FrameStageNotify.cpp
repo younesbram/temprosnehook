@@ -9,7 +9,7 @@
 #include "HookedMethods.hpp"
 #include "AntiAntiAim.hpp"
 
-static settings::Boolean no_shake{ "visual.no-shake", "true" };
+static settings::Boolean no_shake{ "visual.no-shake", "false" };
 static settings::Boolean override_textures{ "visual.override-textures", "false" };
 static settings::String override_textures_texture{ "visual.override-textures.custom-texture", "dev/dev_measuregeneric01b" };
 
@@ -98,9 +98,6 @@ DEFINE_HOOKED_METHOD(FrameStageNotify, void, void *this_, ClientFrameStage_t sta
     original::FrameStageNotify(this_, stage);
     if (backup_punch)
         NET_VECTOR(RAW_ENT(LOCAL_E), netvar.vecPunchAngle) = *backup_punch;
-}
-template <typename T> void rvarCallback(settings::VariableBase<T> &, T)
-{
 }
 static InitRoutine init_fsn(
     []()

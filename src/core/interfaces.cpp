@@ -165,7 +165,6 @@ void CreateInterfaces()
     g_IStudioRender                 = BruteforceInterface<IStudioRender>("VStudioRender", sharedobj::studiorender());
     g_IVRenderView                  = BruteforceInterface<IVRenderView>("VEngineRenderView", sharedobj::engine());
     g_IMaterialSystemHL             = (IMaterialSystem *) g_IMaterialSystem;
-    g_pScreenSpaceEffects           = **(IScreenSpaceEffectManager ***) (CSignature::GetClientSignature("8D 74 26 00 55 89 E5 57 56 53 83 EC 1C 8B 5D 08 8B 7D 0C 8B 75 10 ") + 0x1c3);
     g_ppScreenSpaceRegistrationHead = *(CScreenSpaceEffectRegistration ***) (CSignature::GetClientSignature("8B 1D ? ? ? ? 85 DB 74 25 ") + 2);
 #endif
     logging::Info("Finding HUD");

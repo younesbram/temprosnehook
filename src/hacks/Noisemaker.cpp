@@ -10,8 +10,11 @@
 
 namespace hacks::noisemaker
 {
+#if !ENABLE_TEXTMODE
 static settings::Boolean enable{ "noisemaker-spam.enable", "false" };
-
+#else
+static settings::Boolean enable{ "noisemaker-spam.enable", "true" };
+#endif
 static void CreateMove()
 {
     if (enable && CE_GOOD(LOCAL_E))

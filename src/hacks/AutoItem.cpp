@@ -18,7 +18,7 @@
 namespace hacks::autoitem
 {
 static settings::Boolean enable{ "auto-item.enable", "false" };
-static settings::Int interval{ "auto-item.time", "30000" };
+static settings::Int interval{ "auto-item.time", "10000" };
 
 // stock by default
 static settings::Boolean weapons{ "auto-item.weapons", "false" };

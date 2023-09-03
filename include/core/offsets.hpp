@@ -92,10 +92,6 @@ struct offsets
     {
         return PlatformOffset(17, undefined, undefined);
     }
-    static constexpr uint32_t FrameStageNotify()
-    {
-        return PlatformOffset(35, undefined, undefined);
-    }
     static constexpr uint32_t DispatchUserMessage()
     {
         return PlatformOffset(36, undefined, undefined);

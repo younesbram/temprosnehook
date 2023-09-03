@@ -302,7 +302,7 @@ static void CreateMove()
                 case 13: // Need Teleporter Here!
                     g_IEngine->ServerCmd("voicemenu 1 3");
                     break;
-                case 14: // Need Dispenser Here!
+                case 14: // pootis
                     g_IEngine->ServerCmd("voicemenu 1 4");
                     break;
                 case 15: // Need Sentry Here!

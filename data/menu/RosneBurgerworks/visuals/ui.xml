@@ -3,6 +3,7 @@
         <List width="172">
             <AutoVariable width="fill" target="visual.open-gui-button" label="GUI button"
                           tooltip="Button to toggle this menu."/>
+            <AutoVariable width="fill" target="visual.clean-screenshots" label="Clean screenshots"/>
             <AutoVariable width="fill" target="visual.disable" label="Disable visuals"/>
             <AutoVariable width="fill" target="visual.medal-flip" label="Guaranteed medal flip"/>
             <LabeledObject width="fill" label="Software cursor mode" tooltip="WARNING: Advanced users only.">
@@ -15,6 +16,8 @@
             </LabeledObject>
             <AutoVariable width="fill" target="visual.font_size.esp" label="Main font size"/>
             <AutoVariable width="fill" target="visual.font_size.center_size" label="Center string font size"/>
+        </List>
+    </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Team colors" x="185">
         <List width="150">
             <AutoVariable width="fill" target="colors.team-red" label="Red"/>

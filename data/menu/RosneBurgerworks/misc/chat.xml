@@ -66,20 +66,6 @@
             <AutoVariable width="fill" target="chat.censor.filter" label="add more words"/>
         </List>
     </Box>
-    <Box name="Killsay" width="177" height="content" padding="12 6 6 6" x="170">
-        <List width="150">
-            <LabeledObject width="fill" label="Killsay mode">
-                <Select target="killsay.mode">
-                    <Option name="Disable" value="0"/>
-                    <Option name="Custom" value="1"/>
-                    <Option name="Default" value="2"/>
-                    <Option name="NCC - MLG" value="4"/>
-                </Select>
-            </LabeledObject>
-            <AutoVariable width="fill" target="killsay.file" label="Custom killsay"/>
-            <AutoVariable width="fill" target="killsay.delay" label="Killsay delay" tooltip="Delay in milliseconds"/>
-        </List>
-    </Box>
     <Box name="Votelogger" width="content" height="content" padding="12 6 6 6" x="170" y="140">
         <List width="165">
             <AutoVariable width="fill" target="votelogger.autovote.yes" label="Autovote yes"/>

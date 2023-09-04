@@ -1,3 +1,10 @@
+/*
+ * entitycache.cpp
+ *
+ *  Created on: Nov 7, 2016
+ *      Author: nullifiedcat
+ */
+
 #include "common.hpp"
 #include <settings/Float.hpp>
 #include "soundcache.hpp"
@@ -38,6 +45,7 @@ bool CachedEntity::IsVisible()
         result = m_vecOrigin();
     else
         result = hitbox->center;
+    // for nig
     if (IsEntityVectorVisible(this, result, true, MASK_SHOT_HULL, nullptr, true))
     {
         m_bAnyHitboxVisible = true;
@@ -61,7 +69,7 @@ int previous_ent = 0;
 
 void Update()
 {
-    max = g_IEntityList->GetHighestEntityIndex();
+    max              = g_IEntityList->GetHighestEntityIndex();
     int current_ents = g_IEntityList->NumberOfEntities(false);
     valid_ents.clear();
     player_cache.clear();
@@ -152,7 +160,7 @@ void Shutdown()
 {
     array.clear();
     previous_max = 0;
-    max = -1;
+    max          = -1;
 }
 
 int max = 1;

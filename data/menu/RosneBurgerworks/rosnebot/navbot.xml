@@ -6,8 +6,6 @@
             <AutoVariable width="fill" target="nav.look-at-path" label="Look at path"/>
             <AutoVariable width="fill" target="nav.rathook-spin" label="Rathook spin"
                              tooltip="Enables smooth look and rathook spin when on"/>
-            <AutoVariable width="fill" target="nav.rathook-jump" label="Rathook Crazy Jump"
-                             tooltip="Enables crazy jump if anti aim is off"/>
             <AutoVariable width="fill" target="navbot.enabled" label="Enable NavBot"/>
             <AutoVariable width="fill" target="navbot.capture-objectives" label="Capture objectives"
                           tooltip="Automatically capture objectives (CTF, CP, and PL only)."/>

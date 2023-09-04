@@ -18,7 +18,6 @@ static settings::Boolean enabled("nav.enabled", "false");
 static settings::Boolean draw("nav.draw", "false");
 static settings::Boolean look{ "nav.look-at-path", "false" };
 static settings::Boolean rathookspin{ "nav.rathook-spin", "true" };
-static settings::Boolean rathookcrazyjump{ "nav.rathook-jump", "true" };
 static settings::Boolean draw_debug_areas("nav.draw.debug-areas", "false");
 static settings::Boolean log_pathing{ "nav.log", "false" };
 static settings::Int stuck_time{ "nav.stuck-time", "800" };
@@ -663,18 +662,6 @@ static void followCrumbs()
         {
             // Make it crouch until we land, but jump the first tick
             current_user_cmd->buttons |= crouch ? IN_DUCK : IN_JUMP;
-            // rathook crazy jump
-            if (*rathookcrazyjump)
-            {
-	            if (!hacks::antiaim::isEnabled())
-	            {
-		            Vector flip{ g_pLocalPlayer->v_OrigViewangles.x, g_pLocalPlayer->v_OrigViewangles.y + 180.0f, g_pLocalPlayer->v_Eye.z };
-		            fClampAngle(flip);
-		
-		            current_user_cmd->viewangles = flip;
-		            *bSendPackets                = true;
-		        }
-            }
             // Only flip to crouch state, not to jump state
             if (!crouch)
             {

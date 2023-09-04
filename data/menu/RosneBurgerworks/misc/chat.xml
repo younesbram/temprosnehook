@@ -24,6 +24,7 @@
                 <Select target="spam.voicecommand">
                     <Option name="Disable" value="0"/>
                     <Option name="Random" value="1"/>
+                    <Option name="Nice Shot" value="23"/>
                     <Option name="Medic" value="2"/>
                     <Option name="Thanks" value="3"/>
                     <Option name="Go Go Go" value="4"/>
@@ -45,7 +46,6 @@
                     <Option name="Jeers" value="20"/>
                     <Option name="Positive" value="21"/>
                     <Option name="Negative" value="22"/>
-                    <Option name="Nice Shot" value="23"/>
                     <Option name="Nice Job" value="24"/>
                 </Select>
             </LabeledObject>

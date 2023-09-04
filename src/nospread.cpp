@@ -1,25 +1,3 @@
-// To anyone reading this and planning to add it to their own cheat,
-// It would be nice if you could credit us, the Nullworks/Cathook team.
-// Thanks :)
-
-/*
-* Cathook
-* Copyright (C) 2020  nullworks
-
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
 #include "DetourHook.hpp"
 #include <regex>
 #include <boost/algorithm/string.hpp>
@@ -30,51 +8,17 @@
 
 namespace hacks::nospread
 {
-static settings::Boolean projectile("nospread.projectile", "false");
-/*
- * 0 Always on
- * 1 Disable if being spectated in first person
- * 2 Disable if being spectated
- */
-static settings::Int specmode("nospread.spectator-mode", "1");
-settings::Boolean bullet("nospread.bullet", "false");
-settings::Int debug_nospread("nospread.debug", "0");
+settings::Boolean bullet("nospread.bullet", "true");
 settings::Boolean center_cone{ "nospread.center-cone", "true" };
-settings::Boolean draw{ "nospread.draw-info", "true" };
-settings::Boolean draw_mantissa{ "nospread.draw-info.mantissa", "false" };
 settings::Boolean correct_ping{ "nospread.correct-ping", "true" };
 settings::Boolean use_avg_latency{ "nospread.use-average-latency", "false" };
 settings::Boolean extreme_accuracy{ "nospread.use-extreme-accuracy", "false" };
 bool is_syncing = false;
 
-bool shouldNoSpread(bool _projectile)
-{
-    switch (*specmode)
-    {
-    // Always on
-    default:
-    case 0:
-        break;
-    // Disable if being spectated in first person
-    case 1:
-        if (g_pLocalPlayer->spectator_state == g_pLocalPlayer->FIRSTPERSON)
-            return false;
-        break;
-    // Disable if being spectated
-    case 2:
-        if (g_pLocalPlayer->spectator_state == g_pLocalPlayer->ANY)
-            return false;
-        break;
-    }
-    return _projectile ? *projectile : *bullet;
-}
 
 static void CreateMove()
 {
     if (CE_BAD(LOCAL_E) || CE_BAD(LOCAL_W))
-        return;
-
-    if (!shouldNoSpread(true))
         return;
 
     // Credits to https://www.unknowncheats.me/forum/team-fortress-2-a/139094-projectile-nospread.html
@@ -90,22 +34,6 @@ static void CreateMove()
     if (GetWeaponMode() != weapon_projectile && LOCAL_W->m_iClassID() != CL_CLASS(CTFCompoundBow))
         return;
 
-    // Beggars check
-    if (CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 730)
-    {
-        // Player has 0 loaded rockets and reload mode is not 2 (reloading and ready to release)
-        bool no_loaded_rockets = CE_INT(LOCAL_W, netvar.m_iClip1) == 0 && CE_INT(LOCAL_W, netvar.iReloadMode) != 2;
-        // Player is attacking and reload is not 0 (not reloading)
-        bool loading_rockets = current_late_user_cmd->buttons & IN_ATTACK && CE_INT(LOCAL_W, netvar.iReloadMode) != 0;
-        if (no_loaded_rockets || loading_rockets)
-            return;
-    }
-    // Huntsman check
-    else if (LOCAL_W->m_iClassID() == CL_CLASS(CTFCompoundBow))
-    {
-        if (current_late_user_cmd->buttons & IN_ATTACK || CE_FLOAT(LOCAL_W, netvar.flChargeBeginTime) == 0)
-            return;
-    }
     // Rest of weapons
     else if (!(current_late_user_cmd->buttons & IN_ATTACK))
         return;
@@ -281,28 +209,6 @@ void ApplySpreadCorrection(Vector &angles, int seed, float spread)
     fClampAngle(angles);
 }
 
-CatCommand debug_mantissa("test_mantissa", "For debug purposes",
-                          [](const CCommand &rCmd)
-                          {
-                              if (rCmd.ArgC() < 2)
-                              {
-                                  g_ICvar->ConsoleColorPrintf(MENU_COLOR, "You must provide float to test.\n");
-                                  return;
-                              }
-
-                              try
-                              {
-                                  float float_value   = atof(rCmd.Arg(1));
-                                  float mantissa_step = CalculateMantissaStep(float_value);
-
-                                  g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Mantissa step for %.3f: %.10f\n", float_value, mantissa_step);
-                              }
-                              catch (const std::invalid_argument &)
-                              {
-                                  g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Invalid float.\n");
-                              }
-                              return;
-                          });
 
 static CatCommand nospread_sync("nospread_sync", "Try to sync client and server time",
                                 []()
@@ -519,9 +425,6 @@ bool DispatchUserMessage(bf_read *buf, int type)
         // We got time with latency included, but only outgoing, so compensate
         float_time_delta -= (total_latency / 2.0);
 
-        if (debug_nospread)
-            g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Assumed delta time: %.10f calculated based on %i entries.\n", float_time_delta, (int) vData.size() - 1);
-
         // we need only first output which is latest
         waiting_perf_data = false;
 
@@ -545,17 +448,11 @@ bool DispatchUserMessage(bf_read *buf, int type)
             float_time_delta -= time_difference;
             // it will auto resync it
             resync_needed = true;
-            // Print debug if desired
-            if (debug_nospread)
-                g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Applied correction: %.10f\n", time_difference);
         }
         // We synced successfully
         else
         {
-            if (debug_nospread)
-                g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Nospread successfully synced. Possible precision loss: %.10f Mantissa step: %.2f\n", time_difference, mantissa_step);
-            else
-                g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Nospread successfully synced. Mantissa step: %.2f\n", mantissa_step);
+            g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Nospread successfully synced. Mantissa step: %.2f\n", mantissa_step);
             resync_needed = false;
         }
         last_correction = time_difference;
@@ -581,7 +478,7 @@ void CL_SendMove_hook()
     first_usercmd        = true;
     called_from_sendmove = false;
 
-    if (!no_spread_synced || !shouldNoSpread(false))
+    if (!no_spread_synced)
     {
         auto original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
         original();
@@ -720,8 +617,6 @@ void CL_SendMove_hook()
         return;
     }
 
-    if (*debug_nospread >= 2)
-        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Predicted: %.6f Assumed: %.6f Correction: %.6f Commands: %i\n", predicted_time, asumed_real_time, write_usercmd_correction, new_packets);
     // Try to predict seed now
     // The important thing to understand this: server_random_seed set as soon as ProcessUsercmds called. And it's called in clc_move process function, so as soon as server accepts our packet, not when it actually processed.
     // This means every usercmd in 1 clc_move will have almost same random seed - if process time less than mantissa step for random seed number, then same "random" number will be set for each usercmd in this packet
@@ -753,7 +648,7 @@ void CL_SendMove_hook()
 void WriteUserCmd_hook(bf_write *buf, CUserCmd *to, CUserCmd *from)
 {
     // Called by a demo recorder or we shouldn't compensate it.
-    if ((no_spread_synced != SYNCED && !resync_needed) || !shouldNoSpread(false) || current_weapon_spread == 0.0)
+    if ((no_spread_synced != SYNCED && !resync_needed) || current_weapon_spread == 0.0)
     {
         auto original = (WriteUserCmd_t) cl_writeusercmd_detour.GetOriginalFunc();
         original(buf, to, from);
@@ -885,55 +780,6 @@ static InitRoutine init_bulletnospread(
                     no_spread_synced = NOT_SYNCED;
                 }
             });
-#if ENABLE_VISUALS
-        EC::Register(
-            EC::Draw,
-            []()
-            {
-                if (bullet && (draw || draw_mantissa) && CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
-                {
-                    std::string draw_string;
-                    rgba_t draw_color = colors::white;
-                    switch (no_spread_synced)
-                    {
-                    case NOT_SYNCED:
-                    {
-                        if (bad_mantissa)
-                        {
-                            draw_color  = colors::red_s;
-                            draw_string = "Server uptime too Low!";
-                        }
-                        else
-                        {
-                            draw_color  = colors::orange;
-                            draw_string = "Not Syncing";
-                        }
-                        break;
-                    }
-                    case CORRECTING:
-                    case DEAD_SYNC:
-                    {
-                        draw_color  = colors::yellow;
-                        draw_string = "Syncing...";
-                        break;
-                    }
-                    case SYNCED:
-                    {
-                        draw_color  = colors::green;
-                        draw_string = "Synced.";
-                        break;
-                    }
-                    default:
-                        break;
-                    }
-                    if (draw)
-                        AddCenterString(draw_string, draw_color);
-                    if (draw_mantissa && no_spread_synced != NOT_SYNCED)
-                        AddCenterString("Mantissa step size: " + std::to_string((int) CalculateMantissaStep(1000.0 * (Plat_FloatTime() + float_time_delta))), draw_color);
-                }
-            },
-            "nospread_draw");
-#endif
         EC::Register(
             EC::LevelInit,
             []()

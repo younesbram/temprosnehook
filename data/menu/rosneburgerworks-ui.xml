@@ -1,7 +1,8 @@
 <ElementGroup>
     <Window x="100" y="300" name="Main Window" width="content" height="content">
         <TabContainer width="600" height="450">
-            <Include path="RosneBurgerworks/weapons.xml"/>
+            <Include path="RosneBurgerworks/aimbot.xml"/>
+            <Include path="RosneBurgerworks/exploits.xml"/>
             <Include path="RosneBurgerworks/visuals.xml"/>
             <Include path="RosneBurgerworks/antiaim.xml"/>
             <Include path="RosneBurgerworks/misc.xml"/>

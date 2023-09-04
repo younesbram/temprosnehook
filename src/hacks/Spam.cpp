@@ -17,6 +17,9 @@ static settings::Boolean random_order{ "spam.random", "0" };
 static settings::String filename{ "spam.filename", "spam.txt" };
 static settings::Int spam_delay{ "spam.delay", "800" };
 static settings::Int voicecommand_spam{ "spam.voicecommand", "0" };
+static settings::Boolean teamname_spam{ "spam.teamname", "0" };
+static settings::String teamname_file{ "spam.teamname.file", "teamspam.txt" };
+static settings::Boolean team_only{ "spam.teamchat", "false" };
 
 static size_t last_index;
 
@@ -229,8 +232,30 @@ bool FormatSpamMessage(std::string &message)
     return SubstituteQueries(message);
 }
 
+// What to spam
+static std::vector<std::string> teamspam_text = { "CAT", "HOOK" };
+// Current spam index
+static size_t current_teamspam_idx = 0;
+
 static void CreateMove()
 {
+    // Spam changes the tournament name in casual and compeditive gamemodes
+    if (teamname_spam)
+    {
+        if (!(g_GlobalVars->tickcount % 10))
+        {
+            if (!teamspam_text.empty())
+            {
+                // We've hit the end of the vector, loop back to the front
+                // We need to do it like this, otherwise a file reload happening could cause this to crash at ".at"
+                if (current_teamspam_idx >= teamspam_text.size())
+                    current_teamspam_idx = 0;
+                g_IEngine->ServerCmd(format("tournament_teamname ", teamspam_text.at(current_teamspam_idx)).c_str());
+                current_teamspam_idx++;
+            }
+        }
+    }
+
     if (voicecommand_spam)
     {
         static Timer last_voice_spam;
@@ -345,10 +370,18 @@ static void CreateMove()
         source = &builtin_lennyfaces;
         break;
     case 4:
-        source = &builtin_nonecore;
+        //source = &builtin_blanks;
+        source = &savetf2;
         break;
     case 5:
+        source = &builtin_nonecore;
+        break;
+    case 6:
         source = &builtin_lmaobox;
+        break;
+    case 7:
+        //source = &builtin_lithium; no need anymore
+        source = &randomnn;
         break;
     default:
         return;
@@ -371,6 +404,8 @@ static void CreateMove()
             }
             last_index             = current_index;
             std::string spamString = source->at(current_index);
+            if (FormatSpamMessage(spamString))
+                chat_stack::Say(spamString, *team_only);
             current_index++;
         }
         last_spam_point = std::chrono::system_clock::now();
@@ -396,16 +431,53 @@ void init()
 
 const std::vector<std::string> builtin_default    = { "Rosnehook - BONES? well yes", "Rosnehook: We Love Bones!", "Rosnehook: Never Miss!", "Rosnehook: Darkstorm Code? No!", "Rosnehook: so private that valve will rat your pc just to check rosnehook code!", "Rosnehook: No Bloatware!", "Rosnehook: furry and pedo killer!", "Rosnehook: What is VAC?" };
 const std::vector<std::string> builtin_lennyfaces = { "( ͡° ͜ʖ ͡°)", "( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)", "ʕ•ᴥ•ʔ", "(▀̿Ĺ̯▀̿ ̿)", "( ͡°╭͜ʖ╮͡° )", "(ง'̀-'́)ง", "(◕‿◕✿)", "༼ つ  ͡° ͜ʖ ͡° ༽つ" };
+//const std::vector<std::string> builtin_blanks     = { "\e"
+//                                                          "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+//                                                          "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+//                                                          "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+//                                                          "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+//                                                          "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+//                                                          "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+//                                                          "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" };
+//hope it doesnt crash ^
 const std::vector<std::string> builtin_nonecore = { "NULL CORE - REDUCE YOUR RISK OF BEING OWNED!", "NULL CORE - WAY TO THE TOP!", "NULL CORE - BEST TF2 CHEAT!", "NULL CORE - NOW WITH BLACKJACK AND HOOKERS!", "NULL CORE - BUTTHURT IN 10 SECONDS FLAT!", "NULL CORE - WHOLE SERVER OBSERVING!", "NULL CORE - GET BACK TO PWNING!", "NULL CORE - WHEN PVP IS TOO HARDCORE!", "NULL CORE - CAN CAUSE KIDS TO RAGE!", "NULL CORE - F2P NOOBS WILL BE 100% NERFED!" };
 const std::vector<std::string> builtin_lmaobox  = { "GET GOOD, GET LMAOBOX!", "LMAOBOX - WAY TO THE TOP", "WWW.LMAOBOX.NET - BEST FREE TF2 HACK!" };
+//const std::vector<std::string> builtin_lithium  = { "CHECK OUT www.YouTube.com/c/DurRud FOR MORE INFORMATION!", "PWNING AIMBOTS WITH OP ANTI-AIMS SINCE 2015 - LITHIUMCHEAT", "STOP GETTING MAD AND STABILIZE YOUR MOOD WITH LITHIUMCHEAT!", "SAVE YOUR MONEY AND GET LITHIUMCHEAT! IT IS FREE!", "GOT ROLLED BY LITHIUM? HEY, THAT MEANS IT'S TIME TO GET LITHIUMCHEAT!!" };
+//hope it doesnt crash ^
+const std::vector<std::string> savetf2 = {"We must save tf2!", "Saving tf2 since 2017", "We all here to save tf2!", "Saving tf2 all day long!", "#SaveTF2" };
+const std::vector<std::string> randomnn = {"Pyro's flamethrower roasts marshmallows while Scout tells jokes. Fun!", "Engineer builds a teleporter to outer space, meets Alien Heavy.", "Sniper hunts unicorns, finds magical hats. Sniper's luck!", "Spy disguises as rubber chicken, confuses everyone. Cluck cluck!", "Medic's healing beam shoots rainbows, heals souls, parties!", "Demoman's sticky bombs become bouncy balls. Chaos unleashed!", "Soldier rocket jumps to moon, plants TF2 flag. Victory!", "Team huddles, makes human pyramid. Engineer takes picture.", "Heavy eats bananas, gains crits, goes bananas. Carnage!", "Miniature Saxton Hale bosses over Team Fortress action. Tiny epic!" };
+void teamspam_reload(const std::string &after)
+{
+    // Clear spam vector
+    teamspam_text.clear();
+    // Reset Spam idx
+    current_teamspam_idx = 0;
+    if (!after.empty())
+    {
+        static TextFile teamspam;
+        if (teamspam.TryLoad(after))
+        {
+            teamspam_text = teamspam.lines;
+            for (auto &text : teamspam_text)
+                ReplaceSpecials(text);
+        }
+    }
+}
+
+void teamspam_reload_command()
+{
+    teamspam_reload(*teamname_file);
+}
 
 static InitRoutine EC(
     []()
     {
+        teamname_file.installChangeCallback([](settings::VariableBase<std::string> &, const std::string &after) { teamspam_reload(after); });
         EC::Register(EC::CreateMove, CreateMove, "spam", EC::average);
         init();
     });
 
+static CatCommand reload_ts("teamspam_reload", "Relaod teamspam file", teamspam_reload_command);
 
 static CatCommand reload_cc("spam_reload", "Reload spam file", hacks::spam::reloadSpamFile);
 } // namespace hacks::spam

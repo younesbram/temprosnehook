@@ -29,7 +29,6 @@ static settings::Boolean wait_full{ "warp.rapidfire.wait-full", "true" };
 static settings::Button rapidfire_key{ "warp.rapidfire.key", "<null>" };
 static settings::Int rapidfire_key_mode{ "warp.rapidfire.key-mode", "1" };
 static settings::Int rf_disable_on{ "warp.rapidfire.disable-on", "0" };
-static settings::Int rf_flamethrower_modes{ "warp.rapidfire.flmaethrower-modes", "0" };
 static settings::Float speed{ "warp.speed", "23" };
 static settings::Boolean draw{ "warp.draw", "false" };
 static settings::Boolean draw_bar{ "warp.draw-bar", "false" };
@@ -231,36 +230,7 @@ bool shouldRapidfire()
         return false;
 
     // Mouse 1 is held, do it.
-    bool buttons_pressed = current_user_cmd && current_user_cmd->buttons & IN_ATTACK;
-
-    switch (*rf_flamethrower_modes)
-    {
-    case 0: // Any mode
-    {
-        if (LOCAL_W->m_iClassID() == CL_CLASS(CTFFlameThrower))
-            buttons_pressed = current_user_cmd && current_user_cmd->buttons & (IN_ATTACK | IN_ATTACK2);
-        break;
-    }
-    case 1: // "Flame" mode / mouse 1
-    {
-        if (LOCAL_W->m_iClassID() == CL_CLASS(CTFFlameThrower))
-            buttons_pressed = current_user_cmd && current_user_cmd->buttons & IN_ATTACK;
-        break;
-    }
-    case 2: // Airblast mode / mouse 2
-    {
-        if (LOCAL_W->m_iClassID() == CL_CLASS(CTFFlameThrower))
-            buttons_pressed = current_user_cmd && current_user_cmd->buttons & IN_ATTACK2;
-        break;
-    }
-    case 3: // Disable all
-    default:
-    {
-        if (LOCAL_W->m_iClassID() == CL_CLASS(CTFFlameThrower))
-            return false;
-        break;
-    }
-    }
+    bool buttons_pressed = current_user_cmd && current_user_cmd->buttons & IN_ATTACK;   
 
     if (g_pLocalPlayer->holding_sniper_rifle)
     {

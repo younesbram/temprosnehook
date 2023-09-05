@@ -9,7 +9,6 @@
 #include "entitycache.hpp"
 #include "CaptureLogic.hpp"
 #include "PlayerTools.hpp"
-#include "AntiAim.hpp"
 #include "Aimbot.hpp"
 #include "MiscAimbot.hpp"
 #include "Misc.hpp"

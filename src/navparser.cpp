@@ -16,7 +16,7 @@ namespace navparser
 static settings::Boolean enabled("nav.enabled", "false");
 static settings::Boolean draw("nav.draw", "false");
 static settings::Boolean look{ "nav.look-at-path", "false" };
-static settings::Int smoothspeed{ "nav.smooth-speed", "13" };
+static settings::Boolean smoothspeed{ "nav.smooth-speed", "13" };
 static settings::Boolean rathookspin{ "nav.rathook-spin", "true" };
 static settings::Boolean draw_debug_areas("nav.draw.debug-areas", "false");
 static settings::Boolean log_pathing{ "nav.log", "false" };

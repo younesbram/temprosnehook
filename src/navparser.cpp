@@ -16,7 +16,6 @@ namespace navparser
 static settings::Boolean enabled("nav.enabled", "false");
 static settings::Boolean draw("nav.draw", "false");
 static settings::Boolean look{ "nav.look-at-path", "false" };
-static settings::Boolean smoothspeed{ "nav.smooth-speed", "13" };
 static settings::Boolean rathookspin{ "nav.rathook-spin", "true" };
 static settings::Boolean draw_debug_areas("nav.draw.debug-areas", "false");
 static settings::Boolean log_pathing{ "nav.log", "false" };
@@ -681,15 +680,17 @@ static void followCrumbs()
         }
     }
 
-    // Look at path
+    // Look at path (nav spin) (smooth nav)
     if (*look && !hacks::aimbot::IsAiming())
     {
         Vector next{ crumbs[0].vec.x, crumbs[0].vec.y, g_pLocalPlayer->v_Eye.z };
         next = GetAimAtAngles(g_pLocalPlayer->v_Eye, next);
         if (*rathookspin)
         {
-            hacks::misc_aimbot::DoSlowAim(next, smoothspeed);
-            current_user_cmd->viewangles = next, smoothspeed;
+            static int aim_speed = 13; // how smooth nav is
+            // activate nav spin and smoothen
+            hacks::misc_aimbot::DoSlowAim(next, aim_speed);
+            current_user_cmd->viewangles = next, aim_speed;
         }
         else
         {

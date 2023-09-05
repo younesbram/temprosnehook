@@ -688,9 +688,8 @@ static void followCrumbs()
         next = GetAimAtAngles(g_pLocalPlayer->v_Eye, next);
         if (*rathookspin)
         {
-            static int aim_speed = smoothspeed;
-            hacks::misc_aimbot::DoSlowAim(next, aim_speed);
-            current_user_cmd->viewangles = next, aim_speed;
+            hacks::misc_aimbot::DoSlowAim(next, smoothspeed);
+            current_user_cmd->viewangles = next, smoothspeed;
         }
         else
         {

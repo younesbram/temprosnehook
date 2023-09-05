@@ -1,29 +1,14 @@
-/*
- * Credits to the Hoster Alex for making this and giving us the permission
- * To add it to Cathook.
- *
- * Refined and fixed by BenCat07
- */
-/* License: GPLv3 */
 #include <common.hpp>
-/* For MENU_COLOR definition */
 #include <MiscTemporary.hpp>
-/* e8call_direct */
 #include <e8call.hpp>
 #include <set>
-/* For Textmode */
 #include <map>
-/* Splitting strings nicely */
 #include <boost/algorithm/string.hpp>
 #include <utility>
 
-/* Global switch for DataCenter hooks */
 static settings::Boolean enable{ "dc.enable", "false" };
-/* List of preferred data centers separated by comma ',' */
 static settings::String regions{ "dc.regions", "" };
-/* Find servers only in data centers provided by regions */
 static settings::Boolean restrict { "dc.restrict", "true" };
-/* Enable/disable individual continents */
 static settings::Boolean enable_eu{ "dc.toggle-europe", "false" };
 static settings::Boolean enable_north_america{ "dc.toggle-north-america", "false" };
 static settings::Boolean enable_south_america{ "dc.toggle-south-america", "false" };
@@ -36,7 +21,6 @@ typedef std::array<char, 5> CidStr_t;
 struct SteamNetworkingPOPID_decl
 {
     unsigned v;
-    /* 'out' must point to array with capacity at least 5 */
     void ToString(char *out) const
     {
         out[0] = char(v >> 16);

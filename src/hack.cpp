@@ -319,7 +319,7 @@ free(logname);*/
 
     CreateEarlyInterfaces();
 
-    // Applying the defaults needs to be delayed, because preloaded Cathook can not properly convert SDL codes to names before TF2 init
+    // Applying the defaults needs to be delayed, because preloaded Rosnehook can not properly convert SDL codes to names before TF2 init
     settings::Manager::instance().applyDefaults();
 
     logging::Info("Clearing Early initializer stack");
@@ -404,8 +404,8 @@ void hack::Shutdown()
     if (hack::shutdown)
         return;
     hack::shutdown = true;
-    // Stop cathook stuff
-    settings::cathook_disabled.store(true);
+    // Stop Rosnehook stuff
+    settings::rosnehook_disabled.store(true);
     playerlist::Save();
 #if ENABLE_VISUALS
     sdl_hooks::cleanSdlHooks();

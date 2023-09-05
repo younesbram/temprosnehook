@@ -160,7 +160,7 @@ function performupdate() {
 
   #Create build folder in case it doesn't exist
   mkdir -p ./build
-  # Update cathook
+  # Update Rosnehook
   pushd build && cmake .. && cmake --build . --target cathook -- -j"$(nproc --all)" || {
     echo -e "\033[1;31m \n \nFailed to compile Rosnehook\n\033[0m"
     exit 1

@@ -33,14 +33,14 @@ static bool ShouldSave(const userdata &data)
 
 void Save()
 {
-    DIR *cathook_directory = opendir(paths::getDataPath().c_str());
-    if (!cathook_directory)
+    DIR *rosnehook_directory = opendir(paths::getDataPath().c_str());
+    if (!rosnehook_directory)
     {
-        logging::Info("[ERROR] cathook data directory doesn't exist! How did the cheat even get injected?");
+        logging::Info("[ERROR] Rosnehook data directory doesn't exist! How did the cheat even get injected?");
         return;
     }
     else
-        closedir(cathook_directory);
+        closedir(rosnehook_directory);
     try
     {
         std::ofstream file(paths::getDataPath("/plist"), std::ios::out | std::ios::binary);
@@ -70,14 +70,14 @@ void Save()
 void Load()
 {
     data.clear();
-    DIR *cathook_directory = opendir(paths::getDataPath().c_str());
-    if (!cathook_directory)
+    DIR *rosnehook_directory = opendir(paths::getDataPath().c_str());
+    if (!rosnehook_directory)
     {
-        logging::Info("[ERROR] cathook data directory doesn't exist! How did the cheat even get injected?");
+        logging::Info("[ERROR] Rosnehook data directory doesn't exist! How did the cheat even get injected?");
         return;
     }
     else
-        closedir(cathook_directory);
+        closedir(rosnehook_directory);
     try
     {
         std::ifstream file(paths::getDataPath("/plist"), std::ios::in | std::ios::binary);

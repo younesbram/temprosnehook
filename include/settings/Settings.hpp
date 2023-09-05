@@ -38,7 +38,7 @@
 
 namespace settings
 {
-extern std::atomic<bool> cathook_disabled;
+extern std::atomic<bool> rosnehook_disabled;
 enum class VariableType
 {
     BOOL,

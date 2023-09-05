@@ -41,9 +41,9 @@ void BeginConVars()
     {
         std::ofstream cfg_autoexec_textmode("tf/cfg/cat_autoexec_textmode.cfg", std::ios::out | std::ios::trunc);
         if (cfg_autoexec_textmode.good())
-            cfg_autoexec_textmode << "// Put your custom cathook settings in this "
+            cfg_autoexec_textmode << "// Put your custom Rosnehook settings in this "
                                      "file\n// This script will be executed EACH TIME "
-                                     "YOU INJECT TEXTMODE CATHOOK\n"
+                                     "YOU INJECT TEXTMODE Rosnehook\n"
                                      "sv_cheats 1\n"
                                      "engine_no_focus_sleep 0\n"
                                      "hud_fastswitch 1\n"
@@ -69,9 +69,9 @@ void BeginConVars()
     {
         std::ofstream cfg_autoexec("tf/cfg/cat_autoexec.cfg", std::ios::out | std::ios::trunc);
         if (cfg_autoexec.good())
-            cfg_autoexec << "// Put your custom cathook settings in this "
+            cfg_autoexec << "// Put your custom Rosnehook settings in this "
                             "file\n// This script will be executed EACH TIME "
-                            "YOU INJECT CATHOOK\n";
+                            "YOU INJECT Rosnehook\n";
 
         cfg_autoexec.close();
     }
@@ -80,7 +80,7 @@ void BeginConVars()
     {
         std::ofstream cat_matchexec("tf/cfg/cat_matchexec.cfg", std::ios::out | std::ios::trunc);
         if (cat_matchexec.good())
-            cat_matchexec << "// Put your custom cathook settings in this "
+            cat_matchexec << "// Put your custom Rosnehook settings in this "
                              "file\n// This script will be executed EACH TIME "
                              "YOU JOIN A MATCH\n";
 
@@ -101,7 +101,7 @@ void EndConVars()
     if (cfg_defaults.good())
     {
         cfg_defaults << "// This file is auto-generated and will be "
-                        "overwritten each time you inject cathook\n// Do not "
+                        "overwritten each time you inject Rosnehook\n// Do not "
                         "make edits to this file\n\n// Every registered "
                         "variable dump\n";
         for (const auto &i : RegisteredVarsList())

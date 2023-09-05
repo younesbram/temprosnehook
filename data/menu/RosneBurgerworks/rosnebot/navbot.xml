@@ -4,6 +4,7 @@
             <AutoVariable width="fill" target="nav.enabled" label="Enable pathing"/>
             <AutoVariable width="fill" target="nav.draw" label="Draw path"/>
             <AutoVariable width="fill" target="nav.look-at-path" label="Look at path"/>
+            <AutoVariable width="fill" target="nav.smooth.speed" label="Nav Smooth Speed"/>
             <AutoVariable width="fill" target="nav.rathook-spin" label="Rathook spin"
                              tooltip="Enables smooth look and rathook spin when on"/>
             <AutoVariable width="fill" target="navbot.enabled" label="Enable NavBot"/>

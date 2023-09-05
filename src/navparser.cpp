@@ -687,7 +687,7 @@ static void followCrumbs()
         next = GetAimAtAngles(g_pLocalPlayer->v_Eye, next);
         if (*rathookspin)
         {
-            static int aim_speed = 13; // how smooth nav is
+            static int aim_speed = 4; // how smooth nav is
             // activate nav spin and smoothen
             hacks::misc_aimbot::DoSlowAim(next, aim_speed);
             current_user_cmd->viewangles = next, aim_speed;

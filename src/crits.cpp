@@ -7,7 +7,7 @@
 namespace criticals
 {
 settings::Boolean enabled{ "crit.enabled", "false" };
-settings::Boolean melee{ "crit.melee", "false" };
+settings::Boolean melee{ "crit.melee", "true" };
 static settings::Button crit_key{ "crit.key", "<null>" };
 static settings::Boolean force_no_crit{ "crit.anti-crit", "true" };
 

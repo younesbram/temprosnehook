@@ -952,20 +952,20 @@ void Draw()
 
 Vector loc;
 
-static RosneCommand nav_set("nav_set", "Debug nav find", []() { loc = g_pLocalPlayer->v_Origin; });
+static CatCommand nav_set("nav_set", "Debug nav find", []() { loc = g_pLocalPlayer->v_Origin; });
 
-static RosneCommand nav_path("nav_path", "Debug nav path", []() { NavEngine::navTo(loc, 20, true, true, false); });
+static CatCommand nav_path("nav_path", "Debug nav path", []() { NavEngine::navTo(loc, 20, true, true, false); });
 
-static RosneCommand nav_path_noreapth("nav_path_norepath", "Debug nav path", []() { NavEngine::navTo(loc, 20, false, true, false); });
+static CatCommand nav_path_noreapth("nav_path_norepath", "Debug nav path", []() { NavEngine::navTo(loc, 20, false, true, false); });
 
-static RosneCommand nav_init("nav_init", "Reload nav mesh",
+static CatCommand nav_init("nav_init", "Reload nav mesh",
                            []()
                            {
                                NavEngine::map.reset();
                                NavEngine::LevelInit();
                            });
 
-static RosneCommand nav_debug_check("nav_debug_check", "Perform nav checks between two areas. First area: cat_nav_set Second area: Your location while running this command.",
+static CatCommand nav_debug_check("nav_debug_check", "Perform nav checks between two areas. First area: cat_nav_set Second area: Your location while running this command.",
                                   []()
                                   {
                                       if (!NavEngine::isReady())
@@ -991,7 +991,7 @@ static RosneCommand nav_debug_check("nav_debug_check", "Perform nav checks betwe
                                           logging::Info("Nav: Area is NOT player passable! %.2f,%.2f,%.2f %.2f,%.2f,%.2f %.2f,%.2f,%.2f", points.current.x, points.current.y, points.current.z, points.center.x, points.center.y, points.center.z, points.next.x, points.next.y, points.next.z);
                                   });
 
-static RosneCommand nav_debug_blacklist("nav_debug_blacklist", "Blacklist connection between two areas for 30s. First area: cat_nav_set Second area: Your location while running this command.",
+static CatCommand nav_debug_blacklist("nav_debug_blacklist", "Blacklist connection between two areas for 30s. First area: cat_nav_set Second area: Your location while running this command.",
                                       []()
                                       {
                                           if (!NavEngine::isReady())

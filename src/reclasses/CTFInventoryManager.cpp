@@ -78,7 +78,7 @@ unsigned long long CEconItemView::UUID()
     return b | a;
 }
 
-static RosneCommand equip_debug("equip_debug", "Debug auto equip stuff",
+static CatCommand equip_debug("equip_debug", "Debug auto equip stuff",
                               []()
                               {
                                   auto invmng    = CTFInventoryManager::GTFInventoryManager();
@@ -91,7 +91,7 @@ static RosneCommand equip_debug("equip_debug", "Debug auto equip stuff",
                                   }
                               });
 
-static RosneCommand list_debug("equip_list_debug", "Debug item def listing",
+static CatCommand list_debug("equip_list_debug", "Debug item def listing",
                              []()
                              {
                                  auto invmng = CTFInventoryManager::GTFInventoryManager();
@@ -207,4 +207,4 @@ bool Rent(int item_id)
     return true;
 }
 
-static RosneCommand debug_panel("equip_debug_panel", "Debug the Crafting panel that gets used", []() { Craft({ 5000, 5000, 5000 }); });
+static CatCommand debug_panel("equip_debug_panel", "Debug the Crafting panel that gets used", []() { Craft({ 5000, 5000, 5000 }); });

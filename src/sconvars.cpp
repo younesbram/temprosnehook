@@ -26,7 +26,7 @@ SpoofedConVar::SpoofedConVar(ConVar *var) : original(var)
     spoof = svar;
 }
 
-RosneCommand spoof_convar("spoof", "Spoof ConVar",
+CatCommand spoof_convar("spoof", "Spoof ConVar",
                         [](const CCommand &args)
                         {
                             if (args.ArgC() < 2)

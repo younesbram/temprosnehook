@@ -20,7 +20,7 @@ int count_hits_sniper{ 0 };
 int count_hits{ 0 };
 int count_hits_head{ 0 };
 
-RosneCommand clear_hirate("debug_hitrate_clear", "Clear hitrate",
+CatCommand clear_hirate("debug_hitrate_clear", "Clear hitrate",
                         []()
                         {
                             count_shots       = 0;
@@ -29,7 +29,7 @@ RosneCommand clear_hirate("debug_hitrate_clear", "Clear hitrate",
                             count_hits_head   = 0;
                         });
 
-RosneCommand debug_hitrate("debug_hitrate", "Debug hitrate",
+CatCommand debug_hitrate("debug_hitrate", "Debug hitrate",
                          []()
                          {
                              int p1 = 0;
@@ -44,7 +44,7 @@ RosneCommand debug_hitrate("debug_hitrate", "Debug hitrate",
                              logging::Info("%d / %d (%d%%)", count_hits_head, count_hits_sniper, p2);
                          });
 
-RosneCommand debug_ammo("debug_ammo", "Debug ammo",
+CatCommand debug_ammo("debug_ammo", "Debug ammo",
                       []()
                       {
                           for (int i = 0; i < 4; ++i)

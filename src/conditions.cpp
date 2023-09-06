@@ -8,7 +8,7 @@
 #include "common.hpp"
 #include <bitset>
 
-static RosneCommand dump_conditions("debug_conditions", "Shows conditions for entity #",
+static CatCommand dump_conditions("debug_conditions", "Shows conditions for entity #",
                                   [](const CCommand &args)
                                   {
                                       int id = atoi(args.Arg(1));

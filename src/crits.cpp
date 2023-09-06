@@ -1108,7 +1108,7 @@ void LevelShutdown()
 }
 
 // Prints basically everything you need to know about crits
-static RosneCommand debug_print_crit_info("debug_print_crit_info", "Print a bunch of useful crit info",
+static CatCommand debug_print_crit_info("debug_print_crit_info", "Print a bunch of useful crit info",
                                         []()
                                         {
                                             if (CE_BAD(LOCAL_E))
@@ -1136,7 +1136,7 @@ static RosneCommand debug_print_crit_info("debug_print_crit_info", "Print a bunc
                                             }
                                         });
 
-static RosneCommand debug_data("debug_data", "debug",
+static CatCommand debug_data("debug_data", "debug",
                              []()
                              {
                                  IClientEntity *wep = RAW_ENT(LOCAL_W);

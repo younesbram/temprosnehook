@@ -78,7 +78,7 @@ static std::vector<std::string> asia_datacenters          = { { "bom" }, { "dxb"
 static std::vector<std::string> oceana_datacenters        = { { "syd" }, { "vie" } };
 static std::vector<std::string> africa_datacenters        = { { "jnb" } };
 
-static RosneCommand print("dc_print", "Print codes of all available data centers",
+static CatCommand print("dc_print", "Print codes of all available data centers",
                         []()
                         {
                             static auto GetPOPCount = *(int (**)(void *))(*(uintptr_t *) g_ISteamNetworkingUtils + 37);
@@ -116,7 +116,7 @@ static void Refresh()
     gc[0x374] = true;
 }
 
-static RosneCommand force_refersh("dc_refresh", "Force refresh of ping data", Refresh);
+static CatCommand force_refersh("dc_refresh", "Force refresh of ping data", Refresh);
 
 static void OnRegionsUpdate(std::string regions)
 {

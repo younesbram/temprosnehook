@@ -210,7 +210,7 @@ void ApplySpreadCorrection(Vector &angles, int seed, float spread)
 }
 
 
-static RosneCommand nospread_sync("nospread_sync", "Try to sync client and server time",
+static CatCommand nospread_sync("nospread_sync", "Try to sync client and server time",
                                 []()
                                 {
                                     if (!bullet)
@@ -223,7 +223,7 @@ static RosneCommand nospread_sync("nospread_sync", "Try to sync client and serve
                                     g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Trying to sync Seed...\n");
                                 });
 
-static RosneCommand nospread_resync("nospread_resync", "Try to sync client and server time",
+static CatCommand nospread_resync("nospread_resync", "Try to sync client and server time",
                                   []()
                                   {
                                       if (!bullet)
@@ -314,7 +314,7 @@ void SendNetMessagePost()
     wait_perf.update();
 }
 
-RosneCommand debug_flows("debug_flows", "debug", []() { logging::Info("Incoming: %f\n Outgoing: %f", ((INetChannel *) g_IEngine->GetNetChannelInfo())->GetLatency(FLOW_INCOMING), ((INetChannel *) g_IEngine->GetNetChannelInfo())->GetLatency(FLOW_OUTGOING)); });
+CatCommand debug_flows("debug_flows", "debug", []() { logging::Info("Incoming: %f\n Outgoing: %f", ((INetChannel *) g_IEngine->GetNetChannelInfo())->GetLatency(FLOW_INCOMING), ((INetChannel *) g_IEngine->GetNetChannelInfo())->GetLatency(FLOW_OUTGOING)); });
 
 // false == don't call original, true == call original
 // This function is used to parse the playerperf data

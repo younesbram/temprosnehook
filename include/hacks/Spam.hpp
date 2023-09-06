@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-class RosneCommand;
+class CatCommand;
 
 namespace hacks::spam
 {

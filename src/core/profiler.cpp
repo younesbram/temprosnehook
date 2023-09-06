@@ -11,7 +11,7 @@
 
 unsigned int g_spewcount{ 0 };
 
-static RosneCommand profiler_begin("profiler_spew", "Spew and reset", []() { g_spewcount++; });
+static CatCommand profiler_begin("profiler_spew", "Spew and reset", []() { g_spewcount++; });
 
 ProfilerSection::ProfilerSection(std::string name, ProfilerSection *parent)
 {

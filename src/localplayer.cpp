@@ -8,7 +8,7 @@
 #include "common.hpp"
 #include "AntiAim.hpp"
 
-RosneCommand printfov("fov_print", "Dump achievements to file (development)",
+CatCommand printfov("fov_print", "Dump achievements to file (development)",
                     []()
                     {
                         if (CE_GOOD(LOCAL_E))

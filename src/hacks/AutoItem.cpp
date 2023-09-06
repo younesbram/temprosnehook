@@ -356,7 +356,7 @@ static void CreateMove()
     }
 }
 
-RosneCommand dump_achievement("achievement_dump", "Dump achievements to file (development)",
+CatCommand dump_achievement("achievement_dump", "Dump achievements to file (development)",
                             []()
                             {
                                 if (!checkAchMgr())
@@ -369,7 +369,7 @@ RosneCommand dump_achievement("achievement_dump", "Dump achievements to file (de
                                 out.close();
                             });
 
-RosneCommand unlock_single("achievement_unlock_single", "Unlocks single achievement by ID",
+CatCommand unlock_single("achievement_unlock_single", "Unlocks single achievement by ID",
                          [](const CCommand &args)
                          {
                              if (!checkAchMgr())
@@ -385,7 +385,7 @@ RosneCommand unlock_single("achievement_unlock_single", "Unlocks single achievem
                          });
 
 // For some reason it SEGV's when I try to GetAchievementByID();
-RosneCommand lock_single("achievement_lock_single", "Locks single achievement by INDEX!",
+CatCommand lock_single("achievement_lock_single", "Locks single achievement by INDEX!",
                        [](const CCommand &args)
                        {
                            if (!checkAchMgr())
@@ -428,7 +428,7 @@ RosneCommand lock_single("achievement_lock_single", "Locks single achievement by
                            }
                        });
 
-RosneCommand rent_item("rent_item", "testrun a item by ID",
+CatCommand rent_item("rent_item", "testrun a item by ID",
                      [](const CCommand &args)
                      {
                          char *out = nullptr;
@@ -441,8 +441,8 @@ RosneCommand rent_item("rent_item", "testrun a item by ID",
                          Rent(id);
                      });
 
-RosneCommand lock("achievement_lock", "Lock all achievements", Lock);
-RosneCommand unlock("achievement_unlock", "Unlock all achievements", Unlock);
+CatCommand lock("achievement_lock", "Lock all achievements", Lock);
+CatCommand unlock("achievement_unlock", "Unlock all achievements", Unlock);
 
 void rvarCallback(std::string after, int idx)
 {

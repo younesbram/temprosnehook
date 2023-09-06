@@ -25,16 +25,16 @@ namespace ipc
 {
 static settings::String server_name{ "ipc.server", "cathook_followbot_server" };
 
-RosneCommand fix_deadlock("ipc_fix_deadlock", "Fix deadlock",
+CatCommand fix_deadlock("ipc_fix_deadlock", "Fix deadlock",
                         []()
                         {
                             if (peer)
                                 peer->memory->mutex.unlock();
                         });
 
-RosneCommand id("ipc_id", "Echo ipc id", []() { logging::Info("%d", ipc::peer->client_id); });
+CatCommand id("ipc_id", "Echo ipc id", []() { logging::Info("%d", ipc::peer->client_id); });
 
-RosneCommand connect("ipc_connect", "Connect to IPC server",
+CatCommand connect("ipc_connect", "Connect to IPC server",
                    []()
                    {
                        if (peer)
@@ -71,7 +71,7 @@ RosneCommand connect("ipc_connect", "Connect to IPC server",
                            peer = nullptr;
                        }
                    });
-RosneCommand connect_ghost("ipc_connect_ghost", "Connect to ipc but do not actually receive any commands",
+CatCommand connect_ghost("ipc_connect_ghost", "Connect to ipc but do not actually receive any commands",
                          []()
                          {
                              if (peer)
@@ -95,13 +95,13 @@ RosneCommand connect_ghost("ipc_connect_ghost", "Connect to ipc but do not actua
                                  peer = nullptr;
                              }
                          });
-RosneCommand disconnect("ipc_disconnect", "Disconnect from IPC server",
+CatCommand disconnect("ipc_disconnect", "Disconnect from IPC server",
                       []()
                       {
                           delete peer;
                           peer = nullptr;
                       });
-RosneCommand exec("ipc_exec", "Execute command (first argument = bot ID)",
+CatCommand exec("ipc_exec", "Execute command (first argument = bot ID)",
                 [](const CCommand &args)
                 {
                     char *endptr       = nullptr;
@@ -135,7 +135,7 @@ RosneCommand exec("ipc_exec", "Execute command (first argument = bot ID)",
                         peer->SendMessage(command.c_str(), target_id, ipc::commands::execute_client_cmd, nullptr, 0);
                     }
                 });
-RosneCommand exec_all("ipc_exec_all", "Execute command (on every peer)",
+CatCommand exec_all("ipc_exec_all", "Execute command (on every peer)",
                     [](const CCommand &args)
                     {
                         std::string command = args.ArgS();
@@ -150,7 +150,7 @@ RosneCommand exec_all("ipc_exec_all", "Execute command (on every peer)",
                         }
                     });
 
-RosneCommand exec_sync("ipc_sync_all", "Sync's certain variable (on every peer)",
+CatCommand exec_sync("ipc_sync_all", "Sync's certain variable (on every peer)",
                      [](const CCommand &args)
                      {
                          bool connected = false;
@@ -241,7 +241,7 @@ RosneCommand exec_sync("ipc_sync_all", "Sync's certain variable (on every peer)"
 
 peer_t *peer{ nullptr };
 
-RosneCommand debug_get_ingame_ipc("ipc_debug_dump_server", "Show other bots on server",
+CatCommand debug_get_ingame_ipc("ipc_debug_dump_server", "Show other bots on server",
                                 []()
                                 {
                                     std::vector<unsigned> players{};

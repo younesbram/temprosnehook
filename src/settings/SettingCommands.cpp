@@ -69,7 +69,7 @@ static std::string getAutoSaveConfigPath()
     return path = paths::getConfigPath() + "/autosaves/" + timeString + ".conf";
 }
 
-static RosneCommand cat("cat", "",
+static CatCommand cat("cat", "",
                       [](const CCommand &args)
                       {
                           if (args.ArgC() < 3)
@@ -113,7 +113,7 @@ static RosneCommand cat("cat", "",
                           }
                       });
 
-static RosneCommand toggle("toggle", "",
+static CatCommand toggle("toggle", "",
                          [](const CCommand &args)
                          {
                              if (args.ArgC() < 4)
@@ -141,7 +141,7 @@ static RosneCommand toggle("toggle", "",
                              g_ICvar->ConsoleColorPrintf(MENU_COLOR, "%s = \"%s\"\n", rvar.c_str(), variable->toString().c_str());
                          });
 
-static RosneCommand save("save", "",
+static CatCommand save("save", "",
                        [](const CCommand &args)
                        {
                            settings::SettingsWriter writer{ settings::Manager::instance() };
@@ -170,7 +170,7 @@ static RosneCommand save("save", "",
                            closedir(config_directory);
                        });
 
-static RosneCommand load("load", "",
+static CatCommand load("load", "",
                        [](const CCommand &args)
                        {
                            settings::SettingsReader loader{ settings::Manager::instance() };
@@ -185,7 +185,7 @@ static RosneCommand load("load", "",
                        });
 
 #if ENABLE_VISUALS
-static RosneCommand delete_config("delete_config", "",
+static CatCommand delete_config("delete_config", "",
                                 [](const CCommand &args)
                                 {
                                     if (args.ArgC() == 2)
@@ -200,7 +200,7 @@ static RosneCommand delete_config("delete_config", "",
                                     }
                                 });
 
-static RosneCommand list_config("list_config", "",
+static CatCommand list_config("list_config", "",
                               [](const CCommand &args)
                               {
                                   DIR *direc;
@@ -222,7 +222,7 @@ static RosneCommand list_config("list_config", "",
 
 static std::vector<std::string> sortedVariables{};
 #if ENABLE_VISUALS
-static RosneCommand list_missing("list_missing", "List rvars missing in menu",
+static CatCommand list_missing("list_missing", "List rvars missing in menu",
                                []()
                                {
                                    auto *sv = zerokernel::Menu::instance->wm->getElementById("special-variables");
@@ -278,7 +278,7 @@ static void getAndSortAllConfigs()
     logging::Info("Sorted %u config files\n", sortedConfigs.size());
 }
 
-static RosneCommand cat_find("find", "Find a command by name",
+static CatCommand cat_find("find", "Find a command by name",
                            [](const CCommand &args)
                            {
                                // We need arguments

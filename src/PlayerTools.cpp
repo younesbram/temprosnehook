@@ -18,7 +18,7 @@ static settings::Boolean ignoreRosnehook{ "player-tools.ignore.rosnehook", "true
 
 static boost::unordered_flat_map<unsigned, unsigned> betrayal_list{};
 
-static RosneCommand forgive_all("pt_forgive_all", "Clear betrayal list", []() { betrayal_list.clear(); });
+static CatCommand forgive_all("pt_forgive_all", "Clear betrayal list", []() { betrayal_list.clear(); });
 
 bool shouldTargetSteamId(unsigned id)
 {
@@ -121,7 +121,7 @@ void onKilledBy(unsigned id)
     }
 }
 
-static RosneCommand mark_betrayal("pl_mark_betrayal", "Mark a steamid32 as betrayal",
+static CatCommand mark_betrayal("pl_mark_betrayal", "Mark a steamid32 as betrayal",
                                 [](const CCommand &args)
                                 {
                                     if (args.ArgC() < 2)

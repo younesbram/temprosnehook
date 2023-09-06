@@ -118,7 +118,7 @@ static void updateAntiAfk()
     }
 }
 
-RosneCommand fix_cursor("fix_cursor", "Fix the GUI cursor being visible",
+CatCommand fix_cursor("fix_cursor", "Fix the GUI cursor being visible",
                       []()
                       {
                           g_ISurface->LockCursor();
@@ -544,7 +544,7 @@ void generate_schema()
     logging::Info("Generating complete!");
 }
 
-static RosneCommand generateschema("schema_generate", "Generate custom schema", generate_schema);
+static CatCommand generateschema("schema_generate", "Generate custom schema", generate_schema);
 
 bool InitSchema(const char *fileName, const char *pathID, CUtlVector<CUtlString> *pVecErrors /* = NULL */)
 {
@@ -580,16 +580,16 @@ void Schema_Reload()
     logging::Info("Loading %s", ret ? "Successful" : "Unsuccessful");
 }
 
-RosneCommand schema("schema", "Load custom schema", Schema_Reload);
+CatCommand schema("schema", "Load custom schema", Schema_Reload);
 
-RosneCommand update_gui_color("gui_color_update", "Update the GUI Color",
+CatCommand update_gui_color("gui_color_update", "Update the GUI Color",
                             []()
                             {
                                 hack::command_stack().emplace("cat set zk.style.tab-button.color.selected.background 1f1f1fff;cat set zk.style.tab-button.color.separator 000000ff;cat set zk.style.tab-button.color.hover.underline ffa200ff;cat set zk.style.tab-button.color.selected.underline ffa200ff;cat set zk.style.tooltip.border 446498ff;cat set zk.style.box.color.border 000000ff;cat set zk.style.color-preview.color.border 446498ff;cat set zk.style.modal-container.color.border 000000ff;cat set zk.style.tab-selection.color.border 000000ff;cat set zk.style.table.color.border 000000ff;cat set zk.style.checkbox.color.border 000000ff;cat set zk.style.checkbox.color.checked ffa200ff;cat set zk.style.checkbox.color.hover 1f1f1fff;cat set zk.style.input.color.border 000000ff;cat set zk.style.input.key.color.border 000000ff;cat set zk.style.input.select.border 000000ff;cat set zk.style.input.slider.color.handle_border 000000ff;cat set zk.style.input.slider.color.bar 1f1f1fff;cat set zk.style.input.text.color.border.active ffa200ff");
                                 hack::command_stack().emplace("cat set zk.style.input.text.color.border.inactive 000000ff;cat set zk.style.tree-list-entry.color.lines 42BC99ff;cat set zk.style.task.color.background.hover 616161ff;cat set zk.style.task.color.border 000000ff;cat set zk.style.taskbar.color.border 000000ff;cat set zk.style.window.color.border 000000ff;cat set zk.style.window-close-button.color.border 000000ff;cat set zk.style.window-header.color.background.active 2a2a2aff;cat set zk.style.window-header.color.border.inactive 000000ff;cat set zk.style.window-header.color.border.active 000000ff");
                             });
 
-RosneCommand name("name_set", "Immediate name change",
+CatCommand name("name_set", "Immediate name change",
                 [](const CCommand &args)
                 {
                     if (args.ArgC() < 2)
@@ -614,7 +614,7 @@ RosneCommand name("name_set", "Immediate name change",
                     }
                 });
 
-RosneCommand set_value("set", "Set value",
+CatCommand set_value("set", "Set value",
                      [](const CCommand &args)
                      {
                          if (args.ArgC() < 2)
@@ -630,7 +630,7 @@ RosneCommand set_value("set", "Set value",
                          logging::Info("Set '%s' to '%s'", args.Arg(1), value.c_str());
                      });
 
-RosneCommand get_value("get", "Set value",
+CatCommand get_value("get", "Set value",
                      [](const CCommand &args)
                      {
                          if (args.ArgC() < 2)
@@ -641,7 +641,7 @@ RosneCommand get_value("get", "Set value",
                          logging::Info("'%s': '%s'", args.Arg(1), var->GetString());
                      });
 
-RosneCommand say_lines("say_lines", "Say with newlines (\\n)",
+CatCommand say_lines("say_lines", "Say with newlines (\\n)",
                      [](const CCommand &args)
                      {
                          std::string message(args.ArgS());
@@ -650,7 +650,7 @@ RosneCommand say_lines("say_lines", "Say with newlines (\\n)",
                          g_IEngine->ServerCmd(cmd.c_str());
                      });
 
-RosneCommand disconnect("disconnect", "Disconnect with custom reason",
+CatCommand disconnect("disconnect", "Disconnect with custom reason",
                       [](const CCommand &args)
                       {
                           auto ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
@@ -661,7 +661,7 @@ RosneCommand disconnect("disconnect", "Disconnect with custom reason",
                           ch->Shutdown(string.c_str());
                       });
 
-RosneCommand disconnect_vac("disconnect_vac", "Disconnect (fake VAC)",
+CatCommand disconnect_vac("disconnect_vac", "Disconnect (fake VAC)",
                           []()
                           {
                               auto ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
@@ -711,8 +711,8 @@ void DumpRecvTable(CachedEntity *ent, RecvTable *table, int depth, const char *f
         logging::Info("==== END OF TABLE: %s IN DEAPTH %d", table->GetName(), depth);
 }
 
-// RosneCommand to dumb netvar info
-static RosneCommand dump_vars("debug_dump_netvars", "Dump netvars of entity",
+// CatCommand to dumb netvar info
+static CatCommand dump_vars("debug_dump_netvars", "Dump netvars of entity",
                             [](const CCommand &args)
                             {
                                 if (args.ArgC() < 2)
@@ -729,7 +729,7 @@ static RosneCommand dump_vars("debug_dump_netvars", "Dump netvars of entity",
                                 DumpRecvTable(ent, clz->m_pRecvTable, 0, ft, 0);
                             });
 
-static RosneCommand dump_vars_by_name("debug_dump_netvars_name", "Dump netvars of entity with target name",
+static CatCommand dump_vars_by_name("debug_dump_netvars_name", "Dump netvars of entity with target name",
                                     [](const CCommand &args)
                                     {
                                         if (args.ArgC() < 2)
@@ -749,7 +749,7 @@ static RosneCommand dump_vars_by_name("debug_dump_netvars_name", "Dump netvars o
                                         }
                                     });
 
-static RosneCommand debug_print_weaponid("debug_weaponid", "Print the weapon IDs of all currently equiped weapons",
+static CatCommand debug_print_weaponid("debug_weaponid", "Print the weapon IDs of all currently equiped weapons",
                                        [](const CCommand &)
                                        {
                                            // Invalid player
@@ -975,9 +975,9 @@ static InitRoutine init_pyrovision(
     });
 #endif
 
-static RosneCommand print_eye_diff("debug_print_eye_diff", "debug", []() { logging::Info("%f", g_pLocalPlayer->v_Eye.z - LOCAL_E->m_vecOrigin().z); });
+static CatCommand print_eye_diff("debug_print_eye_diff", "debug", []() { logging::Info("%f", g_pLocalPlayer->v_Eye.z - LOCAL_E->m_vecOrigin().z); });
 
-static RosneCommand print_hash("debug_print_hash", "Log the models and hashes of all entities",
+static CatCommand print_hash("debug_print_hash", "Log the models and hashes of all entities",
                              []()
                              {
                                  for (auto &ent : entity_cache::valid_ents)

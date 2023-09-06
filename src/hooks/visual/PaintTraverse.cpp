@@ -15,7 +15,7 @@ static settings::Boolean debug_log_panel_names{ "debug.log-panels", "false" };
 static settings::Int waittime{ "debug.join-wait-time", "2500" };
 int spamdur = 0;
 Timer joinspam{};
-RosneCommand join_spam("join_spam", "Spam joins server for X seconds",
+CatCommand join_spam("join_spam", "Spam joins server for X seconds",
                      [](const CCommand &args)
                      {
                          if (args.ArgC() < 2)
@@ -24,7 +24,7 @@ RosneCommand join_spam("join_spam", "Spam joins server for X seconds",
                          joinspam.update();
                          spamdur = id;
                      });
-RosneCommand join("mm_join", "Join mm Match",
+CatCommand join("mm_join", "Join mm Match",
                 []()
                 {
                     auto gc = re::CTFGCClientSystem::GTFGCClientSystem();

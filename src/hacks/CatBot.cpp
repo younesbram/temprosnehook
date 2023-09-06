@@ -115,7 +115,7 @@ Timer micspam_off_timer{};
 
 Timer crouchcdr{};
 
-RosneCommand print_ammo("debug_print_ammo", "debug",
+CatCommand print_ammo("debug_print_ammo", "debug",
                       []()
                       {
                           if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer() || CE_BAD(LOCAL_W))

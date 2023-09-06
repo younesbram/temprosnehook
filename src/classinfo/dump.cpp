@@ -22,4 +22,4 @@ void PerformClassDump()
     }
 }
 
-static RosneCommand do_dump("debug_dump_classes", "Dump classes", PerformClassDump);
+static CatCommand do_dump("debug_dump_classes", "Dump classes", PerformClassDump);

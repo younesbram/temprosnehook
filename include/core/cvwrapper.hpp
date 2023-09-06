@@ -16,11 +16,11 @@ class ConVar;
 #include <vector>
 #include <functional>
 
-class CatCommand
+class RosneCommand
 {
 public:
-    CatCommand(std::string name, std::string help, FnCommandCallback_t callback);
-    CatCommand(std::string name, std::string help, FnCommandCallbackVoid_t callback);
+    RosneCommand(std::string name, std::string help, FnCommandCallback_t callback);
+    RosneCommand(std::string name, std::string help, FnCommandCallbackVoid_t callback);
 
     void Register();
 
@@ -34,6 +34,6 @@ public:
     ConCommand *cmd{ nullptr };
 };
 
-std::vector<CatCommand *> &commandRegistrationArray();
+std::vector<RosneCommand *> &commandRegistrationArray();
 
-void RegisterCatCommands();
+void RegisterRosneCommands();

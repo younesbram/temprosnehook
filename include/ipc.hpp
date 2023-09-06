@@ -15,7 +15,7 @@
 #include "pthread.h"
 #include <ctime>
 
-class CatCommand;
+class RosneCommand;
 
 namespace ipc
 {

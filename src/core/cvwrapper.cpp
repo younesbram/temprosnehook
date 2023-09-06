@@ -9,23 +9,23 @@
 #include <helpers.hpp>
 #include <utility>
 
-std::vector<CatCommand *> &commandRegistrationArray()
+std::vector<RosneCommand *> &commandRegistrationArray()
 {
-    static std::vector<CatCommand *> vector;
+    static std::vector<RosneCommand *> vector;
     return vector;
 }
 
-CatCommand::CatCommand(std::string _name, std::string _help, FnCommandCallback_t _callback) : name(std::move(_name)), help(std::move(_help)), callback(_callback)
+RosneCommand::RosneCommand(std::string _name, std::string _help, FnCommandCallback_t _callback) : name(std::move(_name)), help(std::move(_help)), callback(_callback)
 {
     commandRegistrationArray().push_back(this);
 }
 
-CatCommand::CatCommand(std::string _name, std::string _help, FnCommandCallbackVoid_t _callback) : name(std::move(_name)), help(std::move(_help)), callback_void(_callback)
+RosneCommand::RosneCommand(std::string _name, std::string _help, FnCommandCallbackVoid_t _callback) : name(std::move(_name)), help(std::move(_help)), callback_void(_callback)
 {
     commandRegistrationArray().push_back(this);
 }
 
-void CatCommand::Register()
+void RosneCommand::Register()
 {
     char *name_c = new char[256];
     char *help_c = new char[256];
@@ -40,17 +40,17 @@ void CatCommand::Register()
     else if (callback_void)
         cmd = new ConCommand(name_c, callback_void, help_c);
     else
-        throw std::logic_error("no callback in CatCommand");
+        throw std::logic_error("no callback in RosneCommand");
     g_ICvar->RegisterConCommand(cmd);
     RegisteredCommandsList().push_back(cmd);
     // name_c and help_c are not freed because ConCommandBase doesn't copy them
 }
 
-void RegisterCatCommands()
+void RegisterRosneCommands()
 {
     while (!commandRegistrationArray().empty())
     {
-        CatCommand *cmd = commandRegistrationArray().back();
+        RosneCommand *cmd = commandRegistrationArray().back();
         cmd->Register();
         commandRegistrationArray().pop_back();
     }

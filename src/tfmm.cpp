@@ -13,20 +13,20 @@
 static settings::Boolean auto_party{ "player-tools.set-party-state", "true" };
 settings::Int queue{ "autoqueue.mode", "7" };
 
-CatCommand cmd_queue_start("mm_queue_casual", "Start casual queue", []() { tfmm::StartQueue(); });
+RosneCommand cmd_queue_start("mm_queue_casual", "Start casual queue", []() { tfmm::StartQueue(); });
 
-CatCommand queue_party("mm_queue_party", "Queue for Party",
+RosneCommand queue_party("mm_queue_party", "Queue for Party",
                        []()
                        {
                            re::CTFPartyClient *client = re::CTFPartyClient::GTFPartyClient();
                            client->RequestQueueForStandby();
                        });
 
-CatCommand cmd_abandon("mm_abandon", "Abandon match", []() { tfmm::Abandon(); });
+RosneCommand cmd_abandon("mm_abandon", "Abandon match", []() { tfmm::Abandon(); });
 
-CatCommand abandoncmd("disconnect_and_abandon", "Disconnect and abandon", []() { tfmm::DisconnectAndAbandon(); });
+RosneCommand abandoncmd("disconnect_and_abandon", "Disconnect and abandon", []() { tfmm::DisconnectAndAbandon(); });
 
-CatCommand get_state("mm_state", "Get party state",
+RosneCommand get_state("mm_state", "Get party state",
                      []()
                      {
                          re::CTFParty *party = re::CTFParty::GetParty();
@@ -38,9 +38,9 @@ CatCommand get_state("mm_state", "Get party state",
                          logging::Info("State: %d", re::CTFParty::state_(party));
                      });
 
-static CatCommand mm_stop_queue("mm_stop_queue", "Stop current TF2 MM queue", []() { tfmm::LeaveQueue(); });
+static RosneCommand mm_stop_queue("mm_stop_queue", "Stop current TF2 MM queue", []() { tfmm::LeaveQueue(); });
 
-static CatCommand mm_debug_leader("mm_debug_leader", "Get party's leader",
+static RosneCommand mm_debug_leader("mm_debug_leader", "Get party's leader",
                                   []()
                                   {
                                       CSteamID id;
@@ -51,7 +51,7 @@ static CatCommand mm_debug_leader("mm_debug_leader", "Get party's leader",
                                           logging::Info("Failed to get party leader");
                                   });
 
-static CatCommand mm_debug_promote("mm_debug_promote", "Promote player to leader",
+static RosneCommand mm_debug_promote("mm_debug_promote", "Promote player to leader",
                                    [](const CCommand &args)
                                    {
                                        if (args.ArgC() < 2)
@@ -64,7 +64,7 @@ static CatCommand mm_debug_promote("mm_debug_promote", "Promote player to leader
                                        logging::Info("Success ? %d", succ);
                                    });
 
-static CatCommand mm_debug_kick("mm_debug_kick", "Kick player from party",
+static RosneCommand mm_debug_kick("mm_debug_kick", "Kick player from party",
                                 [](const CCommand &args)
                                 {
                                     if (args.ArgC() < 2)
@@ -77,7 +77,7 @@ static CatCommand mm_debug_kick("mm_debug_kick", "Kick player from party",
                                     logging::Info("Success ? %d", succ);
                                 });
 
-static CatCommand mm_debug_chat("mm_debug_chat", "Debug party chat",
+static RosneCommand mm_debug_chat("mm_debug_chat", "Debug party chat",
                                 [](const CCommand &args)
                                 {
                                     if (args.ArgC() <= 1)
@@ -117,7 +117,7 @@ static bool GetMMBanData(int type, int *time, int *time2)
     return GetMMBanData_fn(type, time, time2);
 }
 
-static CatCommand mm_debug_banned("mm_debug_banned", "Prints if your are MM banned and extra data if you are banned",
+static RosneCommand mm_debug_banned("mm_debug_banned", "Prints if your are MM banned and extra data if you are banned",
                                   []()
                                   {
                                       int i, time, left, banned;

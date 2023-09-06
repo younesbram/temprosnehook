@@ -219,10 +219,10 @@ bool ChangeState(CachedEntity *entity, k_EState state, bool force)
     return false;
 }
 
-CatCommand pl_save("pl_save", "Save playerlist", Save);
-CatCommand pl_load("pl_load", "Load playerlist", Load);
+RosneCommand pl_save("pl_save", "Save playerlist", Save);
+RosneCommand pl_load("pl_load", "Load playerlist", Load);
 
-CatCommand pl_print("pl_print", "Print current player list",
+RosneCommand pl_print("pl_print", "Print current player list",
                     [](const CCommand &args)
                     {
                         userdata empty{};
@@ -243,7 +243,7 @@ CatCommand pl_print("pl_print", "Print current player list",
                         }
                     });
 
-CatCommand pl_add_id("pl_add_id", "Sets state for steamid",
+RosneCommand pl_add_id("pl_add_id", "Sets state for steamid",
                      [](const CCommand &args)
                      {
                          if (args.ArgC() <= 2)
@@ -280,9 +280,9 @@ static void pl_cleanup()
     logging::Info("%lu elements were removed", counter);
 }
 
-CatCommand pl_clean("pl_clean", "Removes empty entries to reduce RAM usage", pl_cleanup);
+RosneCommand pl_clean("pl_clean", "Removes empty entries to reduce RAM usage", pl_cleanup);
 
-CatCommand pl_set_state("pl_set_state", "cat_pl_set_state [playername] [state] (Tab to autocomplete)",
+RosneCommand pl_set_state("pl_set_state", "cat_pl_set_state [playername] [state] (Tab to autocomplete)",
                         [](const CCommand &args)
                         {
                             if (args.ArgC() != 3)
@@ -396,7 +396,7 @@ static int cat_pl_set_state_completionCallback(const char *c_partial, char comma
 }
 
 #if ENABLE_VISUALS
-CatCommand pl_set_color("pl_set_color", "pl_set_color uniqueid r g b",
+RosneCommand pl_set_color("pl_set_color", "pl_set_color uniqueid r g b",
                         [](const CCommand &args)
                         {
                             if (args.ArgC() < 5)
@@ -414,7 +414,7 @@ CatCommand pl_set_color("pl_set_color", "pl_set_color uniqueid r g b",
                         });
 #endif
 
-CatCommand pl_info("pl_info", "pl_info uniqueid",
+RosneCommand pl_info("pl_info", "pl_info uniqueid",
                    [](const CCommand &args)
                    {
                        if (args.ArgC() < 2)

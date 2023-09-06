@@ -93,8 +93,8 @@ void BeginConVars()
 
 void EndConVars()
 {
-    logging::Info("Registering CatCommands");
-    RegisterCatCommands();
+    logging::Info("Registering RosneCommands");
+    RegisterRosneCommands();
     ConVar_Register();
 
     std::ofstream cfg_defaults("tf/cfg/cat_defaults.cfg", std::ios::out | std::ios::trunc);
@@ -1722,7 +1722,7 @@ void ValidateUserCmd(CUserCmd *cmd, int sequence_nr)
 }
 
 // Used for getting class names
-CatCommand print_classnames("debug_print_classnames", "Lists classnames currently available in console",
+RosneCommand print_classnames("debug_print_classnames", "Lists classnames currently available in console",
                             []()
                             {
                                 // Go through all the entities

@@ -33,7 +33,7 @@
 
 float last_say = 0.0f;
 
-CatCommand spectate("spectate", "Spectate",
+RosneCommand spectate("spectate", "Spectate",
                     [](const CCommand &args)
                     {
                         if (args.ArgC() < 2)

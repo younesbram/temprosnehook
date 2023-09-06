@@ -47,8 +47,8 @@ void RemoveNullHook()
 {
     g_IMaterialSystem->SetInStubMode(false);
 }
-static CatCommand ApplyNullhook("debug_material_hook", "Debug", []() { NullHook(); });
-static CatCommand RemoveNullhook("debug_material_hook_clear", "Debug", []() { RemoveNullHook(); });
+static RosneCommand ApplyNullhook("debug_material_hook", "Debug", []() { NullHook(); });
+static RosneCommand RemoveNullhook("debug_material_hook_clear", "Debug", []() { RemoveNullHook(); });
 static settings::Boolean debug_framerate("debug.framerate", "false");
 static float framerate = 0.0f;
 static Timer send_timer{};
@@ -195,7 +195,7 @@ static bool FSHook_Precache(const char *pFileName, const char *pPathID)
     return true;
 }
 
-static CatCommand debug_invalidate("invalidate_mdl_cache", "Invalidates MDL cache", []() { g_IBaseClient->InvalidateMdlCache(); });
+static RosneCommand debug_invalidate("invalidate_mdl_cache", "Invalidates MDL cache", []() { g_IBaseClient->InvalidateMdlCache(); });
 
 static hooks::VMTHook fs_hook{}, fs_hook2{};
 static bool hooked_fs = false;

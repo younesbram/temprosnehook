@@ -191,7 +191,7 @@ static void load()
     zerokernel::Menu::instance->setInGame(true);
 }
 
-static CatCommand reload("gui_reload", "Reload", []() { load(); });
+static RosneCommand reload("gui_reload", "Reload", []() { load(); });
 
 void gui::init()
 {

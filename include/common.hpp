@@ -33,6 +33,7 @@
 #if ENABLE_VISUALS
 #include <visual/colors.hpp>
 #include <visual/drawing.hpp>
+#include <visual/atlas.hpp>
 #endif
 
 #include "core/profiler.hpp"

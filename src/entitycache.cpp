@@ -1,9 +1,9 @@
 /*
  * entitycache.cpp
  *
- *  Created on: Nov 7, 2016
- *      Author: nullifiedcat
- */
+ * Rewritten on: September 9th, 2023
+ *      Author: rosne-gamingyt
+*/
 
 #include "common.hpp"
 #include <settings/Float.hpp>
@@ -45,7 +45,7 @@ bool CachedEntity::IsVisible()
         result = m_vecOrigin();
     else
         result = hitbox->center;
-    // Just check a centered hitbox. This is mostly used for ESP anyway
+    // for nig
     if (IsEntityVectorVisible(this, result, true, MASK_SHOT_HULL, nullptr, true))
     {
         m_bAnyHitboxVisible = true;
@@ -79,7 +79,6 @@ void Update()
     if (max >= MAX_ENTITIES)
         max = MAX_ENTITIES - 1;
 
-    // pre-allocate memory
     valid_ents.reserve(max);
     player_cache.reserve(g_GlobalVars->maxClients);
 
@@ -91,7 +90,6 @@ void Update()
             auto internal_entity = val.InternalEntity();
             if (internal_entity)
             {
-                // Non-dormant entities that need bone updates
                 if (!internal_entity->IsDormant())
                 {
                     valid_ents.emplace_back(&val);
@@ -126,7 +124,6 @@ void Update()
             if (internal_entity)
             {
                 auto ent_type = ent.m_Type();
-                // Non-dormant entities that need bone updates
                 if (!internal_entity->IsDormant())
                 {
                     valid_ents.emplace_back(&ent);
@@ -141,7 +138,6 @@ void Update()
                     }
                 }
 
-                // Even dormant players have player info
                 if (ent_type == ENTITY_PLAYER)
                 {
                     if (!ent.player_info)

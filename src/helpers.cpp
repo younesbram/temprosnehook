@@ -57,12 +57,12 @@ void BeginConVars()
 
     if (!std::ifstream("tf/cfg/trusted.cfg"))
     {
-        std::ofstream cfg_autoexec("tf/cfg/trusted.cfg", std::ios::out | std::ios::trunc);
-        if (cfg_autoexec.good())
-            cfg_autoexec << "// trusted ppl\n"
+        std::ofstream cfg_trusted("tf/cfg/trusted.cfg", std::ios::out | std::ios::trunc);
+        if (cfg_trusted.good())
+            cfg_trusted << "// trusted ppl\n"
                             "cat_pl_add_id 1231699043 FRIEND";
 
-        cfg_autoexec.close();
+        cfg_trusted.close();
     }
 
     if (!std::ifstream("tf/cfg/cat_autoexec.cfg"))

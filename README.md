@@ -1,5 +1,9 @@
 # Rosnehook: We Love Bones!
 
+## Is it compiled?
+
+[![CircleCI](https://circleci.com/gh/nullworks/cathook.svg?style=svg)](https://circleci.com/gh/RosneBurgerworks/rosnehook)
+
 ## Shoppy!
 
 https://shoppy.gg/@RosneGaming

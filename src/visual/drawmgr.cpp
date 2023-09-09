@@ -4,7 +4,6 @@
  *  Created on: May 22, 2017
  *      Author: nullifiedcat
  */
-
 #include <MiscTemporary.hpp>
 #include <hacks/Aimbot.hpp>
 #include <hacks/hacklist.hpp>
@@ -26,11 +25,11 @@
 #include "drawmgr.hpp"
 
 static settings::Boolean info_text{ "hack-info.enable", "true" };
+static settings::Boolean info_text_min{ "hack-info.minimal", "false" };
 static settings::Int info_style{ "hack-info.style", "0" };
-static settings::Rgba info_background_color{"hack-info.background", "00000b3"};
-static settings::Rgba info_foreground_color{"hack-info.foreground", "ffffff"};
 static settings::Int info_x{"hack-info.x", "10"};
 static settings::Int info_y{"hack-info.y", "10"};
+static settings::Float info_alpha{"hack-info.alpha", "0.7"};
 
 void RenderCheatVisuals()
 {
@@ -65,32 +64,34 @@ void BeginCheatVisuals()
     ResetStrings();
 }
 
-double getRandom(double lower_bound, double upper_bound)
-{
-    std::uniform_real_distribution<double> unif(lower_bound, upper_bound);
-    static std::mt19937 rand_engine(std::time(nullptr));
-
-    double x = unif(rand_engine);
-    return x;
-}
-
 void DrawCheatVisuals()
 {
     {
         PROF_SECTION(DRAW_info);
         std::string name_s, reason_s;
         PROF_SECTION(PT_info_text);
-        if (info_text)
+        #if ENABLE_GUI
+        if (*info_text)
         {
-            float w, h;
-            std::string hack_info_text;
-            if (*info_style == 0) {
-                hack_info_text = "Rosnehook InDev " + hack::GetVersion();
-                fonts::center_screen->stringSize(hack_info_text, &w, &h);
-                draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
-            }
+        if (*info_style ==  0) {
+        char timeString[10];
+        time_t current_time;
+        struct tm *time_info;
+        time(&current_time);
+        time_info = localtime(&current_time);
+        strftime(timeString, sizeof(timeString), "%H:%M:%S", time_info);
+
+        
+        float w, h;
         }
-    }   
+        else if(*info_style == 1) {
+           auto color = colors::RainbowCurrent();
+            color.a    = 1.0f;
+            AddSideString("Rosnehook InDev", color);
+        }
+#endif
+        }
+    }
     if (spectator_target)
     {
         AddCenterString("Press SPACE to stop spectating");

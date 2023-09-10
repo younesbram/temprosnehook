@@ -2,6 +2,6 @@
     <TabContainer width="fill" height="fill">
         <Include path="RosneBurgerworks/visuals/ui.xml"/>
         <Include path="RosneBurgerworks/visuals/colors.xml"/>
-        <Include path="RosneBurgerworks/visuals/world.xml"/>
+        <Include path="RosneBurgerworks/visuals/removal.xml"/>
     </TabContainer>
 </Tab>

@@ -24,7 +24,11 @@ static settings::Boolean render_zoomed{ "visual.render-local-zoomed", "true" };
 static settings::Boolean anti_afk{ "misc.anti-afk", "true" };
 static settings::Boolean auto_jump{ "misc.auto-jump", "false" };
 static settings::Int auto_jump_chance{ "misc.auto-jump.chance", "100" };
+#if !ENABLE_TEXTMODE
+static settings::Int auto_strafe{ "misc.autostrafe", "1" };
+#else
 static settings::Int auto_strafe{ "misc.autostrafe", "0" };
+#endif
 settings::Boolean tauntslide{ "misc.tauntslide", "true" };
 static settings::Boolean nopush_enabled{ "misc.no-push", "true" };
 static settings::Boolean dont_hide_stealth_kills{ "misc.dont-hide-stealth-kills", "true" };

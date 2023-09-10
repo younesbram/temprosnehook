@@ -23,7 +23,6 @@ bool ignoredc             = false;
 bool *bSendPackets{ nullptr };
 bool ignoreKeys{ false };
 
-settings::Boolean clean_screenshots{ "visual.clean-screenshots", "false" };
 settings::Boolean nolerp{ "misc.no-lerp", "true" };
 float backup_lerp = 0.0f;
 settings::Int fakelag_amount{ "misc.fakelag", "0" };

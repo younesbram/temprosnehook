@@ -881,48 +881,12 @@ UpdateLocalPlayerVisionFlags_t UpdateLocalPlayerVisionFlags_fn;
 
 int *g_nLocalPlayerVisionFlags;
 int *g_nLocalPlayerVisionFlagsWeaponsCheck;
-// If you wish then change this to some other flag you want to apply/remove
-constexpr int PYROVISION = 1;
-
-static settings::Int force_pyrovision("visual.force-pyrovision", "0");
-
-void UpdateLocalPlayerVisionFlags()
-{
-    UpdateLocalPlayerVisionFlags_fn();
-    if (!force_pyrovision)
-        return;
-    if (*force_pyrovision == 2)
-    {
-        *g_nLocalPlayerVisionFlags &= ~PYROVISION;
-        *g_nLocalPlayerVisionFlagsWeaponsCheck &= ~PYROVISION;
-    }
-    else
-    {
-        *g_nLocalPlayerVisionFlags |= PYROVISION;
-        *g_nLocalPlayerVisionFlagsWeaponsCheck |= PYROVISION;
-    }
-}
 
 #define access_ptr(p, i) ((uint8_t *) &(p))[i]
 
 static InitRoutine init_pyrovision(
     []()
     {
-        uintptr_t addr                        = CSignature::GetClientSignature("8B 35 ? ? ? ? 75 27");
-        g_nLocalPlayerVisionFlags             = *reinterpret_cast<int **>(addr + 2);
-        g_nLocalPlayerVisionFlagsWeaponsCheck = *reinterpret_cast<int **>(addr + 8 + 2);
-        addr                                  = CSignature::GetClientSignature("C7 04 24 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? E8");
-        if (!addr)
-            return;
-        addr += 17;
-        UpdateLocalPlayerVisionFlags_fn = UpdateLocalPlayerVisionFlags_t(e8call_direct(addr));
-
-        auto relAddr = ((uintptr_t) UpdateLocalPlayerVisionFlags - (uintptr_t) addr) - 5;
-
-        static BytePatch patch{ addr, { 0xE8, access_ptr(relAddr, 0), access_ptr(relAddr, 1), access_ptr(relAddr, 2), access_ptr(relAddr, 3) } };
-        patch.Patch();
-        EC::Register(
-            EC::Shutdown, []() { patch.Shutdown(); }, "shutdown_pyrovis");
 #if !ENFORCE_STREAM_SAFETY
         EC::Register(
             EC::Paint,

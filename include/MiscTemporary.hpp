@@ -38,7 +38,6 @@ extern int spectator_target;
 extern bool freecam_is_toggled;
 #endif
 
-extern settings::Boolean clean_screenshots;
 extern settings::Boolean nolerp;
 extern float backup_lerp;
 extern settings::Int fakelag_amount;

@@ -19,7 +19,6 @@ settings::Rgba col_blu_v{ "colors.team-blu.vaccinator", "66b6c4ff" };
 settings::Rgba col_red_u{ "colors.team-red.ubercharge", "ff6600ff" };
 settings::Rgba col_blu_u{ "colors.team-blu.ubercharge", "003399ff" };
 settings::Rgba col_guicolor{ "colors.guicolor", "ffffffff" };
-settings::Rgba col_target{ "colors.target", "00ff00ff" };
 
 rgba_t red    = *col_red;
 rgba_t blu    = *col_blu;
@@ -30,7 +29,6 @@ rgba_t blu_v  = *col_blu_v;
 rgba_t red_u  = *col_red_u;
 rgba_t blu_u  = *col_blu_u;
 rgba_t gui    = *col_guicolor;
-rgba_t target = *col_target;
 
 static InitRoutine init(
     []()
@@ -44,7 +42,6 @@ static InitRoutine init(
         col_red_u.installChangeCallback([](settings::VariableBase<rgba_t> &var, rgba_t after) { red_u = after; });
         col_blu_u.installChangeCallback([](settings::VariableBase<rgba_t> &var, rgba_t after) { blu_u = after; });
         col_guicolor.installChangeCallback([](settings::VariableBase<rgba_t> &var, rgba_t after) { gui = after; });
-        col_target.installChangeCallback([](settings::VariableBase<rgba_t> &var, rgba_t after) { target = after; });
     });
 } // namespace colors
 

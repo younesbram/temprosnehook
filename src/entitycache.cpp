@@ -45,7 +45,7 @@ bool CachedEntity::IsVisible()
         result = m_vecOrigin();
     else
         result = hitbox->center;
-    // Just check a centered hitbox. This is mostly used for ESP anyway
+    // Just check a centered hitbox. This was mostly used for ESP anyway
     if (IsEntityVectorVisible(this, result, true, MASK_SHOT_HULL, nullptr, true))
     {
         m_bAnyHitboxVisible = true;

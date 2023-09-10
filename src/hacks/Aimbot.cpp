@@ -7,7 +7,6 @@
 
 #include <hacks/Aimbot.hpp>
 #include <hacks/AntiAim.hpp>
-#include <hacks/ESP.hpp>
 #include <hacks/Backtrack.hpp>
 #include <PlayerTools.hpp>
 #include <settings/Bool.hpp>
@@ -850,10 +849,6 @@ bool Aim(CachedEntity *entity)
     if (slow_aim != 0)
         DoSlowAim(angles);
 
-#if ENABLE_VISUALS
-    if (entity->m_Type() == ENTITY_PLAYER)
-        hacks::esp::SetEntityColor(entity, colors::target);
-#endif
     // Set angles
     current_user_cmd->viewangles = angles;
 

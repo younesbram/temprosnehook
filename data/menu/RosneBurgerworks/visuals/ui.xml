@@ -14,7 +14,6 @@
                     <Option name="Menu on" value="3"/>
                 </Select>
             </LabeledObject>
-            <AutoVariable width="fill" target="visual.font_size.esp" label="Main font size"/>
             <AutoVariable width="fill" target="visual.font_size.center_size" label="Center string font size"/>
         </List>
     </Box>

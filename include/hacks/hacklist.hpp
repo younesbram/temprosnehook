@@ -11,7 +11,6 @@
 
 #if ENABLE_VISUALS
 
-#include "ESP.hpp"
 
 #endif
 #include "Aimbot.hpp"

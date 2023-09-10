@@ -15,8 +15,3 @@ set(files "${CMAKE_CURRENT_LIST_DIR}/AutoJoin.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Noisemaker.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Warp.cpp")
 target_sources(cathook PRIVATE ${files})
-
-if (EnableVisuals)
-    set(files "${CMAKE_CURRENT_LIST_DIR}/ESP.cpp")
-    target_sources(cathook PRIVATE ${files})
-endif()

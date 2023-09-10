@@ -11,6 +11,7 @@
                     <Option name="Multidir" value="2"/>
                 </Select>
             </LabeledObject>
+            <AutoVariable width="fill" target="misc.accurate-movement" label="Accurate movement"/>
             <AutoVariable width="fill" target="misc.tauntslide" label="Taunt slide"/>
             <AutoVariable width="fill" target="misc.no-push" label="No push"/>
             <AutoVariable width="fill" target="misc.anti-afk" label="Anti AFK"/>

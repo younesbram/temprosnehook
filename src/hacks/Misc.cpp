@@ -25,6 +25,7 @@ static settings::Boolean anti_afk{ "misc.anti-afk", "true" };
 static settings::Boolean auto_jump{ "misc.auto-jump", "false" };
 static settings::Int auto_jump_chance{ "misc.auto-jump.chance", "100" };
 static settings::Int auto_strafe{ "misc.autostrafe", "0" };
+static settings::Boolean accurate_movement{ "misc.accurate-movement", "false" };
 settings::Boolean tauntslide{ "misc.tauntslide", "true" };
 static settings::Boolean nopush_enabled{ "misc.no-push", "true" };
 static settings::Boolean dont_hide_stealth_kills{ "misc.dont-hide-stealth-kills", "true" };
@@ -301,6 +302,33 @@ static void CreateMove()
             break;
         }
         }
+    }
+
+    if (*accurate_movement && CE_GOOD(LOCAL_E) && !g_pLocalPlayer->life_state)
+    {
+        if (!(g_pLocalPlayer->flags & FL_ONGROUND))
+            return;
+
+        if (current_user_cmd->buttons & (IN_MOVELEFT | IN_MOVERIGHT | IN_FORWARD | IN_BACK))
+            return;
+
+        auto vel         = CE_VECTOR(LOCAL_E, netvar.vVelocity);
+        const auto Speed = vel.Length2D();
+        if (Speed <= 10.5f)
+            return;
+
+        Vector direction;
+        VectorAngles(vel, direction);
+        float speed = vel.Length();
+
+        direction.y = current_user_cmd->viewangles.y - direction.y;
+
+        Vector forward;
+        AngleVectors2(VectorToQAngle(direction), &forward);
+        Vector negated_direction = forward * -speed;
+
+        current_user_cmd->forwardmove = negated_direction.x;
+        current_user_cmd->sidemove    = negated_direction.y;
     }
 
     // Tauntslide needs improvement for movement, but it mostly works

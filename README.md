@@ -2,14 +2,6 @@
   <img src="https://media.discordapp.net/attachments/1139676647407243315/1150613674201985096/IMG_2314.png">
 </p>
 
-## Has it compiled?
-
-[![CircleCI](https://circleci.com/gh/nullworks/cathook.svg?style=svg)](https://circleci.com/gh/RosneBurgerworks/rosnehook)
-
-## Shoppy!
-
-https://shoppy.gg/@RosneGaming
-
 ## Download Rosnehook
 
 Open a terminal window and enter the following command:

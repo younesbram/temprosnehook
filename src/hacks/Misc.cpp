@@ -25,7 +25,7 @@ static settings::Boolean anti_afk{ "misc.anti-afk", "true" };
 static settings::Boolean auto_jump{ "misc.auto-jump", "false" };
 static settings::Int auto_jump_chance{ "misc.auto-jump.chance", "100" };
 #if !ENABLE_TEXTMODE
-static settings::Int auto_strafe{ "misc.autostrafe", "1" };
+static settings::Int auto_strafe{ "misc.autostrafe", "2" };
 #else
 static settings::Int auto_strafe{ "misc.autostrafe", "0" };
 #endif

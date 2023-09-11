@@ -24,10 +24,7 @@ DEFINE_HOOKED_METHOD(Shutdown, void, INetChannel *this_, const char *reason)
 #if ENABLE_IPC
     ipc::UpdateServerAddress(true);
 #endif
-    if (isHackActive() && (*custom_disconnect_reason).length() > 3 && strstr(reason, "user"))
-        original::Shutdown(this_, (*custom_disconnect_reason).c_str());
-    else
-        original::Shutdown(this_, reason);
+    original::Shutdown(this_, reason);
     ignoredc = false;
     hacks::autojoin::OnShutdown();
     std::string message = reason;

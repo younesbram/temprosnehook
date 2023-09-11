@@ -31,8 +31,6 @@ static settings::Int auto_strafe{ "misc.autostrafe", "0" };
 #endif
 settings::Boolean tauntslide{ "misc.tauntslide", "true" };
 static settings::Boolean nopush_enabled{ "misc.no-push", "true" };
-static settings::Boolean dont_hide_stealth_kills{ "misc.dont-hide-stealth-kills", "true" };
-static settings::Boolean unlimit_bumpercart_movement{ "misc.bumpercarthax.enable", "false" };
 static settings::Boolean ping_reducer{ "misc.ping-reducer.enable", "false" };
 static settings::Int force_ping{ "misc.ping-reducer.target", "0" };
 static settings::Boolean force_wait{ "misc.force-enable-wait", "true" };
@@ -874,33 +872,6 @@ static InitRoutine init_pyrovision(
             "remove_cart_cond");
         static BytePatch cart_patch1(CSignature::GetClientSignature, "0F 84 ? ? ? ? F3 0F 10 A2", 0x0, { 0x90, 0xE9 });
         static BytePatch cart_patch2(CSignature::GetClientSignature, "0F 85 ? ? ? ? 89 F8 84 C0 75 72", 0x0, { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
-        if (unlimit_bumpercart_movement)
-        {
-            cart_patch1.Patch();
-            cart_patch2.Patch();
-        }
-        unlimit_bumpercart_movement.installChangeCallback(
-            [](settings::VariableBase<bool> &, bool after)
-            {
-                if (after)
-                {
-                    cart_patch1.Patch();
-                    cart_patch2.Patch();
-                }
-                else
-                {
-                    cart_patch1.Shutdown();
-                    cart_patch2.Shutdown();
-                }
-            });
-        EC::Register(
-            EC::Shutdown,
-            []()
-            {
-                cart_patch1.Shutdown();
-                cart_patch2.Shutdown();
-            },
-            "cartpatch_shutdown");
         ping_reducer.installChangeCallback(
             [](settings::VariableBase<bool> &, bool)
             {
@@ -1024,28 +995,17 @@ static InitRoutine init(
         patch_scoreboard2->Patch();
         patch_scoreboard3->Patch();
 
-        static BytePatch stealth_kill{ CSignature::GetClientSignature, "84 C0 75 28 A1", 2, { 0x90, 0x90 } }; // stealth kill patch
-        stealth_kill.Patch();
         static BytePatch cyoa_patch{ CSignature::GetClientSignature, "75 ? 80 BB ? ? ? ? 00 74 ? A1 ? ? ? ? 8B 10 C7 44 24", 0, { 0xEB } };
         cyoa_patch.Patch();
         EC::Register(
             EC::Shutdown,
             []()
             {
-                stealth_kill.Shutdown();
                 cyoa_patch.Shutdown();
                 tryPatchLocalPlayerShouldDraw(false);
                 force_wait_func(false);
             },
-            "shutdown_stealthkill");
-        dont_hide_stealth_kills.installChangeCallback(
-            [](settings::VariableBase<bool> &, bool after)
-            {
-                if (after)
-                    stealth_kill.Patch();
-                else
-                    stealth_kill.Shutdown();
-            });
+            "shutdown_stealthkill"););
 #endif
 #endif
     });

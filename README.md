@@ -45,6 +45,7 @@ i like to believe reality/nigsec because im a very smart individual!
 i like child porn.
 i love nilling kiggers!
 im also known as skidney.
+the above statement is true, there is a real skidney account!
 
 ### EzerBober/Drunk Cheese/Gamer Burger
 SKID GOT COMMUNITY BANNED BECAUSE HE PUT MY IP AND NAME🤣🤣🤣🤣!

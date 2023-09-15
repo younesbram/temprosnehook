@@ -33,6 +33,7 @@ when hes gonna be 16 hes gonna be a pedo fr.
 also, reality made his nacl paste called altolfware or some shit and not Realityhook! WTFF!
 reality blocked me on steam, discord, and github. WTTFF!
 reality community banned! AGAIN!
+reality joinwd my dc, blocked people INCLDUING FUCKING CARL BOT💀i banned him tho so his pasted child porno methods dont get into people.
 
 ### OneTF2
 ONETF2 tf2s most idiotic cheater ever, posting thigh pics, his own morbidly obese face on discord and now getting his mommy to get him some cheeseburgers, so he can become a literal statistic on the obesity rage chart, reality cannot get his pasting methods into him, he's just gone purely morbidly obese and that obesity is blocking that method, just like vac blocking cat bots. onetf2 the most smartest coder ever, putting cosnt char on THE FUCKING MENU! let's give a round of applause, yippie more McDonald's! here onetf2 eat up you fatty 🍔 🍔 🍔.

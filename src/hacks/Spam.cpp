@@ -233,7 +233,7 @@ bool FormatSpamMessage(std::string &message)
 }
 
 // What to spam
-static std::vector<std::string> teamspam_text = { "CAT", "HOOK" };
+static std::vector<std::string> teamspam_text = { "ROSNE", "HOOK" };
 // Current spam index
 static size_t current_teamspam_idx = 0;
 

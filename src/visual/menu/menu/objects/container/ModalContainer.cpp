@@ -10,7 +10,7 @@
 */
 namespace zerokernel_modalcontainer
 {
-static settings::RVariable<rgba_t> color_border{ "zk.style.modal-container.color.border", "000000ff" };
+static settings::RVariable<rgba_t> color_border{ "zk.style.modal-container.color.border", "232323ff" };
 static settings::RVariable<rgba_t> color_background{ "zk.style.modal-container.color.background", "2a2a2aff" };
 } // namespace zerokernel_modalcontainer
 

@@ -8,7 +8,6 @@
 #include "AntiAim.hpp"
 #include "HookedMethods.hpp"
 #include "Warp.hpp"
-#include "nospread.hpp"
 
 static settings::Boolean log_sent{ "debug.log-sent-chat", "false" };
 
@@ -112,13 +111,6 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, boo
     std::string newlines{};
     NET_StringCmd stringcmd;
 
-    // Do we have to force reliable state?
-    if (hacks::nospread::SendNetMessage(&msg))
-        force_reliable = true;
-    // Don't use warp with nospread
-    else
-        hacks::warp::SendNetMessage(msg);
-
     static float lastcmd = 0.0f;
     if (lastcmd > g_GlobalVars->absoluteframetime)
     {
@@ -148,7 +140,6 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, boo
         logging::Info("%i bytes => %s", buffer.GetNumBytesWritten(), bytes.c_str());
     }
     bool ret_val = original::SendNetMsg(this_, msg, force_reliable, voice);
-    hacks::nospread::SendNetMessagePost();
     return ret_val;
 }
 } // namespace hooked_methods

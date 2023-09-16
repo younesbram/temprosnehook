@@ -52,7 +52,6 @@ extern Color menu_color;
 extern int stored_buttons;
 typedef void (*CL_SendMove_t)();
 extern DetourHook cl_warp_sendmovedetour;
-extern DetourHook cl_nospread_sendmovedetour;
 namespace hooked_methods
 {
 }// namespace hooked_methods

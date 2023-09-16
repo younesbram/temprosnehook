@@ -12,7 +12,6 @@
 #include "CatBot.hpp"
 #include <iomanip>
 #include "votelogger.hpp"
-#include "nospread.hpp"
 
 static settings::Boolean dispatch_log{ "debug.log-dispatch-user-msg", "false" };
 static settings::Boolean chat_filter_enable{ "chat.censor.enable", "false" };
@@ -92,8 +91,6 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
         retrun = false;
     }
     // We should bail out
-    if (!hacks::nospread::DispatchUserMessage(&buf, type))
-        return true;
     std::string data;
     switch (type)
     {

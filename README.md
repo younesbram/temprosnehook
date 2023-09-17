@@ -40,7 +40,7 @@ reality community banned! AGAIN!
 reality joinwd my dc, blocked people INCLDUING FUCKING CARL BOT💀i banned him tho so his pasted child porno methods dont get into people.
 
 ### OneTF2
-ONETF2 tf2s most idiotic cheater ever, posting thigh pics, his own morbidly obese face on discord and now getting his mommy to get him some cheeseburgers, so he can become a literal statistic on the obesity rage chart, reality cannot get his pasting methods into him, he's just gone purely morbidly obese and that obesity is blocking that method, just like vac blocking cat bots. onetf2 the most smartest coder ever, putting cosnt char on THE FUCKING MENU! let's give a round of applause, yippie more McDonald's! here onetf2 eat up you fatty 🍔 🍔 🍔.
+ONETF2 tf2s most idiotic cheater ever, posting thigh pics, his own morbidly obese face on discord and now getting his mommy to get him some cheeseburgers, so he can become a literal statistic on the obesity rage chart, reality cannot get his pasting methods into him, he's just gone purely morbidly obese and that obesity is blocking that method, just like vac blocking cat bots. onetf2 the most smartest coder ever (and not Terry A. Davis!!!!!) , putting cosnt char on THE FUCKING MENU! let's give a round of applause, yippie more McDonald's! here onetf2 eat up you fatty 🍔 🍔 🍔.
 also, onetf2 keeps adding const char to drawmgr.cpp, when he just had to remove the FUCKING SKINCHANGER SHIT! YOU DIDNT HAVE TO ADD SKIN CHANGER, JUST REMOVE IT FROM DRAWMGR!!!!!!!!!!!!!!!
 plus, THE FAGGOT COWHOOKER LEAKED ROSNEHOOK! WTF I WORKED FOR YOUR GAY OBESE WALKING ASS, JUST YOU WOULD LEAK IT! WHAT A FAG!
 

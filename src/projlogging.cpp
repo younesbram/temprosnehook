@@ -19,18 +19,6 @@ void Update()
         const model_t *model    = RAW_ENT(ent)->GetModel();
         bool issandwich         = false;
         const uint16_t curr_idx = ent->m_IDX;
-        if (model && tickcount % 33 == 0)
-        {
-            std::string model_name(g_IModelInfo->GetModelName(model));
-            if (model_name.find("plate") != std::string::npos)
-            {
-                issandwich      = true;
-                Vector abs_orig = RAW_ENT(ent)->GetAbsOrigin();
-                float movement  = prevloc[curr_idx].DistTo(abs_orig);
-                logging::Info("Sandwich movement: %f", movement);
-                prevloc[curr_idx] = abs_orig;
-            }
-        }
         if (ent->m_Type() == ENTITY_PROJECTILE || issandwich)
         {
             /*int owner = HandleToIDX(CE_INT(ent, 0x894));

@@ -65,8 +65,6 @@ DECLARE_HOOKED_METHOD(ClientCmd_Unrestricted, void, IVEngineClient013*, const ch
 // vgui::IPanel
 DECLARE_HOOKED_METHOD(PaintTraverse, void, vgui::IPanel *, unsigned int, bool, bool)
 #endif
-// IUniformRandomStream
-DECLARE_HOOKED_METHOD(RandomInt, int, IUniformRandomStream *, int, int)
 #if ENABLE_VISUALS
 // CHudChat
 DECLARE_HOOKED_METHOD(StartMessageMode, int, CHudBaseChat *, int)

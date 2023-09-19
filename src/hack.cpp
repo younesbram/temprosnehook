@@ -196,6 +196,7 @@ void hack::Hook()
 #endif
 
     hooks::vstd.Set((void *) g_pUniformStream);
+    hooks::vstd.HookMethod(HOOK_ARGS(RandomInt));
     hooks::vstd.Apply();
 #if ENABLE_VISUALS
     CHudElement *chat_hud;

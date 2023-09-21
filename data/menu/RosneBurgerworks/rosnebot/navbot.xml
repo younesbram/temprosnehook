@@ -10,6 +10,7 @@
             <AutoVariable width="fill" target="nav.path-during-setup" label="Path during setup"
                           tooltip="Path during setup. Will also path while the gates are closed."/>
             <AutoVariable width="fill" target="navbot.search-health" label="Search for health"/>
+            <AutoVariable width="fill" target="navbot.goto-closet-player" label="Nav to closet player within 1000 HMU"/>
             <AutoVariable width="fill" target="navbot.search-ammo" label="Search for ammo"/>
             <AutoVariable width="fill" target="navbot.escape-danger" label="Escape danger"/>
             <AutoVariable width="fill" target="navbot.escape-danger.slight-danger.capping" label="Safe capping"

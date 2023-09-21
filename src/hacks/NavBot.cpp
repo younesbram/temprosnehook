@@ -21,15 +21,14 @@ static settings::Boolean search_health("navbot.search-health", "true");
 static settings::Boolean search_ammo("navbot.search-ammo", "true");
 static settings::Boolean stay_near("navbot.stay-near", "true");
 static settings::Boolean capture_objectives("navbot.capture-objectives", "true");
+static settings::Boolean rllybadfollowbot("navbot.goto-closet-player", "false");
 static settings::Boolean snipe_sentries("navbot.snipe-sentries", "true");
 static settings::Boolean snipe_sentries_shortrange("navbot.snipe-sentries.shortrange", "false");
 static settings::Boolean escape_danger("navbot.escape-danger", "true");
 static settings::Boolean escape_danger_ctf_cap("navbot.escape-danger.ctf-cap", "false");
 static settings::Boolean enable_slight_danger_when_capping("navbot.escape-danger.slight-danger.capping", "false");
-static settings::Boolean autojump("navbot.autojump.enabled", "false");
 static settings::Boolean primary_only("navbot.primary-only", "true"); // auto best weapon
 static settings::Int force_slot("navbot.force-slot", "0");
-static settings::Float jump_distance("navbot.autojump.trigger-distance", "300");
 static settings::Int blacklist_delay("navbot.proximity-blacklist.delay", "500");
 static settings::Boolean blacklist_dormat("navbot.proximity-blacklist.dormant", "false");
 static settings::Int blacklist_delay_dormat("navbot.proximity-blacklist.delay-dormant", "1000");
@@ -651,6 +650,23 @@ bool stayNear()
     return false;
 }
 
+bool navtosomerandomplayer(std::pair<CachedEntity, float> &nearest)
+{
+    if (slot != melee || !nearest.first) // if melee is out, dont enable
+    {
+        if (navparser::NavEngine::current_priority == prio_melee)
+            navparser::NavEngine::cancelPath();
+        return false;
+    }
+
+    if (nearest.second < 1000.0f && hacks::NavBot::isVisible)
+    {
+        AimAt(g_pLocalPlayer->v_Eye, nearest.first->hitboxes.GetHitbox(head)->center, current_user_cmd);
+        WalkTo(nearest.first->m_vecOrigin());
+        navparser::NavEngine::cancelPath();
+        return true;
+    }
+}
 bool isVisible;
 // if melee aimbot/navbot crashes, this is where the problem is.
 bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest) // also known as "melee AI"
@@ -1055,18 +1071,6 @@ bool escapeDanger()
 
 static int slot = primary;
 
-static void autoJump(std::pair<CachedEntity *, float> &nearest)
-{
-    if (!*autojump)
-        return;
-    static Timer last_jump{};
-    if (!last_jump.test_and_set(200) || CE_BAD(nearest.first))
-        return;
-
-    if (nearest.second <= *jump_distance)
-        current_user_cmd->buttons |= IN_JUMP | IN_DUCK;
-}
-
 static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &nearest)
 {
     if (*force_slot)
@@ -1089,10 +1093,6 @@ static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &ne
     }
     case tf_sniper:
     {
-        // Have a Huntsman, Always use primary
-        if (HasWeapon(LOCAL_E, 56) || HasWeapon(LOCAL_E, 1005) || HasWeapon(LOCAL_E, 1092))
-            return primary;
-
         if (nearest.second <= 200.0f)
             return melee;
         else if (nearest.second <= 300.0f && nearest.first->m_iHealth() < 75)
@@ -1180,7 +1180,6 @@ static void CreateMove()
     auto nearest = getNearestPlayerDistance();
 
     updateSlot(nearest);
-    autoJump(nearest);
     updateEnemyBlacklist(slot);
 
     // Try to escape danger first of all

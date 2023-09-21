@@ -31,12 +31,9 @@ static settings::Int auto_strafe{ "misc.autostrafe", "0" };
 #endif
 static settings::Boolean nopush_enabled{ "misc.no-push", "true" };
 static settings::Boolean force_wait{ "misc.force-enable-wait", "true" };
-static settings::Boolean scc{ "misc.scoreboard.match-custom-team-colors", "false" };
 #if ENABLE_VISUALS
 static settings::Boolean debug_info{ "misc.debug-info", "false" };
-static settings::Boolean misc_drawhitboxes{ "misc.draw-hitboxes", "false" };
 // Useful for debugging with showlagcompensation
-static settings::Boolean misc_drawhitboxes_dead{ "misc.draw-hitboxes.dead-players", "false" };
 static settings::Boolean show_spectators{ "misc.show-spectators", "false" };
 
 // Need our own Text drawing
@@ -197,17 +194,6 @@ static float angleDiffRad(float a1, float a2) noexcept
 
 static void CreateMove()
 {
-#if ENABLE_VISUALS
-    if (*misc_drawhitboxes)
-    {
-        for (const auto &ent : entity_cache::player_cache)
-        {
-            if ((!*misc_drawhitboxes_dead && !ent->m_bAlivePlayer()) || ent == LOCAL_E)
-                continue;
-            QueueWireframeHitboxes(ent->hitboxes);
-        }
-    }
-#endif
     if (current_user_cmd->command_number)
         last_number = current_user_cmd->command_number;
     // AntiAfk That after a certain time without movement keys depressed, causes
@@ -309,12 +295,6 @@ static void CreateMove()
 #if ENABLE_VISUALS
 void Draw()
 {
-    if (*misc_drawhitboxes)
-    {
-        for (const auto &entry : wireframe_queue)
-            DrawWireframeHitbox(entry);
-        wireframe_queue.clear();
-    }
     if (*show_spectators)
     {
         for (const auto &ent : entity_cache::valid_ents)
@@ -710,112 +690,6 @@ static CatCommand debug_print_weaponid("debug_weaponid", "Print the weapon IDs o
                                        });
 
 #if ENABLE_VISUALS && !ENFORCE_STREAM_SAFETY
-// This makes us able to see enemy class and status in scoreboard and player panel
-static std::unique_ptr<BytePatch> patch_playerpanel;
-static std::unique_ptr<BytePatch> patch_scoreboard1;
-static std::unique_ptr<BytePatch> patch_scoreboard2;
-static std::unique_ptr<BytePatch> patch_scoreboard3;
-
-// Credits to UNKN0WN
-namespace ScoreboardColoring
-{
-static std::unique_ptr<BytePatch> patch_scoreboardcolor1;
-static std::unique_ptr<BytePatch> patch_scoreboardcolor2;
-uintptr_t addr1 = 0;
-uintptr_t addr2 = 0;
-
-// Colors taken from client.so
-Color &GetPlayerColor(int idx, int team, bool dead = false)
-{
-    static Color returnColor(0, 0, 0, 0);
-
-    int col_red[] = { scc ? int(colors::red.r * 255) : 255, scc ? int(colors::red.g * 255) : 64, scc ? int(colors::red.b * 255) : 64 };
-    int col_blu[] = { scc ? int(colors::blu.r * 255) : 153, scc ? int(colors::blu.g * 255) : 204, scc ? int(colors::blu.b * 255) : 255 };
-
-    switch (team)
-    {
-    case TEAM_RED:
-        returnColor.SetColor(col_red[0], col_red[1], col_red[2], 255);
-        break;
-    case TEAM_BLU:
-        returnColor.SetColor(col_blu[0], col_blu[1], col_blu[2], 255);
-        break;
-    default:
-        returnColor.SetColor(245, 229, 196, 255);
-    }
-
-    player_info_s pinfo{};
-    if (GetPlayerInfo(idx, &pinfo))
-    {
-        rgba_t cust = playerlist::Color(pinfo.friendsID);
-        if (cust != colors::empty)
-            returnColor.SetColor(cust.r * 255, cust.g * 255, cust.b * 255, 255);
-    }
-
-    if (dead)
-        for (uint8 i = 0; i < 3; ++i)
-            returnColor[i] /= 1.5f;
-
-    return returnColor;
-}
-
-// This gets playerIndex with assembly magic, then sets a Color for the scoreboard entries
-Color &GetTeamColor(void *, int team)
-{
-    int playerIndex;
-    __asm__("mov %%esi, %0" : "=r"(playerIndex));
-    return GetPlayerColor(playerIndex, team);
-}
-
-// This is some assembly magic in order to get playerIndex and team from already existing variables and then set scoreboard entries
-Color &GetDeadPlayerColor()
-{
-    int playerIndex;
-    int team;
-    __asm__("mov %%esi, %0" : "=r"(playerIndex));
-    team = g_pPlayerResource->GetTeam(playerIndex);
-    return GetPlayerColor(playerIndex, team, true);
-}
-
-static InitRoutine init(
-    []()
-    {
-        // 012BA7E4
-        addr1 = CSignature::GetClientSignature("89 04 24 FF 92 ? ? ? ? 8B 00") + 3;
-        // 012BA105
-        addr2 = CSignature::GetClientSignature("75 1B 83 FB 02") + 2;
-        if (addr1 == 3 || addr2 == 2)
-            return;
-        logging::Info("Patching scoreboard colors");
-
-        // Used to Detour, we need to detour at two parts in order to do this properly
-        auto relAddr1 = ((uintptr_t) GetTeamColor - (uintptr_t) addr1) - 5;
-        auto relAddr2 = ((uintptr_t) GetDeadPlayerColor - (uintptr_t) addr2) - 5;
-
-        // Construct BytePatch1
-        std::vector<unsigned char> patch1 = { 0xE8 };
-        for (size_t i = 0; i < sizeof(uintptr_t); ++i)
-            patch1.push_back(((unsigned char *) &relAddr1)[i]);
-        for (unsigned int i = patch1.size(); i < 6; i++)
-            patch1.push_back(0x90);
-
-        // Construct BytePatch2
-        std::vector<unsigned char> patch2 = { 0xE8 };
-        for (size_t i = 0; i < sizeof(uintptr_t); ++i)
-            patch2.push_back(((unsigned char *) &relAddr2)[i]);
-        patch2.push_back(0x8B);
-        patch2.push_back(0x00);
-        for (unsigned int i = patch2.size(); i < 27; ++i)
-            patch2.push_back(0x90);
-
-        patch_scoreboardcolor1 = std::make_unique<BytePatch>(addr1, patch1);
-        patch_scoreboardcolor2 = std::make_unique<BytePatch>(addr2, patch2);
-
-        // Patch!
-        patch_scoreboardcolor1->Patch();
-        patch_scoreboardcolor2->Patch();
-    });
-} // namespace ScoreboardColoring
 
 typedef void (*UpdateLocalPlayerVisionFlags_t)();
 UpdateLocalPlayerVisionFlags_t UpdateLocalPlayerVisionFlags_fn;
@@ -862,14 +736,6 @@ void Shutdown()
     // unpatching local player
     render_zoomed = false;
     patch_playerpanel->Shutdown();
-    patch_scoreboard1->Shutdown();
-    patch_scoreboard2->Shutdown();
-    patch_scoreboard3->Shutdown();
-    if (ScoreboardColoring::addr1 == 3 || ScoreboardColoring::addr2 == 2)
-        return;
-
-    ScoreboardColoring::patch_scoreboardcolor1->Shutdown();
-    ScoreboardColoring::patch_scoreboardcolor2->Shutdown();
 #endif
 }
 
@@ -944,13 +810,7 @@ static InitRoutine init(
         uintptr_t target_addr = e8call_direct(CSignature::GetClientSignature("E8 ? ? ? ? 83 FE 2D"));
         uintptr_t rel_addr    = ((uintptr_t) target_addr - ((uintptr_t) addr_scrbrd + 2)) - 5;
 
-        patch_scoreboard1 = std::make_unique<BytePatch>(addr_scrbrd, std::vector<unsigned char>{ 0xEB, 0x31, 0xE8, foffset(rel_addr, 0), foffset(rel_addr, 1), foffset(rel_addr, 2), foffset(rel_addr, 3), 0xE9, 0xC9, 0x06, 0x00, 0x00 });
-        patch_scoreboard2 = std::make_unique<BytePatch>(addr_scrbrd + 0xA0, std::vector<unsigned char>{ 0xE9, 0x5D, 0xFF, 0xFF, 0xFF });
-        patch_scoreboard3 = std::make_unique<BytePatch>(addr_scrbrd + 0x84A, std::vector<unsigned char>{ 0x8f, 0xFE });
         patch_playerpanel->Patch();
-        patch_scoreboard1->Patch();
-        patch_scoreboard2->Patch();
-        patch_scoreboard3->Patch();
 
         static BytePatch cyoa_patch{ CSignature::GetClientSignature, "75 ? 80 BB ? ? ? ? 00 74 ? A1 ? ? ? ? 8B 10 C7 44 24", 0, { 0xEB } };
         cyoa_patch.Patch();

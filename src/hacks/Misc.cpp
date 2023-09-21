@@ -29,10 +29,7 @@ static settings::Int auto_strafe{ "misc.autostrafe", "2" };
 #else
 static settings::Int auto_strafe{ "misc.autostrafe", "0" };
 #endif
-settings::Boolean tauntslide{ "misc.tauntslide", "true" };
 static settings::Boolean nopush_enabled{ "misc.no-push", "true" };
-static settings::Boolean ping_reducer{ "misc.ping-reducer.enable", "false" };
-static settings::Int force_ping{ "misc.ping-reducer.target", "0" };
 static settings::Boolean force_wait{ "misc.force-enable-wait", "true" };
 static settings::Boolean scc{ "misc.scoreboard.match-custom-team-colors", "false" };
 #if ENABLE_VISUALS
@@ -305,38 +302,8 @@ static void CreateMove()
         }
     }
 
-    // Tauntslide needs improvement for movement, but it mostly works
-    if (*tauntslide && CE_GOOD(LOCAL_E) && HasCondition<TFCond_Taunting>(LOCAL_E))
-        current_user_cmd->viewangles.x = (current_user_cmd->buttons & IN_BACK) ? 91.0f : (current_user_cmd->buttons & IN_FORWARD) ? 0.0f : 90.0f;
-
     // Simple No-Push through cvars
     g_ICvar->FindVar("tf_avoidteammates_pushaway")->SetValue(!*nopush_enabled);
-
-    // Ping Reducer
-    if (*ping_reducer)
-    {
-        static ConVar *cmdrate = g_ICvar->FindVar("cl_cmdrate");
-        if (cmdrate == nullptr)
-        {
-            cmdrate = g_ICvar->FindVar("cl_cmdrate");
-            return;
-        }
-        int ping = g_pPlayerResource->GetPing(g_IEngine->GetLocalPlayer());
-        static Timer updateratetimer{};
-        if (updateratetimer.test_and_set(500))
-        {
-            if (*force_ping <= ping)
-            {
-                NET_SetConVar command("cl_cmdrate", "-1");
-                ((INetChannel *) g_IEngine->GetNetChannelInfo())->SendNetMsg(command);
-            }
-            else if (*force_ping > ping)
-            {
-                NET_SetConVar command("cl_cmdrate", std::to_string(cmdrate->GetInt()).c_str());
-                ((INetChannel *) g_IEngine->GetNetChannelInfo())->SendNetMsg(command);
-            }
-        }
-    }
 }
 
 #if ENABLE_VISUALS

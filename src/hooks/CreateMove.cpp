@@ -174,15 +174,6 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
         return ret;
     }
 
-#if ENABLE_VISUALS
-    // Fix nolerp camera jitter
-    if (nolerp && !hacks::misc::tauntslide)
-    {
-        QAngle viewangles = { cmd->viewangles.x, cmd->viewangles.y, cmd->viewangles.z };
-        g_IEngine->SetViewAngles(viewangles);
-    }
-#endif
-
     // Disabled because this causes EXTREME aimbot inaccuracy
     // Actually don't disable it. It causes even more inaccuracy
     if (!cmd->command_number)

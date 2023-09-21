@@ -11,7 +11,6 @@
 
 namespace hacks::misc
 {
-extern settings::Boolean tauntslide;
 void generate_schema();
 void Schema_Reload();
 void CreateMove();

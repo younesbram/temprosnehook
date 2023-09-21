@@ -735,7 +735,6 @@ void Shutdown()
 #if ENABLE_VISUALS && !ENFORCE_STREAM_SAFETY
     // unpatching local player
     render_zoomed = false;
-    patch_playerpanel->Shutdown();
 #endif
 }
 
@@ -803,14 +802,11 @@ static InitRoutine init(
         if (render_zoomed)
             tryPatchLocalPlayerShouldDraw(true);
         render_zoomed.installChangeCallback([](settings::VariableBase<bool> &, bool after) { tryPatchLocalPlayerShouldDraw(after); });
-        patch_playerpanel     = std::make_unique<BytePatch>(CSignature::GetClientSignature, "0F 94 45 ? 85 C0 0F 8E", 0x0, std::vector<unsigned char>{ 0xC6, 0x45, 0xDF, 0x01 });
         uintptr_t addr_scrbrd = CSignature::GetClientSignature("8B 10 89 74 24 04 89 04 24 FF 92 ? ? ? ? 83 F8 02 75 09");
 
         // Address to the function we need to jump to
         uintptr_t target_addr = e8call_direct(CSignature::GetClientSignature("E8 ? ? ? ? 83 FE 2D"));
         uintptr_t rel_addr    = ((uintptr_t) target_addr - ((uintptr_t) addr_scrbrd + 2)) - 5;
-
-        patch_playerpanel->Patch();
 
         static BytePatch cyoa_patch{ CSignature::GetClientSignature, "75 ? 80 BB ? ? ? ? 00 74 ? A1 ? ? ? ? 8B 10 C7 44 24", 0, { 0xEB } };
         cyoa_patch.Patch();

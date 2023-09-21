@@ -21,7 +21,6 @@ static settings::Boolean search_health("navbot.search-health", "true");
 static settings::Boolean search_ammo("navbot.search-ammo", "true");
 static settings::Boolean stay_near("navbot.stay-near", "true");
 static settings::Boolean capture_objectives("navbot.capture-objectives", "true");
-static settings::Boolean rllybadfollowbot("navbot.goto-closet-player", "false");
 static settings::Boolean snipe_sentries("navbot.snipe-sentries", "true");
 static settings::Boolean snipe_sentries_shortrange("navbot.snipe-sentries.shortrange", "false");
 static settings::Boolean escape_danger("navbot.escape-danger", "true");
@@ -650,23 +649,6 @@ bool stayNear()
     return false;
 }
 
-bool navtosomerandomplayer(std::pair<CachedEntity, float> &nearest)
-{
-    if (slot != melee || !nearest.first) // if melee is out, dont enable
-    {
-        if (navparser::NavEngine::current_priority == prio_melee)
-            navparser::NavEngine::cancelPath();
-        return false;
-    }
-
-    if (nearest.second < 1000.0f && hacks::NavBot::isVisible)
-    {
-        AimAt(g_pLocalPlayer->v_Eye, nearest.first->hitboxes.GetHitbox(head)->center, current_user_cmd);
-        WalkTo(nearest.first->m_vecOrigin());
-        navparser::NavEngine::cancelPath();
-        return true;
-    }
-}
 bool isVisible;
 // if melee aimbot/navbot crashes, this is where the problem is.
 bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest) // also known as "melee AI"

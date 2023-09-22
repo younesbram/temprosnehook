@@ -5,7 +5,6 @@
 #pragma once
 
 #include <menu/object/Text.hpp>
-#include <menu/wm/WindowCloseButton.hpp>
 #include <menu/object/container/Container.hpp>
 
 namespace zerokernel
@@ -45,7 +44,6 @@ public:
 
     WMWindow &window;
     bool dragged{ false };
-    WindowCloseButton *close{ nullptr };
     Text *title{ nullptr };
 };
 } // namespace zerokernel

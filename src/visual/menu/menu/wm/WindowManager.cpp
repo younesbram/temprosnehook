@@ -43,8 +43,8 @@ void zerokernel::WindowManager::loadWindowFromXml(const tinyxml2::XMLElement *da
         win.short_name = title_short;
     else
         win.short_name = title;
+
     win.header->updateTitle();
-    bar->addWindowButton(win);
 }
 
 zerokernel::WMWindow *zerokernel::WindowManager::findWindow(size_t uid)
@@ -68,9 +68,4 @@ void zerokernel::WindowManager::init()
     this->container = container.get();
     container->move(0, 0);
     addObject(std::move(container));
-
-    auto bar  = std::make_unique<TaskBar>(*this);
-    this->bar = bar.get();
-    bar->move(0, 0);
-    addObject(std::move(bar));
 }

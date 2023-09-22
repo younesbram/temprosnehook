@@ -39,8 +39,6 @@
 #include "./menu/wm/Task.cpp"
 #include "./menu/wm/WindowHeader.cpp"
 #include "./menu/wm/WindowCloseButton.cpp"
-#include "./menu/wm/TaskBar.cpp"
-#include "./menu/wm/WindowContainer.cpp"
 #include "./menu/special/VariableListEntry.cpp"
 #include "./menu/special/TreeListBaseEntry.cpp"
 #include "./menu/special/ModalFactory.cpp"

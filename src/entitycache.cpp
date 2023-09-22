@@ -35,7 +35,6 @@ inline CachedEntity::~CachedEntity()
 
 bool CachedEntity::IsVisible()
 {
-    PROF_SECTION(CE_IsVisible)
     if (m_bVisCheckComplete)
         return m_bAnyHitboxVisible;
 

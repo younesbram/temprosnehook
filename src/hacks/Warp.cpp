@@ -456,8 +456,6 @@ void Warp(float accumulated_extra_samples, bool finalTick)
         return;
     }
 
-    PROF_SECTION(warp_profiler)
-
     int warp_ticks = warp_amount;
     if (warp_amount_override)
         warp_ticks = warp_amount_override;

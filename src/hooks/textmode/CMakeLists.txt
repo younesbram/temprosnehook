@@ -1,1 +1,1 @@
-target_sources(cathook PRIVATE "${CMAKE_CURRENT_LIST_DIR}/PaintTraverse.cpp")
+target_sources(rosnehook PRIVATE "${CMAKE_CURRENT_LIST_DIR}/PaintTraverse.cpp")

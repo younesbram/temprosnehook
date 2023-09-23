@@ -398,7 +398,6 @@ bool canReachVector(Vector loc, Vector dest)
                 Ray_t ray;
                 ray.Init(vec, directionalLoc);
                 {
-                    PROF_SECTION(IEVV_TraceRay)
                     g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_no_player, &trace);
                 }
                 // distance of trace < than 26
@@ -441,7 +440,6 @@ bool canReachVector(Vector loc, Vector dest)
             Ray_t ray;
             ray.Init(loc, directionalLoc);
             {
-                PROF_SECTION(IEVV_TraceRay)
                 g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_no_player, &trace);
             }
             // distance of trace < than 26
@@ -1036,7 +1034,6 @@ bool IsEntityVectorVisible(CachedEntity *entity, Vector endpos, bool use_weapon_
         eye = getShootPos(GetAimAtAngles(eye, endpos, LOCAL_E));
     ray.Init(eye, endpos);
     {
-        PROF_SECTION(IEVV_TraceRay)
         if (!*tcm || g_Settings.is_create_move)
             g_ITrace->TraceRay(ray, mask, &trace::filter_default, trace);
     }
@@ -1073,7 +1070,6 @@ bool VisCheckEntFromEnt(CachedEntity *startEnt, CachedEntity *endEnt)
     Ray_t ray;
     ray.Init(startEnt->m_vecOrigin(), endEnt->m_vecOrigin());
     {
-        PROF_SECTION(IEVV_TraceRay)
         g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, &trace);
     }
     // Is the entity that we hit our target ent? if so, the vis check passes
@@ -1096,7 +1092,6 @@ bool VisCheckEntFromEntVector(Vector startVector, CachedEntity *startEnt, Cached
     Ray_t ray;
     ray.Init(startVector, endEnt->m_vecOrigin());
     {
-        PROF_SECTION(IEVV_TraceRay)
         g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_default, &trace);
     }
     // Is the entity that we hit our target ent? if so, the vis check passes
@@ -1392,7 +1387,6 @@ bool IsVectorVisible(Vector origin, Vector target, bool enviroment_only, CachedE
 
         trace::filter_no_player.SetSelf(RAW_ENT(self));
         ray.Init(origin, target);
-        PROF_SECTION(IEVV_TraceRay)
         g_ITrace->TraceRay(ray, mask, &trace::filter_no_player, &trace_visible);
         return trace_visible.fraction == 1.0f;
     }
@@ -1403,7 +1397,6 @@ bool IsVectorVisible(Vector origin, Vector target, bool enviroment_only, CachedE
 
         trace::filter_no_entity.SetSelf(RAW_ENT(self));
         ray.Init(origin, target);
-        PROF_SECTION(IEVV_TraceRay)
         g_ITrace->TraceRay(ray, mask, &trace::filter_no_entity, &trace_visible);
         return trace_visible.fraction == 1.0f;
     }
@@ -1415,7 +1408,6 @@ bool IsVectorVisibleNavigation(Vector origin, Vector target, unsigned int mask)
     Ray_t ray;
 
     ray.Init(origin, target);
-    PROF_SECTION(IEVV_TraceRay)
     g_ITrace->TraceRay(ray, mask, &trace::filter_navigation, &trace_visible);
     return trace_visible.fraction == 1.0f;
 }
@@ -1452,7 +1444,6 @@ void WhatIAmLookingAt(int *result_eindex, Vector *result_pos)
         Ray_t ray;
         ray.Init(g_pLocalPlayer->v_Eye, endpos);
         {
-            PROF_SECTION(IEVV_TraceRay)
             g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_default, &trace);
         }
     }
@@ -1684,7 +1675,6 @@ bool IsEntityVisiblePenetration(CachedEntity *entity, int hb)
 
     ray.Init(g_pLocalPlayer->v_Origin + g_pLocalPlayer->v_ViewOffset, hit);
     {
-        PROF_SECTION(IEVV_TraceRay)
         g_ITrace->TraceRay(ray, MASK_SHOT_HULL, &trace::filter_penetration, &trace_visible);
     }
     correct_entity = false;
@@ -1694,7 +1684,6 @@ bool IsEntityVisiblePenetration(CachedEntity *entity, int hb)
     if (!correct_entity)
         return false;
     {
-        PROF_SECTION(IEVV_TraceRay)
         g_ITrace->TraceRay(ray, 0x4200400B, &trace::filter_default, &trace_visible);
     }
     if (trace_visible.m_pEnt)

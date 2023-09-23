@@ -5,7 +5,6 @@
 #pragma once
 
 #include <menu/wm/WindowContainer.hpp>
-#include <menu/wm/TaskBar.hpp>
 
 namespace zerokernel
 {
@@ -31,9 +30,7 @@ public:
 
     // Sub-elements
 
-    TaskBar *bar{ nullptr };
     WindowContainer *container{ nullptr };
-
     size_t active_window{ 0 };
 };
 } // namespace zerokernel

@@ -565,7 +565,6 @@ std::optional<std::pair<CNavArea *, int>> findClosestHidingSpot(CNavArea *area, 
 // and snipe them)
 bool stayNear()
 {
-    PROF_SECTION(stayNear)
     static Timer staynear_cooldown{};
     static CachedEntity *previous_target = nullptr;
 

@@ -689,8 +689,6 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
 // A second check to determine whether a target is good enough to be aimed at
 bool IsTargetStateGood(CachedEntity *entity)
 {
-    PROF_SECTION(PT_aimbot_targetstatecheck)
-
     const int current_type = entity->m_Type();
     switch (current_type)
     {

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "core/profiler.hpp"
 #include <array>
 
 namespace EC

@@ -4,4 +4,4 @@ set(files "${CMAKE_CURRENT_LIST_DIR}/imgui_impl.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/imgui_freetype.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/imgui_widgets.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/imrenderer.cpp")
-target_sources(rosnehook PRIVATE ${files})
+target_sources(cathook PRIVATE ${files})

@@ -8,7 +8,7 @@ if (EnableGUI)
     add_subdirectory(menu)
 endif()
 
-target_sources(rosnehook PRIVATE ${files})
+target_sources(cathook PRIVATE ${files})
 
 if (EnableImGuiDrawing)
     add_subdirectory(imgui)

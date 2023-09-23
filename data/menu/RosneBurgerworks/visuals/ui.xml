@@ -5,6 +5,14 @@
                           tooltip="Button to toggle this menu."/>
             <AutoVariable width="fill" target="visual.disable" label="Disable visuals"/>
             <AutoVariable width="fill" target="visual.medal-flip" label="Guaranteed medal flip"/>
+            <LabeledObject width="fill" label="Software cursor mode" tooltip="WARNING: Advanced users only.">
+                <Select target="visual.software-cursor-mode">
+                    <Option name="Keep" value="0"/>
+                    <Option name="Always" value="1"/>
+                    <Option name="Never" value="2"/>
+                    <Option name="Menu on" value="3"/>
+                </Select>
+            </LabeledObject>
             <AutoVariable width="fill" target="visual.font_size.center_size" label="Center string font size"/>
         </List>
     </Box>

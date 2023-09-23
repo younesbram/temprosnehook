@@ -169,6 +169,14 @@ static void load()
 {
     zerokernel::Menu::instance->loadFromFile(paths::getDataPath("/menu"), "menu.xml");
 
+    zerokernel::Container *sv = dynamic_cast<zerokernel::Container *>(zerokernel::Menu::instance->wm->getElementById("special-variables"));
+    if (sv)
+    {
+        zerokernel::special::SettingsManagerList list(*sv);
+        list.construct();
+        printf("SV found\n");
+    }
+
     zerokernel::Container *cl = dynamic_cast<zerokernel::Container *>(zerokernel::Menu::instance->wm->getElementById("cfg-list"));
     if (cl)
     {

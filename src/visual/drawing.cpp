@@ -579,11 +579,17 @@ void BeginGL()
     glColor3f(1, 1, 1);
 #if EXTERNAL_DRAWING
     xoverlay_draw_begin();
+    {
+        PROF_SECTION(draw_begin__SDL_GL_MakeCurrent);
+        // SDL_GL_MakeCurrent(sdl_hooks::window, context);
+    }
 #endif
     {
         glActiveTexture(GL_TEXTURE0);
+        PROF_SECTION(draw_begin__glez_begin);
         glez::begin();
         glDisable(GL_FRAMEBUFFER_SRGB);
+        PROF_SECTION(DRAWEX_draw_begin);
     }
 #endif
 }
@@ -597,13 +603,16 @@ void EndGL()
     SDL_GL_MakeCurrent(sdl_hooks::window, nullptr);
 #endif
 #elif ENABLE_GLEZ_DRAWING
+    PROF_SECTION(DRAWEX_draw_end);
     {
+        PROF_SECTION(draw_end__glez_end);
         glEnable(GL_FRAMEBUFFER_SRGB);
         glez::end();
     }
 #if EXTERNAL_DRAWING
     xoverlay_draw_end();
     {
+        PROF_SECTION(draw_end__SDL_GL_MakeCurrent);
         SDL_GL_MakeCurrent(sdl_hooks::window, nullptr);
     }
 #endif

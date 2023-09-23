@@ -221,6 +221,21 @@ static CatCommand list_config("list_config", "",
 #endif
 
 static std::vector<std::string> sortedVariables{};
+#if ENABLE_VISUALS
+static CatCommand list_missing("list_missing", "List rvars missing in menu",
+                               []()
+                               {
+                                   auto *sv = zerokernel::Menu::instance->wm->getElementById("special-variables");
+                                   if (!sv)
+                                   {
+                                       logging::Info("Special Variables tab missing!");
+                                       return;
+                                   }
+                                   for (auto &var : sortedVariables)
+                                       if (!zerokernel::special::SettingsManagerList::isVariableMarked(var))
+                                           logging::Info("%s", var.c_str());
+                               });
+#endif
 
 static void getAndSortAllVariables()
 {

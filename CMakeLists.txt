@@ -17,12 +17,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
-project(rosnehook VERSION 0.0.1)
+project(cathook VERSION 0.0.1)
 set(CMAKE_CXX_STANDARD 23)
-add_library(rosnehook SHARED "")
+add_library(cathook SHARED "")
 
 set(Visuals_DrawType "IMGUI" CACHE STRING "Target drawing api")
-set(DrawTypes "Textmode;No Visuals;Glez;Engine;IMGUI;IMGUI Streamproof" CACHE INTERNAL "Select the drawing api that rosnehook should use")
+set(DrawTypes "Textmode;No Visuals;Glez;Engine;IMGUI;IMGUI Streamproof" CACHE INTERNAL "Select the drawing api that cathook should use")
 set_property(CACHE Visuals_DrawType PROPERTY STRINGS ${DrawTypes})
 set(Visuals_EnforceStreamSafety 1 CACHE BOOL "If a streamsafe drawing method is used, this will remove features that are not streamsafe.")
 
@@ -68,10 +68,10 @@ endif()
 # Internal variables
 # INTERNAL implies "FORCE" by default, so don't set if already set
 if (NOT DEFINED Internal_Binarymode)
-    set(Internal_Binarymode 0 CACHE INTERNAL "Build rosnehook to be used in 'binary mode'")
+    set(Internal_Binarymode 0 CACHE INTERNAL "Build cathook to be used in 'binary mode'")
 endif()
 if (NOT DEFINED Internal_Symbolized)
-    set(Internal_Symbolized 0 CACHE INTERNAL "Build rosnehook with symbols so crashes can be sent")
+    set(Internal_Symbolized 0 CACHE INTERNAL "Build cathook with symbols so crashes can be sent")
 endif()
 
 #
@@ -83,7 +83,7 @@ if (EnableVisuals)
     if (EnableImGuiDrawing)
         find_package(Freetype REQUIRED)
         target_include_directories(cathook PRIVATE "${FREETYPE_INCLUDE_DIRS}")
-        target_link_libraries(rosnehook ${FREETYPE_LIBRARIES})
+        target_link_libraries(cathook ${FREETYPE_LIBRARIES})
     endif()
 endif()
 
@@ -116,7 +116,7 @@ find_library(ValveLibraryVStdLib NAMES vstdlib PATHS "${PROJECT_SOURCE_DIR}/lib"
 
 if (EnableIPC)
     add_subdirectory(external/simple-ipc)
-    target_link_libraries(rosnehook SimpleIPC)
+    target_link_libraries(cathook SimpleIPC)
 endif()
 
 if (EnableVisuals)
@@ -127,16 +127,16 @@ if (EnableVisuals)
     find_package(SDL2 REQUIRED)
     if (ExternalDrawing)
         add_subdirectory(external/libxoverlay)
-        target_link_libraries(rosnehook xoverlay)
+        target_link_libraries(cathook xoverlay)
         target_include_directories(cathook PRIVATE external/libxoverlay/include)
     endif()
     target_include_directories(cathook PRIVATE "${SDL2_INCLUDE_DIR}")
     if (EnableGlezDrawing)
-        target_link_libraries(rosnehook glez)
+        target_link_libraries(cathook glez)
     endif()
     if (EnableGlezDrawing)
         find_package(GLEW REQUIRED)
-        target_link_libraries(rosnehook ${GLEW_LIBRARIES})
+        target_link_libraries(cathook ${GLEW_LIBRARIES})
     endif()
 endif()
 
@@ -175,7 +175,7 @@ target_compile_definitions(cathook PRIVATE
         GNUC=1
         NO_MALLOC_OVERRIDE=1)
 
-target_include_directories(rosnehook SYSTEM PRIVATE
+target_include_directories(cathook SYSTEM PRIVATE
         "external/source-sdk-2013-headers/mp/src/mathlib"
         "external/source-sdk-2013-headers/mp/src/public"
         "external/source-sdk-2013-headers/mp/src/common"
@@ -202,8 +202,8 @@ add_custom_target(data
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
         VERBATIM)
 
-target_link_libraries(rosnehook ${ValveLibraryVStdLib} ${SDL2_LIBRARY})
-set_target_properties(rosnehook PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+target_link_libraries(cathook ${ValveLibraryVStdLib} ${SDL2_LIBRARY})
+set_target_properties(cathook PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory(src)
 add_subdirectory(include)
@@ -212,9 +212,9 @@ add_subdirectory(external)
 target_precompile_headers(cathook PRIVATE "${CMAKE_SOURCE_DIR}/include/common.hpp")
 
 if (NOT Internal_Symbolized)
-    add_custom_command(TARGET rosnehook POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:rosnehook> "${CMAKE_SOURCE_DIR}/bin/$<TARGET_FILE_NAME:rosnehook>")
+    add_custom_command(TARGET cathook POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:cathook> "${CMAKE_SOURCE_DIR}/bin/$<TARGET_FILE_NAME:cathook>")
 else()
     message("Symbolized build")
-    set(Internal_Symbolized 0 CACHE INTERNAL "Build rosnehook with symbols so crashes can be sent" FORCE)
+    set(Internal_Symbolized 0 CACHE INTERNAL "Build cathook with symbols so crashes can be sent" FORCE)
 endif()

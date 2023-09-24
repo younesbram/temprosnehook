@@ -37,6 +37,7 @@
 #include "./menu/wm/WindowManager.cpp"
 #include "./menu/wm/WMWindow.cpp"
 #include "./menu/wm/WindowHeader.cpp"
+#include "./menu/wm/WindowContainer.cpp"
 #include "./menu/special/VariableListEntry.cpp"
 #include "./menu/special/TreeListBaseEntry.cpp"
 #include "./menu/special/ModalFactory.cpp"

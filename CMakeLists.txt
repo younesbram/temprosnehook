@@ -90,12 +90,13 @@ endif()
 find_package(Git REQUIRED)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/external")
 find_package(SDL2 REQUIRED)
+
 find_package(Boost 1.76.0 EXACT)
-if (NOT ${Boost_FOUND})
+if (NOT Boost_FOUND)
     set(BOOST_LIBS_OPTIONAL "" CACHE STRING "Boost libs to be compiled")
     add_subdirectory(external/boost-cmake)
-    SET (BOOST_ROOT ${CMAKE_BINARY_DIR}/_deps/boost-src)
-    find_package(Boost 1.76.0 EXACT)
+    set(BOOST_ROOT ${CMAKE_BINARY_DIR}/_deps/boost-src)
+    find_package(Boost 1.76.0 EXACT REQUIRED)
     include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
@@ -202,6 +203,7 @@ add_custom_target(data
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
         VERBATIM)
 
+# SDL included because of https://cathook.club/issues/689
 target_link_libraries(cathook ${ValveLibraryVStdLib} ${SDL2_LIBRARY})
 set_target_properties(cathook PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 

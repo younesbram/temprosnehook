@@ -120,6 +120,7 @@ DEFINE_HOOKED_METHOD(SendNetMsg, bool, INetChannel *this_, INetMessage &msg, boo
     else
     {
         hacks::warp::SendNetMessage(msg);
+    }
 
     static float lastcmd = 0.0f;
     if (lastcmd > g_GlobalVars->absoluteframetime)

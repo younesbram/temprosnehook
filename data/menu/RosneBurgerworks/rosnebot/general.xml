@@ -31,6 +31,7 @@
             <AutoVariable width="fill" target="cat-bot.requeue-if.ipc-bots-gte" label="Requeue if IPC bots Gte"/>
             <AutoVariable width="fill" target="cat-bot.requeue-if.humans-lte" label="Requeue if humans Lte"/>
             <AutoVariable width="fill" target="cat-bot.requeue-if.players-lte" label="Requeue if players Lte"/>
+            <AutoVariable width="fill" target="cat-bot.auto-crouch" label="Autocrouch"/>
             <AutoVariable width="fill" target="cat-bot.mark-human-after-kills" label="Mark human after kills"/>
             <AutoVariable width="fill" target="cat-bot.micspam.enable" label="Micspam"/>
             <AutoVariable width="fill" target="cat-bot.micspam.interval-off" label="Micspam interval off"/>
@@ -39,6 +40,7 @@
             <AutoVariable width="fill" target="cat-bot.anti-autobalance" label="Anti auto balance"/>
             <AutoVariable width="fill" target="cat-bot.anti-motd" label="Anti MOTD"/>
             <AutoVariable width="fill" target="cat-bot.autovote-map" label="Autovote for current map"/>
+            <AutoVariable width="fill" target="cat-bot.always-crouch" label="Always crouch"/>
             <AutoVariable width="fill" target="misc.auto-noisemaker" label="Auto unlock and equip noisemakers"/>
         </List>
     </Box>

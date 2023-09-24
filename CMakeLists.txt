@@ -142,7 +142,6 @@ if (EnableVisuals)
 endif()
 
 configure_file(include/config.h.in ${CMAKE_SOURCE_DIR}/include/config.h @ONLY)
-configure_file(include/version.h.in ${CMAKE_SOURCE_DIR}/include/version.h @ONLY)
 
 set(CMAKE_CXX_FLAGS "-m32 -march=native -mtune=native -fexceptions -DNDEBUG")
 

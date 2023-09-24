@@ -399,7 +399,7 @@ public:
 
         static size_t previous_blacklist_size = 0;
 
-        bool erased = previous_blacklist_size != free_blacklist.size();
+        bool erased             = previous_blacklist_size != free_blacklist.size();
         previous_blacklist_size = free_blacklist.size();
 
         std::erase_if(free_blacklist, [](const auto &entry) { return entry.second.time && entry.second.time < g_GlobalVars->tickcount; });
@@ -441,8 +441,7 @@ bool isReady()
         return false;
 
     std::string level_name = GetLevelName();
-    return *enabled && map && map->state == NavState::Active &&
-           (level_name == "plr_pipeline" || TFGameRules()->State_Get() > CGameRules::GR_STATE_PREROUND);
+    return *enabled && map && map->state == NavState::Active && (level_name == "plr_pipeline" || TFGameRules()->State_Get() > CGameRules::GR_STATE_PREROUND);
 }
 
 bool isPathing()
@@ -939,6 +938,21 @@ void Draw()
     }
 }
 #endif
+
+class CLocalPlayerRespawn : public IGameEventListener
+{
+public:
+    void FireGameEvent(KeyValues *event) override
+    {
+        map->pather.Reset();
+    }
+};
+
+CLocalPlayerRespawn &listener()
+{
+    static CLocalPlayerRespawn l{};
+    return l;
+}
 } // namespace NavEngine
 
 Vector loc;
@@ -1000,10 +1014,13 @@ static CatCommand nav_debug_blacklist("nav_debug_blacklist", "Blacklist connecti
 static InitRoutine init(
     []()
     {
-        EC::Register(EC::CreateMove_NoEnginePred, NavEngine::CreateMove, "navengine_cm");
-        EC::Register(EC::LevelInit, NavEngine::LevelInit, "navengine_levelinit");
+        g_IGameEventManager->AddListener(&NavEngine::listener(), "localplayer_respawn", false);
+        EC::Register(
+            EC::Shutdown, []() { g_IGameEventManager->RemoveListener(&NavEngine::listener()); }, "SHUTDOWN_NavEngine");
+        EC::Register(EC::CreateMove_NoEnginePred, NavEngine::CreateMove, "CMNEP_NavEngine");
+        EC::Register(EC::LevelInit, NavEngine::LevelInit, "INIT_NavEngine");
 #if ENABLE_VISUALS
-        EC::Register(EC::Draw, NavEngine::Draw, "navengine_draw");
+        EC::Register(EC::Draw, NavEngine::Draw, "DRAW_NavEngine");
 #endif
         enabled.installChangeCallback(
             [](settings::VariableBase<bool> &, bool after)

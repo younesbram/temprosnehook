@@ -300,7 +300,7 @@ void Draw()
         for (const auto &ent : entity_cache::valid_ents)
         {
             player_info_s info{};
-            if (ent != LOCAL_E && ent->m_Type() == ENTITY_PLAYER && HandleToIDX(CE_INT(ent, netvar.hObserverTarget)) == LOCAL_E->m_IDX && GetPlayerInfo(ent->m_IDX, &info))
+            if (ent->m_Type() == ENTITY_PLAYER && HandleToIDX(CE_INT(ent, netvar.hObserverTarget)) == LOCAL_E->m_IDX && GetPlayerInfo(ent->m_IDX, &info) && ent != LOCAL_E)
             {
                 auto observermode = "N/A";
                 rgba_t color      = ent->m_iTeam() == TEAM_BLU ? colors::blu : (ent->m_iTeam() == TEAM_RED ? colors::red : colors::white);

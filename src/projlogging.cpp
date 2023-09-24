@@ -16,7 +16,6 @@ void Update()
 {
     for (const auto &ent : entity_cache::valid_ents)
     {
-        const model_t *model    = RAW_ENT(ent)->GetModel();
         bool issandwich         = false;
         const uint16_t curr_idx = ent->m_IDX;
         if (ent->m_Type() == ENTITY_PROJECTILE || issandwich)

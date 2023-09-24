@@ -28,7 +28,7 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
 
     auto calculateEntity = [&](CachedEntity *ent) -> std::optional<std::tuple<float, Vector, std::optional<backtrack::BacktrackData>>>
     {
-        if (CE_BAD(ent) || !ent->m_bAlivePlayer() || (teammate && ent->m_iTeam() != g_pLocalPlayer->team) || ent == LOCAL_E)
+        if (RAW_ENT(ent)->IsDormant() || (teammate && ent->m_iTeam() != g_pLocalPlayer->team) || ent == LOCAL_E)
             return std::nullopt;
         if (!teammate && ent->m_iTeam() == g_pLocalPlayer->team)
             return std::nullopt;

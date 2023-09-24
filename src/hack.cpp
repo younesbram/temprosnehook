@@ -272,17 +272,7 @@ void hack::Initialize()
     ::signal(SIGABRT, &critical_error_handler);
 #endif
     time_injected = time(nullptr);
-/*passwd *pwd   = getpwuid(getuid());
-char *logname = strfmt("/tmp/rosnehook-game-stdout-%s-%u.log", pwd->pw_name,
-time_injected);
-freopen(logname, "w", stdout);
-free(logname);
-logname = strfmt("/tmp/rosnehook-game-stderr-%s-%u.log", pwd->pw_name,
-time_injected);
-freopen(logname, "w", stderr);
-free(logname);*/
-// Essential files must always exist, except when the game is running in text
-// mode.
+
 #if ENABLE_VISUALS
     {
         std::vector<std::string> essential = { "fonts/tf2build.ttf" };

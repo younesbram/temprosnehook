@@ -21,7 +21,6 @@
 #include <menu/GuiInterface.hpp>
 #include "common.hpp"
 #include "visual/drawing.hpp"
-#include "hack.hpp"
 #include "menu/menu/Menu.hpp"
 #include "drawmgr.hpp"
 
@@ -80,7 +79,7 @@ void DrawCheatVisuals()
             float w, h;
             std::string hack_info_text;
             if (*info_style == 0) {
-                hack_info_text = "Rosnehook InDev " + hack::GetVersion();
+                hack_info_text = "Rosnehook InDev";
                 fonts::center_screen->stringSize(hack_info_text, &w, &h);
                 draw::String(*info_x, *info_y, *info_foreground_color, hack_info_text.c_str(), *fonts::center_screen);
             }

@@ -36,7 +36,6 @@
 #endif
 
 #include "copypasted/CDumper.hpp"
-#include "version.h"
 
 /*
  *  Credits to josh33901 aka F1ssi0N for butifel F1Public and Darkstorm 2015
@@ -47,40 +46,6 @@
 bool hack::game_shutdown = true;
 bool hack::shutdown      = false;
 bool hack::initialized   = false;
-
-const std::string &hack::GetVersion()
-{
-    static std::string version("Unknown Version");
-    if (version != "Unknown Version")
-        return version;
-#if defined(GIT_COMMIT_HASH) && defined(GIT_COMMITTER_DATE)
-    version = "Version: #" GIT_COMMIT_HASH " " GIT_COMMITTER_DATE;
-#endif
-    return version;
-}
-
-const std::string &hack::GetType()
-{
-    static std::string version("Unknown Type");
-    if (version != "Unknown Type")
-        return version;
-    version = "";
-#if !ENABLE_IPC
-    version += " NOIPC";
-#endif
-#if !ENABLE_GUI
-    version += " NOGUI";
-#else
-    version += " GUI";
-#endif
-
-#if !ENABLE_VISUALS
-    version += " NOVISUALS";
-#endif
-
-    version = version.substr(1);
-    return version;
-}
 
 std::mutex hack::command_stack_mutex;
 std::stack<std::string> &hack::command_stack()

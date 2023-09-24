@@ -9,14 +9,9 @@
 #include "MiscTemporary.hpp"
 #include "votelogger.hpp"
 
-settings::Boolean random_name{ "misc.random-name", "false" };
-extern std::string name_forced;
 
 namespace hooked_methods
 {
-
-static TextFile randomnames_file;
-
 DEFINE_HOOKED_METHOD(Shutdown, void, INetChannel *this_, const char *reason)
 {
     g_Settings.bInvalid = true;

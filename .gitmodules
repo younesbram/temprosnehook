@@ -12,7 +12,7 @@
 	url = https://github.com/nullworks/TF2_NavFile_Reader
 [submodule "external/clip"]
 	path = external/clip
-	url = https://github.com/nullworks/clip
+	url = https://github.com/RosneBurgerworks/clip
 [submodule "external/source-sdk-2013-headers"]
 	path = external/source-sdk-2013-headers
 	url = https://github.com/RosneBurgerworks/source-sdk-2013-headers.git

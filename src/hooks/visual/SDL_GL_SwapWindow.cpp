@@ -9,7 +9,7 @@
 #include "timer.hpp"
 #include <SDL2/SDL_syswm.h>
 #include <menu/menu/Menu.hpp>
-#include "clip.h"
+#include "clip.hpp"
 #if ENABLE_VISUALS
 #include "drawmgr.hpp"
 #endif

@@ -15,12 +15,6 @@ Open a terminal window and enter the following command:
     bash <(wget -qO- https://raw.githubusercontent.com/RosneBurgerworks/One-in-all-rosnehook-install/master/install-all)
 
 ## The Hall of Retards
-
-### OneTF2
-ONETF2 tf2s most idiotic cheater ever, posting thigh pics, his own morbidly obese face on discord and now getting his mommy to get him some cheeseburgers, so he can become a literal statistic on the obesity rage chart, reality cannot get his pasting methods into him, he's just gone purely morbidly obese and that obesity is blocking that method, just like vac blocking cat bots. onetf2 the most smartest coder ever (and not Terry A. Davis!!!!!) , putting cosnt char on THE FUCKING MENU! let's give a round of applause, yippie more McDonald's! here onetf2 eat up you fatty 🍔 🍔 🍔.
-also, onetf2 keeps adding const char to drawmgr.cpp, when he just had to remove the FUCKING SKINCHANGER SHIT! YOU DIDNT HAVE TO ADD SKIN CHANGER, JUST REMOVE IT FROM DRAWMGR!!!!!!!!!!!!!!!
-plus, THE FAGGOT COWHOOKER LEAKED ROSNEHOOK! WTF I WORKED FOR YOUR GAY OBESE WALKING ASS, JUST YOU WOULD LEAK IT! WHAT A FAG!
-
 ### Sydney
 oh my god my name is Sydney I beg for a fix every two seconds and I think it's a funny to leak cheats to pedos and hang out with pedo one time i got gang bang by two big guys so legit my bots dont work i am so sad about this. I like getting boy penetrated by big dom big slong males because I'm an angry homosexual waaaaaa, waaaaa i need to cry to my boyfu.
 i like to believe reality/nigsec because im a very smart individual!

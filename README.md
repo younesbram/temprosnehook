@@ -2,6 +2,8 @@
   <img src="https://media.discordapp.net/attachments/1139676647407243315/1150613674201985096/IMG_2314.png">
 </p>
 
+# good pasted cheat 👍
+
 ## Support
 
 https://discord.gg/3q2xM7NNxJ

@@ -340,6 +340,16 @@ void update()
                 continue;
             }
 
+            if (playerlist::AccessData(info.friendsID).state == playerlist::k_EState::CHEATER)
+            {
+                --count_total;
+            }
+
+            if (playerlist::AccessData(info.friendsID).state == playerlist::k_EState::FRIEND)
+            {
+                --count_total;
+            }
+            
             if (playerlist::AccessData(info.friendsID).state == playerlist::k_EState::CAT)
             {
                 --count_total;

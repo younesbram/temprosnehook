@@ -323,6 +323,7 @@ void hack::Initialize()
     }
     logging::Info("Initializer stack done");
 #if ENABLE_TEXTMODE
+    hack::command_stack().emplace("exec cheaters");
     hack::command_stack().emplace("exec cat_autoexec_textmode");
     hack::command_stack().emplace("exec betrayals");
     hack::command_stack().emplace("exec trusted");

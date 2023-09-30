@@ -16,8 +16,8 @@ namespace playerlist
 {
 std::unordered_map<unsigned, userdata> data{};
 
-const std::string k_Names[]                                     = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "ABUSE", "PARTY" };
-const char *const k_pszNames[]                                  = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "ABUSE", "PARTY" };
+const std::string k_Names[]                                     = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "ABUSE", "PARTY", "CHEATER" };
+const char *const k_pszNames[]                                  = { "DEFAULT", "FRIEND", "RAGE", "IPC", "TEXTMODE", "CAT", "ABUSE", "PARTY", "CHEATER" };
 const std::array<std::pair<k_EState, size_t>, 5> k_arrGUIStates = { std::pair(k_EState::DEFAULT, 0), { k_EState::FRIEND, 1 }, { k_EState::RAGE, 2 } };
 #if ENABLE_VISUALS
 std::array<rgba_t, 8> k_Colors = { colors::empty, colors::FromRGBA8(99, 226, 161, 255), colors::FromRGBA8(226, 204, 99, 255), colors::FromRGBA8(232, 134, 6, 255), colors::FromRGBA8(232, 134, 6, 255), colors::empty, colors::FromRGBA8(150, 75, 0, 255), colors::FromRGBA8(99, 226, 161, 255) };
@@ -192,6 +192,14 @@ bool ChangeState(unsigned int steamid, k_EState state, bool force)
             return false;
     case k_EState::CAT:
         if (state == k_EState::FRIEND || state == k_EState::IPC || state == k_EState::TEXTMODE || state == k_EState::PARTY)
+        {
+            ChangeState(steamid, state, true);
+            return true;
+        }
+        else
+            return false;
+    case k_EState::CHEATER:
+        if (state == k_EState::CHEATER)
         {
             ChangeState(steamid, state, true);
             return true;

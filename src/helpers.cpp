@@ -67,7 +67,7 @@ void BeginConVars()
 
     if (!std::ifstream("tf/cfg/cheaters.cfg")) // undone
     {
-        std::ofstream cfg_trusted("tf/cfg/cheaters.cfg", std::ios::out | std::ios::trunc);
+        std::ofstream cfg_cheaters("tf/cfg/cheaters.cfg", std::ios::out | std::ios::trunc);
         if (cfg_cheaters.good())
             cfg_cheaters << "// cheaters for auto requeue\n"
                             "cat_pl_add_id 366175960 CHEATER\n"

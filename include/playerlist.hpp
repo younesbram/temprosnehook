@@ -19,7 +19,6 @@ enum class k_EState
     DEFAULT     = STATE_FIRST,
     FRIEND,
     RAGE,
-    CHEATER,
     IPC,
     TEXTMODE,
     CAT,

@@ -654,6 +654,9 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest) // also kn
         return false;
     }
 
+    if (HasCondition<TFCond_Bonked>(LOCAL_E))
+        return false;
+        
     // Too high priority, so don't try
     if (navparser::NavEngine::current_priority > prio_melee)
         return false;

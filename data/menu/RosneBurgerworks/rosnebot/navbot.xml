@@ -18,6 +18,7 @@
                           tooltip="Also try to escape from danger when carrying intel."/>
             <AutoVariable width="fill" target="navbot.primary-only" label="Auto best weapon"/>
             <AutoVariable width="fill" target="navbot.melee-mode" label="Melee only"/>
+            <AutoVariable width="fill" target="navbot.engineer-mode" label="Engi mode"/>
             <LabeledObject width="fill" label="Force slot">
                 <Select target="navbot.force-slot">
                     <Option name="Don't force" value="0"/>

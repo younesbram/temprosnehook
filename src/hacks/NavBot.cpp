@@ -474,9 +474,9 @@ enum slots
 {
     primary   = 1,
     secondary = 2,
-    melee     = 3 
-     pda1      = 4,
-     pda2      = 5
+    melee     = 3,
+    pda1      = 4,
+    pda2      = 5
 };
 
 #if ENABLE_VISUALS

@@ -644,9 +644,9 @@ bool stayNear()
 
 bool isVisible;
 // if melee aimbot/navbot crashes, this is where the problem is.
-bool meleeAttack(CachedEntity *entity, int slot, std::pair<CachedEntity *, float> &nearest) // also known as "melee AI"
+bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest) // also known as "melee AI"
 {
-    if (IsPlayerInvulnerable(entity))
+    if (IsPlayerInvulnerable(CachedEntity))
             return false;
     // There is no point in engaging the melee AI if we are not using melee
     if (slot != melee || !nearest.first)
@@ -655,7 +655,6 @@ bool meleeAttack(CachedEntity *entity, int slot, std::pair<CachedEntity *, float
             navparser::NavEngine::cancelPath();
         return false;
     }
-
 
     // Too high priority, so don't try
     if (navparser::NavEngine::current_priority > prio_melee)

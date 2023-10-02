@@ -1507,9 +1507,8 @@ static void CreateMove()
     // If we aren't getting health, get ammo
     if (getAmmo())
         return;
-    case tf_engineer:
-            selected_config = isEngieMode() ? HasGunslinger(LOCAL_E) ? CONFIG_GUNSLINGER_ENGINEER : CONFIG_ENGINEER : CONFIG_SHORT_RANGE;
-            break;
+    if (runEngineerLogic())
+        return;
     // run the melee AI
     if (meleeAttack(slot, nearest))
         return;

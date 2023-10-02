@@ -1326,8 +1326,8 @@ bool escapeDanger()
     // In danger, try to run (besides if it's a building spot, don't run away from that)
     if (blacklist->contains(local_nav))
     {
-        /*if ((*blacklist)[local_nav].value == navparser::BlacklistReason_enum::BAD_BUILDING_SPOT)
-            return false;*/
+        if ((*blacklist)[local_nav].value == navparser::BlacklistReason_enum::BAD_BUILDING_SPOT)
+            return false;
 
         static CNavArea *target_area = nullptr;
         // Already running and our target is still valid

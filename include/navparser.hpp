@@ -37,7 +37,7 @@ enum BlacklistReason_enum
     STICKY,
     ENEMY_NORMAL,
     ENEMY_DORMANT,
-    // BAD_BUILDING_SPOT,
+    BAD_BUILDING_SPOT,
     // Always last
     BLACKLIST_LENGTH
 };

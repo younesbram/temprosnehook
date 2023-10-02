@@ -25,6 +25,7 @@
                     <Option name="Disable" value="0"/>
                     <Option name="Random" value="1"/>
                     <Option name="Nice Shot" value="23"/>
+                    <Option name="POOTIS!" value="14"/>
                     <Option name="Medic" value="2"/>
                     <Option name="Thanks" value="3"/>
                     <Option name="Go Go Go" value="4"/>
@@ -37,7 +38,6 @@
                     <Option name="Spy" value="11"/>
                     <Option name="Sentry Ahead" value="12"/>
                     <Option name="Teleporter Here" value="13"/>
-                    <Option name="Dispenser Here" value="14"/>
                     <Option name="Sentry Here" value="15"/>
                     <Option name="Activate Charge" value="16"/>
                     <Option name="Help" value="17"/>
@@ -59,11 +59,12 @@
                           tooltip="Don't save your chat spam to the log."/>
         </List>
     </Box>
-    <Box name="OMEGATRONIC I AM NOT A BOT" width="content" height="content" padding="12 6 6 6" y="200">
+    <Box name="Misc" width="content" height="content" padding="12 6 6 6" y="200">
         <List width="150">
-            <AutoVariable width="fill" target="chat.censor.enable" label="Enable"
-                          tooltip="SAYS 'I am not a bot' in chat when called out"/>
-            <AutoVariable width="fill" target="chat.censor.filter" label="add more words"/>
+            <AutoVariable width="fill" target="chat.censor.enable" label="'I am not a bot'"
+                          tooltip="Says 'I am not a bot' in chat when called out"/>
+            <AutoVariable width="fill" target="votelogger.kicksay" label="Says in chat to F1 when calling a votekick"
+                          tooltip="Says 'F1, get this bot outta here!' in chat when starting a votekick."/>
         </List>
     </Box>
     <Box name="Votelogger" width="content" height="content" padding="12 6 6 6" x="170" y="140">

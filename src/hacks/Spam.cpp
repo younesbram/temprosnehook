@@ -367,7 +367,6 @@ static void CreateMove()
         source = &builtin_lennyfaces;
         break;
     case 4:
-        //source = &builtin_blanks;
         source = &savetf2;
         break;
     case 5:
@@ -377,7 +376,6 @@ static void CreateMove()
         source = &builtin_lmaobox;
         break;
     case 7:
-        //source = &builtin_lithium; no need anymore
         source = &randomnn;
         break;
     default:
@@ -428,19 +426,8 @@ void init()
 
 const std::vector<std::string> builtin_default    = { "Rosnehook - BONES? well yes", "Rosnehook: We Love Bones!", "Rosnehook: Never Miss!", "Rosnehook: Darkstorm Code? No!", "Rosnehook: so private that valve will rat your pc just to check rosnehook code!", "Rosnehook: No Bloatware!", "Rosnehook: furry and pedo killer!", "Rosnehook: What is VAC?" };
 const std::vector<std::string> builtin_lennyfaces = { "( ͡° ͜ʖ ͡°)", "( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)", "ʕ•ᴥ•ʔ", "(▀̿Ĺ̯▀̿ ̿)", "( ͡°╭͜ʖ╮͡° )", "(ง'̀-'́)ง", "(◕‿◕✿)", "༼ つ  ͡° ͜ʖ ͡° ༽つ" };
-//const std::vector<std::string> builtin_blanks     = { "\e"
-//                                                          "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-//                                                          "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-//                                                          "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-//                                                          "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-//                                                          "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-//                                                          "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-//                                                          "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" };
-//hope it doesnt crash ^
 const std::vector<std::string> builtin_nonecore = { "NULL CORE - REDUCE YOUR RISK OF BEING OWNED!", "NULL CORE - WAY TO THE TOP!", "NULL CORE - BEST TF2 CHEAT!", "NULL CORE - NOW WITH BLACKJACK AND HOOKERS!", "NULL CORE - BUTTHURT IN 10 SECONDS FLAT!", "NULL CORE - WHOLE SERVER OBSERVING!", "NULL CORE - GET BACK TO PWNING!", "NULL CORE - WHEN PVP IS TOO HARDCORE!", "NULL CORE - CAN CAUSE KIDS TO RAGE!", "NULL CORE - F2P NOOBS WILL BE 100% NERFED!" };
 const std::vector<std::string> builtin_lmaobox  = { "GET GOOD, GET LMAOBOX!", "LMAOBOX - WAY TO THE TOP", "WWW.LMAOBOX.NET - BEST FREE TF2 HACK!" };
-//const std::vector<std::string> builtin_lithium  = { "CHECK OUT www.YouTube.com/c/DurRud FOR MORE INFORMATION!", "PWNING AIMBOTS WITH OP ANTI-AIMS SINCE 2015 - LITHIUMCHEAT", "STOP GETTING MAD AND STABILIZE YOUR MOOD WITH LITHIUMCHEAT!", "SAVE YOUR MONEY AND GET LITHIUMCHEAT! IT IS FREE!", "GOT ROLLED BY LITHIUM? HEY, THAT MEANS IT'S TIME TO GET LITHIUMCHEAT!!" };
-//hope it doesnt crash ^
 const std::vector<std::string> savetf2 = {"We must save tf2!", "Saving tf2 since 2017", "We all here to save tf2!", "Saving tf2 all day long!", "#SaveTF2" };
 const std::vector<std::string> randomnn = {"Pyro's flamethrower roasts marshmallows while Scout tells jokes. Fun!", "Engineer builds a teleporter to outer space, meets Alien Heavy.", "Sniper hunts unicorns, finds magical hats. Sniper's luck!", "Spy disguises as rubber chicken, confuses everyone. Cluck cluck!", "Medic's healing beam shoots rainbows, heals souls, parties!", "Demoman's sticky bombs become bouncy balls. Chaos unleashed!", "Soldier rocket jumps to moon, plants TF2 flag. Victory!", "Team huddles, makes human pyramid. Engineer takes picture.", "Heavy eats bananas, gains crits, goes bananas. Carnage!", "Miniature Saxton Hale bosses over Team Fortress action. Tiny epic!" };
 void teamspam_reload(const std::string &after)

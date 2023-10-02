@@ -32,6 +32,7 @@ std::array<rgba_t, 32> side_strings_colors{ colors::empty };
 std::array<rgba_t, 32> center_strings_colors{ colors::empty };
 size_t side_strings_count{ 0 };
 size_t center_strings_count{ 0 };
+static settings::Int esp_font_size{ "visual.font_size.esp", "13" };
 static settings::Int center_font_size{ "visual.font_size.center_size", "14" };
 
 void InitStrings()
@@ -154,12 +155,26 @@ void font::changeSize(int new_font_size)
 }
 #endif
 std::unique_ptr<font> menu{ nullptr };
+std::unique_ptr<font> esp{ nullptr };
 std::unique_ptr<font> center_screen{ nullptr };
 } // namespace fonts
 
 static InitRoutine font_size(
     []()
     {
+        esp_font_size.installChangeCallback(
+            [](settings::VariableBase<int> &var, int after)
+            {
+                if (after > 0 && after < 100)
+                {
+#if ENABLE_GLEZ_DRAWING
+                    fonts::esp->unload();
+                    fonts::esp.reset(new fonts::font(paths::getDataPath("/fonts/notosans.ttf"), after));
+#else
+                    fonts::esp->changeSize(after);
+#endif
+                }
+            });
         center_font_size.installChangeCallback(
             [](settings::VariableBase<int> &var, int after)
             {
@@ -188,12 +203,15 @@ void Initialize()
 #if ENABLE_GLEZ_DRAWING
     glez::preInit();
     fonts::menu          = std::make_unique<fonts::font>(paths::getDataPath("/fonts/notosans.ttf"), 10);
+    fonts::esp           = std::make_unique<fonts::font>(paths::getDataPath("/fonts/notosans.ttf"), 10);
     fonts::center_screen = std::make_unique<fonts::font>(paths::getDataPath("/fonts/notosans.ttf"), 12);
 #elif ENABLE_ENGINE_DRAWING
     fonts::menu = std::make_unique<fonts::font>(paths::getDataPath("/fonts/notosans.ttf"), 10, true);
+    fonts::esp = std::make_unique<fonts::font>(paths::getDataPath("/fonts/notosans.ttf"), 10, true);
     fonts::center_screen = std::make_unique<fonts::font>(paths::getDataPath("/fonts/notosans.ttf"), 12, true);
 #elif ENABLE_IMGUI_DRAWING
     fonts::menu          = std::make_unique<fonts::font>(paths::getDataPath("/fonts/notosans.ttf"), 14, true);
+    fonts::esp           = std::make_unique<fonts::font>(paths::getDataPath("/fonts/notosans.ttf"), 15);
     fonts::center_screen = std::make_unique<fonts::font>(paths::getDataPath("/fonts/notosans.ttf"), 15, true);
 #endif
 #if ENABLE_ENGINE_DRAWING

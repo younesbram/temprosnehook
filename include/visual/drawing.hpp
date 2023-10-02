@@ -50,6 +50,7 @@ typedef im_renderer::font font;
 typedef glez::font font;
 #endif
 
+extern std::unique_ptr<font> esp;
 extern std::unique_ptr<font> menu;
 extern std::unique_ptr<font> center_screen;
 

@@ -71,8 +71,8 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Other" x="163" y="340">
         <List width="150">
             <AutoVariable width="fill" target="colors.guicolor" label="GUI color"/>
-            <AutoVariable width="fill" target="misc.scoreboard.match-custom-team-colors" label="Use custom colors"
-                          tooltip="On scoreboard."/>
+            <AutoVariable width="fill" target="colors.target" label="Target color"
+                            tooltip="Aimbot target color. This is used for ESP, chams, glow, and radar."/>
         </List>
     </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Playerlist" x="330">

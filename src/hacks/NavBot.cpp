@@ -654,7 +654,7 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest) // also kn
         return false;
     }
 
-    if (IsPlayerInvulnerable(CachedEntity *))
+    if (IsPlayerInvulnerable(CachedEntity *)
             return false;
         
     // Too high priority, so don't try

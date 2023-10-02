@@ -63,7 +63,7 @@
         <List width="150">
             <AutoVariable width="fill" target="chat.censor.enable" label="'I am not a bot'"
                           tooltip="Says 'I am not a bot' in chat when called out"/>
-            <AutoVariable width="fill" target="votelogger.kicksay" label="Says in chat to F1 when calling a votekick"
+            <AutoVariable width="fill" target="votelogger.kicksay" label="Votesay"
                           tooltip="Says 'F1, get this bot outta here!' in chat when starting a votekick."/>
         </List>
     </Box>

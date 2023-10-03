@@ -312,7 +312,6 @@ static void Draw()
 {
     if (!enable)
         return;
-    PROF_SECTION(DRAW_ESP_PERFORMANCE)
     ProcessEntityPT();
 }
 
@@ -335,8 +334,7 @@ static void CreateMove()
     // clients
     if (!buildings && !proj_esp && !item_esp)
     {
-        { // Prof section ends when out of scope, these brackets here.
-            PROF_SECTION(CM_ESP_EntityLoop)
+        {
             for (const auto &ent : entity_cache::player_cache)
             {
                 ProcessEntity(ent);
@@ -355,8 +353,7 @@ static void CreateMove()
     }
     else
     {
-        { // Prof section ends when out of scope, these brackets here.
-            PROF_SECTION(CM_ESP_EntityLoop)
+        {
             // Loop through entities
             for (const auto &ent_index : entity_cache::valid_ents)
             {
@@ -394,7 +391,6 @@ void _FASTCALL Sightlines(CachedEntity *ent, rgba_t &fg)
 {
     if (((int) sightlines == 2 || ((int) sightlines == 1 && CE_INT(ent, netvar.iClass) == tf_sniper)) && CE_GOOD(ent) && ent->hitboxes.GetHitbox(0))
     {
-        PROF_SECTION(PT_esp_sightlines)
 
         // Get players angle and head position
         Vector &eye_angles = NET_VECTOR(RAW_ENT(ent), netvar.m_angEyeAngles);
@@ -539,7 +535,6 @@ void _FASTCALL Healthbar(EntityType &type, int &classid, rgba_t &fg, ESPData &en
 
 void DrawStrings(EntityType &type, bool &transparent, Vector &draw_point, ESPData &ent_data, CachedEntity *ent)
 {
-    PROF_SECTION(PT_esp_drawstrings)
 
     // Create our initial point at the center of the entity
     bool origin_is_zero = true;
@@ -793,7 +788,6 @@ void _FASTCALL ShowConditions(CachedEntity *ent)
 // Used when processing entities with cached data from createmove in draw
 void ProcessEntityPT()
 {
-    PROF_SECTION(PT_esp_process_entity)
     for (const auto &[ent, distance] : entities_need_repaint)
     {
         // Check to prevent crashes
@@ -1328,7 +1322,6 @@ void Shutdown()
 // Draw a box around a player
 void _FASTCALL DrawBox(CachedEntity *ent, const rgba_t &clr)
 {
-    PROF_SECTION(PT_esp_drawbox)
 
     // Check if ent is bad to prevent crashes
     if (CE_INVALID(ent) || !ent->m_bAlivePlayer())
@@ -1398,7 +1391,6 @@ void BoxCorners(int minx, int miny, int maxx, int maxy, const rgba_t &color, boo
 // Used for caching collidable bounds
 bool GetCollide(CachedEntity *ent)
 {
-    PROF_SECTION(PT_esp_getcollide)
 
     // Null check to prevent crashing
     if (CE_INVALID(ent) || !ent->m_bAlivePlayer())

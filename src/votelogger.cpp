@@ -110,7 +110,7 @@ void dispatchUserMessage(bf_read &buffer, int type)
         {
             if (*saywhenimkickingaskid)
             {
-                chat_stack::Say("F1, get this bot outta here!");
+                chat_stack::Say("f1 cheater/bot", true);
             }
             was_local_player = true;
             local_kick_timer.update();

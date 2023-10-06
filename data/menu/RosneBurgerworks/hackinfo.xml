@@ -9,7 +9,6 @@
             <AutoVariable width="fill" target="debug.log-sent-chat" label="Log sent chat"/>
             <AutoVariable width="fill" target="debug.pp-extrapolate" label="PP extrapolate"/>
             <AutoVariable width="fill" target="debug.pp-rocket-time-ping" label="PP rocket time ping"/>
-            <AutoVariable width="fill" target="debug.projectiles" label="Debug projectiles"/>
             <AutoVariable width="fill" target="debug.tcm" label="Debug TCM"/>
             <AutoVariable width="fill" target="aimbot.debug" label="Debug aimbot"/>
             <AutoVariable width="fill" target="aimbot.debug.engine-pp" label="Debug engine PP"/>

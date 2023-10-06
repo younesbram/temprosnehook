@@ -20,7 +20,6 @@
 static settings::Boolean roll_speedhack{ "misc.roll-speedhack", "false" };
 static settings::Boolean forward_speedhack{ "misc.roll-speedhack.forward", "false" };
 settings::Boolean engine_pred{ "misc.engine-prediction", "true" };
-static settings::Boolean debug_projectiles{ "debug.projectiles", "false" };
 
 class CMoveData;
 namespace engine_prediction
@@ -287,8 +286,6 @@ DEFINE_HOOKED_METHOD(CreateMove, bool, void *this_, float input_sample_time, CUs
             {
                 hacks::antiaim::ProcessUserCmd(cmd);
             }
-            if (debug_projectiles)
-                projectile_logging::Update();
         }
     }
     else

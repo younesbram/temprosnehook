@@ -7,9 +7,6 @@
 #include "HookedMethods.hpp"
 #include "PlayerTools.hpp"
 
-static settings::String ipc_name{ "name.ipc", "" };
-
-static std::string stolen_name;
 
 int getRng(int min, int max)
 {

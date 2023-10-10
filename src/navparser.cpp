@@ -811,15 +811,6 @@ static void CreateMove()
         return;
     }
 
-    // Still in setup, if on fitting team, do not path yet.
-    std::string level_name = GetLevelName();
-    if (g_pLocalPlayer->team == TEAM_BLU && (TFGameRules()->InSetup() && level_name != "plr_pipeline"))
-    {
-        if (navparser::NavEngine::isPathing())
-            navparser::NavEngine::cancelPath();
-        return;
-    }
-
     if (*vischeck_runtime)
         vischeckPath();
     checkBlacklist();

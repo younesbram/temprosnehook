@@ -441,7 +441,8 @@ bool isReady()
         return false;
 
     std::string level_name = GetLevelName();
-    return *enabled && map && map->state == NavState::Active && (level_name == "plr_pipeline" || TFGameRules()->State_Get() > CGameRules::GR_STATE_PREROUND);
+    return *enabled && map && map->state == NavState::Active && (level_name == "plr_pipeline" || TFGameRules()->State_Get() > CGameRules::GR_STATE_PREROUND) &&
+           !g_pLocalPlayer->team == TEAM_BLU && TFGameRules()->InSetup();
 }
 
 bool isPathing()
@@ -809,7 +810,16 @@ static void CreateMove()
         cancelPath();
         return;
     }
-    
+
+    // Still in setup, if on fitting team, do not path yet.
+    std::string level_name = GetLevelName();
+    if (g_pLocalPlayer->team == TEAM_BLU && (TFGameRules()->InSetup() && level_name != "plr_pipeline"))
+    {
+        if (navparser::NavEngine::isPathing())
+            navparser::NavEngine::cancelPath();
+        return;
+    }
+
     if (*vischeck_runtime)
         vischeckPath();
     checkBlacklist();

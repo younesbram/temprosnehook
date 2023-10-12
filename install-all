@@ -3,7 +3,7 @@
 set -e
 
 #
-# Build cathook
+# Build rosnehook
 #
 
 ./scripts/updater false true true

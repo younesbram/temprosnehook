@@ -4,9 +4,6 @@
 #include <settings/SettingsIO.hpp>
 #include <settings/String.hpp>
 #include "common.hpp"
-#include <iostream>
-#include <dirent.h>
-#include <sys/stat.h>
 #if ENABLE_VISUALS
 #include "Menu.hpp"
 #include "special/ConfigsManagerList.hpp"
@@ -35,18 +32,17 @@ void Draw()
     {
         settings::SettingsWriter writer{ settings::Manager::instance() };
 
-        const char *configPath = paths::getConfigPath().c_str();
-        DIR *config_directory = opendir(configPath);
+        DIR *config_directory = opendir(paths::getConfigPath().c_str());
         if (!config_directory)
         {
             logging::Info("Configs directory doesn't exist, creating one!");
-            mkdir(configPath, S_IRWXU | S_IRWXG);
+            mkdir(paths::getConfigPath().c_str(), S_IRWXU | S_IRWXG);
         }
 
         writer.saveTo(paths::getConfigPath() + "/" + *cfg_save + ".conf");
 
         logging::Info("cat_save: Sorting configs...");
-        // void getAndSortAllConfigs(); // commented out as it appears to be a function declaration inside Draw
+        void getAndSortAllConfigs();
         logging::Info("cat_save: Closing dir...");
         closedir(config_directory);
         refreshConfigList();

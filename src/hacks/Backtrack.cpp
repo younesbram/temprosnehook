@@ -97,7 +97,7 @@ float getLatency()
 bool isTickInRange(int tickcount)
 {
     int delta_tickcount = abs(tickcount - current_user_cmd->tick_count + TIME_TO_TICKS(getLatency() / 1000.0f));
-    return delta_tickcount <= TICKS_TO_TIME(1);
+    return TICKS_TO_TIME(delta_tickcount) <= 0.2f - TICKS_TO_TIME(2);
 }
 
 // Is backtrack enabled?

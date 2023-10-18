@@ -1,4 +1,6 @@
-// rewritten by rosne-gamingyt
+//
+// Created by bencat07 on 28.09.18.
+//
 
 #include "common.hpp"
 #include "settings/Bool.hpp"
@@ -14,7 +16,7 @@ constexpr float initial_vel    = 200.0f;
 int prevent                    = -1;
 static Timer previous_entity_delay{};
 
-std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool zcheck,  float range)
+std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool zcheck, float range)
 {
     CachedEntity *bestent                             = nullptr;
     float bestscr                                     = FLT_MAX;

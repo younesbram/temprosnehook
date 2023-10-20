@@ -32,7 +32,7 @@
 
 #include "teamroundtimer.hpp"
 #if EXTERNAL_DRAWING
-#include "xoverlay.h"
+#include "xoverlay.hpp"
 #endif
 
 #include "copypasted/CDumper.hpp"

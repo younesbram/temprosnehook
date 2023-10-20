@@ -23,7 +23,7 @@
 #include <locale>
 
 #if EXTERNAL_DRAWING
-#include "xoverlay.h"
+#include "xoverlay.hpp"
 #endif
 
 std::array<std::string, 32> side_strings;

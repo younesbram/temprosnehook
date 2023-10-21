@@ -209,7 +209,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
                 break;
             }
 
-            std::vector<std::string> res = { "skid", "script", "cheat", "hak", "f1", "hax", "vac", "bot", "report", "kick", "hack", "chaet" };
+            std::vector<std::string> res = { "cheat", "bot", "hack" };
             if (claz)
                 res.emplace_back(claz);
 
@@ -228,7 +228,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
             for (const auto &filter : res)
                 if (boost::contains(message2, filter))
                 {
-                    chat_stack::Say("I am not a bot.", true); // omega tonic
+                    chat_stack::Say("I am not a ◌๎bot.", true); // omegatronic
                     retrun     = true;
                     lastfilter = message;
                     lastname   = format(name);

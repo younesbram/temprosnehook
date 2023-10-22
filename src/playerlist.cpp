@@ -356,7 +356,7 @@ static int cat_pl_set_state_completionCallback(const char *c_partial, char comma
 
     std::vector<std::string> names;
 
-    for (int i = 1; i <= g_GlobalVars->maxClients; i++)
+    for (int i = 1; i <= g_GlobalVars->maxClients; ++i)
     {
         player_info_s info{};
         if (!GetPlayerInfo(i, &info))

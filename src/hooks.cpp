@@ -14,7 +14,7 @@ namespace hooks
 unsigned CountMethods(method_table_t table)
 {
     unsigned int i = 0;
-    while (table[i++])
+    while (table[++i])
         ;
     return i;
 }

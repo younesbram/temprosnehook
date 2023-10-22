@@ -200,7 +200,7 @@ CatCommand exec_sync("ipc_sync_all", "Sync's certain variable (on every peer)",
                              /* this could probaly be put in a function
                                  it loops trough all IPC bots and ignores the local player. */
 
-                             for (unsigned i = 0; i < peer->memory->peer_count; i++)
+                             for (unsigned i = 0; i < peer->memory->peer_count; ++i)
                              {
                                  if (!peer->memory->peer_data[i].free)
                                  {
@@ -216,7 +216,7 @@ CatCommand exec_sync("ipc_sync_all", "Sync's certain variable (on every peer)",
                          else
                          {
                              {
-                                 for (unsigned i = 0; i < peer->memory->peer_count; i++)
+                                 for (unsigned i = 0; i < peer->memory->peer_count; ++i)
                                  {
                                      if (!peer->memory->peer_data[i].free)
                                      {
@@ -256,7 +256,7 @@ CatCommand debug_get_ingame_ipc("ipc_debug_dump_server", "Show other bots on ser
                                     }
                                     int count = 0;
                                     std::vector<unsigned> botlist{};
-                                    for (unsigned i = 0; i < cat_ipc::max_peers; i++)
+                                    for (unsigned i = 0; i < cat_ipc::max_peers; ++i)
                                     {
                                         if (!ipc::peer->memory->peer_data[i].free)
                                         {
@@ -378,7 +378,7 @@ void UpdatePlayerlist()
 {
     if (peer && ipc_update_list)
     {
-        for (unsigned i = 0; i < cat_ipc::max_peers; i++)
+        for (unsigned i = 0; i < cat_ipc::max_peers; ++i)
         {
             if (!peer->memory->peer_data[i].free)
             {

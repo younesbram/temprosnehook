@@ -48,7 +48,7 @@ float angle_data_s::deviation(int steps) const
     int k    = j + 1;
     float hx = 0.0f, hy = 0.0f;
 
-    for (int i = 0; i < steps && i < angle_count; i++)
+    for (int i = 0; i < steps && i < angle_count; ++i)
     {
         if (j < 0)
         {

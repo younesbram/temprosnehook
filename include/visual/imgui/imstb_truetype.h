@@ -1159,7 +1159,7 @@ static stbtt_uint32 stbtt__buf_get(stbtt__buf *b, int n)
     stbtt_uint32 v = 0;
     int i;
     STBTT_assert(n >= 1 && n <= 4);
-    for (i = 0; i < n; i++)
+    for (i = 0; i < n; ++i)
         v = (v << 8) | stbtt__buf_get8(b);
     return v;
 }
@@ -1261,7 +1261,7 @@ static void stbtt__dict_get_ints(stbtt__buf *b, int key, int outcount, stbtt_uin
 {
     int i;
     stbtt__buf operands = stbtt__dict_get(b, key);
-    for (i = 0; i < outcount && operands.cursor < operands.size; i++)
+    for (i = 0; i < outcount && operands.cursor < operands.size; ++i)
         out[i] = stbtt__cff_int(&operands);
 }
 
@@ -2138,7 +2138,7 @@ static stbtt__buf stbtt__cid_get_glyph_subrs(const stbtt_fontinfo *info, int gly
     {
         nranges = stbtt__buf_get16(&fdselect);
         start   = stbtt__buf_get16(&fdselect);
-        for (i = 0; i < nranges; i++)
+        for (i = 0; i < nranges; ++i)
         {
             v   = stbtt__buf_get8(&fdselect);
             end = stbtt__buf_get16(&fdselect);
@@ -2231,12 +2231,12 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
                 if (i >= sp)
                     break;
                 stbtt__csctx_rline_to(c, s[i], 0);
-                i++;
+                ++i;
             vlineto:
                 if (i >= sp)
                     break;
                 stbtt__csctx_rline_to(c, 0, s[i]);
-                i++;
+                ++i;
             }
             break;
 
@@ -2296,7 +2296,7 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index, st
             if (sp & 1)
             {
                 f = s[i];
-                i++;
+                ++i;
             }
             for (; i + 3 < sp; i += 4)
             {
@@ -2716,7 +2716,7 @@ static stbtt_int32 stbtt__GetGlyphGPOSInfoAdvance(const stbtt_fontinfo *info, in
         case 2:
         { // Pair Adjustment Positioning Subtable
             stbtt_int32 sti;
-            for (sti = 0; sti < subTableCount; sti++)
+            for (sti = 0; sti < subTableCount; st++i)
             {
                 stbtt_uint16 subtableOffset = ttUSHORT(subTableOffsets + 2 * sti);
                 stbtt_uint8 *table          = lookupTable + subtableOffset;
@@ -4897,7 +4897,7 @@ STBTT_DEF unsigned char *stbtt_GetGlyphSDF(const stbtt_fontinfo *info, float sca
         data          = (unsigned char *) STBTT_malloc(w * h, info->userdata);
         precompute    = (float *) STBTT_malloc(num_verts * sizeof(float), info->userdata);
 
-        for (i = 0, j = num_verts - 1; i < num_verts; j = i++)
+        for (i = 0, j = num_verts - 1; i < num_verts; j = ++i)
         {
             if (verts[i].type == STBTT_vline)
             {
@@ -5092,16 +5092,16 @@ static stbtt_int32 stbtt__CompareUTF8toUTF16_bigendian_prefix(stbtt_uint8 *s1, s
         {
             if (i >= len1)
                 return -1;
-            if (s1[i++] != ch)
+            if (s1[++i] != ch)
                 return -1;
         }
         else if (ch < 0x800)
         {
             if (i + 1 >= len1)
                 return -1;
-            if (s1[i++] != 0xc0 + (ch >> 6))
+            if (s1[++i] != 0xc0 + (ch >> 6))
                 return -1;
-            if (s1[i++] != 0x80 + (ch & 0x3f))
+            if (s1[++i] != 0x80 + (ch & 0x3f))
                 return -1;
         }
         else if (ch >= 0xd800 && ch < 0xdc00)
@@ -5111,13 +5111,13 @@ static stbtt_int32 stbtt__CompareUTF8toUTF16_bigendian_prefix(stbtt_uint8 *s1, s
             if (i + 3 >= len1)
                 return -1;
             c = ((ch - 0xd800) << 10) + (ch2 - 0xdc00) + 0x10000;
-            if (s1[i++] != 0xf0 + (c >> 18))
+            if (s1[++i] != 0xf0 + (c >> 18))
                 return -1;
-            if (s1[i++] != 0x80 + ((c >> 12) & 0x3f))
+            if (s1[++i] != 0x80 + ((c >> 12) & 0x3f))
                 return -1;
-            if (s1[i++] != 0x80 + ((c >> 6) & 0x3f))
+            if (s1[++i] != 0x80 + ((c >> 6) & 0x3f))
                 return -1;
-            if (s1[i++] != 0x80 + ((c) &0x3f))
+            if (s1[++i] != 0x80 + ((c) &0x3f))
                 return -1;
             s2 += 2; // plus another 2 below
             len2 -= 2;
@@ -5130,11 +5130,11 @@ static stbtt_int32 stbtt__CompareUTF8toUTF16_bigendian_prefix(stbtt_uint8 *s1, s
         {
             if (i + 2 >= len1)
                 return -1;
-            if (s1[i++] != 0xe0 + (ch >> 12))
+            if (s1[++i] != 0xe0 + (ch >> 12))
                 return -1;
-            if (s1[i++] != 0x80 + ((ch >> 6) & 0x3f))
+            if (s1[++i] != 0x80 + ((ch >> 6) & 0x3f))
                 return -1;
-            if (s1[i++] != 0x80 + ((ch) &0x3f))
+            if (s1[++i] != 0x80 + ((ch) &0x3f))
                 return -1;
         }
         s2 += 2;

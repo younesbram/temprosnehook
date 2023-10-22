@@ -210,7 +210,7 @@ static int nextCritTick(int loops = 4096)
 
     int old_seed = MD5_PseudoRandom(current_late_user_cmd->command_number) & 0x7FFFFFFF;
     // Try 4096 times
-    for (int i = 0; i < loops; i++)
+    for (int i = 0; i < loops; ++i)
     {
         int cmd_number = current_late_user_cmd->command_number + i;
 
@@ -512,7 +512,7 @@ static void updateCmds()
 
         // 100000 should be fine performance wise, as they are very spread out
         // j indicates the amount to store at max
-        for (int i = cur_cmdnum + 200, j = 3; i <= cur_cmdnum + 100000 + 200 && j > 0; i++)
+        for (int i = cur_cmdnum + 200, j = 3; i <= cur_cmdnum + 100000 + 200 && j > 0; ++i)
         {
             // Manually make seed
             int iSeed = MD5_PseudoRandom(i) & 0x7fffffff;

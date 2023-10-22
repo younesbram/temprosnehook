@@ -158,7 +158,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
         if (s >= 256 || CE_BAD(LOCAL_E))
             break;
 
-        for (i = 0; i < s; i++)
+        for (i = 0; i < s; ++i)
             data.push_back(buf_data[i]);
         /* First byte is player ENT index
          * Second byte is unidentified (equals to 0x01)
@@ -222,7 +222,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
             const char *toreplace[]   = { " ", "4", "3", "0", "6", "5", "7", "@", ".", ",", "-" };
             const char *replacewith[] = { "", "a", "e", "o", "g", "s", "t", "a", "", "", "" };
 
-            for (int i = 0; i < 7; i++)
+            for (int i = 0; i < 7; ++i)
                 boost::replace_all(message2, toreplace[i], replacewith[i]);
 
             for (const auto &filter : res)
@@ -262,7 +262,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
                 msg.push_back(c);
             else
             {
-                logging::Info("[%d] %s", i++, msg.c_str());
+                logging::Info("[%d] %s", ++i, msg.c_str());
                 msg.clear();
             }
         }

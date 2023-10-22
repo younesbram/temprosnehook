@@ -281,7 +281,7 @@ std::vector<Vector> Predict(CachedEntity *player, Vector pos, float offset, Vect
     float dist       = DistanceToGround(pos, minmax.first, minmax.second);
     auto strafe_pred = initializeStrafePrediction(player);
 
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; ++i)
     {
         if (vischeck)
             pos = PredictStep(pos, vel, acceleration, &minmax, g_GlobalVars->interval_per_tick, strafe_pred ? &*strafe_pred : nullptr);
@@ -325,7 +325,7 @@ void Prediction_PaintTraverse()
                 Vector mins = RAW_ENT(ent)->GetCollideable()->OBBMins();
                 Vector maxs = RAW_ENT(ent)->GetCollideable()->OBBMaxs();
 
-                for (int i = 0; i < 64; i++)
+                for (int i = 0; i < 64; ++i)
                 {
                     const_cast<Vector &>(RAW_ENT(ent)->GetAbsOrigin()) = new_origin;
                     CE_VECTOR(ent, 0x354)                              = new_origin;

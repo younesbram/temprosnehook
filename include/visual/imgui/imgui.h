@@ -2144,7 +2144,7 @@ struct ImGuiStorage
 // Usage:
 //     ImGuiListClipper clipper(1000);  // we have 1000 elements, evenly spaced.
 //     while (clipper.Step())
-//         for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+//         for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i)
 //             ImGui::Text("line number %d", i);
 // - Step 0: the clipper let you process the first element, regardless of it being visible or not, so we can measure the element height (step skipped if we passed a known height as second arg to
 // constructor).

@@ -469,7 +469,7 @@ bool CCommand::Tokenize(const char *pCommand, characterset_t *pBreakSet)
 const char *CCommand::FindArg(const char *pName) const
 {
     int nArgC = ArgC();
-    for (int i = 1; i < nArgC; i++)
+    for (int i = 1; i < nArgC; ++i)
     {
         if (!Q_stricmp(Arg(i), pName))
             return (i + 1) < nArgC ? Arg(i + 1) : "";

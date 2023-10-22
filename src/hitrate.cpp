@@ -111,7 +111,7 @@ void Update()
             auto ch = (INetChannel *) g_IEngine->GetNetChannelInfo();
             if (ch)
             {
-                for (int i = 1; i < PLAYER_ARRAY_SIZE; i++)
+                for (int i = 1; i < PLAYER_ARRAY_SIZE; ++i)
                 {
                     if (!resolve_soon[i])
                     {

@@ -1449,7 +1449,7 @@ bool ImGui::Combo(const char *label, int *current_item, bool (*items_getter)(voi
     // Display items
     // FIXME-OPT: Use clipper (but we need to disable it on the appearing frame to make sure our call to SetItemDefaultFocus() is processed)
     bool value_changed = false;
-    for (int i = 0; i < items_count; i++)
+    for (int i = 0; i < items_count; ++i)
     {
         PushID((void *) (intptr_t) i);
         const bool item_selected = (i == *current_item);
@@ -2151,7 +2151,7 @@ bool ImGui::DragScalarN(const char *label, ImGuiDataType data_type, void *v, int
     PushID(label);
     PushMultiItemsWidths(components);
     size_t type_size = GDataTypeInfo[data_type].Size;
-    for (int i = 0; i < components; i++)
+    for (int i = 0; i < components; ++i)
     {
         PushID(i);
         value_changed |= DragScalar("", data_type, v, v_speed, v_min, v_max, format, power);
@@ -2619,7 +2619,7 @@ bool ImGui::SliderScalarN(const char *label, ImGuiDataType data_type, void *v, i
     PushID(label);
     PushMultiItemsWidths(components);
     size_t type_size = GDataTypeInfo[data_type].Size;
-    for (int i = 0; i < components; i++)
+    for (int i = 0; i < components; ++i)
     {
         PushID(i);
         value_changed |= SliderScalar("", data_type, v, v_min, v_max, format, power);
@@ -2956,7 +2956,7 @@ bool ImGui::InputScalarN(const char *label, ImGuiDataType data_type, void *v, in
     PushID(label);
     PushMultiItemsWidths(components);
     size_t type_size = GDataTypeInfo[data_type].Size;
-    for (int i = 0; i < components; i++)
+    for (int i = 0; i < components; ++i)
     {
         PushID(i);
         value_changed |= InputScalar("", data_type, v, step, step_fast, format, flags);
@@ -4451,7 +4451,7 @@ void ImGui::RenderColorRectWithAlphaCheckerboard(ImVec2 p_min, ImVec2 p_max, ImU
         window->DrawList->AddRectFilled(p_min, p_max, col_bg1, rounding, rounding_corners_flags);
 
         int yi = 0;
-        for (float y = p_min.y + grid_off.y; y < p_max.y; y += grid_step, yi++)
+        for (float y = p_min.y + grid_off.y; y < p_max.y; y += grid_step, y++i)
         {
             float y1 = ImClamp(y, p_min.y, p_max.y), y2 = ImMin(y + grid_step, p_max.y);
             if (y2 <= y1)
@@ -5634,7 +5634,7 @@ bool ImGui::ListBox(const char *label, int *current_item, bool (*items_getter)(v
     bool value_changed = false;
     ImGuiListClipper clipper(items_count, GetTextLineHeightWithSpacing()); // We know exactly our line height here so we pass it as a minor optimization, but generally you don't need to.
     while (clipper.Step())
-        for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+        for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i)
         {
             const bool item_selected = (i == *current_item);
             const char *item_text;
@@ -5695,7 +5695,7 @@ void ImGui::PlotEx(ImGuiPlotType plot_type, const char *label, float (*values_ge
     {
         float v_min = FLT_MAX;
         float v_max = -FLT_MAX;
-        for (int i = 0; i < values_count; i++)
+        for (int i = 0; i < values_count; ++i)
         {
             const float v = values_getter(data, i);
             v_min         = ImMin(v_min, v);
@@ -5885,7 +5885,7 @@ void ImGuiMenuColumns::Update(int count, float spacing, bool clear)
     Spacing           = spacing;
     if (clear)
         memset(NextWidths, 0, sizeof(NextWidths));
-    for (int i = 0; i < Count; i++)
+    for (int i = 0; i < Count; ++i)
     {
         if (i > 0 && NextWidths[i] > 0.0f)
             Width += Spacing;
@@ -5901,7 +5901,7 @@ float ImGuiMenuColumns::DeclColumns(float w0, float w1, float w2) // not using v
     NextWidths[0] = ImMax(NextWidths[0], w0);
     NextWidths[1] = ImMax(NextWidths[1], w1);
     NextWidths[2] = ImMax(NextWidths[2], w2);
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 3; ++i)
         NextWidth += NextWidths[i] + ((i > 0 && NextWidths[i] > 0.0f) ? Spacing : 0.0f);
     return ImMax(Width, NextWidth);
 }

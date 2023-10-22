@@ -21,7 +21,7 @@ namespace hooked_methods
 std::vector<KeyValues *> Iterate(KeyValues *event, int depth)
 {
     std::vector<KeyValues *> peer_list = { event };
-    for (int i = 0; i < depth; i++)
+    for (int i = 0; i < depth; ++i)
     {
         for (auto ev : peer_list)
         {

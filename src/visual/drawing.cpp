@@ -371,7 +371,7 @@ void Circle(float x, float y, float radius, rgba_t color, float thickness, int s
 #else
     float px = 0;
     float py = 0;
-    for (int i = 0; i <= steps; i++)
+    for (int i = 0; i <= steps; ++i)
     {
         float ang = 2 * float(M_PI) * (float(i) / steps);
         if (!i)

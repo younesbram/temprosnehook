@@ -31,11 +31,11 @@ void GetSkeleton(IClientEntity *ent, CStudioHdr *pStudioHdr, Vector pos[], Quate
     // sort the layers
     int layer[MAX_OVERLAYS] = {};
     int i;
-    for (i = 0; i < m_AnimOverlay.Count(); i++)
+    for (i = 0; i < m_AnimOverlay.Count(); ++i)
     {
         layer[i] = MAX_OVERLAYS;
     }
-    for (i = 0; i < m_AnimOverlay.Count(); i++)
+    for (i = 0; i < m_AnimOverlay.Count(); ++i)
     {
         CAnimationLayer &pLayer = m_AnimOverlay[i];
         if ((pLayer.m_flWeight > 0) && pLayer.IsActive() && pLayer.m_nOrder >= 0 && pLayer.m_nOrder < m_AnimOverlay.Count())
@@ -43,7 +43,7 @@ void GetSkeleton(IClientEntity *ent, CStudioHdr *pStudioHdr, Vector pos[], Quate
             layer[pLayer.m_nOrder] = i;
         }
     }
-    for (i = 0; i < m_AnimOverlay.Count(); i++)
+    for (i = 0; i < m_AnimOverlay.Count(); ++i)
     {
         if (layer[i] >= 0 && layer[i] < m_AnimOverlay.Count())
         {

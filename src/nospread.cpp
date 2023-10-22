@@ -165,7 +165,7 @@ void ApplySpreadCorrection(Vector &angles, int seed, float spread)
     std::vector<Vector> bullet_corrections;
     Vector average_spread(0.0f);
 
-    for (int i = 0; i < nBulletsPerShot; i++)
+    for (int i = 0; i < nBulletsPerShot; ++i)
     {
         RandomSeed(seed + i);
         float flX = RandomFloat(-0.5, 0.5) + RandomFloat(-0.5, 0.5);

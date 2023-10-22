@@ -50,7 +50,7 @@ static void initPlayerlist()
             [](unsigned steam, int userid)
             {
                 auto &pl = playerlist::AccessData(steam);
-                for (unsigned i = 0; i < playerlist::k_arrGUIStates.size() - 1; i++)
+                for (unsigned i = 0; i < playerlist::k_arrGUIStates.size() - 1; ++i)
                 {
                     if (pl.state == playerlist::k_arrGUIStates.at(i).first)
                     {

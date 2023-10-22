@@ -487,7 +487,7 @@ const char *CLC_ListenEvents::ToString(void) const
 {
     int count = 0;
 
-    for (int i = 0; i < MAX_EVENT_NUMBER; i++)
+    for (int i = 0; i < MAX_EVENT_NUMBER; ++i)
     {
         if (m_EventArray.Get(i))
             count++;
@@ -534,7 +534,7 @@ bool NET_SetConVar::WriteToBuffer(bf_write &buffer)
     // Note how many we're sending
     buffer.WriteByte(numvars);
     // logging::Info("C");
-    // for (int i=0; i< numvars; i++ )
+    // for (int i=0; i< numvars; ++i )
     //{
     // cvar_t * cvar = &m_ConVars[i];
     buffer.WriteString(convar.name);
@@ -550,7 +550,7 @@ bool NET_SetConVar::ReadFromBuffer(bf_read &buffer)
 
     // m_ConVars.RemoveAll();
 
-    for (int i = 0; i < numvars; i++)
+    for (int i = 0; i < numvars; ++i)
     {
         cvar_t cvar;
         buffer.ReadString(cvar.name, sizeof(cvar.name));

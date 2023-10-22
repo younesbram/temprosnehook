@@ -490,7 +490,7 @@ bool navTo(const Vector &destination, int priority, bool should_repath, bool nav
         path.erase(path.begin());
     crumbs.clear();
 
-    for (size_t i = 0; i < path.size(); i++)
+    for (size_t i = 0; i < path.size(); ++i)
     {
         auto *area = reinterpret_cast<CNavArea *>(path.at(i));
 

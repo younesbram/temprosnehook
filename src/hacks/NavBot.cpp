@@ -1498,6 +1498,12 @@ static void CreateMove()
     updateSlot(nearest);
     updateEnemyBlacklist(slot);
 
+    // Default cathook nav prios suck.
+    // Melee > Danger > Health > Ammo > Engie logic > Snipe sentries > Cap objective > Stay near > Roam.
+    
+    // Attack people with melee first
+    if (meleeAttack(slot, nearest))
+        return;
     // Try to escape danger first of all
     if (escapeDanger())
         return;
@@ -1509,14 +1515,11 @@ static void CreateMove()
         return;
     if (runEngineerLogic())
         return;
-    // run the melee AI
-    if (meleeAttack(slot, nearest))
+    // Try to snipe sentries
+    if (snipeSentries())
         return;
     // Try to capture objectives
     if (captureObjectives())
-        return;
-    // Try to snipe sentries
-    if (snipeSentries())
         return;
     // Try to stalk enemies
     if (stayNear())

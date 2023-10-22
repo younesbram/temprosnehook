@@ -88,7 +88,7 @@ void ImGui_Impl_Render(ImDrawData *draw_data)
         glTexCoordPointer(2, GL_FLOAT, sizeof(ImDrawVert), (const GLvoid *) ((const char *) vtx_buffer + IM_OFFSETOF(ImDrawVert, uv)));
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(ImDrawVert), (const GLvoid *) ((const char *) vtx_buffer + IM_OFFSETOF(ImDrawVert, col)));
 
-        for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_++i)
+        for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
         {
             const ImDrawCmd *pcmd = &cmd_list->CmdBuffer[cmd_i];
             if (pcmd->UserCallback)

@@ -3,8 +3,10 @@
 #include <e8call.hpp>
 #include <set>
 #include <map>
-#include <boost/algorithm/string.hpp>
-#include <utility>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <cstring>
 
 static settings::Boolean enable{ "dc.enable", "false" };
 static settings::String regions{ "dc.regions", "" };
@@ -35,7 +37,6 @@ static std::set<CidStr_t> regionsSet;
 
 static void *g_ISteamNetworkingUtils;
 
-// clang-format off
 static std::unordered_map<std::string, std::string> dc_name_map{
     {"ams", "Amsterdam"},
     {"atl", "Atlanta"},
@@ -70,19 +71,19 @@ static std::unordered_map<std::string, std::string> dc_name_map{
     {"tyo1", "Tokyo (South)"},
     {"vie", "Vienna"},
     {"waw", "Warsaw"}};
-// clang-format on
-static std::vector<std::string> eu_datacenters            = { { "ams" }, { "fra" }, { "lhr" }, { "mad" }, { "par" }, { "sto" }, { "sto2" }, { "waw" }, { "lux" }, { "lux1" }, { "lux2" } };
-static std::vector<std::string> north_america_datacenters = { { "atl" }, { "eat" }, { "mwh" }, { "iad" }, { "lax" }, { "okc" }, { "ord" }, { "sea" } };
-static std::vector<std::string> south_america_datacenters = { { "gru" }, { "lim" }, { "scl" } };
-static std::vector<std::string> asia_datacenters          = { { "bom" }, { "dxb" }, { "gnrt" }, { "hkg" }, { "maa" }, { "man" }, { "sgp" }, { "tyo" }, { "tyo2" }, { "tyo1" } };
-static std::vector<std::string> oceana_datacenters        = { { "syd" }, { "vie" } };
-static std::vector<std::string> africa_datacenters        = { { "jnb" } };
+
+static std::vector<std::string> eu_datacenters = { "ams", "fra", "lhr", "mad", "par", "sto", "sto2", "waw", "lux", "lux1", "lux2" };
+static std::vector<std::string> north_america_datacenters = { "atl", "eat", "mwh", "iad", "lax", "okc", "ord", "sea" };
+static std::vector<std::string> south_america_datacenters = { "gru", "lim", "scl" };
+static std::vector<std::string> asia_datacenters = { "bom", "dxb", "gnrt", "hkg", "maa", "man", "sgp", "tyo", "tyo2", "tyo1" };
+static std::vector<std::string> oceana_datacenters = { "syd", "vie" };
+static std::vector<std::string> africa_datacenters = { "jnb" };
 
 static CatCommand print("dc_print", "Print codes of all available data centers",
                         []()
                         {
                             static auto GetPOPCount = *(int (**)(void *))(*(uintptr_t *) g_ISteamNetworkingUtils + 37);
-                            static auto GetPOPList  = *(int (**)(void *, SteamNetworkingPOPID_decl *, int))(*(uintptr_t *) g_ISteamNetworkingUtils + 41);
+                            static auto GetPOPList = *(int (**)(void *, SteamNetworkingPOPID_decl *, int))(*(uintptr_t *) g_ISteamNetworkingUtils + 41);
 
                             char region[5];
 
@@ -125,9 +126,13 @@ static void OnRegionsUpdate(std::string regions)
     regionsSet.clear();
 
     std::vector<std::string> regions_vec;
-    boost::split(regions_vec, regions, boost::is_any_of(","));
-    for (auto &region_str : regions_vec)
+    size_t pos = 0;
+    while (pos < regions.length())
     {
+        size_t commaPos = regions.find(',', pos);
+        std::string region_str = regions.substr(pos, commaPos - pos);
+        pos = (commaPos == std::string::npos) ? regions.length() : commaPos + 1;
+
         if (region_str.empty())
             continue;
         if (region_str.length() > 4)
@@ -179,8 +184,17 @@ static void Hook(bool on)
 void manageRegions(const std::vector<std::string> &regions_vec, bool add)
 {
     std::set<std::string> regions_split;
-    if ((*regions).length())
-        boost::split(regions_split, *regions, boost::is_any_of(","));
+    if (!regions.empty())
+    {
+        size_t pos = 0;
+        while (pos < regions.length())
+        {
+            size_t commaPos = regions.find(',', pos);
+            std::string region_str = regions.substr(pos, commaPos - pos);
+            pos = (commaPos == std::string::npos) ? regions.length() : commaPos + 1;
+            regions_split.insert(region_str);
+        }
+    }
 
     std::set<std::string> new_regions = regions_split;
 
@@ -202,7 +216,13 @@ void manageRegions(const std::vector<std::string> &regions_vec, bool add)
                 new_regions.erase(position);
         }
     }
-    regions = boost::join(new_regions, ",");
+    regions = "";
+    for (const std::string &region : new_regions)
+    {
+        if (!regions.empty())
+            regions += ",";
+        regions += region;
+    }
 }
 
 static void Init()

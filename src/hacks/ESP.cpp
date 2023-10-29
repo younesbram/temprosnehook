@@ -254,7 +254,6 @@ void _FASTCALL bonelist_s::Draw(CachedEntity *ent, const rgba_t &color)
 }
 
 // These are strings that never change and should only be constructed once
-const std::string dormant_str        = "DORMANT";
 const std::string jarated_str        = "JARATED";
 const std::string milked_str         = "MILKED";
 const std::string burn_str           = "BURN";
@@ -391,7 +390,6 @@ void _FASTCALL Sightlines(CachedEntity *ent, rgba_t &fg)
 {
     if (((int) sightlines == 2 || ((int) sightlines == 1 && CE_INT(ent, netvar.iClass) == tf_sniper)) && CE_GOOD(ent) && ent->hitboxes.GetHitbox(0))
     {
-
         // Get players angle and head position
         Vector &eye_angles = NET_VECTOR(RAW_ENT(ent), netvar.m_angEyeAngles);
         Vector eye_position;
@@ -535,7 +533,6 @@ void _FASTCALL Healthbar(EntityType &type, int &classid, rgba_t &fg, ESPData &en
 
 void DrawStrings(EntityType &type, bool &transparent, Vector &draw_point, ESPData &ent_data, CachedEntity *ent)
 {
-
     // Create our initial point at the center of the entity
     bool origin_is_zero = true;
 
@@ -715,9 +712,6 @@ void _FASTCALL ShowConditions(CachedEntity *ent)
         clr.g *= 0.5f;
         clr.b *= 0.5f;
     }
-
-    if (CE_VALID(ent) && RAW_ENT(ent)->IsDormant())
-        AddEntityString(ent, dormant_str, colors::FromRGBA8(255, 0, 0, 255));
 
     if (IsPlayerInvisible(ent))
     {
@@ -1322,7 +1316,6 @@ void Shutdown()
 // Draw a box around a player
 void _FASTCALL DrawBox(CachedEntity *ent, const rgba_t &clr)
 {
-
     // Check if ent is bad to prevent crashes
     if (CE_INVALID(ent) || !ent->m_bAlivePlayer())
         return;
@@ -1391,7 +1384,6 @@ void BoxCorners(int minx, int miny, int maxx, int maxy, const rgba_t &color, boo
 // Used for caching collidable bounds
 bool GetCollide(CachedEntity *ent)
 {
-
     // Null check to prevent crashing
     if (CE_INVALID(ent) || !ent->m_bAlivePlayer())
         return false;
@@ -1494,7 +1486,7 @@ void ResetEntityStrings(bool full_clear)
     }
     else
     {
-        for (int i = 1; i < g_GlobalVars->maxClients; ++i)
+        for (u_int16_t i = 1; i < g_GlobalVars->maxClients; ++i)
         {
             auto &element        = data[i];
             element.string_count = 0;

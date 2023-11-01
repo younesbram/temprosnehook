@@ -1,3 +1,5 @@
+#include "common.hpp"
+#include "crits.hpp"
 #include "DetourHook.hpp"
 #include <regex>
 #include <boost/algorithm/string.hpp>
@@ -8,20 +10,21 @@
 
 namespace hacks::nospread
 {
-settings::Boolean bullet("nospread.bullet", "true");
+settings::Boolean bullet("nospread.bullet", "false");
+settings::Int debug_nospread("nospread.debug", "0");
 settings::Boolean center_cone{ "nospread.center-cone", "true" };
+settings::Boolean draw{ "nospread.draw-info", "false" };
+settings::Boolean draw_mantissa{ "nospread.draw-info.mantissa", "false" };
 settings::Boolean correct_ping{ "nospread.correct-ping", "true" };
 settings::Boolean use_avg_latency{ "nospread.use-average-latency", "false" };
 settings::Boolean extreme_accuracy{ "nospread.use-extreme-accuracy", "false" };
-bool is_syncing = false;
-
+static bool should_nospread = false;
+bool is_syncing             = false;
 
 static void CreateMove()
 {
     if (CE_BAD(LOCAL_E) || CE_BAD(LOCAL_W))
         return;
-
-    // Credits to https://www.unknowncheats.me/forum/team-fortress-2-a/139094-projectile-nospread.html
 
     // Set up Random Seed
     int cmd_num = current_late_user_cmd->command_number;
@@ -30,54 +33,9 @@ static void CreateMove()
     for (int i = 0; i < 6; ++i)
         RandomFloat();
 
-    // Projectile/Huntsman check
-    if (GetWeaponMode() != weapon_projectile && LOCAL_W->m_iClassID() != CL_CLASS(CTFCompoundBow))
-        return;
-
     // Rest of weapons
-    else if (!(current_late_user_cmd->buttons & IN_ATTACK))
+    if (!(current_late_user_cmd->buttons & IN_ATTACK))
         return;
-
-    switch (LOCAL_W->m_iClassID())
-    {
-    case CL_CLASS(CTFSyringeGun):
-    {
-        if (g_pLocalPlayer->v_OrigViewangles == current_late_user_cmd->viewangles)
-            g_pLocalPlayer->bUseSilentAngles = true;
-        float spread = 1.5f;
-        current_late_user_cmd->viewangles.x -= RandomFloat(-spread, spread);
-        current_late_user_cmd->viewangles.y -= RandomFloat(-spread, spread);
-        fClampAngle(current_late_user_cmd->viewangles);
-        break;
-    }
-    case CL_CLASS(CTFCompoundBow):
-    {
-        Vector view = re::C_BasePlayer::GetLocalEyeAngles(RAW_ENT(LOCAL_E));
-        if (g_pLocalPlayer->v_OrigViewangles == current_late_user_cmd->viewangles)
-            g_pLocalPlayer->bUseSilentAngles = true;
-
-        Vector spread;
-        Vector src;
-
-        re::C_TFWeaponBase::GetProjectileFireSetupHuntsman(RAW_ENT(LOCAL_W), RAW_ENT(LOCAL_E), Vector(23.5f, -8.f, 8.f), &src, &spread, false, 2000.0f);
-
-        spread -= view;
-        current_late_user_cmd->viewangles -= spread;
-        fClampAngle(current_late_user_cmd->viewangles);
-        break;
-    }
-    default:
-        Vector view = re::C_BasePlayer::GetLocalEyeAngles(RAW_ENT(LOCAL_E));
-        if (g_pLocalPlayer->v_OrigViewangles == current_late_user_cmd->viewangles)
-            g_pLocalPlayer->bUseSilentAngles = true;
-
-        Vector spread = re::C_TFWeaponBase::GetSpreadAngles(RAW_ENT(LOCAL_W));
-
-        spread -= view;
-        current_late_user_cmd->viewangles -= spread;
-        fClampAngle(current_late_user_cmd->viewangles);
-        break;
-    }
 }
 
 static InitRoutine init([]() { EC::Register(EC::CreateMoveLate, CreateMove, "nospread_cm", EC::very_late); });
@@ -130,7 +88,7 @@ bool IsPerfectShot(IClientEntity *weapon, float provided_time = 0.0 /*used for o
 
     int nBulletsPerShot = GetWeaponData(weapon)->m_nBulletsPerShot;
     if (nBulletsPerShot >= 1)
-        nBulletsPerShot = ATTRIB_HOOK_FLOAT(nBulletsPerShot, "mult_bullets_per_shot", weapon, nullptr, true);
+        nBulletsPerShot = ATTRIB_HOOK_FLOAT(nBulletsPerShot, "mult_bullets_per_shot", weapon, 0x0, true);
     else
         nBulletsPerShot = 1;
     if ((nBulletsPerShot == 1 && time_since_attack > 1.25) || (nBulletsPerShot > 1 && time_since_attack > 0.25))
@@ -150,7 +108,7 @@ void ApplySpreadCorrection(Vector &angles, int seed, float spread)
     // Size of one WeaponMode_t is 0x40, 0x6fc is the offset to bullets per shot
     int nBulletsPerShot = GetWeaponData(weapon)->m_nBulletsPerShot;
     if (nBulletsPerShot >= 1)
-        nBulletsPerShot = ATTRIB_HOOK_FLOAT(nBulletsPerShot, "mult_bullets_per_shot", RAW_ENT(LOCAL_W), nullptr, true);
+        nBulletsPerShot = ATTRIB_HOOK_FLOAT(nBulletsPerShot, "mult_bullets_per_shot", RAW_ENT(LOCAL_W), 0x0, true);
     else
         nBulletsPerShot = 1;
 
@@ -209,6 +167,28 @@ void ApplySpreadCorrection(Vector &angles, int seed, float spread)
     fClampAngle(angles);
 }
 
+CatCommand debug_mantissa("test_mantissa", "For debug purposes",
+                          [](const CCommand &rCmd)
+                          {
+                              if (rCmd.ArgC() < 2)
+                              {
+                                  g_ICvar->ConsoleColorPrintf(MENU_COLOR, "You must provide float to test.\n");
+                                  return;
+                              }
+
+                              try
+                              {
+                                  float float_value   = atof(rCmd.Arg(1));
+                                  float mantissa_step = CalculateMantissaStep(float_value);
+
+                                  g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Mantissa step for %.3f: %.10f\n", float_value, mantissa_step);
+                              }
+                              catch (const std::invalid_argument &)
+                              {
+                                  g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Invalid float.\n");
+                              }
+                              return;
+                          });
 
 static CatCommand nospread_sync("nospread_sync", "Try to sync client and server time",
                                 []()
@@ -344,6 +324,7 @@ bool DispatchUserMessage(bf_read *buf, int type)
     buf->Seek(0);
 
     std::vector<std::string> lines;
+    /* Boost here */
     boost::split(lines, msg_str, boost::is_any_of("\n"), boost::token_compress_on);
 
     // Regex to find the playerperf data we want/need
@@ -351,13 +332,13 @@ bool DispatchUserMessage(bf_read *buf, int type)
 
     std::vector<double> vData;
 
-    for (const auto &sStr : lines)
+    for (auto sStr : lines)
     {
         std::smatch sMatch;
 
         if (!std::regex_match(sStr, sMatch, primary_regex) || sMatch.size() != 5)
         {
-            static std::regex backup_regex(R"(^(([0-9]+\.[0-9]+) ([0-9]{1,2}) ([0-9]{1,2}) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) vel ([0-9]+\.[0-9]+))$)");
+            static std::regex backup_regex("^(([0-9]+\\.[0-9]+) ([0-9]{1,2}) ([0-9]{1,2}) ([0-9]+\\.[0-9]+) ([0-9]+\\.[0-9]+) vel ([0-9]+\\.[0-9]+))$");
             std::smatch sMatch2;
             if (std::regex_match(sStr, sMatch2, backup_regex) && sMatch2.size() > 5)
             {
@@ -382,7 +363,7 @@ bool DispatchUserMessage(bf_read *buf, int type)
 
     if (vData.size() < 2)
     {
-        if (vData.empty())
+        if (!vData.size())
             last_was_player_perf = false;
         // Still do not call original, we don't want the playerperf spewing everywhere
         else
@@ -425,6 +406,9 @@ bool DispatchUserMessage(bf_read *buf, int type)
         // We got time with latency included, but only outgoing, so compensate
         float_time_delta -= (total_latency / 2.0);
 
+        if (debug_nospread)
+            g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Assumed delta time: %.10f calculated based on %i entries.\n", float_time_delta, (int) vData.size() - 1);
+
         // we need only first output which is latest
         waiting_perf_data = false;
 
@@ -448,11 +432,17 @@ bool DispatchUserMessage(bf_read *buf, int type)
             float_time_delta -= time_difference;
             // it will auto resync it
             resync_needed = true;
+            // Print debug if desired
+            if (debug_nospread)
+                g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Applied correction: %.10f\n", time_difference);
         }
         // We synced successfully
         else
         {
-            g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Nospread successfully synced. Mantissa step: %.2f\n", mantissa_step);
+            if (debug_nospread)
+                g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Nospread successfully synced. Possible precision loss: %.10f Mantissa step: %.2f\n", time_difference, mantissa_step);
+            else
+                g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Nospread successfully synced. Mantissa step: %.2f\n", mantissa_step);
             resync_needed = false;
         }
         last_correction = time_difference;
@@ -471,7 +461,7 @@ bool DispatchUserMessage(bf_read *buf, int type)
         waiting_perf_data = false;
     }
     return should_call_original;
-}
+};
 
 void CL_SendMove_hook()
 {
@@ -480,7 +470,7 @@ void CL_SendMove_hook()
 
     if (!no_spread_synced)
     {
-        auto original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
+        CL_SendMove_t original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
         original();
         cl_nospread_sendmovedetour.RestorePatch();
         return;
@@ -493,7 +483,7 @@ void CL_SendMove_hook()
     if (!RAW_ENT(LOCAL_E) || HasCondition<TFCond_HalloweenGhostMode>(LOCAL_E))
     {
         // don't set called_from_sendmove here cuz we don't care
-        auto original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
+        CL_SendMove_t original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
         original();
         cl_nospread_sendmovedetour.RestorePatch();
         return;
@@ -555,7 +545,7 @@ void CL_SendMove_hook()
     // If we're dead just return original
     if (!LOCAL_E->m_bAlivePlayer())
     {
-        auto original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
+        CL_SendMove_t original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
         original();
         cl_nospread_sendmovedetour.RestorePatch();
         return;
@@ -578,9 +568,9 @@ void CL_SendMove_hook()
     }
 
     // Bad weapon
-    if ((GetWeaponMode() != weapon_hitscan && LOCAL_W->m_iClassID() != CL_CLASS(CTFCompoundBow)))
+    if ((g_pLocalPlayer->weapon_mode != weapon_hitscan && LOCAL_W->m_iClassID() != CL_CLASS(CTFCompoundBow)))
     {
-        auto original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
+        CL_SendMove_t original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
         original();
         cl_nospread_sendmovedetour.RestorePatch();
         return;
@@ -591,7 +581,7 @@ void CL_SendMove_hook()
     // Check if we are attacking, if not then no point in adjusting
     if (!current_user_cmd || !(current_user_cmd->buttons & IN_ATTACK))
     {
-        auto original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
+        CL_SendMove_t original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
         original();
         cl_nospread_sendmovedetour.RestorePatch();
         return;
@@ -600,7 +590,7 @@ void CL_SendMove_hook()
     // If we have a perfect shot and we don#t want to center the whole cone, returne too
     if (IsPerfectShot(RAW_ENT(LOCAL_W), current_time) && !center_cone)
     {
-        auto original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
+        CL_SendMove_t original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
         original();
         cl_nospread_sendmovedetour.RestorePatch();
         return;
@@ -611,12 +601,14 @@ void CL_SendMove_hook()
     // Bad spread
     if (!IsFinite(current_weapon_spread))
     {
-        auto original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
+        CL_SendMove_t original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
         original();
         cl_nospread_sendmovedetour.RestorePatch();
         return;
     }
 
+    if (*debug_nospread >= 2)
+        g_ICvar->ConsoleColorPrintf(MENU_COLOR, "Predicted: %.6f Assumed: %.6f Correction: %.6f Commands: %i\n", predicted_time, asumed_real_time, write_usercmd_correction, new_packets);
     // Try to predict seed now
     // The important thing to understand this: server_random_seed set as soon as ProcessUsercmds called. And it's called in clc_move process function, so as soon as server accepts our packet, not when it actually processed.
     // This means every usercmd in 1 clc_move will have almost same random seed - if process time less than mantissa step for random seed number, then same "random" number will be set for each usercmd in this packet
@@ -629,7 +621,7 @@ void CL_SendMove_hook()
     called_from_sendmove = true;
     double time_start    = Plat_FloatTime();
 
-    auto original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
+    CL_SendMove_t original = (CL_SendMove_t) cl_nospread_sendmovedetour.GetOriginalFunc();
     original();
     cl_nospread_sendmovedetour.RestorePatch();
 
@@ -650,7 +642,7 @@ void WriteUserCmd_hook(bf_write *buf, CUserCmd *to, CUserCmd *from)
     // Called by a demo recorder or we shouldn't compensate it.
     if ((no_spread_synced != SYNCED && !resync_needed) || current_weapon_spread == 0.0)
     {
-        auto original = (WriteUserCmd_t) cl_writeusercmd_detour.GetOriginalFunc();
+        WriteUserCmd_t original = (WriteUserCmd_t) cl_writeusercmd_detour.GetOriginalFunc();
         original(buf, to, from);
         cl_writeusercmd_detour.RestorePatch();
         return;
@@ -661,9 +653,9 @@ void WriteUserCmd_hook(bf_write *buf, CUserCmd *to, CUserCmd *from)
 
     if (!(to->buttons & IN_ATTACK))
     {
-        user_cmd_backup = *to;
-        first_usercmd   = false;
-        auto original   = (WriteUserCmd_t) cl_writeusercmd_detour.GetOriginalFunc();
+        user_cmd_backup         = *to;
+        first_usercmd           = false;
+        WriteUserCmd_t original = (WriteUserCmd_t) cl_writeusercmd_detour.GetOriginalFunc();
         original(buf, to, from);
         cl_writeusercmd_detour.RestorePatch();
         return;
@@ -682,7 +674,7 @@ void WriteUserCmd_hook(bf_write *buf, CUserCmd *to, CUserCmd *from)
     user_cmd_backup = *to;
     first_usercmd   = false;
 
-    auto original = (WriteUserCmd_t) cl_writeusercmd_detour.GetOriginalFunc();
+    WriteUserCmd_t original = (WriteUserCmd_t) cl_writeusercmd_detour.GetOriginalFunc();
     original(buf, to, from);
     cl_writeusercmd_detour.RestorePatch();
 
@@ -697,7 +689,7 @@ void FX_FireBullets_hook(IClientEntity *weapon, int player, Vector *origin, Vect
     // Not synced/weapon bad
     if (!weapon || (no_spread_synced != SYNCED && !resync_needed) || !bullet || (IsPerfectShot(weapon) && !center_cone))
     {
-        auto original = (FX_FireBullets_t) fx_firebullets_detour.GetOriginalFunc();
+        FX_FireBullets_t original = (FX_FireBullets_t) fx_firebullets_detour.GetOriginalFunc();
         original(weapon, player, origin, angles, weapon_idx, bullet_mode, seed, spread, damage, is_critical);
         fx_firebullets_detour.RestorePatch();
         return;
@@ -706,7 +698,7 @@ void FX_FireBullets_hook(IClientEntity *weapon, int player, Vector *origin, Vect
     Vector corrected_angles = *angles;
     ApplySpreadCorrection(corrected_angles, seed, spread);
 
-    auto original = (FX_FireBullets_t) fx_firebullets_detour.GetOriginalFunc();
+    FX_FireBullets_t original = (FX_FireBullets_t) fx_firebullets_detour.GetOriginalFunc();
     original(weapon, player, origin, &corrected_angles, weapon_idx, bullet_mode, seed, spread, damage, is_critical);
     fx_firebullets_detour.RestorePatch();
 }
@@ -760,12 +752,10 @@ static InitRoutine init_bulletnospread(
     []()
     {
         // Get our detour hooks running
-        static auto writeusercmd_addr = CSignature::GetClientSignature("55 89 E5 57 56 53 83 EC 2C 8B 45 ? 8B 7D ? 8B 5D ? 89 45 ? 8B 40");
+        static auto writeusercmd_addr  = CSignature::GetClientSignature("55 89 E5 57 56 53 83 EC 2C 8B 45 ? 8B 7D ? 8B 5D ? 89 45 ? 8B 40");
         cl_writeusercmd_detour.Init(writeusercmd_addr, (void *) WriteUserCmd_hook);
         static auto fx_firebullets_addr = CSignature::GetClientSignature("55 89 E5 57 56 53 81 EC 0C 01 00 00 8B 45 ? 8B 7D ? 89 85");
         fx_firebullets_detour.Init(fx_firebullets_addr, (void *) FX_FireBullets_hook);
-        /*static auto net_sendpacket_addr = CSignature::GetEngineSignature("55 89 E5 57 56 53 81 EC EC 20 00 00 C7 85 ? ? ? ? 00 00 00 00 8B 45");
-        net_sendpacket_detour.Init(net_sendpacket_addr, (void *) NET_SendPacket_hook);*/
 
         // Register Event callbacks
         EC::Register(EC::CreateMove, CreateMove2, "nospread_createmove2");
@@ -780,6 +770,55 @@ static InitRoutine init_bulletnospread(
                     no_spread_synced = NOT_SYNCED;
                 }
             });
+#if ENABLE_VISUALS
+        EC::Register(
+            EC::Draw,
+            []()
+            {
+                if (bullet && (draw || draw_mantissa) && CE_GOOD(LOCAL_E) && LOCAL_E->m_bAlivePlayer())
+                {
+                    std::string draw_string = "";
+                    rgba_t draw_color       = colors::white;
+                    switch (no_spread_synced)
+                    {
+                    case NOT_SYNCED:
+                    {
+                        if (bad_mantissa)
+                        {
+                            draw_color  = colors::red_s;
+                            draw_string = "Server uptime too Low!";
+                        }
+                        else
+                        {
+                            draw_color  = colors::orange;
+                            draw_string = "Not Syncing";
+                        }
+                        break;
+                    }
+                    case CORRECTING:
+                    case DEAD_SYNC:
+                    {
+                        draw_color  = colors::yellow;
+                        draw_string = "Syncing...";
+                        break;
+                    }
+                    case SYNCED:
+                    {
+                        draw_color  = colors::green;
+                        draw_string = "Synced.";
+                        break;
+                    }
+                    default:
+                        break;
+                    }
+                    if (draw)
+                        AddCenterString(draw_string, draw_color);
+                    if (draw_mantissa && no_spread_synced != NOT_SYNCED)
+                        AddCenterString("Mantissa step size: " + std::to_string((int) CalculateMantissaStep(1000.0 * (Plat_FloatTime() + float_time_delta))), draw_color);
+                }
+            },
+            "nospread_draw");
+#endif
         EC::Register(
             EC::LevelInit,
             []()

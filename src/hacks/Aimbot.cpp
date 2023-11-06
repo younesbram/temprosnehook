@@ -514,6 +514,9 @@ bool ShouldAim()
     // Our team lost, so we can't hurt the enemy team
     if (TFGameRules()->RoundHasBeenWon() && TFGameRules()->GetWinningTeam() != g_pLocalPlayer->team)
         return false;
+    // Using a forbidden weapon?
+    if (!LOCAL_W || LOCAL_W->m_iClassID() == CL_CLASS(CTFKnife) || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 237 || CE_INT(LOCAL_W, netvar.iItemDefinitionIndex) == 265)
+        return false;
     // Carrying A building?
     if (CE_BYTE(LOCAL_E, netvar.m_bCarryingObject))
         return false;
@@ -571,28 +574,27 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
     last_target_ignore_timer = 0;
 
     // Do not attempt to target hazards using melee weapons
-    if (*target_hazards && GetWeaponMode() != weapon_melee && !TFGameRules()->m_bCompetitiveMode)
+    if (*target_hazards && GetWeaponMode() != weapon_melee)
     {
-        for (const auto &pEntity : entity_cache::valid_ents)
+        for (const auto &hazard_entity : entity_cache::valid_ents)
         {
-            const model_t *pModel = RAW_ENT(pEntity)->GetModel();
-            const char *pszName = g_IModelInfo->GetModelName(pModel);
-            if (Hash::IsHazard(pszName))
+            const model_t *model = RAW_ENT(hazard_entity)->GetModel();
+            if (model)
             {
-                // TODO: Test if hazards hurt NPCs
-                for (const auto &pPlayer : entity_cache::player_cache)
+                const auto szName = g_IModelInfo->GetModelName(model);
+                if (Hash::IsHazard(szName))
                 {
-                    const Vector vecHazardOrigin = pEntity->m_vecOrigin();
-                    const Vector vecEntityOrigin = pPlayer->m_vecOrigin();
-                    if (IsTargetStateGood(pPlayer) && IsVectorVisible(vecHazardOrigin, vecEntityOrigin, true))
+                    for (const auto &ent : entity_cache::valid_ents)
                     {
-                        const float flDistHazardToTarget       = vecHazardOrigin.DistTo(vecEntityOrigin);
-                        const float flDistHazardToLocalPlayer  = pEntity->m_flDistance();
-                        const float flDamageToTarget           = 150.0f - 0.25f * flDistHazardToTarget;
-                        // Hazards cannot deal less than 75 damage
-                        if (flDamageToTarget >= 75.0f && flDistHazardToLocalPlayer > 350.0f && Aim(pEntity))
+                        const auto hazard_origin = hazard_entity->m_vecOrigin();
+                        if (IsTargetStateGood(ent) && IsVectorVisible(hazard_origin, ent->m_vecOrigin(), true))
                         {
-                            return pEntity;
+                            const float dist_hazard_to_enemy        = hazard_origin.DistTo(ent->m_vecOrigin());
+                            const float dist_hazard_to_local_player = hazard_entity->m_flDistance();
+                            const float damage_to_enemy             = 150.0f - 0.25f * dist_hazard_to_enemy;
+                            // Hazards cannot deal less than 75 damage
+                            if (damage_to_enemy >= 75.0f && dist_hazard_to_local_player > 350.0f && Aim(hazard_entity))
+                                return hazard_entity;
                         }
                     }
                 }
@@ -606,11 +608,6 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
     std::optional<hacks::backtrack::BacktrackData> bt_tick = std::nullopt;
     for (const auto &ent : entity_cache::valid_ents)
     {
-        if (RAW_ENT(ent)->IsDormant())
-        {
-            continue;
-        }
-
         // Check whether the current ent is good enough to target
         bool good_target = false;
 
@@ -852,6 +849,7 @@ bool Aim(CachedEntity *entity)
     // Slow aim
     if (slow_aim != 0)
         DoSlowAim(angles);
+
 #if ENABLE_VISUALS
     if (entity->m_Type() == ENTITY_PLAYER)
         hacks::esp::SetEntityColor(entity, colors::target);
@@ -1170,6 +1168,9 @@ static InitRoutine EC(
         EC::Register(EC::LevelShutdown, Reset, "SHUTDOWN_Aimbot", EC::average);
         EC::Register(EC::CreateMove, CreateMove, "CM_Aimbot", EC::late);
         EC::Register(EC::CreateMoveWarp, CreateMoveWarp, "CMW_Aimbot", EC::late);
+#if ENABLE_VISUALS
+        EC::Register(EC::Draw, DrawText, "DRAW_Aimbot", EC::average);
+#endif
     });
 
 } // namespace hacks::aimbot

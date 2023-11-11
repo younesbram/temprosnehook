@@ -35,9 +35,9 @@ static settings::Boolean wait_for_charge{ "aimbot.wait-for-charge", "false" };
 static settings::Boolean silent{ "aimbot.silent", "true" };
 static settings::Boolean target_lock{ "aimbot.lock-target", "false" };
 #if ENABLE_VISUALS
+static settings::Boolean assistance_only{ "aimbot.assistance.only", "false" };
 static settings::Boolean fov_draw{ "aimbot.fov-circle.enable", "0" };
 static settings::Float fovcircle_opacity{ "aimbot.fov-circle.opacity", "0.7" };
-static settings::Boolean assistance_only{ "aimbot.assistance.only", "false" };
 #endif
 static settings::Int hitbox{ "aimbot.hitbox", "0" };
 static settings::Boolean zoomed_only{ "aimbot.zoomed-only", "true" };
@@ -54,7 +54,7 @@ static settings::Float zoom_distance{ "aimbot.zoom.distance", "2000.0" };
 static settings::Boolean backtrack_aimbot{ "aimbot.backtrack", "false" };
 static settings::Boolean backtrack_last_tick_only("aimbot.backtrack.only-last-tick", "true");
 static bool force_backtrack_aimbot = false;
-// wtf is this above
+
 static settings::Boolean target_hazards{ "aimbot.target.hazards", "true" };
 static settings::Float max_range{ "aimbot.target.max-range", "4096" };
 static settings::Boolean ignore_vaccinator{ "aimbot.target.ignore-vaccinator", "false" };
@@ -369,7 +369,6 @@ void DoAutoZoom(bool target_found, CachedEntity *target)
         return;
     }
 
-    // zoom distance
     auto nearest = hacks::NavBot::getNearestPlayerDistance();
     if (g_pLocalPlayer->holding_sniper_rifle && !AllowNoScope(target) && (target_found || nearest.second <= *zoom_distance))
     {
@@ -571,6 +570,7 @@ CachedEntity *RetrieveBestTarget(bool aimkey_state)
     last_target_ignore_timer = 0;
 
     // Do not attempt to target hazards using melee weapons
+    // Competitive maps do not have any hazards
     if (*target_hazards && GetWeaponMode() != weapon_melee && !TFGameRules()->m_bCompetitiveMode)
     {
         for (const auto &pEntity : entity_cache::valid_ents)
@@ -852,6 +852,7 @@ bool Aim(CachedEntity *entity)
     // Slow aim
     if (slow_aim != 0)
         DoSlowAim(angles);
+
 #if ENABLE_VISUALS
     if (entity->m_Type() == ENTITY_PLAYER)
         hacks::esp::SetEntityColor(entity, colors::target);
@@ -909,7 +910,7 @@ void DoAutoshoot(CachedEntity *target_entity)
         current_user_cmd->buttons |= IN_ATTACK2;
 }
 
-// this is important
+// Grab a vector for a specific ent
 Vector PredictEntity(CachedEntity *entity)
 {
     // Pull out predicted data
@@ -1170,6 +1171,9 @@ static InitRoutine EC(
         EC::Register(EC::LevelShutdown, Reset, "SHUTDOWN_Aimbot", EC::average);
         EC::Register(EC::CreateMove, CreateMove, "CM_Aimbot", EC::late);
         EC::Register(EC::CreateMoveWarp, CreateMoveWarp, "CMW_Aimbot", EC::late);
+#if ENABLE_VISUALS
+        EC::Register(EC::Draw, DrawText, "DRAW_Aimbot", EC::average);
+#endif
     });
 
 } // namespace hacks::aimbot

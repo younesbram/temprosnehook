@@ -807,7 +807,7 @@ static void CreateMove()
     if (!isReady())
         return;
 
-    if (CE_BAD(LOCAL_E) || !g_pLocalPlayer->alive)
+    if (CE_BAD(LOCAL_E) || !LOCAL_E->m_bAlivePlayer())
     {
         cancelPath();
         return;

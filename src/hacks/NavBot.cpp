@@ -1272,7 +1272,6 @@ bool doRoam()
     int enemy_team = g_pLocalPlayer->team == TEAM_BLU ? TEAM_RED : TEAM_BLU;
 
     std::optional<Vector> target;
-    target = getPayloadGoal(enemy_team);
     if (!target)
         target = getControlPointGoal(enemy_team);
     if (target)

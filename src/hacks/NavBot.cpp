@@ -21,6 +21,7 @@ static settings::Boolean search_health("navbot.search-health", "true");
 static settings::Boolean search_ammo("navbot.search-ammo", "true");
 static settings::Boolean stay_near("navbot.stay-near", "true");
 static settings::Boolean capture_objectives("navbot.capture-objectives", "true");
+static settings::Boolean defendthecartred("navbot.defend-pl-red", "false");
 static settings::Boolean snipe_sentries("navbot.snipe-sentries", "true");
 static settings::Boolean snipe_sentries_shortrange("navbot.snipe-sentries.shortrange", "false");
 static settings::Boolean escape_danger("navbot.escape-danger", "true");
@@ -836,6 +837,13 @@ bool meleeAttack(int slot, std::pair<CachedEntity *, float> &nearest) // also kn
         return false;
     }
 
+    // credits: pixelwarrior99
+    if (nearest.first && IsPlayerInvulnerable(nearest.first))
+    {
+        // If the nearest enemy is invulnerable, don't engage or follow
+        return false;
+    }
+
     // Too high priority, so don't try
     if (navparser::NavEngine::current_priority > prio_melee)
         return false;
@@ -1216,7 +1224,10 @@ bool captureObjectives()
 
     // Where we want to go
     std::optional<Vector> target;
-
+    if (*defendthecartred)
+    {
+        target = getPayloadGoal(enemy_team);
+    }
     int our_team   = g_pLocalPlayer->team;
     int enemy_team = our_team == TEAM_BLU ? TEAM_RED : TEAM_BLU;
 

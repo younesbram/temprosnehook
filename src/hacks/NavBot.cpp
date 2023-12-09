@@ -1224,10 +1224,7 @@ bool captureObjectives()
 
     // Where we want to go
     std::optional<Vector> target;
-    if (*defendthecartred)
-    {
-        target = getPayloadGoal(enemy_team);
-    }
+
     int our_team   = g_pLocalPlayer->team;
     int enemy_team = our_team == TEAM_BLU ? TEAM_RED : TEAM_BLU;
 
@@ -1283,6 +1280,10 @@ bool doRoam()
     int enemy_team = g_pLocalPlayer->team == TEAM_BLU ? TEAM_RED : TEAM_BLU;
 
     std::optional<Vector> target;
+    if (*defendthecartred)
+    {
+        target = getPayloadGoal(enemy_team);
+    }
     if (!target)
         target = getControlPointGoal(enemy_team);
     if (target)

@@ -517,6 +517,9 @@ void updateEnemyBlacklist(int slot)
     std::vector<std::pair<CachedEntity *, Vector>> checked_origins;
     for (const auto &ent : entity_cache::player_cache)
     {
+        // Entity is generally invalid, ignore
+        if (CE_INVALID(ent) || !g_pPlayerResource->IsAlive(ent->m_IDX))
+            continue;
         // On our team, do not care
         if (ent->m_iTeam() == g_pLocalPlayer->team)
             continue;
@@ -1153,6 +1156,14 @@ std::optional<Vector> getCtfGoal(int our_team, int enemy_team)
 
     current_capturetype = ctf;
 
+    // Literally straight from Inithook: https://github.com/RosneBurgerworks/inithook/blob/master/src/hacks/NavBot.cpp#L891
+    // Assist other bots with capturing - low priority
+    if (status == TF_FLAGINFO_STOLEN && carrier != LOCAL_E)
+    {
+        if (!player_tools::shouldTargetSteamId(carrier->player_info->friendsID))
+            return carrier->m_vecDormantOrigin();
+    }
+
     // CTF is the current capture type
     if (status == TF_FLAGINFO_STOLEN)
     {
@@ -1515,7 +1526,7 @@ static void CreateMove()
     // Attack people with melee first
     if (meleeAttack(slot, nearest))
         return;
-    // Try to escape danger first of all
+    // Try to escape danger
     if (escapeDanger())
         return;
     // Second priority should be getting health

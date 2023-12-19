@@ -18,13 +18,13 @@ static settings::Boolean draw("nav.draw", "false");
 static settings::Boolean look{ "nav.look-at-path", "false" };
 static settings::Boolean draw_debug_areas("nav.draw.debug-areas", "false");
 static settings::Boolean log_pathing{ "nav.log", "false" };
-static settings::Int stuck_time{ "nav.stuck-time", "800" };
+static settings::Int stuck_time{ "nav.stuck-time", "750" };
 static settings::Int vischeck_cache_time{ "nav.vischeck-cache.time", "240" };
 static settings::Boolean vischeck_runtime{ "nav.vischeck-runtime.enabled", "true" };
 static settings::Int vischeck_time{ "nav.vischeck-runtime.delay", "2000" };
-static settings::Int stuck_detect_time{ "nav.anti-stuck.detection-time", "5" };
+static settings::Int stuck_detect_time{ "nav.anti-stuck.detection-time", "6" };
 // How long until accumulated "Stuck time" expires
-static settings::Int stuck_expire_time{ "nav.anti-stuck.expire-time", "10" };
+static settings::Int stuck_expire_time{ "nav.anti-stuck.expire-time", "5" };
 // How long we should blacklist the node after being stuck for too long?
 static settings::Int stuck_blacklist_time{ "nav.anti-stuck.blacklist-time", "120" };
 static settings::Int sticky_ignore_time{ "nav.ignore.sticky-time", "15" };
@@ -813,7 +813,7 @@ static void CreateMove()
         return;
     }
 
-    // Still in setup or waiting for players. If on fitting team, do not path yet
+    // Still in setup If on fitting team and map, do not path yet
     std::string level_name = GetLevelName();
     if (g_pLocalPlayer->team == TEAM_BLU && (TFGameRules()->InSetup() || TFGameRules()->IsInWaitingForPlayers() && (level_name.starts_with("pl_") || level_name.starts_with("cp_"))))
     {

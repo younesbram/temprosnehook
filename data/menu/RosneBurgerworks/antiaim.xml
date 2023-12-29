@@ -72,7 +72,6 @@
     <Box padding="12 6 6 6" width="content" height="content" name="Resolver" x="170">
         <List width="150">
             <AutoVariable width="fill" target="anti-anti-aim.enable" label="Enable" tooltip="Attempt to bruteforce enemy antiaim"/>
-            <AutoVariable width="fill" target="anti-anti-aim.yaw" label="Enable Yaw" tooltip="Attempt to bruteforce enemy yaw"/>
         </List>
     </Box>
     <Box padding="12 6 6 6" name="Anti-resolver" width="content" height="content" x="340">

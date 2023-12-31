@@ -1408,7 +1408,12 @@ static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &ne
         else if (nearest.second >= 250.0f)
             return primary;
         else
-            return melee;
+        {
+            if (IsPlayerInvulnerable(nearest.first))
+            {
+                return melee;
+            }
+        }
     }
     case tf_sniper:
     {

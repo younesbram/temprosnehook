@@ -35,7 +35,6 @@ static settings::Boolean wait_for_charge{ "aimbot.wait-for-charge", "false" };
 static settings::Boolean silent{ "aimbot.silent", "true" };
 static settings::Boolean target_lock{ "aimbot.lock-target", "false" };
 #if ENABLE_VISUALS
-static settings::Boolean assistance_only{ "aimbot.assistance.only", "false" };
 static settings::Boolean fov_draw{ "aimbot.fov-circle.enable", "0" };
 static settings::Float fovcircle_opacity{ "aimbot.fov-circle.opacity", "0.7" };
 #endif
@@ -528,10 +527,6 @@ bool ShouldAim()
     // Using the minigun and we have no ammo?
     if (LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun) && CE_INT(LOCAL_E, netvar.m_iAmmo + 4) == 0)
         return false;
-#if ENABLE_VISUALS
-    if (*assistance_only && !MouseMoving())
-        return false;
-#endif
     return true;
 }
 

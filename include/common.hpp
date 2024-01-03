@@ -35,7 +35,6 @@
 #include <visual/drawing.hpp>
 #endif
 
-#include "core/profiler.hpp"
 #include "core/offsets.hpp"
 #include <entitycache.hpp>
 #include <enums.hpp>

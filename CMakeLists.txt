@@ -52,7 +52,6 @@ if (NOT ExternalDrawing)
     set(Visuals_EnforceStreamSafety 0)
 endif()
 
-set(EnableProfiler 0 CACHE BOOL "Enable Profiler")
 set(EnableGUI 1 CACHE BOOL "Enable GUI")
 set(EnableIPC 1 CACHE BOOL "Enable IPC")
 set(DataPath "/opt/cathook/data" CACHE FILEPATH "Data location")

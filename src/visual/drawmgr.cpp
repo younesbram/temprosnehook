@@ -34,15 +34,12 @@ static settings::Int info_y{"hack-info.y", "10"};
 void RenderCheatVisuals()
 {
     {
-        PROF_SECTION(BeginCheatVisuals)
         BeginCheatVisuals();
     }
     {
-        PROF_SECTION(DrawCheatVisuals)
         DrawCheatVisuals();
     }
     {
-        PROF_SECTION(EndCheatVisuals)
         EndCheatVisuals();
     }
 }
@@ -76,9 +73,7 @@ double getRandom(double lower_bound, double upper_bound)
 void DrawCheatVisuals()
 {
     {
-        PROF_SECTION(DRAW_info);
         std::string name_s, reason_s;
-        PROF_SECTION(PT_info_text);
         if (info_text)
         {
             float w, h;
@@ -95,7 +90,6 @@ void DrawCheatVisuals()
         AddCenterString("Press SPACE to stop spectating");
     }
     {
-        PROF_SECTION(DRAW_WRAPPER);
         EC::run(EC::Draw);
     }
     if (CE_GOOD(g_pLocalPlayer->entity) && !g_Settings.bInvalid)
@@ -103,12 +97,10 @@ void DrawCheatVisuals()
         Prediction_PaintTraverse();
     }
     {
-        PROF_SECTION(DRAW_strings);
         DrawStrings();
     }
 #if ENABLE_GUI
     {
-        PROF_SECTION(DRAW_GUI);
         gui::draw();
     }
 #endif

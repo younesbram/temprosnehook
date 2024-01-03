@@ -1261,7 +1261,7 @@ static void stbtt__dict_get_ints(stbtt__buf *b, int key, int outcount, stbtt_uin
 {
     int i;
     stbtt__buf operands = stbtt__dict_get(b, key);
-    for (i = 0; i < outcount && operands.cursor < operands.size; i++)
+    for (i = 0; i < outcount && operands.cursor < operands.size; ++i)
         out[i] = stbtt__cff_int(&operands);
 }
 

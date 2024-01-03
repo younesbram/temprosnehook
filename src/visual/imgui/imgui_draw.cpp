@@ -571,7 +571,7 @@ void ImDrawList::ChannelsMerge()
         CmdBuffer.pop_back();
 
     int new_cmd_buffer_count = 0, new_idx_buffer_count = 0;
-    for (int i = 1; i < _ChannelsCount; i++)
+    for (int i = 1; i < _ChannelsCount; ++i)
     {
         ImDrawChannel &ch = _Channels[i];
         if (ch.CmdBuffer.Size && ch.CmdBuffer.back().ElemCount == 0)
@@ -584,7 +584,7 @@ void ImDrawList::ChannelsMerge()
 
     ImDrawCmd *cmd_write = CmdBuffer.Data + CmdBuffer.Size - new_cmd_buffer_count;
     _IdxWritePtr         = IdxBuffer.Data + IdxBuffer.Size - new_idx_buffer_count;
-    for (int i = 1; i < _ChannelsCount; i++)
+    for (int i = 1; i < _ChannelsCount; ++i)
     {
         ImDrawChannel &ch = _Channels[i];
         if (int sz = ch.CmdBuffer.Size)
@@ -826,7 +826,7 @@ void ImDrawList::AddPolyline(const ImVec2 *points, const int points_count, ImU32
             }
 
             // Add vertexes
-            for (int i = 0; i < points_count; i++)
+            for (int i = 0; i < points_count; ++i)
             {
                 _VtxWritePtr[0].pos = points[i];
                 _VtxWritePtr[0].uv  = uv;
@@ -907,7 +907,7 @@ void ImDrawList::AddPolyline(const ImVec2 *points, const int points_count, ImU32
             }
 
             // Add vertexes
-            for (int i = 0; i < points_count; i++)
+            for (int i = 0; i < points_count; ++i)
             {
                 _VtxWritePtr[0].pos = temp_points[i * 4 + 0];
                 _VtxWritePtr[0].uv  = uv;
@@ -995,7 +995,7 @@ void ImDrawList::AddConvexPolyFilled(const ImVec2 *points, const int points_coun
         // Add indexes for fill
         unsigned int vtx_inner_idx = _VtxCurrentIdx;
         unsigned int vtx_outer_idx = _VtxCurrentIdx + 1;
-        for (int i = 2; i < points_count; i++)
+        for (int i = 2; i < points_count; ++i)
         {
             _IdxWritePtr[0] = (ImDrawIdx) (vtx_inner_idx);
             _IdxWritePtr[1] = (ImDrawIdx) (vtx_inner_idx + ((i - 1) << 1));
@@ -1055,14 +1055,14 @@ void ImDrawList::AddConvexPolyFilled(const ImVec2 *points, const int points_coun
         const int idx_count = (points_count - 2) * 3;
         const int vtx_count = points_count;
         PrimReserve(idx_count, vtx_count);
-        for (int i = 0; i < vtx_count; i++)
+        for (int i = 0; i < vtx_count; ++i)
         {
             _VtxWritePtr[0].pos = points[i];
             _VtxWritePtr[0].uv  = uv;
             _VtxWritePtr[0].col = col;
             _VtxWritePtr++;
         }
-        for (int i = 2; i < points_count; i++)
+        for (int i = 2; i < points_count; ++i)
         {
             _IdxWritePtr[0] = (ImDrawIdx) (_VtxCurrentIdx);
             _IdxWritePtr[1] = (ImDrawIdx) (_VtxCurrentIdx + i - 1);
@@ -1099,7 +1099,7 @@ void ImDrawList::PathArcTo(const ImVec2 &centre, float radius, float a_min, floa
     // Note that we are adding a point at both a_min and a_max.
     // If you are trying to draw a full closed circle you don't want the overlapping points!
     _Path.reserve(_Path.Size + (num_segments + 1));
-    for (int i = 0; i <= num_segments; i++)
+    for (int i = 0; i <= num_segments; ++i)
     {
         const float a = a_min + ((float) i / (float) num_segments) * (a_max - a_min);
         _Path.push_back(ImVec2(centre.x + ImCos(a) * radius, centre.y + ImSin(a) * radius));
@@ -1419,7 +1419,7 @@ void ImDrawData::DeIndexAllBuffers()
 {
     ImVector<ImDrawVert> new_vtx_buffer;
     TotalVtxCount = TotalIdxCount = 0;
-    for (int i = 0; i < CmdListsCount; i++)
+    for (int i = 0; i < CmdListsCount; ++i)
     {
         ImDrawList *cmd_list = CmdLists[i];
         if (cmd_list->IdxBuffer.empty())
@@ -1438,7 +1438,7 @@ void ImDrawData::DeIndexAllBuffers()
 // or if there is a difference between your window resolution and framebuffer resolution.
 void ImDrawData::ScaleClipRects(const ImVec2 &fb_scale)
 {
-    for (int i = 0; i < CmdListsCount; i++)
+    for (int i = 0; i < CmdListsCount; ++i)
     {
         ImDrawList *cmd_list = CmdLists[i];
         for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
@@ -1595,7 +1595,7 @@ ImFontAtlas::~ImFontAtlas()
 void ImFontAtlas::ClearInputData()
 {
     IM_ASSERT(!Locked && "Cannot modify a locked ImFontAtlas between NewFrame() and EndFrame/Render()!");
-    for (int i = 0; i < ConfigData.Size; i++)
+    for (int i = 0; i < ConfigData.Size; ++i)
         if (ConfigData[i].FontData && ConfigData[i].FontDataOwnedByAtlas)
         {
             ImGui::MemFree(ConfigData[i].FontData);
@@ -1603,7 +1603,7 @@ void ImFontAtlas::ClearInputData()
         }
 
     // When clearing this we lose access to the font name and other information used to build the font.
-    for (int i = 0; i < Fonts.Size; i++)
+    for (int i = 0; i < Fonts.Size; ++i)
         if (Fonts[i]->ConfigData >= ConfigData.Data && Fonts[i]->ConfigData < ConfigData.Data + ConfigData.Size)
         {
             Fonts[i]->ConfigData      = NULL;
@@ -1629,7 +1629,7 @@ void ImFontAtlas::ClearTexData()
 void ImFontAtlas::ClearFonts()
 {
     IM_ASSERT(!Locked && "Cannot modify a locked ImFontAtlas between NewFrame() and EndFrame/Render()!");
-    for (int i = 0; i < Fonts.Size; i++)
+    for (int i = 0; i < Fonts.Size; ++i)
         IM_DELETE(Fonts[i]);
     Fonts.clear();
 }
@@ -1885,7 +1885,7 @@ bool ImFontAtlas::Build()
 
 void ImFontAtlasBuildMultiplyCalcLookupTable(unsigned char out_table[256], float in_brighten_factor)
 {
-    for (unsigned int i = 0; i < 256; i++)
+    for (unsigned int i = 0; i < 256; ++i)
     {
         unsigned int value = (unsigned int) (i * in_brighten_factor);
         out_table[i]       = value > 255 ? 255 : (value & 0xFF);
@@ -1896,7 +1896,7 @@ void ImFontAtlasBuildMultiplyRectAlpha8(const unsigned char table[256], unsigned
 {
     unsigned char *data = pixels + x + y * stride;
     for (int j = h; j > 0; j--, data += stride)
-        for (int i = 0; i < w; i++)
+        for (int i = 0; i < w; ++i)
             data[i] = table[data[i]];
 }
 
@@ -2228,13 +2228,13 @@ void ImFontAtlasBuildPackCustomRects(ImFontAtlas *atlas, void *stbrp_context_opa
     ImVector<stbrp_rect> pack_rects;
     pack_rects.resize(user_rects.Size);
     memset(pack_rects.Data, 0, (size_t) pack_rects.size_in_bytes());
-    for (int i = 0; i < user_rects.Size; i++)
+    for (int i = 0; i < user_rects.Size; ++i)
     {
         pack_rects[i].w = user_rects[i].Width;
         pack_rects[i].h = user_rects[i].Height;
     }
     stbrp_pack_rects(pack_context, &pack_rects[0], pack_rects.Size);
-    for (int i = 0; i < pack_rects.Size; i++)
+    for (int i = 0; i < pack_rects.Size; ++i)
         if (pack_rects[i].was_packed)
         {
             user_rects[i].X = pack_rects[i].x;
@@ -2281,7 +2281,7 @@ void ImFontAtlasBuildFinish(ImFontAtlas *atlas)
     ImFontAtlasBuildRenderDefaultTexData(atlas);
 
     // Register custom rectangle glyphs
-    for (int i = 0; i < atlas->CustomRects.Size; i++)
+    for (int i = 0; i < atlas->CustomRects.Size; ++i)
     {
         const ImFontAtlas::CustomRect &r = atlas->CustomRects[i];
         if (r.Font == NULL || r.ID > 0x10000)
@@ -2294,7 +2294,7 @@ void ImFontAtlasBuildFinish(ImFontAtlas *atlas)
     }
 
     // Build all fonts lookup tables
-    for (int i = 0; i < atlas->Fonts.Size; i++)
+    for (int i = 0; i < atlas->Fonts.Size; ++i)
         if (atlas->Fonts[i]->DirtyLookupTables)
             atlas->Fonts[i]->BuildLookupTable();
 }
@@ -2503,7 +2503,7 @@ void ImFont::ClearOutputData()
 void ImFont::BuildLookupTable()
 {
     int max_codepoint = 0;
-    for (int i = 0; i != Glyphs.Size; i++)
+    for (int i = 0; i != Glyphs.Size; ++i)
         max_codepoint = ImMax(max_codepoint, (int) Glyphs[i].Codepoint);
 
     IM_ASSERT(Glyphs.Size < 0xFFFF); // -1 is reserved
@@ -2511,7 +2511,7 @@ void ImFont::BuildLookupTable()
     IndexLookup.clear();
     DirtyLookupTables = false;
     GrowIndex(max_codepoint + 1);
-    for (int i = 0; i < Glyphs.Size; i++)
+    for (int i = 0; i < Glyphs.Size; ++i)
     {
         int codepoint            = (int) Glyphs[i].Codepoint;
         IndexAdvanceX[codepoint] = Glyphs[i].AdvanceX;
@@ -2534,7 +2534,7 @@ void ImFont::BuildLookupTable()
 
     FallbackGlyph    = FindGlyphNoFallback(FallbackChar);
     FallbackAdvanceX = FallbackGlyph ? FallbackGlyph->AdvanceX : 0.0f;
-    for (int i = 0; i < max_codepoint + 1; i++)
+    for (int i = 0; i < max_codepoint + 1; ++i)
         if (IndexAdvanceX[i] < 0.0f)
             IndexAdvanceX[i] = FallbackAdvanceX;
 }

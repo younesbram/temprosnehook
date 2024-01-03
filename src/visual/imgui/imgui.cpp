@@ -259,7 +259,7 @@ ImGuiIO::ImGuiIO()
     LogFilename             = "imgui_log.txt";
     MouseDoubleClickTime    = 0.30f;
     MouseDoubleClickMaxDist = 6.0f;
-    for (int i = 0; i < ImGuiKey_COUNT; i++)
+    for (int i = 0; i < ImGuiKey_COUNT; ++i)
         KeyMap[i] = -1;
     KeyRepeatDelay = 0.250f;
     KeyRepeatRate  = 0.050f;
@@ -299,11 +299,11 @@ ImGuiIO::ImGuiIO()
     MousePos           = ImVec2(-FLT_MAX, -FLT_MAX);
     MousePosPrev       = ImVec2(-FLT_MAX, -FLT_MAX);
     MouseDragThreshold = 6.0f;
-    for (int i = 0; i < IM_ARRAYSIZE(MouseDownDuration); i++)
+    for (int i = 0; i < IM_ARRAYSIZE(MouseDownDuration); ++i)
         MouseDownDuration[i] = MouseDownDurationPrev[i] = -1.0f;
-    for (int i = 0; i < IM_ARRAYSIZE(KeysDownDuration); i++)
+    for (int i = 0; i < IM_ARRAYSIZE(KeysDownDuration); ++i)
         KeysDownDuration[i] = KeysDownDurationPrev[i] = -1.0f;
-    for (int i = 0; i < IM_ARRAYSIZE(NavInputsDownDuration); i++)
+    for (int i = 0; i < IM_ARRAYSIZE(NavInputsDownDuration); ++i)
         NavInputsDownDuration[i] = -1.0f;
 }
 
@@ -1147,7 +1147,7 @@ void ImGuiStorage::SetVoidPtr(ImGuiID key, void *val)
 
 void ImGuiStorage::SetAllInt(int v)
 {
-    for (int i = 0; i < Data.Size; i++)
+    for (int i = 0; i < Data.Size; ++i)
         Data[i].val_i = v;
 }
 
@@ -1207,7 +1207,7 @@ void ImGuiTextFilter::Build()
     input_range.split(',', &Filters);
 
     CountGrep = 0;
-    for (int i = 0; i != Filters.Size; i++)
+    for (int i = 0; i != Filters.Size; ++i)
     {
         TextRange &f = Filters[i];
         while (f.b < f.e && ImCharIsBlankA(f.b[0]))
@@ -1229,7 +1229,7 @@ bool ImGuiTextFilter::PassFilter(const char *text, const char *text_end) const
     if (text == NULL)
         text = "";
 
-    for (int i = 0; i != Filters.Size; i++)
+    for (int i = 0; i != Filters.Size; ++i)
     {
         const TextRange &f = Filters[i];
         if (f.empty())
@@ -1715,7 +1715,7 @@ ImGuiWindow::~ImGuiWindow()
 {
     IM_ASSERT(DrawList == &DrawListInst);
     IM_DELETE(Name);
-    for (int i = 0; i != ColumnsStorage.Size; i++)
+    for (int i = 0; i != ColumnsStorage.Size; ++i)
         ColumnsStorage[i].~ImGuiColumnsSet();
 }
 
@@ -2393,7 +2393,7 @@ static void ImGui::UpdateMouseInputs()
         g.NavDisableMouseHover = false;
 
     g.IO.MousePosPrev = g.IO.MousePos;
-    for (int i = 0; i < IM_ARRAYSIZE(g.IO.MouseDown); i++)
+    for (int i = 0; i < IM_ARRAYSIZE(g.IO.MouseDown); ++i)
     {
         g.IO.MouseClicked[i]          = g.IO.MouseDown[i] && g.IO.MouseDownDuration[i] < 0.0f;
         g.IO.MouseReleased[i]         = !g.IO.MouseDown[i] && g.IO.MouseDownDuration[i] >= 0.0f;
@@ -2499,7 +2499,7 @@ void ImGui::UpdateHoveredWindowAndCaptureFlags()
     // We track click ownership. When clicked outside of a window the click is owned by the application and won't report hovering nor request capture even while dragging over our windows afterward.
     int mouse_earliest_button_down = -1;
     bool mouse_any_down            = false;
-    for (int i = 0; i < IM_ARRAYSIZE(g.IO.MouseDown); i++)
+    for (int i = 0; i < IM_ARRAYSIZE(g.IO.MouseDown); ++i)
     {
         if (g.IO.MouseClicked[i])
             g.IO.MouseDownOwned[i] = (g.HoveredWindow != NULL) || (!g.OpenPopupStack.empty());
@@ -2648,7 +2648,7 @@ void ImGui::NewFrame()
 
     // Update keyboard input state
     memcpy(g.IO.KeysDownDurationPrev, g.IO.KeysDownDuration, sizeof(g.IO.KeysDownDuration));
-    for (int i = 0; i < IM_ARRAYSIZE(g.IO.KeysDown); i++)
+    for (int i = 0; i < IM_ARRAYSIZE(g.IO.KeysDown); ++i)
         g.IO.KeysDownDuration[i] = g.IO.KeysDown[i] ? (g.IO.KeysDownDuration[i] < 0.0f ? 0.0f : g.IO.KeysDownDuration[i] + g.IO.DeltaTime) : -1.0f;
 
     // Update gamepad/keyboard directional navigation
@@ -2692,7 +2692,7 @@ void ImGui::NewFrame()
 
     // Mark all windows as not visible
     IM_ASSERT(g.WindowsFocusOrder.Size == g.Windows.Size);
-    for (int i = 0; i != g.Windows.Size; i++)
+    for (int i = 0; i != g.Windows.Size; ++i)
     {
         ImGuiWindow *window   = g.Windows[i];
         window->WasActive     = window->Active;
@@ -2765,7 +2765,7 @@ void ImGui::Shutdown(ImGuiContext *context)
     }
 
     // Clear everything else
-    for (int i = 0; i < g.Windows.Size; i++)
+    for (int i = 0; i < g.Windows.Size; ++i)
         IM_DELETE(g.Windows[i]);
     g.Windows.clear();
     g.WindowsFocusOrder.clear();
@@ -2787,7 +2787,7 @@ void ImGui::Shutdown(ImGuiContext *context)
     g.PrivateClipboard.clear();
     g.InputTextState.ClearFreeMemory();
 
-    for (int i = 0; i < g.SettingsWindows.Size; i++)
+    for (int i = 0; i < g.SettingsWindows.Size; ++i)
         IM_DELETE(g.SettingsWindows[i].Name);
     g.SettingsWindows.clear();
     g.SettingsHandlers.clear();
@@ -2822,7 +2822,7 @@ static void AddWindowToSortBuffer(ImVector<ImGuiWindow *> *out_sorted_windows, I
         int count = window->DC.ChildWindows.Size;
         if (count > 1)
             ImQsort(window->DC.ChildWindows.begin(), (size_t) count, sizeof(ImGuiWindow *), ChildWindowComparer);
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < count; ++i)
         {
             ImGuiWindow *child = window->DC.ChildWindows[i];
             if (child->Active)
@@ -2870,7 +2870,7 @@ static void AddWindowToDrawData(ImVector<ImDrawList *> *out_render_list, ImGuiWi
     ImGuiContext &g = *GImGui;
     g.IO.MetricsRenderWindows++;
     ImGui::AddDrawListToDrawData(out_render_list, window->DrawList);
-    for (int i = 0; i < window->DC.ChildWindows.Size; i++)
+    for (int i = 0; i < window->DC.ChildWindows.Size; ++i)
     {
         ImGuiWindow *child = window->DC.ChildWindows[i];
         if (IsWindowActiveAndVisible(child)) // clipped children may have been marked not active
@@ -2891,7 +2891,7 @@ void ImDrawDataBuilder::FlattenIntoSingleLayer()
 {
     int n    = Layers[0].Size;
     int size = n;
-    for (int i = 1; i < IM_ARRAYSIZE(Layers); i++)
+    for (int i = 1; i < IM_ARRAYSIZE(Layers); ++i)
         size += Layers[i].Size;
     Layers[0].resize(size);
     for (int layer_n = 1; layer_n < IM_ARRAYSIZE(Layers); layer_n++)
@@ -3007,7 +3007,7 @@ void ImGui::EndFrame()
     // We cannot do that on FocusWindow() because childs may not exist yet
     g.WindowsSortBuffer.resize(0);
     g.WindowsSortBuffer.reserve(g.Windows.Size);
-    for (int i = 0; i != g.Windows.Size; i++)
+    for (int i = 0; i != g.Windows.Size; ++i)
     {
         ImGuiWindow *window = g.Windows[i];
         if (window->Active && (window->Flags & ImGuiWindowFlags_ChildWindow)) // if a child is active its parent will add it
@@ -4808,7 +4808,7 @@ void ImGui::BringWindowToDisplayBack(ImGuiWindow *window)
     ImGuiContext &g = *GImGui;
     if (g.Windows[0] == window)
         return;
-    for (int i = 0; i < g.Windows.Size; i++)
+    for (int i = 0; i < g.Windows.Size; ++i)
         if (g.Windows[i] == window)
         {
             memmove(&g.Windows[1], &g.Windows[0], (size_t) i * sizeof(ImGuiWindow *));
@@ -4886,7 +4886,7 @@ void ImGui::PushMultiItemsWidths(int components, float w_full)
     const float w_item_one  = ImMax(1.0f, (float) (int) ((w_full - (style.ItemInnerSpacing.x) * (components - 1)) / (float) components));
     const float w_item_last = ImMax(1.0f, (float) (int) (w_full - (w_item_one + style.ItemInnerSpacing.x) * (components - 1)));
     window->DC.ItemWidthStack.push_back(w_item_last);
-    for (int i = 0; i < components - 1; i++)
+    for (int i = 0; i < components - 1; ++i)
         window->DC.ItemWidthStack.push_back(w_item_one);
     window->DC.ItemWidth = window->DC.ItemWidthStack.back();
 }
@@ -6940,7 +6940,7 @@ static void ImGui::NavUpdate()
 #undef NAV_MAP_KEY
     }
     memcpy(g.IO.NavInputsDownDurationPrev, g.IO.NavInputsDownDuration, sizeof(g.IO.NavInputsDownDuration));
-    for (int i = 0; i < IM_ARRAYSIZE(g.IO.NavInputs); i++)
+    for (int i = 0; i < IM_ARRAYSIZE(g.IO.NavInputs); ++i)
         g.IO.NavInputsDownDuration[i] = (g.IO.NavInputs[i] > 0.0f) ? (g.IO.NavInputsDownDuration[i] < 0.0f ? 0.0f : g.IO.NavInputsDownDuration[i] + g.IO.DeltaTime) : -1.0f;
 
     // Process navigation init request (select first/default focus)
@@ -8361,7 +8361,7 @@ ImGuiWindowSettings *ImGui::CreateNewWindowSettings(const char *name)
 ImGuiWindowSettings *ImGui::FindWindowSettings(ImGuiID id)
 {
     ImGuiContext &g = *GImGui;
-    for (int i = 0; i != g.SettingsWindows.Size; i++)
+    for (int i = 0; i != g.SettingsWindows.Size; ++i)
         if (g.SettingsWindows[i].ID == id)
             return &g.SettingsWindows[i];
     return NULL;
@@ -8515,7 +8515,7 @@ static void SettingsHandlerWindow_WriteAll(ImGuiContext *imgui_ctx, ImGuiSetting
     // Gather data from windows that were active during this session
     // (if a window wasn't opened in this session we preserve its settings)
     ImGuiContext &g = *imgui_ctx;
-    for (int i = 0; i != g.Windows.Size; i++)
+    for (int i = 0; i != g.Windows.Size; ++i)
     {
         ImGuiWindow *window = g.Windows[i];
         if (window->Flags & ImGuiWindowFlags_NoSavedSettings)
@@ -8535,7 +8535,7 @@ static void SettingsHandlerWindow_WriteAll(ImGuiContext *imgui_ctx, ImGuiSetting
 
     // Write to text buffer
     buf->reserve(buf->size() + g.SettingsWindows.Size * 96); // ballpark reserve
-    for (int i = 0; i != g.SettingsWindows.Size; i++)
+    for (int i = 0; i != g.SettingsWindows.Size; ++i)
     {
         const ImGuiWindowSettings *settings = &g.SettingsWindows[i];
         if (settings->Pos.x == FLT_MAX)
@@ -8729,7 +8729,7 @@ void ImGui::ShowMetricsWindow(bool *p_open)
                 {
                     ImRect clip_rect = pcmd->ClipRect;
                     ImRect vtxs_rect;
-                    for (int i = elem_offset; i < elem_offset + (int) pcmd->ElemCount; i++)
+                    for (int i = elem_offset; i < elem_offset + (int) pcmd->ElemCount; ++i)
                         vtxs_rect.Add(draw_list->VtxBuffer[idx_buffer ? idx_buffer[i] : i].pos);
                     clip_rect.Floor();
                     overlay_draw_list->AddRect(clip_rect.Min, clip_rect.Max, IM_COL32(255, 255, 0, 255));
@@ -8772,7 +8772,7 @@ void ImGui::ShowMetricsWindow(bool *p_open)
         {
             if (!ImGui::TreeNode(label, "%s (%d)", label, windows.Size))
                 return;
-            for (int i = 0; i < windows.Size; i++)
+            for (int i = 0; i < windows.Size; ++i)
                 Funcs::NodeWindow(windows[i], "Window");
             ImGui::TreePop();
         }
@@ -8855,13 +8855,13 @@ void ImGui::ShowMetricsWindow(bool *p_open)
     Funcs::NodeWindows(g.Windows, "Windows");
     if (ImGui::TreeNode("DrawList", "Active DrawLists (%d)", g.DrawDataBuilder.Layers[0].Size))
     {
-        for (int i = 0; i < g.DrawDataBuilder.Layers[0].Size; i++)
+        for (int i = 0; i < g.DrawDataBuilder.Layers[0].Size; ++i)
             Funcs::NodeDrawList(NULL, g.DrawDataBuilder.Layers[0][i], "DrawList");
         ImGui::TreePop();
     }
     if (ImGui::TreeNode("Popups", "Popups (%d)", g.OpenPopupStack.Size))
     {
-        for (int i = 0; i < g.OpenPopupStack.Size; i++)
+        for (int i = 0; i < g.OpenPopupStack.Size; ++i)
         {
             ImGuiWindow *window = g.OpenPopupStack[i].Window;
             ImGui::BulletText("PopupID: %08x, Window: '%s'%s%s", g.OpenPopupStack[i].PopupId, window ? window->Name : "NULL", window && (window->Flags & ImGuiWindowFlags_ChildWindow) ? " ChildWindow" : "", window && (window->Flags & ImGuiWindowFlags_ChildMenu) ? " ChildMenu" : "");

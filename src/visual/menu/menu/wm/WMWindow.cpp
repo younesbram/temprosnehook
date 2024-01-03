@@ -13,7 +13,7 @@
 
 namespace zerokernel_wmwindow
 {
-static settings::RVariable<rgba_t> color_border{ "zk.style.window.color.border", "254f00ff" };
+static settings::RVariable<rgba_t> color_border{ "zk.style.window.color.border", "25a00eff" };
 static settings::RVariable<rgba_t> color_background{ "zk.style.window.color.background.active", "000000c6" };
 static settings::RVariable<rgba_t> color_background_inactive{ "zk.style.window.color.background.inactive", "000000ff" };
 } // namespace zerokernel_wmwindow

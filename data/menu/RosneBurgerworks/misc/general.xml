@@ -1,7 +1,7 @@
 <Tab name="General" padding="4 4 4 4">
     <Box height="content" width="content" padding="12 6 6 6" name="Collective">
         <List width="155">
-            <AutoVariable width="fill" target="misc.auto-jump" label="BHOP" tooltip="Automatically bunnyhop."/>
+            <AutoVariable width="fill" target="misc.auto-jump" label="Auto Bhop" tooltip="Automatically bunnyhop."/>
             <AutoVariable width="fill" target="misc.auto-jump.chance" label="Auto jump chance"
                           tooltip="% chance of a successful bunnyhop."/>
             <LabeledObject width="fill" label="Auto strafe">
@@ -14,6 +14,7 @@
             <AutoVariable width="fill" target="misc.no-push" label="No push"/>
             <AutoVariable width="fill" target="misc.anti-afk" label="Anti AFK"/>
             <AutoVariable width="fill" target="misc.no-lerp" label="No lerp"/>
+            <AutoVariable width="fill" target="misc.animfix.enabled" label="Player Anim Fix"/>  
             <AutoVariable width="fill" target="misc.roll-speedhack" label="Moonwalk"
                           tooltip="Increase crouched movement speed."/>
             <AutoVariable width="fill" target="misc.roll-speedhack.forward" label="Moonwalk forwards"/>

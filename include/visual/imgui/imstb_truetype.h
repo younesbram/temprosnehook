@@ -1159,7 +1159,7 @@ static stbtt_uint32 stbtt__buf_get(stbtt__buf *b, int n)
     stbtt_uint32 v = 0;
     int i;
     STBTT_assert(n >= 1 && n <= 4);
-    for (i = 0; i < n; i++)
+    for (i = 0; i < n; ++i)
         v = (v << 8) | stbtt__buf_get8(b);
     return v;
 }
@@ -2138,7 +2138,7 @@ static stbtt__buf stbtt__cid_get_glyph_subrs(const stbtt_fontinfo *info, int gly
     {
         nranges = stbtt__buf_get16(&fdselect);
         start   = stbtt__buf_get16(&fdselect);
-        for (i = 0; i < nranges; i++)
+        for (i = 0; i < nranges; ++i)
         {
             v   = stbtt__buf_get8(&fdselect);
             end = stbtt__buf_get16(&fdselect);

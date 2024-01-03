@@ -350,7 +350,7 @@ ImDrawListSharedData::ImDrawListSharedData()
     ClipRectFullscreen   = ImVec4(-8192.0f, -8192.0f, +8192.0f, +8192.0f);
 
     // Const data
-    for (int i = 0; i < IM_ARRAYSIZE(CircleVtx12); i++)
+    for (int i = 0; i < IM_ARRAYSIZE(CircleVtx12); ++i)
     {
         const float a  = ((float) i * 2 * IM_PI) / (float) IM_ARRAYSIZE(CircleVtx12);
         CircleVtx12[i] = ImVec2(ImCos(a), ImSin(a));
@@ -387,7 +387,7 @@ void ImDrawList::ClearFreeMemory()
     _Path.clear();
     _ChannelsCurrent = 0;
     _ChannelsCount   = 1;
-    for (int i = 0; i < _Channels.Size; i++)
+    for (int i = 0; i < _Channels.Size; ++i)
     {
         if (i == 0)
             memset(&_Channels[0], 0, sizeof(_Channels[0])); // channel 0 is a copy of CmdBuffer/IdxBuffer, don't destruct again
@@ -539,7 +539,7 @@ void ImDrawList::ChannelsSplit(int channels_count)
     // The content of _Channels[0] at this point doesn't matter. We clear it to make state tidy in a debugger but we don't strictly need to.
     // When we switch to the next channel, we'll copy _CmdBuffer/_IdxBuffer into _Channels[0] and then _Channels[1] into _CmdBuffer/_IdxBuffer
     memset(&_Channels[0], 0, sizeof(ImDrawChannel));
-    for (int i = 1; i < channels_count; i++)
+    for (int i = 1; i < channels_count; ++i)
     {
         if (i >= old_channels_count)
         {

@@ -32,8 +32,8 @@ static settings::Boolean always_crouch{ "cat-bot.always-crouch", "false" };
 static settings::Boolean random_votekicks{ "cat-bot.votekicks", "false" };
 static settings::Boolean autovote_map{ "cat-bot.autovote-map", "true" };
 
-settings::Boolean catbotmode{ "cat-bot.enable", "true" }; // i forgur :troll:
-settings::Boolean anti_motd{ "cat-bot.anti-motd", "true" }; // may reduces lag idk
+settings::Boolean catbotmode{ "cat-bot.enable", "true" };
+settings::Boolean anti_motd{ "cat-bot.anti-motd", "true" };
 
 void do_random_votekick()
 {
@@ -230,7 +230,6 @@ CatCommand print_ammo("debug_print_ammo", "debug",
                           }
                       });
 
-static Timer disguise{};
 static CachedEntity *local_w;
 static void cm()
 {

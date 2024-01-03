@@ -23,7 +23,7 @@ std::pair<CachedEntity *, Vector> FindBestEnt(bool teammate, bool Predict, bool 
     std::optional<backtrack::BacktrackData> best_data = std::nullopt;
     Vector predicted{};
     // Too long since we focused it
-    if (previous_entity_delay.check(100))
+    if (previous_entity_delay.check(100)) 
         prevent = -1;
 
     bool shouldBacktrack = backtrack::backtrackEnabled() && !backtrack::hasData();

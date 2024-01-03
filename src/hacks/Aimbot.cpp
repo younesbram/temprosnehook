@@ -54,7 +54,7 @@ static settings::Boolean backtrack_aimbot{ "aimbot.backtrack", "false" };
 static settings::Boolean backtrack_last_tick_only("aimbot.backtrack.only-last-tick", "true");
 static bool force_backtrack_aimbot = false;
 
-static settings::Boolean target_hazards{ "aimbot.target.hazards", "true" };
+static settings::Boolean target_hazards{ "aimbot.target.hazards", "true" }; 
 static settings::Float max_range{ "aimbot.target.max-range", "4096" };
 static settings::Boolean ignore_vaccinator{ "aimbot.target.ignore-vaccinator", "false" };
 static settings::Boolean buildings_sentry{ "aimbot.target.sentry", "true" };
@@ -728,9 +728,6 @@ bool IsTargetStateGood(CachedEntity *entity)
             }
             bool maxCharge = cdmg >= maxhs;
 
-            // Darwins damage correction, Darwins protects against 15% of damage
-            //                if (HasDarwins(entity))
-            //                    cdmg = (cdmg * 0.85f) - 1.0f;
             // Vaccinator damage correction, Vac charge protects against 75% of damage
             if (IsPlayerInvisible(entity))
                 cdmg = cdmg * 0.80f - 1.0f;

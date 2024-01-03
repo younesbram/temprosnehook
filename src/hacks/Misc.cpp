@@ -373,6 +373,81 @@ void Draw()
         AddSideString(format("Weapon state: ", CE_INT(LOCAL_W, netvar.iWeaponState)));
         AddSideString(format("ItemDefinitionIndex: ", CE_INT(LOCAL_W, netvar.iItemDefinitionIndex)));
         AddSideString(format("Maxspeed: ", CE_FLOAT(LOCAL_E, netvar.m_flMaxspeed)));
+        /*AddSideString(colors::white, "Weapon: %s [%i]",
+        RAW_ENT(LOCAL_W)->GetClientClass()->GetName(),
+        LOCAL_W->m_iClassID());
+        //AddSideString(colors::white, "flNextPrimaryAttack: %f",
+        CE_FLOAT(LOCAL_W, netvar.flNextPrimaryAttack));
+        //AddSideString(colors::white, "nTickBase: %f",
+        (float)(CE_INT(LOCAL_E, netvar.nTickBase)) *
+        gvars->interval_per_tick); AddSideString(colors::white, "CanShoot: %i",
+        CanShoot());
+        //AddSideString(colors::white, "Damage: %f",
+        CE_FLOAT(LOCAL_W, netvar.flChargedDamage)); if (TF2)
+        AddSideString(colors::white, "DefIndex: %i",
+        CE_INT(LOCAL_W, netvar.iItemDefinitionIndex));
+        //AddSideString(colors::white, "GlobalVars: 0x%08x", gvars);
+        //AddSideString(colors::white, "realtime: %f", gvars->realtime);
+        //AddSideString(colors::white, "interval_per_tick: %f",
+        gvars->interval_per_tick);
+        //if (TF2) AddSideString(colors::white, "ambassador_can_headshot: %i",
+        (gvars->curtime - CE_FLOAT(LOCAL_W,
+        netvar.flLastFireTime)) > 0.95); AddSideString(colors::white,
+        "WeaponMode: %i", GetWeaponMode(LOCAL_E));
+        AddSideString(colors::white, "ToGround: %f",
+        DistanceToGround(g_pLocalPlayer->v_Origin));
+        AddSideString(colors::white, "ServerTime: %f",
+        CE_FLOAT(LOCAL_E, netvar.nTickBase) *
+        g_GlobalVars->interval_per_tick); AddSideString(colors::white, "CurTime:
+        %f", g_GlobalVars->curtime); AddSideString(colors::white, "FrameCount:
+        %i", g_GlobalVars->framecount); float speed, gravity;
+        GetProjectileData(LOCAL_W, speed, gravity);
+        AddSideString(colors::white, "ALT: %i",
+        g_pLocalPlayer->bAttackLastTick); AddSideString(colors::white, "Speed:
+        %f", speed); AddSideString(colors::white, "Gravity: %f", gravity);
+        AddSideString(colors::white, "CIAC: %i", *(bool*)(RAW_ENT(LOCAL_W) +
+        2380)); if (TF2) AddSideString(colors::white, "Melee: %i",
+        vfunc<bool(*)(IClientEntity*)>(RAW_ENT(LOCAL_W), 1860 / 4,
+        0)(RAW_ENT(LOCAL_W))); if (TF2) AddSideString(colors::white, "Bucket:
+        %.2f", *(float*)((uintptr_t)RAW_ENT(LOCAL_W) + 2612u));
+        //if (TF2C) AddSideString(colors::white, "Seed: %i",
+        *(int*)(sharedobj::client->lmap->l_addr + 0x00D53F68ul));
+        //AddSideString(colors::white, "IsZoomed: %i", g_pLocalPlayer->bZoomed);
+        //AddSideString(colors::white, "CanHeadshot: %i", CanHeadshot());
+        //AddSideString(colors::white, "IsThirdPerson: %i",
+        iinput->CAM_IsThirdPerson());
+        //if (TF2C) AddSideString(colors::white, "Crits: %i", s_bCrits);
+        //if (TF2C) AddSideString(colors::white, "CritMult: %i",
+        RemapValClampedNC( CE_INT(LOCAL_E, netvar.iCritMult), 0, 255, 1.0, 6 ));
+        for (int i = 0; i <= HIGHEST_ENTITY; ++i) {
+            CachedEntity* e = ENTITY(i);
+            if (CE_GOOD(e)) {
+                if (e->m_Type() == EntityType::ENTITY_PROJECTILE) {
+                    //logging::Info("Entity %i [%s]: V %.2f (X: %.2f, Y: %.2f,
+        Z: %.2f) ACC %.2f (X: %.2f, Y: %.2f, Z: %.2f)", i,
+        RAW_ENT(e)->GetClientClass()->GetName(), e->m_vecVelocity.Length(),
+        e->m_vecVelocity.x, e->m_vecVelocity.y, e->m_vecVelocity.z,
+        e->m_vecAcceleration.Length(), e->m_vecAcceleration.x,
+        e->m_vecAcceleration.y, e->m_vecAcceleration.z);
+                    AddSideString(colors::white, "Entity %i [%s]: V %.2f (X:
+        %.2f, Y: %.2f, Z: %.2f) ACC %.2f (X: %.2f, Y: %.2f, Z: %.2f)", i,
+        RAW_ENT(e)->GetClientClass()->GetName(), e->m_vecVelocity.Length(),
+        e->m_vecVelocity.x, e->m_vecVelocity.y, e->m_vecVelocity.z,
+        e->m_vecAcceleration.Length(), e->m_vecAcceleration.x,
+        e->m_vecAcceleration.y, e->m_vecAcceleration.z);
+                }
+            }
+        }//AddSideString(draw::white, draw::black, "???: %f",
+        NET_FLOAT(LOCAL_E, netvar.test));
+        //AddSideString(draw::white, draw::black, "VecPunchAngle: %f %f %f",
+        pa.x, pa.y, pa.z);
+        //draw::DrawString(10, y, draw::white, draw::black, false,
+        "VecPunchAngleVel: %f %f %f", pav.x, pav.y, pav.z);
+        //y += 14;
+        //AddCenterString(fonts::font_handle,
+        input->GetAnalogValue(AnalogCode_t::MOUSE_X),
+        input->GetAnalogValue(AnalogCode_t::MOUSE_Y), draw::white,
+        L"S\u0FD5");*/
     }
 }
 #endif
@@ -432,7 +507,7 @@ CatCommand update_gui_color("gui_color_update", "Update the GUI Color",
                             []()
                             {
                                 hack::command_stack().emplace("cat set zk.style.tab-button.color.selected.background 1f1f1fff;cat set zk.style.tab-button.color.separator 000000ff;cat set zk.style.tab-button.color.hover.underline ffa200ff;cat set zk.style.tab-button.color.selected.underline ffa200ff;cat set zk.style.tooltip.border 446498ff;cat set zk.style.box.color.border 000000ff;cat set zk.style.color-preview.color.border 446498ff;cat set zk.style.modal-container.color.border 000000ff;cat set zk.style.tab-selection.color.border 000000ff;cat set zk.style.table.color.border 000000ff;cat set zk.style.checkbox.color.border 000000ff;cat set zk.style.checkbox.color.checked ffa200ff;cat set zk.style.checkbox.color.hover 1f1f1fff;cat set zk.style.input.color.border 000000ff;cat set zk.style.input.key.color.border 000000ff;cat set zk.style.input.select.border 000000ff;cat set zk.style.input.slider.color.handle_border 000000ff;cat set zk.style.input.slider.color.bar 1f1f1fff;cat set zk.style.input.text.color.border.active ffa200ff");
-                                hack::command_stack().emplace("cat set zk.style.input.text.color.border.inactive 000000ff;cat set zk.style.tree-list-entry.color.lines 42BC99ff;cat set zk.style.window.color.border 000000ff;cat set zk.style.window-close-button.color.border 000000ff;cat set zk.style.window-header.color.background.active 2a2a2aff;cat set zk.style.window-header.color.border.inactive 000000ff;cat set zk.style.window-header.color.border.active 000000ff");
+                                hack::command_stack().emplace("cat set zk.style.input.text.color.border.inactive 000000ff;cat set zk.style.tree-list-entry.color.lines 42BC99ff;cat set zk.style.task.color.background.hover 616161ff;cat set zk.style.task.color.border 000000ff;cat set zk.style.taskbar.color.border 000000ff;cat set zk.style.window.color.border 000000ff;cat set zk.style.window-close-button.color.border 000000ff;cat set zk.style.window-header.color.background.active 2a2a2aff;cat set zk.style.window-header.color.border.inactive 000000ff;cat set zk.style.window-header.color.border.active 000000ff");
                             });
 
 CatCommand name("name_set", "Immediate name change",

@@ -83,6 +83,12 @@
             <AutoVariable width="fill" target="zk.style.player-list.team.blue-dead" label="BLU team dead"/>
         </List>
     </Box>
+    <Box padding="12 6 6 6" width="content" height="content" name="Taskbar" x="330" y="91">
+        <List width="150">
+            <AutoVariable width="fill" target="zk.style.taskbar.color.border" label="Border"/>
+            <AutoVariable width="fill" target="zk.style.taskbar.color.background" label="Background"/>
+        </List>
+    </Box>
     <Box padding="12 6 6 6" width="content" height="content" name="Task" x="330" y="150">
         <List width="150">
             <AutoVariable width="fill" target="zk.style.task.color.border" label="Border"/>

@@ -15,12 +15,17 @@ static settings::RVariable<rgba_t> color_border{ "zk.style.window-header.color.b
 static settings::RVariable<rgba_t> color_border_focused{ "zk.style.window-header.color.border.active", "000000ff" };
 } // namespace zerokernel_windowheader
 
-zerokernel::WindowHeader::WindowHeader(WMWindow &window) : BaseMenuObject(), window(window)
+zerokernel::WindowHeader::WindowHeader(WMWindow &window) : BaseMenuObject(), window(window), close()
 {
     setParent(&window);
 
     bb.width.mode = BoundingBox::SizeMode::Mode::FILL;
     bb.height.setContent();
+
+    auto close_button = std::make_unique<WindowCloseButton>();
+    close             = close_button.get();
+    close->addMessageHandler(*this);
+    addObject(std::move(close_button));
 
     auto title  = std::make_unique<Text>();
     this->title = title.get();
@@ -51,6 +56,9 @@ bool zerokernel::WindowHeader::handleSdlEvent(SDL_Event *event)
 void zerokernel::WindowHeader::render()
 {
     renderBackground(window.isFocused() ? *zerokernel_windowheader::color_background_focused : *zerokernel_windowheader::color_background);
+    // glez::draw::line(bb.getBorderBox().left(), bb.getBorderBox().bottom() -
+    // 1, bb.getBorderBox().width, 0, window.focused ? *color_border_focused :
+    // *color_border, 1);
     renderBorder(window.isFocused() ? *zerokernel_windowheader::color_border_focused : *zerokernel_windowheader::color_border);
 
     Container::render();
@@ -87,6 +95,7 @@ void zerokernel::WindowHeader::updateTitle()
 void zerokernel::WindowHeader::reorderElements()
 {
     title->move(0, 0);
+    close->move(bb.getContentBox().width - close->getBoundingBox().getBorderBox().width, 0);
 }
 
 bool zerokernel::WindowHeader::isHidden()

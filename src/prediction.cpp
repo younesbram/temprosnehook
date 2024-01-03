@@ -143,6 +143,7 @@ std::optional<StrafePredictionData> initializeStrafePrediction(CachedEntity *ent
 
 Vector PredictStep(Vector pos, Vector &vel, const Vector &acceleration, std::pair<Vector, Vector> *minmax, float steplength, StrafePredictionData *strafepred, bool vischeck, std::optional<float> grounddistance)
 {
+    PROF_SECTION(PredictNew)
     Vector result = pos;
 
     // If we should do strafe prediction, then we still need to do the calculations, but instead of applying them we simply calculate the distance traveled and use that info together with strafe pred
@@ -167,6 +168,7 @@ Vector PredictStep(Vector pos, Vector &vel, const Vector &acceleration, std::pai
         low.z -= 8912.0f;
 
         {
+            PROF_SECTION(PredictTraces)
 
             // First, ensure we're not slightly below the floor, up to 18 HU will snap up
             trace_t upwards_trace;
@@ -209,6 +211,7 @@ Vector PredictStep(Vector pos, Vector &vel, const Vector &acceleration, std::pai
     if (vischeck && !moved_upwards)
     {
         {
+            PROF_SECTION(PredictTraces)
             Ray_t ray;
             trace_t trace;
             if (minmax)

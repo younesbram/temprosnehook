@@ -67,7 +67,7 @@
                           tooltip="Says 'f1 cheater/bot' in chat when starting a votekick."/>
         </List>
     </Box>
-    <Box name="Votelogger" width="content" height="content" padding="12 6 6 6" x="170" y="170">
+    <Box name="Votelogger" width="content" height="content" padding="12 6 6 6" x="170" y="100">
         <List width="165">
             <AutoVariable width="fill" target="votelogger.autovote.yes" label="Autovote yes"/>
             <AutoVariable width="fill" target="votelogger.autovote.no" label="Autovote no"/>

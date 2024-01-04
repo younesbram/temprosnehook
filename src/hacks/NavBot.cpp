@@ -24,7 +24,7 @@ static settings::Boolean capture_objectives("navbot.capture-objectives", "true")
 static settings::Boolean defendthecartred("navbot.defend-pl-red", "false");
 static settings::Boolean snipe_sentries("navbot.snipe-sentries", "true");
 static settings::Boolean snipe_sentries_shortrange("navbot.snipe-sentries.shortrange", "false");
-static settings::Boolean escape_danger("navbot.escape-danger", "false");
+static settings::Boolean escape_danger("navbot.escape-danger", "true");
 static settings::Boolean escape_danger_ctf_cap("navbot.escape-danger.ctf-cap", "false");
 static settings::Boolean enable_slight_danger_when_capping("navbot.escape-danger.slight-danger.capping", "false");
 static settings::Boolean primary_only("navbot.primary-only", "true"); // auto best weapon

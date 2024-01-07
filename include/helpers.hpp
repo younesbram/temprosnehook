@@ -145,6 +145,7 @@ bool IsVectorVisibleNavigation(Vector a, Vector b, unsigned int mask = MASK_SHOT
 float ProjGravMult(int class_id, float x_speed);
 bool DidProjectileHit(Vector start_point, Vector end_point, CachedEntity *entity, float projectile_size, bool grav_comp, trace_t *tracer = nullptr);
 Vector getShootPos(Vector angle);
+bool is_rocket(int);
 Vector GetForwardVector(Vector origin, Vector viewangles, float distance, CachedEntity *punch_entity = nullptr);
 Vector GetForwardVector(float distance, CachedEntity *punch_entity = nullptr);
 CachedEntity *getClosestEntity(Vector vec);

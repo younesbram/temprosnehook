@@ -483,11 +483,10 @@ Vector EnginePrediction(CachedEntity *entity, float time, Vector *vecVelocity)
 
 std::pair<Vector, Vector> ProjectilePrediction_Engine(CachedEntity *ent, int hb, float speed, float gravity, float entgmod, float proj_startvelocity)
 {
-    Vector origin = ent->m_vecOrigin();
+    Vector origin = RAW_ENT(ent)->GetAbsOrigin();
     Vector velocity;
     velocity::EstimateAbsVelocity(RAW_ENT(ent), velocity);
-    Vector hitbox;
-    GetHitbox(ent, hb, hitbox);
+    Vector hitbox        = ent->hitboxes.GetHitbox(hb)->center;
     Vector hitbox_offset = hitbox - origin;
 
     if (!sv_gravity)

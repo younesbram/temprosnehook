@@ -836,10 +836,16 @@ bool Aim(CachedEntity *entity)
 {
     // Get angles from eye to target
     Vector is_it_good = PredictEntity(entity);
+    
+    Vector player_velocity;
+    velocity::EstimateAbsVelocity(RAW_ENT(LOCAL_E), player_velocity);
+
+    Vector start = g_pLocalPlayer->v_Eye + player_velocity * TICKS_TO_TIME(1);
+
     if (!IsEntityVectorVisible(entity, is_it_good, true, MASK_SHOT_HULL, nullptr, true))
         return false;
 
-    Vector angles = GetAimAtAngles(g_pLocalPlayer->v_Eye, is_it_good, LOCAL_E);
+    Vector angles = GetAimAtAngles(start, is_it_good, LOCAL_E);
     if (fov > 0.0f && cd.fov > fov)
         return false;
     // Slow aim

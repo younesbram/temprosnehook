@@ -7,19 +7,18 @@
 
 #pragma once
 
-#include "platform.h"
+#include <chrono>
 
 class Timer
 {
-private:
-    int last{};
-
 public:
+    std::chrono::time_point<std::chrono::system_clock> last{};
+
     constexpr Timer() noexcept = default;
 
     inline bool check(unsigned int ms) const noexcept
     {
-        return Plat_MSTime() - last >= ms;
+        return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - last).count() >= ms;
     }
 
     bool test_and_set(unsigned int ms) noexcept
@@ -34,21 +33,6 @@ public:
 
     inline void update() noexcept
     {
-        last = static_cast<int>(Plat_MSTime());
-    }
-
-    static inline unsigned int sec_to_ms(unsigned int sec)
-    {
-        return sec * 1000;
-    }
-
-    inline void operator-=(unsigned int ms)
-    {
-        last -= static_cast<int>(ms);
-    }
-
-    inline void operator+=(unsigned int ms)
-    {
-        last += static_cast<int>(ms);
+        last = std::chrono::system_clock::now();
     }
 };

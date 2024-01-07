@@ -12,13 +12,15 @@
 class Timer
 {
 public:
-    std::chrono::time_point<std::chrono::system_clock> last{};
+    std::chrono::time_point<std::chrono::system_clock> last;
 
-    constexpr Timer() noexcept = default;
+    constexpr Timer() noexcept : last(std::chrono::system_clock::now()) {}
 
     inline bool check(unsigned int ms) const noexcept
     {
-        return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - last).count() >= ms;
+        auto now = std::chrono::system_clock::now();
+        auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now - last).count();
+        return elapsed_ms >= ms;
     }
 
     bool test_and_set(unsigned int ms) noexcept

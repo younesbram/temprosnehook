@@ -322,6 +322,7 @@ void UpdateTemporaryData()
             data.ingame.team       = g_pPlayerResource->GetTeam(localplayer);
             data.ingame.role       = g_pPlayerResource->GetClass(localplayer);
             data.ingame.life_state = NET_BYTE(player, netvar.iLifeState);
+            data.ingame.ping       = ((INetChannel *) (g_IEngine->GetNetChannelInfo()))->GetLatency(FLOW_OUTGOING);
             data.ingame.health     = g_pPlayerResource->GetHealth(LOCAL_E);
             data.ingame.health_max = g_pPlayerResource->GetMaxHealth(LOCAL_E);
 

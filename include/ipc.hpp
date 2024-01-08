@@ -74,7 +74,7 @@ struct user_data_s
         int headshots;
 
         int team;
-        int ping
+        int ping;
         int role; // class
         char life_state;
         int health;

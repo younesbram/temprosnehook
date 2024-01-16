@@ -15,11 +15,14 @@ static settings::Boolean enable{ "noisemaker-spam.enable", "false" };
 #else
 static settings::Boolean enable{ "noisemaker-spam.enable", "true" };
 #endif
+
+static Timer timer;
+
 static void CreateMove()
 {
     if (enable && CE_GOOD(LOCAL_E))
     {
-        if (g_GlobalVars->framecount % 40 == 0)
+        if (timer.test_and_set(1000))
         {
             auto *kv = new KeyValues("+use_action_slot_item_server");
             g_IEngine->ServerCmdKeyValues(kv);

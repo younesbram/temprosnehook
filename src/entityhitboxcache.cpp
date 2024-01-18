@@ -140,8 +140,6 @@ matrix3x4_t *EntityHitboxCache::GetBones(int numbones)
             bones.resize(numbones);
         if (g_Settings.is_create_move)
         {
-            PROF_SECTION(bone_setup);
-
             // Only use reconstructed setupbones on players
             if (parent_ref->m_Type() == ENTITY_PLAYER)
                 bones_setup = setupbones_reconst::SetupBones(RAW_ENT(parent_ref), bones.data(), 0x7FF00);

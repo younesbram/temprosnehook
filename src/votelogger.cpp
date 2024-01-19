@@ -17,8 +17,10 @@ static settings::Boolean vote_rage_vote{ "votelogger.autovote.no.rage", "false" 
 static settings::Boolean chat{ "votelogger.chat", "true" };
 static settings::Boolean chat_partysay{ "votelogger.chat.partysay", "false" };
 static settings::Boolean chat_casts{ "votelogger.chat.casts", "false" };
+static settings::Boolean f2pleaseimnotbot{ "votelogger.f2please", "false" };
 static settings::Boolean saywhenimkickingaskid{ "votelogger.kicksay", "false" };
 static settings::Boolean chat_casts_f1_only{ "votelogger.chat.casts.f1-only", "true" };
+static settings::Boolean requeue_on_kick{ "votelogger.requeue-on-kick", "false" };
 // Leave party and crash, useful VAC hosting
 static settings::Boolean abandon_and_crash_on_kick{ "votelogger.restart-on-kick", "false" };
 
@@ -108,12 +110,25 @@ void dispatchUserMessage(bf_read &buffer, int type)
         logging::Info("[%s] Vote called to kick %s [U:1:%u] for %s by %s [U:1:%u]", team_name, info.name, info.friendsID, reason, info2.name, info2.friendsID);
         if (info.friendsID == g_ISteamUser->GetSteamID().GetAccountID())
         {
+            if (requeue_on_kick)
+            {
+                tfmm::StartQueue();
+            }
+
+            if (*f2pleaseimnotbot)
+            {
+                chat_stack::Say("f2 bro wtf", true);
+            }
+            was_local_player = true;
+            local_kick_timer.update();
+        }
+        
+        if (info2.friendsID == g_ISteamUser->GetSteamID().GetAccountID())
+        {
             if (*saywhenimkickingaskid)
             {
                 chat_stack::Say("f1 cheater/bot", true);
             }
-            was_local_player = true;
-            local_kick_timer.update();
         }
 
         if (*vote_kickn || *vote_kicky)
@@ -157,6 +172,8 @@ void dispatchUserMessage(bf_read &buffer, int type)
     }
     case 48:
         logging::Info("Vote failed");
+        if (was_local_player && requeue_on_kick)
+            tfmm::LeaveQueue();
         break;
     case 49:
         logging::Info("VoteSetup?");

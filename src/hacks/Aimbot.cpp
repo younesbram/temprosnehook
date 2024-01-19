@@ -32,7 +32,7 @@ static settings::Float normal_fov{ "aimbot.fov", "0" };
 static settings::Int priority_mode{ "aimbot.priority-mode", "0" };
 static settings::Boolean wait_for_charge{ "aimbot.wait-for-charge", "false" };
 
-static settings::Boolean silent{ "aimbot.silent", "false" };
+static settings::Boolean silent{ "aimbot.silent", "true" };
 static settings::Boolean target_lock{ "aimbot.lock-target", "true" };
 #if ENABLE_VISUALS
 static settings::Boolean fov_draw{ "aimbot.fov-circle.enable", "0" };
@@ -359,6 +359,7 @@ void DoAutoZoom(bool target_found, CachedEntity *target)
     static Timer zoom_time{};
     auto nearest = hacks::NavBot::getNearestPlayerDistance();
 
+    // rev distance
     if (LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun) && (target_found || nearest.second <= *zoom_distance))
     {
         if (target_found)

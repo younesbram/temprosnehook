@@ -49,6 +49,7 @@ static settings::Boolean minigun_tapfire{ "aimbot.auto.tapfire", "false" };
 static settings::Boolean auto_zoom{ "aimbot.auto.zoom", "true" };
 static settings::Boolean auto_unzoom{ "aimbot.auto.unzoom", "true" };
 static settings::Float zoom_distance{ "aimbot.zoom.distance", "2000.0" };
+static settings::Float rev_distance{ "aimbot.rev.distance", "1500.0" };
 
 static settings::Boolean backtrack_aimbot{ "aimbot.backtrack", "false" };
 static settings::Boolean backtrack_last_tick_only("aimbot.backtrack.only-last-tick", "true");
@@ -360,7 +361,7 @@ void DoAutoZoom(bool target_found, CachedEntity *target)
     auto nearest = hacks::NavBot::getNearestPlayerDistance();
 
     // rev distance
-    if (LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun) && (target_found || nearest.second <= *zoom_distance))
+    if (LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun) && (target_found || nearest.second <= *rev_distance))
     {
         if (target_found)
             zoom_time.update();

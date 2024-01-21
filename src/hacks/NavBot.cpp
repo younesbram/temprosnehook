@@ -1,6 +1,7 @@
 #include "Settings.hpp"
 #include "init.hpp"
 #include "HookTools.hpp"
+#include <unordered_set>
 #include "interfaces.hpp"
 #include "navparser.hpp"
 #include "playerresource.hpp"
@@ -152,6 +153,18 @@ std::vector<CachedEntity *> getEntities(bool find_health)
     return entities;
 }
 
+std::unordered_set<CachedEntity*> takenHealthPacks;
+
+bool healthpackIsTaken(CachedEntity* healthpack)
+{
+    return takenHealthPacks.find(healthpack) != takenHealthPacks.end();
+}
+
+void markHealthPackAsTaken(CachedEntity* healthpack)
+{
+    takenHealthPacks.insert(healthpack);
+}
+
 // Find health if needed
 bool getHealth(bool low_priority = false)
 {
@@ -169,8 +182,7 @@ bool getHealth(bool low_priority = false)
         }
         auto healthpacks = getEntities(true);
         auto dispensers  = getDispensers();
-
-        auto total_ents = healthpacks;
+        auto total_ents  = healthpacks;
 
         // Add dispensers and sort list again
         if (!dispensers.empty())
@@ -181,9 +193,18 @@ bool getHealth(bool low_priority = false)
         }
 
         for (const auto healthpack : total_ents)
-            // If we succeed, don't try to path to other packs
+        {
+            if (healthpackIsTaken(healthpack))
+                continue;
+
+            // If we succeed, mark the health pack as taken and don't try to path to other packs
             if (navparser::NavEngine::navTo(healthpack->m_vecOrigin(), priority, true, healthpack->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) > Sqr(200.0f)))
+            {
+                markHealthPackAsTaken(healthpack);
                 return true;
+            }
+        }
+
         health_cooldown.update();
     }
     else if (navparser::NavEngine::current_priority == priority)

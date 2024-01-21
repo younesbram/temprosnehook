@@ -134,25 +134,23 @@ std::vector<CachedEntity *> getDispensers()
 
 // Get entities of given itemtypes (Used for health/ammo)
 // Use true for health packs, use false for ammo packs
-std::vector<CachedEntity *> getEntities(const std::vector<k_EItemType> &itemtypes)
+std::vector<CachedEntity *> getEntities(bool find_health)
 {
     std::vector<CachedEntity *> entities;
     for (const auto &ent : entity_cache::valid_ents)
     {
-        for (auto &itemtype : itemtypes)
+        const model_t *model = RAW_ENT(ent)->GetModel();
+        const auto szName = g_IModelInfo->GetModelName(model);
+        if (find_health && Hash::IsHealth(szName) || !find_health && Hash::IsAmmo(szName))
         {
-            if (ent->m_ItemType() == itemtype)
-            {
-                entities.push_back(ent);
-                break;
-            }
+            entities.push_back(ent);
+            break;
         }
     }
     // Sort by distance, closer is better
-    std::sort(entities.begin(), entities.end(), [](CachedEntity *a, CachedEntity *b) { return a->m_flDistance() < b->m_flDistance(); });
+    std::sort(entities.begin(), entities.end(), [](CachedEntity *a, CachedEntity *b) { return a->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) < b->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin); });
     return entities;
 }
-
 
 // Find health if needed
 bool getHealth(bool low_priority = false)

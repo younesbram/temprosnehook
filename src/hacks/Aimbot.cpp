@@ -370,7 +370,7 @@ void DoAutoZoom(bool target_found, CachedEntity *target)
     }
 
     // Minigun spun up handler
-    if (*auto_spin_up && LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun))
+    if (*auto_spin_up && LOCAL_W->m_iClassID() == CL_CLASS(CTFMinigun) && !*rev_distance)
     {
         if (target_found)
             zoom_time.update();

@@ -70,7 +70,7 @@ template <typename T> T *BruteforceInterface(const std::string &name, sharedobj:
             zeros = 2;
         else
             zeros = 1;
-        for (int j = 0; j < zeros; j++)
+        for (int j = 0; j < zeros; ++j)
             stream << '0';
         stream << i;
         result = reinterpret_cast<T *>(object.CreateInterface(stream.str()));

@@ -85,7 +85,7 @@ public:
             if (pProp->GetDataTable())
                 DumpTable(pProp->GetDataTable(), iLevel + 1, pProp->GetOffset());
 
-            for (int j = 0; j < iLevel; j++)
+            for (int j = 0; j < iLevel; ++j)
                 m_file << "  ";
 
             int offset        = pProp->GetOffset();

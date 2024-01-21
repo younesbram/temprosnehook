@@ -228,7 +228,7 @@ DEFINE_HOOKED_METHOD(DispatchUserMessage, bool, void *this_, int type, bf_read &
             for (const auto &filter : res)
                 if (boost::contains(message2, filter))
                 {
-                    chat_stack::Say("I am not a ◌๎bot.", true); // omegatronic
+                    chat_stack::Say("I am not a bo◌๎t.", true);
                     retrun     = true;
                     lastfilter = message;
                     lastname   = format(name);

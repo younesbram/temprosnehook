@@ -6,12 +6,4 @@ Fix the problems that rosne commits/creates (SECOND PRIORITY)
 
 Remove boost xd
 
-
-Fix that crash that never happens but sometimes does when navparser literally fucking dies
-
-
-Fix the annoying menu being buggy, glitched out
-
-
-Add some features that arent added on the xml
-
+Debloat the hell out of createmove in hooks

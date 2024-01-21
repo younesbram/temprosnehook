@@ -444,7 +444,7 @@ void CUtlString::TrimLeft(const char *szTargets)
     {
         bool bWhitespace = false;
 
-        for (int j = 0; szTargets[j] != 0; j++)
+        for (int j = 0; szTargets[j] != 0; ++j)
         {
             if (m_pString[i] == szTargets[j])
             {
@@ -494,7 +494,7 @@ void CUtlString::TrimRight(const char *szTargets)
     {
         bool bWhitespace = false;
 
-        for (int j = 0; szTargets[j] != 0; j++)
+        for (int j = 0; szTargets[j] != 0; ++j)
         {
             if (m_pString[i] == szTargets[j])
             {

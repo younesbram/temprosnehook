@@ -1363,7 +1363,7 @@ void CStudioHdr::RunFlexRules(const float *src, float *dest)
         //*/
         // debugoverlay->AddTextOverlay( GetAbsOrigin() + Vector( 0, 0, 64 ), i + 1, 0, "%2d:%d\n", i, prule->flex );
 
-        for (j = 0; j < prule->numops; j++)
+        for (j = 0; j < prule->numops; ++j)
         {
             switch (pops->op)
             {

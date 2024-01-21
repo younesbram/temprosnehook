@@ -215,7 +215,7 @@ static void hook()
                     continue;
                 const char *pszName2 = pProp1->m_pVarName;
                 if (!strcmp(pszName2, "tfnonlocaldata"))
-                    for (int j = 0; j < pProp1->m_pDataTable->m_nProps; j++)
+                    for (int j = 0; j < pProp1->m_pDataTable->m_nProps; ++j)
                     {
                         auto *pProp2 = (RecvPropRedef *) &(pProp1->m_pDataTable->m_pProps[j]);
                         if (!pProp2)

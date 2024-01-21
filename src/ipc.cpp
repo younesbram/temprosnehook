@@ -245,7 +245,7 @@ CatCommand debug_get_ingame_ipc("ipc_debug_dump_server", "Show other bots on ser
                                 []()
                                 {
                                     std::vector<unsigned> players{};
-                                    for (int j = 1; j <= MAX_PLAYERS; j++)
+                                    for (int j = 1; j <= MAX_PLAYERS; ++j)
                                     {
                                         player_info_s info{};
                                         if (GetPlayerInfo(j, &info))

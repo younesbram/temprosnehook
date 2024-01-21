@@ -797,15 +797,15 @@ void KeyValues::WriteConvertedString(IBaseFileSystem *filesystem, FileHandle_t f
         if (pszString[i] == '\"')
         {
             convertedString[j] = '\\';
-            j++;
+            ++j;
         }
         else if (m_bHasEscapeSequences && pszString[i] == '\\')
         {
             convertedString[j] = '\\';
-            j++;
+            ++j;
         }
         convertedString[j] = pszString[i];
-        j++;
+        ++j;
     }
 
     INTERNALWRITE(convertedString, Q_strlen(convertedString));

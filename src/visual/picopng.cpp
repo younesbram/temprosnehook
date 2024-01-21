@@ -430,7 +430,7 @@ int decodePNG(unsigned char *&out_image, int &image_width, int &image_height, co
                     } // error: palette too big
                     for (size_t i = 0; i < info.palette.size(); i += 4)
                     {
-                        for (size_t j = 0; j < 3; j++)
+                        for (size_t j = 0; j < 3; ++j)
                             info.palette[i + j] = in[pos++]; // RGB
                         info.palette[i + 3] = 255;           // alpha
                     }

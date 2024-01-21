@@ -1,7 +1,6 @@
 #include "Settings.hpp"
 #include "init.hpp"
 #include "HookTools.hpp"
-#include <unordered_set>
 #include "interfaces.hpp"
 #include "navparser.hpp"
 #include "playerresource.hpp"
@@ -135,35 +134,25 @@ std::vector<CachedEntity *> getDispensers()
 
 // Get entities of given itemtypes (Used for health/ammo)
 // Use true for health packs, use false for ammo packs
-std::vector<CachedEntity *> getEntities(bool find_health)
+std::vector<CachedEntity *> getEntities(const std::vector<k_EItemType> &itemtypes)
 {
     std::vector<CachedEntity *> entities;
     for (const auto &ent : entity_cache::valid_ents)
     {
-        const model_t *model = RAW_ENT(ent)->GetModel();
-        const auto szName = g_IModelInfo->GetModelName(model);
-        if (find_health && Hash::IsHealth(szName) || !find_health && Hash::IsAmmo(szName))
+        for (auto &itemtype : itemtypes)
         {
-            entities.push_back(ent);
-            break;
+            if (ent->m_ItemType() == itemtype)
+            {
+                entities.push_back(ent);
+                break;
+            }
         }
     }
     // Sort by distance, closer is better
-    std::sort(entities.begin(), entities.end(), [](CachedEntity *a, CachedEntity *b) { return a->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) < b->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin); });
+    std::sort(entities.begin(), entities.end(), [](CachedEntity *a, CachedEntity *b) { return a->m_flDistance() < b->m_flDistance(); });
     return entities;
 }
 
-std::unordered_set<CachedEntity*> takenHealthPacks;
-
-bool healthpackIsTaken(CachedEntity* healthpack)
-{
-    return takenHealthPacks.find(healthpack) != takenHealthPacks.end();
-}
-
-void markHealthPackAsTaken(CachedEntity* healthpack)
-{
-    takenHealthPacks.insert(healthpack);
-}
 
 // Find health if needed
 bool getHealth(bool low_priority = false)
@@ -182,7 +171,8 @@ bool getHealth(bool low_priority = false)
         }
         auto healthpacks = getEntities(true);
         auto dispensers  = getDispensers();
-        auto total_ents  = healthpacks;
+
+        auto total_ents = healthpacks;
 
         // Add dispensers and sort list again
         if (!dispensers.empty())
@@ -193,18 +183,9 @@ bool getHealth(bool low_priority = false)
         }
 
         for (const auto healthpack : total_ents)
-        {
-            if (healthpackIsTaken(healthpack))
-                continue;
-
-            // If we succeed, mark the health pack as taken and don't try to path to other packs
+            // If we succeed, don't try to path to other packs
             if (navparser::NavEngine::navTo(healthpack->m_vecOrigin(), priority, true, healthpack->m_vecOrigin().DistToSqr(g_pLocalPlayer->v_Origin) > Sqr(200.0f)))
-            {
-                markHealthPackAsTaken(healthpack);
                 return true;
-            }
-        }
-
         health_cooldown.update();
     }
     else if (navparser::NavEngine::current_priority == priority)

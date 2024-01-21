@@ -685,7 +685,7 @@ static void followCrumbs()
     {
         Vector next{ crumbs[0].vec.x, crumbs[0].vec.y, g_pLocalPlayer->v_Eye.z };
         next = GetAimAtAngles(g_pLocalPlayer->v_Eye, next);
-        static int aim_speed = 25; // how smooth nav is/ im cringing at this damn speed.
+        static int aim_speed = 15; // how smooth nav is/ im cringing at this damn speed.
         // activate nav spin and smoothen
         hacks::misc_aimbot::DoSlowAim(next, aim_speed);
         current_user_cmd->viewangles = next, aim_speed;

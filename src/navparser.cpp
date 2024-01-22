@@ -2,6 +2,7 @@
 #include "micropather.h"
 #include "CNavFile.h"
 #include "Aimbot.hpp"
+#include "AntiAim.hpp"
 #include "navparser.hpp"
 #include "MiscTemporary.hpp"
 #if ENABLE_VISUALS
@@ -16,6 +17,7 @@ namespace navparser
 static settings::Boolean enabled("nav.enabled", "false");
 static settings::Boolean draw("nav.draw", "false");
 static settings::Boolean look{ "nav.look-at-path", "false" };
+static settings::Boolean crazyjump{ "nav.crazy-jump", "false" };
 static settings::Boolean draw_debug_areas("nav.draw.debug-areas", "false");
 static settings::Boolean log_pathing{ "nav.log", "false" };
 static settings::Int stuck_time{ "nav.stuck-time", "750" };
@@ -661,7 +663,15 @@ static void followCrumbs()
         {
             // Make it crouch until we land, but jump the first tick
             current_user_cmd->buttons |= crouch ? IN_DUCK : IN_JUMP;
+            if (!hacks::antiaim::isEnabled() && *crazyjump)
+            {
+                // Do a flip to avoid getting stuck on edges
+                Vector flip{ g_pLocalPlayer->v_OrigViewangles.x, g_pLocalPlayer->v_OrigViewangles.y + 180.0f, g_pLocalPlayer->v_Eye.z };
+                fClampAngle(flip);
 
+                current_user_cmd->viewangles = flip;
+                *bSendPackets                = true;
+            }
             // Only flip to crouch state, not to jump state
             if (!crouch)
             {

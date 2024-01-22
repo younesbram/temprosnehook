@@ -663,15 +663,7 @@ static void followCrumbs()
         {
             // Make it crouch until we land, but jump the first tick
             current_user_cmd->buttons |= crouch ? IN_DUCK : IN_JUMP;
-            if (!hacks::antiaim::isEnabled() && *crazyjump)
-            {
-                // Do a flip to avoid getting stuck on edges
-                Vector flip{ g_pLocalPlayer->v_OrigViewangles.x, g_pLocalPlayer->v_OrigViewangles.y + 180.0f, g_pLocalPlayer->v_Eye.z };
-                fClampAngle(flip);
 
-                current_user_cmd->viewangles = flip;
-                *bSendPackets                = true;
-            }
             // Only flip to crouch state, not to jump state
             if (!crouch)
             {
@@ -686,6 +678,14 @@ static void followCrumbs()
                 // Reset
                 crouch = false;
                 last_jump.update();
+            }
+
+            if (!hacks::antiaim::isEnabled() && *crazyjump)
+            {
+                // Do a flip to avoid getting stuck on edges
+                Vector flip{ g_pLocalPlayer->v_OrigViewangles.x, g_pLocalPlayer->v_OrigViewangles.y + 180.0f, g_pLocalPlayer->v_Eye.z };
+                current_user_cmd->viewangles = flip;
+                *bSendPackets                = true;
             }
         }
     }

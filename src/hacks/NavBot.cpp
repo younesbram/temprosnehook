@@ -1161,7 +1161,11 @@ std::optional<Vector> getCtfGoal(int our_team, int enemy_team)
     if (status == TF_FLAGINFO_STOLEN && carrier != LOCAL_E)
     {
         if (!player_tools::shouldTargetSteamId(carrier->player_info->friendsID))
-            return carrier->m_vecDormantOrigin();
+        {
+            Vector offset(10.0f, 0.0f, 0.0f);
+
+            return carrier->m_vecDormantOrigin() + offset;
+        }
     }
 
     // CTF is the current capture type

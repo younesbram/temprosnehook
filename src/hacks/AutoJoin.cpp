@@ -16,6 +16,7 @@
 namespace hacks::autojoin
 {
 static settings::Boolean autojoin_team{ "autojoin.team", "true" };
+static settings::Boolean random_class{ "autojoin.random-class", "false" };
 static settings::Int autojoin_class{ "autojoin.class", "0" };
 static settings::Boolean auto_queue{ "autojoin.auto-queue", "false" };
 static settings::Boolean auto_requeue{ "autojoin.auto-requeue", "false" };
@@ -101,6 +102,8 @@ static void Update()
             hack::ExecuteCommand("autoteam");
         else if (*autojoin_class && UnassignedClass() && *autojoin_class < 10)
             g_IEngine->ExecuteClientCmd(format("join_class ", class_names[*autojoin_class - 1]).c_str());
+        else if (*random_class && UnassignedClass())
+            g_IEngine->ExecuteClientCmd(format("join_class random").c_str());
     }
 }
 

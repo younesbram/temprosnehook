@@ -19,6 +19,7 @@
                     <Option name="Engineer" value="9"/>
                 </Select>
             </LabeledObject>
+            <AutoVariable width="fill" target="autojoin.random-class" label="Random Class" tooltip="Will not work unless autoclass is set to None"/>
             <AutoVariable width="fill" target="autojoin.team" label="Autojoin team"
                           tooltip="Automatically join a team."/>
         </List>

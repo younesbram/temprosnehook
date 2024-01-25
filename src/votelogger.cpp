@@ -118,7 +118,7 @@ void dispatchUserMessage(bf_read &buffer, int type)
 
             if (*f2pleaseimnotbot)
             {
-                f2file.Load
+                f2file.Load;
                 chat_stack::Say(f2file.lines, true);
             }
             was_local_player = true;

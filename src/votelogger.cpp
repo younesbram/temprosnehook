@@ -26,6 +26,7 @@ static settings::Boolean abandon_and_crash_on_kick{ "votelogger.restart-on-kick"
 
 namespace votelogger
 {
+static TextFile f2file{};
 static bool was_local_player{ false };
 static Timer local_kick_timer{};
 
@@ -117,7 +118,8 @@ void dispatchUserMessage(bf_read &buffer, int type)
 
             if (*f2pleaseimnotbot)
             {
-                chat_stack::Say("f2 bro wtf", true);
+                f2file.Load
+                chat_stack::Say(f2file.lines, true);
             }
             was_local_player = true;
             local_kick_timer.update();

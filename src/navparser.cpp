@@ -17,6 +17,7 @@ namespace navparser
 static settings::Boolean enabled("nav.enabled", "false");
 static settings::Boolean draw("nav.draw", "false");
 static settings::Boolean look{ "nav.look-at-path", "false" };
+static settings::Boolean look_legit{ "nav.look-at-path-legit", "false" };
 static settings::Boolean crazyjump{ "nav.crazy-jump", "false" };
 static settings::Boolean draw_debug_areas("nav.draw.debug-areas", "false");
 static settings::Boolean log_pathing{ "nav.log", "false" };
@@ -699,6 +700,64 @@ static void followCrumbs()
         // activate nav spin and smoothen
         hacks::misc_aimbot::DoSlowAim(next, aim_speed);
         current_user_cmd->viewangles = next, aim_speed;
+    }
+
+    // omegatronic legit bot
+    if (look_legit && !hacks::aimbot::IsAiming())
+    {
+        float best_dist                = FLT_MAX;
+        std::optional<Vector> look_vec = std::nullopt;
+        for (int i = 1; i <= g_IEngine->GetMaxClients(); i++)
+        {
+            CachedEntity *ent = ENTITY(i);
+            if (i == g_pLocalPlayer->entity_idx || CE_INVALID(ent) || !ent->m_bEnemy())
+                continue;
+            auto sound = soundcache::GetSoundLocation(i);
+            sound->z += PLAYER_JUMP_HEIGHT;
+            if (sound && sound->DistTo(g_pLocalPlayer->v_Eye) < best_dist && (IsVectorVisible(g_pLocalPlayer->v_Eye, *sound, true) || sound->DistTo(g_pLocalPlayer->v_Eye) <= 400.0f))
+            {
+                best_dist = sound->DistTo(g_pLocalPlayer->v_Eye);
+                look_vec  = sound;
+            }
+        }
+        if (look_vec)
+        {
+            Vector aim_ang = GetAimAtAngles(g_pLocalPlayer->v_Eye, *look_vec);
+            hacks::misc_aimbot::DoSlowAim(aim_ang, 20);
+            current_user_cmd->viewangles = aim_ang;
+        }
+        else
+        {
+            static Vector next{ crumbs[0].vec.x, crumbs[0].vec.y, g_pLocalPlayer->v_Eye.z };
+            static bool looked_at_point = true;
+            static Timer choose_new_point;
+
+            static int wait_time = 1000;
+            static int aim_speed = 10;
+
+            if (looked_at_point && choose_new_point.test_and_set(wait_time))
+            {
+                next = { crumbs[0].vec.x, crumbs[0].vec.y, g_pLocalPlayer->v_Eye.z };
+                next = GetAimAtAngles(g_pLocalPlayer->v_Eye, next);
+                next.x += UniformRandomInt(-1, 1);
+                next.y += UniformRandomInt(-45, 45);
+                fClampAngle(next);
+                looked_at_point = false;
+            }
+
+            if ((current_user_cmd->viewangles - next).IsZero(10.0f))
+            {
+                if (!looked_at_point)
+                    choose_new_point.update();
+                looked_at_point = true;
+                wait_time       = 750 + UniformRandomInt(0, 4000);
+                aim_speed       = 10 + UniformRandomInt(0, 2);
+            }
+
+            Vector next_slow = next;
+            hacks::misc_aimbot::DoSlowAim(next_slow, aim_speed);
+            current_user_cmd->viewangles = next_slow;
+        }
     }
 
     WalkTo(current_vec);

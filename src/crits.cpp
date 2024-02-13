@@ -240,6 +240,8 @@ static int nextCritTick(int loops = 4096)
 static bool randomCritEnabled()
 {
     static ConVar *tf_weapon_criticals = g_ICvar->FindVar("tf_weapon_criticals");
+    if (!tf_weapon_criticals)
+        return false;
     return tf_weapon_criticals->GetBool();
 }
 

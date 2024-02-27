@@ -1,6 +1,6 @@
 #include "config.h"
 #include "common.hpp"
-#include "libnullnexus/nullnexus.hpp"
+#include "libnullnexus/include/nullnexus.hpp"
 #include "nullnexus.hpp"
 #include "netadr.h"
 #if ENABLE_VISUALS

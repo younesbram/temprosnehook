@@ -22,6 +22,3 @@
 [submodule "external/MicroPather"]
 	path = external/MicroPather
 	url = https://github.com/explowz/MicroPather.git
-[submodule "external/libnullnexus"]
-	path = external/libnullnexus
-	url = https://github.com/cinortaxeh/libnullnexus

@@ -21,6 +21,7 @@ static settings::Boolean look_legit{ "nav.look-at-path-legit", "false" };
 static settings::Boolean crazyjump{ "nav.crazy-jump", "false" };
 static settings::Boolean draw_debug_areas("nav.draw.debug-areas", "false");
 static settings::Boolean log_pathing{ "nav.log", "false" };
+static settings::Boolean move_during_setup_blu("nav.path-during-setup", "false");
 static settings::Int stuck_time{ "nav.stuck-time", "750" };
 static settings::Int aim_speed{ "nav.smooth-speed", "7" };
 static settings::Int vischeck_cache_time{ "nav.vischeck-cache.time", "240" };
@@ -445,10 +446,13 @@ bool isReady()
         return false;
 
     std::string level_name = GetLevelName();
-    return *enabled && map && map->state == NavState::Active && (level_name == "plr_pipeline" || TFGameRules()->State_Get() > CGameRules::GR_STATE_PREROUND) &&
-           !(g_pLocalPlayer->team == TEAM_BLU && (TFGameRules()->InSetup() ||
-                                                  // FIXME: If we're on a control point map, and blue is the attacking team, then the gates are closed, so we shouldn't path
-                                                  (TFGameRules()->IsInWaitingForPlayers() && (level_name.starts_with("pl_") || level_name.starts_with("cp_")))));
+    if (!move_during_setup_blu)
+    {
+        return *enabled && map && map->state == NavState::Active && (level_name == "plr_pipeline" || TFGameRules()->State_Get() > CGameRules::GR_STATE_PREROUND) &&
+            !(g_pLocalPlayer->team == TEAM_BLU && (TFGameRules()->InSetup() ||
+                                                    // FIXME: If we're on a control point map, and blue is the attacking team, then the gates are closed, so we shouldn't path
+                                                    (TFGameRules()->IsInWaitingForPlayers() && (level_name.starts_with("pl_") || level_name.starts_with("cp_")))));
+    }
 }
 
 bool isPathing()
@@ -884,11 +888,14 @@ static void CreateMove()
 
     // Still in setup If on fitting team and map, do not path yet
     std::string level_name = GetLevelName();
-    if (g_pLocalPlayer->team == TEAM_BLU && (TFGameRules()->InSetup() || TFGameRules()->IsInWaitingForPlayers() && (level_name.starts_with("pl_") || level_name.starts_with("cp_"))))
+    if (!move_during_setup_blu)
     {
-        if (navparser::NavEngine::isPathing())
-            navparser::NavEngine::cancelPath();
-        return;
+        if (g_pLocalPlayer->team == TEAM_BLU && (TFGameRules()->InSetup() || TFGameRules()->IsInWaitingForPlayers() && (level_name.starts_with("pl_") || level_name.starts_with("cp_"))))
+        {
+            if (navparser::NavEngine::isPathing())
+                navparser::NavEngine::cancelPath();
+            return;
+        }
     }
 
     if (*vischeck_runtime)

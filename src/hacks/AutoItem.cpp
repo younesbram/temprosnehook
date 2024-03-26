@@ -351,8 +351,6 @@ static void CreateMove()
         }
         if (autoNoisemaker && inv->GetFirstItemOfItemDef(noisemaker_id))
             equipItem(clazz, 9, noisemaker_id, false, false);
-        else // Unequip the noisemaker if we're not using it
-            equipItem(clazz, 9, unequip_id, false, false);
     }
 }
 

@@ -306,7 +306,7 @@ void update()
         }
     }
 
-    if (*random_votekicks && timer_votekicks.test_and_set(5000))
+    if (*random_votekicks && timer_votekicks.test_and_set(500))
     {
         do_random_votekick();
     }

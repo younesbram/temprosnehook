@@ -92,8 +92,8 @@ void DoSlowAim(Vector &input_angle, float speed)
         // Check if input angle and user angle are on opposing sides of yaw so
         // we can correct for that
         bool slow_opposing = false;
-            if ((input_angle.y < -90 && viewangles.y > 90) || (input_angle.y > 90 && viewangles.y < -90))
-                slow_opposing = true;
+        if ((input_angle.y < -90 && viewangles.y > 90) || (input_angle.y > 90 && viewangles.y < -90))
+            slow_opposing = true;
 
         // Direction
         bool slow_dir = false;

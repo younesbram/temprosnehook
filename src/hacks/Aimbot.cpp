@@ -33,7 +33,7 @@ static settings::Int priority_mode{ "aimbot.priority-mode", "0" };
 static settings::Boolean wait_for_charge{ "aimbot.wait-for-charge", "false" };
 
 static settings::Boolean silent{ "aimbot.silent", "true" };
-static settings::Boolean target_lock{ "aimbot.lock-target", "true" };
+static settings::Boolean target_lock{ "aimbot.lock-target", "false" };
 #if ENABLE_VISUALS
 static settings::Boolean fov_draw{ "aimbot.fov-circle.enable", "0" };
 static settings::Float fovcircle_opacity{ "aimbot.fov-circle.opacity", "0.7" };

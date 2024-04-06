@@ -6,7 +6,7 @@
 
 ## Support
 
-https://dsc.gg/rosnehook
+[Discord Server](https://discord.gg/XqBRXE5QVy)
 
 ## Download Rosnehook
 

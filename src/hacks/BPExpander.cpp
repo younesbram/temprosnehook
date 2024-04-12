@@ -5,7 +5,7 @@
 #include "reclasses.hpp"
 #include "HookedMethods.hpp"
 
-static settings::Boolean enabled{ "misc.backpack-expander.enabled", "true" };
+static settings::Boolean enabled{ "misc.backpack-expander.enabled", "false" };
 static settings::Int slot_count{ "misc.backpack-expander.slot-count", "3000" };
 namespace hooked_methods
 {

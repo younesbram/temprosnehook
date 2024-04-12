@@ -15,7 +15,7 @@ namespace hacks::spam
 static settings::Int spam_source{ "spam.source", "0" };
 static settings::Boolean random_order{ "spam.random", "0" };
 static settings::String filename{ "spam.filename", "spam.txt" };
-static settings::Int spam_delay{ "spam.delay", "800" };
+static settings::Int spam_delay{ "spam.delay", "8000" };
 static settings::Int voicecommand_spam{ "spam.voicecommand", "0" };
 static settings::Boolean teamname_spam{ "spam.teamname", "0" };
 static settings::String teamname_file{ "spam.teamname.file", "teamspam.txt" };
@@ -424,7 +424,7 @@ void init()
     reloadSpamFile();
 }
 
-const std::vector<std::string> builtin_default    = { "Rosnehook - BONES? well yes", "Rosnehook: We Love Bones!", "Rosnehook: Never Miss!", "Rosnehook: Darkstorm Code? No!", "Rosnehook: so private that valve will rat your pc just to check rosnehook code!", "Rosnehook: No Bloatware!", "Rosnehook: furry and pedo killer!", "Rosnehook: What is VAC?" };
+const std::vector<std::string> builtin_default    = { "Rosnehook - BONES? well yes", "Rosnehook: We Love Bones!", "Rosnehook: Never Miss!", "Rosnehook: Darkstorm Code? No!", "Rosnehook: Start hosting today! https://github.com/RosneBurgerworks", "Rosnehook: No Bloatware!", "Rosnehook: furry and pedo killer!", "Rosnehook: What is VAC?" };
 const std::vector<std::string> builtin_lennyfaces = { "( ͡° ͜ʖ ͡°)", "( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)", "ʕ•ᴥ•ʔ", "(▀̿Ĺ̯▀̿ ̿)", "( ͡°╭͜ʖ╮͡° )", "(ง'̀-'́)ง", "(◕‿◕✿)", "༼ つ  ͡° ͜ʖ ͡° ༽つ" };
 const std::vector<std::string> builtin_nonecore = { "NULL CORE - REDUCE YOUR RISK OF BEING OWNED!", "NULL CORE - WAY TO THE TOP!", "NULL CORE - BEST TF2 CHEAT!", "NULL CORE - NOW WITH BLACKJACK AND HOOKERS!", "NULL CORE - BUTTHURT IN 10 SECONDS FLAT!", "NULL CORE - WHOLE SERVER OBSERVING!", "NULL CORE - GET BACK TO PWNING!", "NULL CORE - WHEN PVP IS TOO HARDCORE!", "NULL CORE - CAN CAUSE KIDS TO RAGE!", "NULL CORE - F2P NOOBS WILL BE 100% NERFED!" };
 const std::vector<std::string> builtin_lmaobox  = { "GET GOOD, GET LMAOBOX!", "LMAOBOX - WAY TO THE TOP", "WWW.LMAOBOX.NET - BEST FREE TF2 HACK!" };

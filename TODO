@@ -2,7 +2,4 @@ Help rosne consistantly take showers, he still smells (TOP PRIORITY)
 
 Fix the problems that rosne commits/creates (SECOND PRIORITY)
 
-Remove boost xd
-
-Debloat the hell out of createmove in hooks (dont this this is possible) 
-
+Fix that one crash from autoitem relating to CEconItemView::UUID() in ctfinventorymanager

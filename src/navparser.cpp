@@ -18,10 +18,9 @@ static settings::Boolean enabled("nav.enabled", "false");
 static settings::Boolean draw("nav.draw", "false");
 static settings::Boolean look{ "nav.look-at-path", "false" };
 static settings::Boolean look_legit{ "nav.look-at-path-legit", "false" };
-static settings::Boolean crazyjump{ "nav.crazy-jump", "false" };
 static settings::Boolean draw_debug_areas("nav.draw.debug-areas", "false");
 static settings::Boolean log_pathing{ "nav.log", "false" };
-static settings::Int stuck_time{ "nav.stuck-time", "750" };
+static settings::Int stuck_time{ "nav.stuck-time", "200" };
 static settings::Int aim_speed{ "nav.smooth-speed", "7" };
 static settings::Int vischeck_cache_time{ "nav.vischeck-cache.time", "240" };
 static settings::Boolean vischeck_runtime{ "nav.vischeck-runtime.enabled", "true" };
@@ -681,28 +680,19 @@ static void followCrumbs()
                 crouch = false;
                 last_jump.update();
             }
-
-            if (!hacks::antiaim::isEnabled() && *crazyjump)
-            {
-                // Do a flip to avoid getting stuck on edges
-                Vector flip{ g_pLocalPlayer->v_OrigViewangles.x, g_pLocalPlayer->v_OrigViewangles.y + 180.0f, g_pLocalPlayer->v_Eye.z };
-                current_user_cmd->viewangles = flip;
-                *bSendPackets                = true;
-            }
         }
     }
 
-    // Look at path (nav spin) (smooth nav)
+    // Look at path
     if (*look && !hacks::aimbot::IsAiming())
     {
         Vector next{ crumbs[0].vec.x, crumbs[0].vec.y, g_pLocalPlayer->v_Eye.z };
         next = GetAimAtAngles(g_pLocalPlayer->v_Eye, next);
-        // activate nav spin and smoothen
+        // Nav smoothen
         hacks::misc_aimbot::DoSlowAim(next, *aim_speed);
         current_user_cmd->viewangles = next, *aim_speed;
     }
 
-    // omegatronic legit bot
     if (look_legit && !hacks::aimbot::IsAiming())
     {
         float best_dist                = FLT_MAX;

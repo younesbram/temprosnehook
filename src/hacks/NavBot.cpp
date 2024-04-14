@@ -23,7 +23,7 @@ static settings::Boolean stay_near("navbot.stay-near", "true");
 static settings::Boolean capture_objectives("navbot.capture-objectives", "true");
 static settings::Boolean defend_during_roam("navbot.defend-roam", "true");
 static settings::Boolean snipe_sentries("navbot.snipe-sentries", "true");
-static settings::Boolean snipe_sentries_shortrange("navbot.snipe-sentries.shortrange", "true");
+static settings::Boolean snipe_sentries_shortrange("navbot.snipe-sentries.shortrange", "false");
 static settings::Boolean escape_danger("navbot.escape-danger", "true");
 static settings::Boolean escape_danger_ctf_cap("navbot.escape-danger.ctf-cap", "false");
 static settings::Boolean enable_slight_danger_when_capping("navbot.escape-danger.slight-danger.capping", "false");
@@ -954,7 +954,7 @@ bool snipeSentries()
         return false;
 
     // Sentries don't move often, so we can use a slightly longer timer
-    if (!sentry_snipe_cooldown.test_and_set(3000))
+    if (!sentry_snipe_cooldown.test_and_set(5000))
         return navparser::NavEngine::current_priority == snipe_sentry || isSnipeTargetValid(previous_target);
 
     if (isSnipeTargetValid(previous_target))
@@ -1157,7 +1157,7 @@ std::optional<Vector> getCtfGoal(int our_team, int enemy_team)
     current_capturetype = ctf;
 
     // Literally straight from Inithook: https://github.com/RosneBurgerworks/inithook/blob/master/src/hacks/NavBot.cpp#L891
-    // Assist other bots with capturing - low priority
+    // Assist other bots with capturing
     if (status == TF_FLAGINFO_STOLEN && carrier != LOCAL_E)
     {
         if (!player_tools::shouldTargetSteamId(carrier->player_info->friendsID))
@@ -1193,7 +1193,7 @@ std::optional<Vector> getPayloadGoal(int our_team)
     if (g_pLocalPlayer->v_Origin.DistToSqr(*position) <= Sqr(150.0f))
         position->z = LOCAL_E->m_vecOrigin().z;
     // If close enough, don't move (mostly due to lifts)
-    if (position->DistToSqr(g_pLocalPlayer->v_Origin) <= Sqr(50.0f))
+    if (position->DistToSqr(g_pLocalPlayer->v_Origin) <= Sqr(15.0f))
     {
         overwrite_capture = true;
         return std::nullopt;
@@ -1389,6 +1389,14 @@ bool escapeDanger()
 
 static int slot = primary;
 
+// should we even have melee out?
+static bool CheckMelee(CachedEntity *ent)
+{
+    if (!ent->m_bAlivePlayer() || IsPlayerInvulnerable(ent))
+        return false;
+    return true;
+}
+
 static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &nearest)
 {
     if (*force_slot)
@@ -1411,7 +1419,7 @@ static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &ne
     }
     case tf_sniper:
     {
-        if (nearest.second <= 200.0f && !IsPlayerInvulnerable(nearest.first) && nearest.first->IsVisible())
+        if (nearest.second <= 200.0f && CheckMelee(nearest.first) && nearest.first->IsVisible())
             return melee;
         else if (nearest.second <= 300.0f && nearest.first->m_iHealth() < 75)
             return secondary;

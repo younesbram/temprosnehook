@@ -29,7 +29,7 @@ static settings::Int auto_strafe{ "misc.autostrafe", "2" };
 #else
 static settings::Int auto_strafe{ "misc.autostrafe", "0" };
 #endif
-static settings::Boolean nopush_enabled{ "misc.no-push", "true" };
+static settings::Boolean nopush_enabled{ "misc.no-push", "false" };
 static settings::Boolean force_wait{ "misc.force-enable-wait", "true" };
 #if ENABLE_VISUALS
 static settings::Boolean debug_info{ "misc.debug-info", "false" };

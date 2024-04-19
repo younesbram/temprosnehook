@@ -1419,7 +1419,7 @@ static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &ne
     }
     case tf_sniper:
     {
-        if (nearest.second <= 200.0f && CheckMelee(nearest.first) && nearest.first->IsVisible())
+        if (nearest.second <= 350.0f && CheckMelee(nearest.first) && nearest.first->IsVisible())
             return melee;
         else if (nearest.second <= 300.0f && nearest.first->m_iHealth() < 75)
             return secondary;
@@ -1432,6 +1432,8 @@ static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &ne
     {
         if (nearest.second > 450.0f && active_slot == secondary)
             return active_slot;
+        if (nearest.second <= 300.0f && CheckMelee(nearest.first) && nearest.first->IsVisible())
+            return melee;
         else if (nearest.second <= 550.0f)
             return primary;
         else
@@ -1439,6 +1441,8 @@ static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &ne
     }
     case tf_soldier:
     {
+        if (nearest.second <= 300.0f && CheckMelee(nearest.first) && nearest.first->IsVisible())
+            return melee;
         if (nearest.second <= 200.0f)
             return secondary;
         else if (nearest.second <= 300.0f)
@@ -1462,6 +1466,8 @@ static slots getBestSlot(slots active_slot, std::pair<CachedEntity *, float> &ne
     }
     default:
     {
+        if (nearest.second <= 300.0f && CheckMelee(nearest.first) && nearest.first->IsVisible())
+            return melee;
         if (nearest.second <= 400.0f)
             return secondary;
         else if (nearest.second <= 500.0f)

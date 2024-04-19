@@ -425,6 +425,8 @@ static void CreateMove()
     bool should_zoom         = *auto_zoom;
     switch (weapon_mode)
     {
+    case weapon_projectile:
+    case weapon_throwable:
     case weapon_hitscan:
         if (should_backtrack)
             UpdateShouldBacktrack();

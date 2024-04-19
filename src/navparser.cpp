@@ -445,9 +445,7 @@ bool isReady()
 
     std::string level_name = GetLevelName();
     return *enabled && map && map->state == NavState::Active &&
-           !(g_pLocalPlayer->team == TEAM_BLU && (TFGameRules()->InSetup() ||
-                                                  // FIXME: If we're on a control point map, and blue is the attacking team, then the gates are closed, so we shouldn't path
-                                                  (TFGameRules()->IsInWaitingForPlayers() && (level_name.starts_with("pl_") || level_name.starts_with("cp_")))));
+           !(g_pLocalPlayer->team == TEAM_BLU && (TFGameRules()->InSetup() && (level_name.starts_with("pl_") || level_name.starts_with("cp_"))));
 }
 
 bool isPathing()
@@ -788,8 +786,8 @@ static Timer blacklist_check_timer{};
 // Check if one of the crumbs is suddenly blacklisted
 void checkBlacklist()
 {
-    // Only check every 500ms
-    if (!blacklist_check_timer.test_and_set(500))
+    // Only check every 1500ms
+    if (!blacklist_check_timer.test_and_set(1500))
         return;
 
     // Local player is ubered and does not care about the blacklist
@@ -874,7 +872,7 @@ static void CreateMove()
 
     // Still in setup If on fitting team and map, do not path yet
     std::string level_name = GetLevelName();
-    if (g_pLocalPlayer->team == TEAM_BLU && (TFGameRules()->InSetup() || TFGameRules()->IsInWaitingForPlayers() && (level_name.starts_with("pl_") || level_name.starts_with("cp_"))))
+    if (g_pLocalPlayer->team == TEAM_BLU && (TFGameRules()->InSetup() && (level_name.starts_with("pl_") || level_name.starts_with("cp_"))))
     {
         if (navparser::NavEngine::isPathing())
             navparser::NavEngine::cancelPath();

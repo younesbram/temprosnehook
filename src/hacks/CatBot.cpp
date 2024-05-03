@@ -22,6 +22,7 @@ namespace hacks::catbot
 settings::Int requeue_if_ipc_bots_gte{ "cat-bot.requeue-if.ipc-bots-gte", "0" };
 static settings::Int requeue_if_humans_lte{ "cat-bot.requeue-if.humans-lte", "0" };
 static settings::Int requeue_if_players_lte{ "cat-bot.requeue-if.players-lte", "0" };
+static settings::Boolean abandon_instead_requeue{ "cat-bot.abandon-instead", "false" };
 
 static settings::Boolean micspam{ "cat-bot.micspam.enable", "false" };
 static settings::Int micspam_on{ "cat-bot.micspam.interval-on", "1" };
@@ -398,8 +399,11 @@ void update()
                     waiting_for_quit_bool = false;
                     ipc_blacklist.clear();
 
-                    logging::Info("Requeuing because there are %d local players in game, and requeue_if_ipc_bots_gte is %d.", count_ipc, *requeue_if_ipc_bots_gte);
-                    tfmm::StartQueue();
+                    logging::Info("Requeuing/leaving because there are %d local players in game, and requeue_if_ipc_bots_gte is %d.", count_ipc, *requeue_if_ipc_bots_gte);
+                    if (*abandon_instead_requeue)
+                        tfmm::Abandon();
+                    else
+                        tfmm::StartQueue();
                     return;
                 }
                 else
@@ -433,8 +437,11 @@ void update()
         {
             if (count_total - count_ipc <=  *requeue_if_humans_lte)
             {
-                logging::Info("Abandoning because there are %d non-bots in game, and requeue_if_humans_lte is %d.", count_total - count_ipc, *requeue_if_humans_lte);
-                tfmm::StartQueue();
+                logging::Info("Requeuing/leaving because there are %d non-bots in game, and requeue_if_humans_lte is %d.", count_total - count_ipc, *requeue_if_humans_lte);
+                if (*abandon_instead_requeue)
+                    tfmm::Abandon();
+                else
+                    tfmm::StartQueue();
                 return;
             }
         }
@@ -442,8 +449,11 @@ void update()
         {
             if (count_total <= *requeue_if_players_lte)
             {
-                logging::Info("Requeuing because there are %d total players in game, and requeue_if_players_lte is %d.", count_total, *requeue_if_players_lte);
-                tfmm::StartQueue();
+                logging::Info("Requeuing/leaving because there are %d total players in game, and requeue_if_players_lte is %d.", count_total, *requeue_if_players_lte);
+                if (*abandon_instead_requeue)
+                    tfmm::Abandon();
+                else
+                    tfmm::StartQueue();
                 return;
             }
         }

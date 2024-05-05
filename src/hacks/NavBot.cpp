@@ -1215,7 +1215,7 @@ std::optional<Vector> getControlPointGoal(int our_team)
 
     current_capturetype = controlpoints;
     // If close enough, don't move
-    if (position->DistToSqr(LOCAL_E->m_vecOrigin()) <= Sqr(50.0f))
+    if ((position->DistToSqr(LOCAL_E->m_vecOrigin()) <= Sqr(50.0f)) && !*randomize_cpspot)
     {
         overwrite_capture = true;
         return std::nullopt;

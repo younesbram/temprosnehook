@@ -21,6 +21,7 @@ static settings::Boolean search_health("navbot.search-health", "true");
 static settings::Boolean search_ammo("navbot.search-ammo", "true");
 static settings::Boolean stay_near("navbot.stay-near", "true");
 static settings::Boolean capture_objectives("navbot.capture-objectives", "true");
+static settings::Boolean randomize_cpspot("navbot.randomize-cpspot", "true");
 static settings::Boolean defend_during_roam("navbot.defend-roam", "true");
 static settings::Boolean snipe_sentries("navbot.snipe-sentries", "true");
 static settings::Boolean snipe_sentries_shortrange("navbot.snipe-sentries.shortrange", "false");
@@ -1204,6 +1205,9 @@ std::optional<Vector> getPayloadGoal(int our_team)
 
 std::optional<Vector> getControlPointGoal(int our_team)
 {
+    static Vector previous_position(0.0f);
+    static Vector randomized_position(0.0f);
+
     auto position = cpcontroller::getClosestControlPoint(g_pLocalPlayer->v_Origin, our_team);
     // No points found :(
     if (!position)
@@ -1215,6 +1219,20 @@ std::optional<Vector> getControlPointGoal(int our_team)
     {
         overwrite_capture = true;
         return std::nullopt;
+    }
+    if (*randomize_cpspot)
+    {
+        // Randomize where on the point we walk a bit so bots don't just stand there
+        if (previous_position != *position || !navparser::NavEngine::isPathing())
+        {
+            previous_position   = *position;
+            randomized_position = *position;
+            randomized_position.x += RandomFloat(0.0f, 50.0f);
+            randomized_position.y += RandomFloat(0.0f, 50.0f);
+        }
+
+        // Try to navigate
+        return randomized_position;
     }
     else
         return position;

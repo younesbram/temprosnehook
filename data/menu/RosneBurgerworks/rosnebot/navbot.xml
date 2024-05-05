@@ -40,6 +40,7 @@
         <List width="150">
             <AutoVariable width="fill" target="nav.stuck-time" label="Nav stuck time" tooltip="Time in milliseconds the bot is stuck until re-path"/>
             <AutoVariable width="fill" target="nav.smooth-speed" label="Nav smoothen speed" tooltip="How smooth look at path is"/>
+            <AutoVariable width="fill" target="navbot.randomize-cpspot" label="Randomize spot on control point" tooltip="For KOTH and CP"/>
             <AutoVariable width="fill" target="nav.vischeck-runtime.enabled" label="Nav vischeck"/>
             <AutoVariable width="fill" target="nav.vischeck-cache.time" label="Nav visc time"/>
             <AutoVariable width="fill" target="nav.crumb-tollerance" label="Nav crumb"/>

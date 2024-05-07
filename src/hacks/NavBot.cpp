@@ -1227,8 +1227,8 @@ std::optional<Vector> getControlPointGoal(int our_team)
         {
             previous_position   = *position;
             randomized_position = *position;
-            randomized_position.x += RandomFloat(0.0f, 50.0f);
-            randomized_position.y += RandomFloat(0.0f, 50.0f);
+            randomized_position.x += RandomFloat(0.0f, 100.0f);
+            randomized_position.y += RandomFloat(0.0f, 100.0f);
         }
 
         // Try to navigate

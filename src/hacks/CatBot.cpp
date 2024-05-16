@@ -343,7 +343,7 @@ void update()
                 --count_total;
             }
 
-            if (playerlist::AccessData(info.friendsID).state == playerlist::k_EState::IPC || playerlist::AccessData(info.friendsID).state == playerlist::k_EState::TEXTMODE || playerlist::AccessData(info.friendsID).state == playerlist::k_EState::CAT)
+            if (playerlist::AccessData(info.friendsID).state == playerlist::k_EState::IPC || playerlist::AccessData(info.friendsID).state == playerlist::k_EState::TEXTMODE || playerlist::AccessData(info.friendsID).state == playerlist::k_EState::CAT || playerlist::AccessData(info.friendsID).state == playerlist::k_EState::FRIEND)
             {
                 ipc_list.push_back(info.friendsID);
                 ++count_ipc;

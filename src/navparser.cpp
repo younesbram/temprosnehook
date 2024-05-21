@@ -21,7 +21,7 @@ static settings::Boolean look_legit{ "nav.look-at-path-legit", "false" };
 static settings::Boolean draw_debug_areas("nav.draw.debug-areas", "false");
 static settings::Boolean log_pathing{ "nav.log", "false" };
 static settings::Int stuck_time{ "nav.stuck-time", "400" };
-static settings::Int aim_speed{ "nav.smooth-speed", "4" }; // default nav smooth from nullworks.
+static settings::Int aim_speed{ "nav.smooth-speed", "7" };
 static settings::Int vischeck_cache_time{ "nav.vischeck-cache.time", "240" };
 static settings::Boolean vischeck_runtime{ "nav.vischeck-runtime.enabled", "true" };
 static settings::Int vischeck_time{ "nav.vischeck-runtime.delay", "2000" };

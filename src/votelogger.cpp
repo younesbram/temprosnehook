@@ -8,6 +8,8 @@
 #include "common.hpp"
 #include <boost/algorithm/string.hpp>
 #include <settings/Bool.hpp>
+#include <cstdlib>
+#include <ctime>
 #include "CatBot.hpp"
 #include "votelogger.hpp"
 
@@ -18,6 +20,7 @@ static settings::Boolean chat{ "votelogger.chat", "true" };
 static settings::Boolean chat_partysay{ "votelogger.chat.partysay", "false" };
 static settings::Boolean chat_casts{ "votelogger.chat.casts", "false" };
 static settings::Boolean f2pleaseimnotbot{ "votelogger.f2please", "false" };
+static settings::Boolean legitmode{ "votelogger.legitmode", "false" };
 static settings::Boolean saywhenimkickingaskid{ "votelogger.kicksay", "false" };
 static settings::Boolean chat_casts_f1_only{ "votelogger.chat.casts.f1-only", "true" };
 static settings::Boolean requeue_on_kick{ "votelogger.requeue-on-kick", "false" };
@@ -28,6 +31,40 @@ namespace votelogger
 {
 static bool was_local_player{ false };
 static Timer local_kick_timer{};
+
+static const std::vector<std::string> f2_phrases =
+{
+    "f2??",
+    "BRO WHY KICK",
+    "bro",
+    "vote no please",
+    "f2 please"
+};
+
+static const std::vector<std::string> f1_phrases =
+{
+    "f1 bot",
+    "f1 cheater",
+    "hes a bot",
+    "vote yes",
+    "f1 hacks"
+};
+
+static const std::vector<std::string> friendly_f1 =
+{
+    "kick bot",
+    "kick the bot",
+    "pls kick them",
+    "kick",
+    "kick the cheater"
+};
+
+static std::string getRandomPhrase(const std::vector<std::string>& phrases) // blah blah blah seeding whatever (i dont know how to use mt19937)
+{
+    std::srand(std::time(nullptr));
+    int index = std::rand() % phrases.size();
+    return phrases[index];
+}
 
 static void vote_rage_back()
 {
@@ -105,6 +142,14 @@ void dispatchUserMessage(bf_read &buffer, int type)
         player_info_s info{}, info2{};
         if (!GetPlayerInfo(target, &info) || !GetPlayerInfo(caller, &info2))
             break;
+        
+        using namespace playerlist;
+
+        auto &pl             = AccessData(info.friendsID);
+        auto &pl_caller      = AccessData(info2.friendsID);
+        bool friendly_kicked = pl.state != k_EState::RAGE && pl.state != k_EState::DEFAULT;
+        bool friendly_caller = pl_caller.state != k_EState::RAGE && pl_caller.state != k_EState::DEFAULT;
+
 
         auto team_name = teamname(team);
         logging::Info("[%s] Vote called to kick %s [U:1:%u] for %s by %s [U:1:%u]", team_name, info.name, info.friendsID, reason, info2.name, info2.friendsID);
@@ -117,29 +162,33 @@ void dispatchUserMessage(bf_read &buffer, int type)
 
             if (*f2pleaseimnotbot)
             {
-                chat_stack::Say("f2 bro wtf", true);
+                if (*legitmode)
+                    chat_stack::Say(getRandomPhrase(f2_phrases).c_str(), true);
+                else
+                    chat_stack::Say("f2 bro wtf", true);
             }
             was_local_player = true;
             local_kick_timer.update();
+        }
+
+        if (friendly_caller && *legitmode)
+        {
+            chat_stack::Say(getRandomPhrase(friendly_f1).c_str());
         }
         
         if (info2.friendsID == g_ISteamUser->GetSteamID().GetAccountID())
         {
             if (*saywhenimkickingaskid)
             {
-                chat_stack::Say("f1 cheater/bot", true);
+                if (*legitmode)
+                    chat_stack::Say(getRandomPhrase(f1_phrases).c_str(), true);
+                else
+                    chat_stack::Say("f1 cheater/bot", true);
             }
         }
 
         if (*vote_kickn || *vote_kicky)
         {
-            using namespace playerlist;
-
-            auto &pl             = AccessData(info.friendsID);
-            auto &pl_caller      = AccessData(info2.friendsID);
-            bool friendly_kicked = pl.state != k_EState::RAGE && pl.state != k_EState::DEFAULT;
-            bool friendly_caller = pl_caller.state != k_EState::RAGE && pl_caller.state != k_EState::DEFAULT;
-
             if (*vote_kickn && friendly_kicked)
             {
                 vote_command = { strfmt("vote %d option2", vote_id).get(), 0 };  // Set the delay to 0

@@ -16,6 +16,7 @@ DEFINE_HOOKED_METHOD(Shutdown, void, INetChannel *this_, const char *reason)
 {
     g_Settings.bInvalid = true;
     logging::Info("Disconnect: %s", reason);
+    g_IEngine->ClientCmd_Unrestricted("alias sniperragefromlegitbot");
 #if ENABLE_IPC
     ipc::UpdateServerAddress(true);
 #endif
